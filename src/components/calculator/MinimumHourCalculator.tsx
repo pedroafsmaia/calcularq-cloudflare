@@ -1,0 +1,229 @@
+import { useState, useMemo, useEffect } from "react";
+import { Calculator } from "lucide-react";
+import ExpenseCard, { Expense } from "./ExpenseCard";
+
+interface MinimumHourCalculatorProps {
+  initialFixedExpenses?: Expense[];
+  initialProLabore?: number;
+  initialProductiveHours?: number;
+  onProLaboreChange?: (value: number) => void;
+  onCalculate: (minHourRate: number) => void;
+  initialMinHourRate?: number;
+  onFixedExpensesChange?: (expenses: Expense[]) => void;
+  onProductiveHoursChange?: (hours: number) => void;
+}
+
+export default function MinimumHourCalculator({ 
+  onCalculate, 
+  initialMinHourRate,
+  onFixedExpensesChange,
+  onProductiveHoursChange,
+  onProLaboreChange,
+  initialFixedExpenses,
+  initialProLabore,
+  initialProductiveHours,
+}: MinimumHourCalculatorProps) {
+  const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
+  const [proLabore, setProLabore] = useState(initialProLabore || 0);
+  const [productiveHours, setProductiveHours] = useState(initialProductiveHours || 0);
+  const [manualMinHourRate, setManualMinHourRate] = useState<number | undefined>(initialMinHourRate);
+  const [useManual, setUseManual] = useState(!!initialMinHourRate);
+
+  const calculatedMinHourRate = useMemo(() => {
+    if (useManual && manualMinHourRate !== undefined) {
+      return manualMinHourRate;
+    }
+    const totalExpenses = fixedExpenses.reduce((sum, exp) => sum + exp.value, 0);
+    if (productiveHours === 0) return 0;
+    return (totalExpenses + proLabore) / productiveHours;
+  }, [fixedExpenses, proLabore, productiveHours, useManual, manualMinHourRate]);
+
+
+  // Sincronizar valores iniciais (quando carrega um cálculo salvo)
+  useEffect(() => {
+    if (initialFixedExpenses) {
+      setFixedExpenses(initialFixedExpenses);
+      onFixedExpensesChange?.(initialFixedExpenses);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialFixedExpenses || [])]);
+
+  useEffect(() => {
+    if (typeof initialProLabore === 'number') {
+      setProLabore(initialProLabore);
+      onProLaboreChange?.(initialProLabore);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProLabore]);
+
+  useEffect(() => {
+    if (typeof initialProductiveHours === 'number') {
+      setProductiveHours(initialProductiveHours);
+      onProductiveHoursChange?.(initialProductiveHours);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProductiveHours]);
+
+  const handleAddExpense = (expense: Expense) => {
+    const updated = [...fixedExpenses, expense];
+    setFixedExpenses(updated);
+    onFixedExpensesChange?.(updated);
+  };
+
+  const handleRemoveExpense = (id: string) => {
+    const updated = fixedExpenses.filter((exp) => exp.id !== id);
+    setFixedExpenses(updated);
+    onFixedExpensesChange?.(updated);
+  };
+
+  const handleUpdateExpense = (id: string, updates: Partial<Expense>) => {
+    const updated = fixedExpenses.map((exp) => (exp.id === id ? { ...exp, ...updates } : exp));
+    setFixedExpenses(updated);
+    onFixedExpensesChange?.(updated);
+  };
+
+  const handleCalculate = () => {
+    onCalculate(calculatedMinHourRate);
+  };
+
+  // Calcular automaticamente quando valores mudarem
+  useEffect(() => {
+    if (!useManual && calculatedMinHourRate > 0) {
+      handleCalculate();
+    } else if (useManual && manualMinHourRate !== undefined && manualMinHourRate > 0) {
+      handleCalculate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calculatedMinHourRate, useManual, manualMinHourRate]);
+
+  // Garantir que sempre haja pelo menos um card de despesa fixa
+  useEffect(() => {
+    if (!useManual && fixedExpenses.length === 0) {
+      handleAddExpense({ id: Date.now().toString(), name: "", value: 0 });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
+          <Calculator className="w-5 h-5 text-calcularq-blue" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-calcularq-blue">
+            Calculadora da Hora Técnica Mínima
+          </h2>
+          <p className="text-sm text-slate-500 mt-1">
+            Preencha os dados do seu escritório para descobrir o valor da sua hora técnica
+            mínima.
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {/* Opção Manual */}
+        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
+          <input
+            type="checkbox"
+            id="useManual"
+            checked={useManual}
+            onChange={(e) => setUseManual(e.target.checked)}
+            className="w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
+          />
+          <label htmlFor="useManual" className="text-sm font-medium text-slate-700">
+            Já sei a minha hora técnica mínima.
+          </label>
+        </div>
+
+        {useManual ? (
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Hora Técnica Mínima (R$/hora)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
+                R$
+              </span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={manualMinHourRate || ""}
+                onChange={(e) => setManualMinHourRate(Number(e.target.value))}
+                className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
+                placeholder="0,00"
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Despesas Fixas */}
+            <ExpenseCard
+              expenses={fixedExpenses}
+              onAdd={handleAddExpense}
+              onRemove={handleRemoveExpense}
+              onUpdate={handleUpdateExpense}
+              placeholder="Ex: Aluguel, Contador..."
+              label="Despesas Fixas Mensais (R$)"
+            />
+
+            {/* Pró-labore Mínimo */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Pró-labore Mínimo (R$)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
+                  R$
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={proLabore || ""}
+                  onChange={(e) => { const v = Number(e.target.value); setProLabore(v); onProLaboreChange?.(v); }}
+                  className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+
+            {/* Horas Produtivas Mensais */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Horas Produtivas Mensais
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                  value={productiveHours || ""}
+                  onChange={(e) => {
+                    const hours = Number(e.target.value);
+                    setProductiveHours(hours);
+                    onProductiveHoursChange?.(hours);
+                  }}
+                className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
+                placeholder="0"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Resultado */}
+        <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-calcularq-blue">Hora Técnica Mín. (R$/hora):</span>
+            <span className="text-2xl font-bold text-calcularq-blue">
+              R$ {calculatedMinHourRate.toLocaleString("pt-BR", { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+              })}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,9 @@
+name = "calcularq"
+compatibility_date = "2026-02-20"
+
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "calcularq"
+database_id = "REPLACE_ME_WITH_YOUR_D1_DATABASE_ID"
