@@ -98,7 +98,7 @@ export const termsContent = `
           </p>
           <p class="mt-2">
             Nesta hipótese, o LICENCIADO deverá formalizar o pedido de cancelamento através do
-            e-mail atendimento.calcularq@gmail.com, sendo garantido o reembolso integral do valor
+            e-mail atendimento@calcularq.com.br, sendo garantido o reembolso integral do valor
             pago.
           </p>
         </div>
@@ -285,12 +285,6 @@ export const privacyContent = `
             submetida a hashing criptográfico) e os registros de conexão (Endereço IP, User-Agent,
             data e hora).
           </p>
-          <p class="text-slate-700 mb-2">
-            Na hipótese de o USUÁRIO optar pelo acesso via Login Social (integração com Google,
-            Facebook ou similares), o CONTROLADOR coletará os dados públicos de perfil autorizados
-            pelo USUÁRIO na plataforma de origem, limitando-se estritamente ao necessário para a
-            identificação e criação da conta (Nome, E-mail e Foto de Perfil).
-          </p>
           <p class="text-slate-700">
             O tratamento destes dados fundamenta-se no cumprimento de obrigação legal (Art. 7º, II,
             LGPD c/c Art. 15, Lei 12.965/14) e na necessidade para a execução de contrato (Art. 7º, V,
@@ -337,15 +331,10 @@ export const privacyContent = `
         localizados fora do território nacional.
       </p>
       <p class="text-slate-700 mb-3">
-        Os dados são hospedados na infraestrutura de nuvem da Oracle Corporation (Oracle
-        Cloud Infrastructure), que atua como provedora de serviços de computação e
+        Os dados são hospedados na infraestrutura de nuvem da Cloudflare, Inc. (Cloudflare
+        Pages e Cloudflare D1), que atua como provedora de serviços de computação e
         armazenamento de banco de dados. A transferência baseia-se em cláusulas contratuais
         padrão e protocolos globais de segurança.
-      </p>
-      <p class="text-slate-700 mb-3">
-        Os dados de autenticação via Login Social são compartilhados com os respectivos
-        provedores de identidade (ex: Google LLC, Meta Platforms Inc.) estritamente para fins de
-        verificação de credenciais.
       </p>
       <p class="text-slate-700">
         Os dados financeiros são processados pela Stripe Inc. (Global), para fins exclusivos de
@@ -406,7 +395,7 @@ export const privacyContent = `
         deverá entrar em contato através do canal oficial:
       </p>
       <p class="text-slate-700 font-semibold">
-        E-mail: atendimento.calcularq@gmail.com
+        E-mail: atendimento@calcularq.com.br
       </p>
       <p class="text-slate-700 mt-3">
         As solicitações serão recebidas, analisadas e respondidas dentro dos prazos legais
