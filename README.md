@@ -229,6 +229,23 @@ npx wrangler d1 execute calcularq --remote --command "DELETE FROM budgets WHERE 
 
 ---
 
+### Reembolso
+
+O prazo legal de reembolso é de 7 dias corridos a partir da data da compra, conforme o Código de Defesa do Consumidor.
+
+**Passo a passo:**
+
+1. Acesse o painel da Stripe em [dashboard.stripe.com](https://dashboard.stripe.com)
+2. Vá em **Payments** e localize o pagamento pelo email do cliente
+3. Clique no pagamento e depois em **Refund**
+4. Confirme o valor e o motivo
+
+O reembolso cai automaticamente no cartão do cliente em até 5 dias úteis. Após processar, revogue o acesso do usuário no banco:
+
+```bash
+npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 0, payment_date = NULL WHERE email = 'email@exemplo.com';"
+```
+
 ### Redefinição de senha
 
 **Ver tokens de redefinição de senha ativos:**
