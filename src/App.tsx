@@ -5,6 +5,7 @@ import Calculator from './pages/Calculator'
 import Manual from './pages/Manual'
 import Login from './pages/Login'
 import Payment from './pages/Payment'
+import PaymentClose from './pages/PaymentClose'
 import BudgetsHistory from './pages/BudgetsHistory'
 import ResetPassword from './pages/ResetPassword'
 import Layout from './components/Layout'
@@ -40,6 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/payment/close" element={<PaymentClose />} />
           <Route 
             path="/budgets" 
             element={
