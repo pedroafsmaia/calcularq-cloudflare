@@ -6,4 +6,4 @@ pages_build_output_dir = "./dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "calcularq"
-database_id = "REPLACE_ME_WITH_YOUR_D1_DATABASE_ID"
+database_id = "09b56d30-8386-41c4-9f29-f360d4a42a4b"
