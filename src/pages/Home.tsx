@@ -57,8 +57,8 @@ export default function Home() {
     },
     {
       icon: DollarSign,
-      title: "Investimento Mínimo",
-      description: "Solução de baixo custo para facilitar a precificação dos seus projetos de arquitetura."
+      title: "Preço Acessível",
+      description: "Acesso completo por um valor único e justo, sem mensalidades ou custos surpresa."
     },
     {
       icon: Zap,
@@ -125,7 +125,7 @@ export default function Home() {
                       data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
                       data-mode="shadow"
                       data-lazyload="false"
-                      style={{ display: 'block', width: '100%' }}
+                      style={{ display: 'block', width: '100%', transform: 'scale(1.3)', transformOrigin: 'center' }}
                     />
                   </div>
                   
@@ -263,10 +263,10 @@ export default function Home() {
             className="text-center"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-calcularq-blue mb-4">
-              Ajustes Finais
+              Como Funciona
             </h2>
             <p className="text-lg text-slate-700 mb-12 max-w-3xl mx-auto">
-              Adicione despesas variáveis, aplique descontos estratégicos e visualize instantaneamente o preço de venda final do seu projeto.
+              Em 3 passos simples você chega ao preço ideal do seu projeto, considerando suas despesas, a complexidade e os custos variáveis.
             </p>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
