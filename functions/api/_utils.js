@@ -23,7 +23,7 @@ function base64urlDecode(str) {
 
 // Password hashing using WebCrypto PBKDF2 (bcrypt is not available in Workers runtime)
 // Stored format: pbkdf2$sha256$<iterations>$<salt_b64url>$<hash_b64url>
-export async function hashPassword(password, iterations = 210_000) {
+export async function hashPassword(password, iterations = 100_000) {
   const enc = new TextEncoder();
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const keyMaterial = await crypto.subtle.importKey(
