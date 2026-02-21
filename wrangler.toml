@@ -7,3 +7,8 @@ pages_build_output_dir = "./dist"
 binding = "DB"
 database_name = "calcularq"
 database_id = "09b56d30-8386-41c4-9f29-f360d4a42a4b"
+
+[vars]
+FRONTEND_URL = "https://calcularq-cloudflare.pages.dev"
+REQUIRE_PAYMENT = "0"
+DEBUG_EMAIL_TOKENS = "1"
