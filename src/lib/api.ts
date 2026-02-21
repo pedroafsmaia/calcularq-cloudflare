@@ -19,6 +19,34 @@ const getApiBaseUrl = () => {
 
 const API_BASE_URL = getApiBaseUrl();
 
+export interface Budget {
+  id: string;
+  userId: string;
+  name: string;
+  clientName?: string;
+  projectName?: string;
+  data: {
+    minHourlyRate: number;
+    factors: Array<{ id: string; name: string; weight: number; level: number }>;
+    areaIntervals: Array<{ min: number; max: number | null; level: number }>;
+    selections: Record<string, number>;
+    estimatedHours: number;
+    fixedExpenses?: Array<{ id: string; name: string; value: number }>;
+    proLabore?: number;
+    productiveHours?: number;
+    commercialDiscount?: number;
+    variableExpenses: Array<{ id: string; name: string; value: number }>;
+    results: {
+      globalComplexity: number;
+      adjustedHourlyRate: number;
+      projectPrice: number;
+      finalSalePrice: number;
+    };
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface PaymentStatus {
   userId: string;
   hasPaid: boolean;
@@ -102,15 +130,15 @@ class ApiClient {
     return this.request('/api/auth/logout', { method: 'POST' });
   }
 
-  async listBudgets(): Promise<{ success: boolean; budgets: any[] }> {
+  async listBudgets(): Promise<{ success: boolean; budgets: Budget[] }> {
     return this.request('/api/budgets');
   }
 
-  async getBudget(id: string): Promise<{ success: boolean; budget: any }> {
+  async getBudget(id: string): Promise<{ success: boolean; budget: Budget }> {
     return this.request(`/api/budgets/${id}`);
   }
 
-  async saveBudget(payload: { id?: string; name: string; clientName?: string; projectName?: string; data: any }): Promise<{ success: boolean; budget: any }> {
+  async saveBudget(payload: { id?: string; name: string; clientName?: string; projectName?: string; data: any }): Promise<{ success: boolean; budget: Budget }> {
     return this.request('/api/budgets', { method: 'POST', body: JSON.stringify(payload) });
   }
 

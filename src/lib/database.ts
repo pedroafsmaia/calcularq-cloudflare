@@ -11,39 +11,13 @@ export interface User {
   createdAt: string;
 }
 
-export interface Budget {
-  id: string;
-  userId: string;
-  name: string;
-  clientName?: string;
-  projectName?: string;
-  data: {
-    minHourlyRate: number;
-    factors: Array<{ id: string; name: string; weight: number; level: number }>;
-    areaIntervals: Array<{ min: number; max: number | null; level: number }>;
-    selections: Record<string, number>;
-    estimatedHours: number;
-    fixedExpenses?: Array<{ id: string; name: string; value: number }>;
-    proLabore?: number;
-    productiveHours?: number;
-    commercialDiscount?: number;
-    variableExpenses: Array<{ id: string; name: string; value: number }>;
-    results: {
-      globalComplexity: number;
-      adjustedHourlyRate: number;
-      projectPrice: number;
-      finalSalePrice: number;
-    };
-  };
-  createdAt: string;
-  updatedAt: string;
-}
+// Orçamentos são gerenciados exclusivamente pelo backend (Cloudflare D1)
+// via src/lib/api.ts — não há armazenamento local de orçamentos.
 
 class LocalDatabase {
-  private budgetsKey = 'calcularq_budgets';
   private currentUserKey = 'calcularq_current_user';
 
-  // Sessão
+  // Sessão do usuário
   getCurrentUser(): User | null {
     const data = localStorage.getItem(this.currentUserKey);
     return data ? JSON.parse(data) : null;
@@ -55,36 +29,6 @@ class LocalDatabase {
 
   logout(): void {
     localStorage.removeItem(this.currentUserKey);
-  }
-
-  // Orçamentos
-  getBudgets(userId: string): Budget[] {
-    const data = localStorage.getItem(this.budgetsKey);
-    const allBudgets: Budget[] = data ? JSON.parse(data) : [];
-    return allBudgets.filter(b => b.userId === userId);
-  }
-
-  saveBudget(budget: Budget): void {
-    const data = localStorage.getItem(this.budgetsKey);
-    const budgets: Budget[] = data ? JSON.parse(data) : [];
-    const existingIndex = budgets.findIndex(b => b.id === budget.id);
-    if (existingIndex >= 0) {
-      budgets[existingIndex] = budget;
-    } else {
-      budgets.push(budget);
-    }
-    localStorage.setItem(this.budgetsKey, JSON.stringify(budgets));
-  }
-
-  deleteBudget(budgetId: string, userId: string): void {
-    const data = localStorage.getItem(this.budgetsKey);
-    const budgets: Budget[] = data ? JSON.parse(data) : [];
-    const filtered = budgets.filter(b => !(b.id === budgetId && b.userId === userId));
-    localStorage.setItem(this.budgetsKey, JSON.stringify(filtered));
-  }
-
-  getBudgetById(budgetId: string, userId: string): Budget | undefined {
-    return this.getBudgets(userId).find(b => b.id === budgetId);
   }
 
   // Atualizar dados do usuário na sessão local (após pagamento, etc.)
