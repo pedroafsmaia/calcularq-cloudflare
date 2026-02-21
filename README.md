@@ -286,6 +286,37 @@ npx wrangler d1 info calcularq --remote
 npx wrangler d1 export calcularq --remote --output=backup-$(date +%Y%m%d).sql
 ```
 
+## Gerenciamento de Chaves
+
+Todas as chaves de produção estão salvas no **Bitwarden** sob a entrada **"Calcularq - Produção"**.
+
+As chaves armazenadas são:
+
+| Chave | Onde encontrar se precisar recriar |
+|---|---|
+| `JWT_SECRET` | Gere um novo com: `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` |
+| `STRIPE_SECRET_KEY` | [dashboard.stripe.com](https://dashboard.stripe.com) → Developers → API Keys |
+| `STRIPE_PRICE_ID` | [dashboard.stripe.com](https://dashboard.stripe.com) → Products → seu produto |
+| `STRIPE_WEBHOOK_SECRET` | [dashboard.stripe.com](https://dashboard.stripe.com) → Developers → Webhooks |
+| `BREVO_API_KEY` | [app.brevo.com](https://app.brevo.com) → Settings → API Keys |
+
+**Para gerar um novo JWT_SECRET**, rode no terminal (funciona em qualquer pasta):
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+Copie o resultado, salve no Bitwarden e depois atualize no Cloudflare:
+```bash
+npx wrangler pages secret put JWT_SECRET --project-name calcularq-cloudflare
+```
+> ⚠️ Ao trocar o JWT_SECRET todos os usuários logados serão desconectados e precisarão fazer login novamente.
+
+**Para atualizar qualquer outra chave no Cloudflare:**
+```bash
+npx wrangler pages secret put NOME_DA_CHAVE --project-name calcularq-cloudflare
+```
+
+---
+
 ## Boas práticas para este repositório
 
 - **Nunca commite** chaves de API, senhas ou qualquer dado sensível
