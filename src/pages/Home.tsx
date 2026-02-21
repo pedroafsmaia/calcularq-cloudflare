@@ -125,7 +125,7 @@ export default function Home() {
                       data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
                       data-mode="shadow"
                       data-lazyload="false"
-                      style={{ display: 'block', width: '100%', transform: 'scale(1.3)', transformOrigin: 'center' }}
+                      style={{ display: 'block', width: '100%', transform: 'scale(1.2)', transformOrigin: 'center', margin: '0 auto' }}
                     />
                   </div>
                   
