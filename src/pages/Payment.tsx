@@ -374,15 +374,15 @@ export default function Payment() {
         )}
 
         <LegalModal
-          open={showTerms}
-          onOpenChange={setShowTerms}
+          isOpen={showTerms}
+          onClose={() => setShowTerms(false)}
           title="Termos de Uso"
           content={termsContent}
         />
 
         <LegalModal
-          open={showPrivacy}
-          onOpenChange={setShowPrivacy}
+          isOpen={showPrivacy}
+          onClose={() => setShowPrivacy(false)}
           title="Política de Privacidade"
           content={privacyContent}
         />
