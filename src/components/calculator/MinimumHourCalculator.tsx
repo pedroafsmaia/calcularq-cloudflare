@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Calculator } from "lucide-react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 
@@ -40,13 +40,19 @@ export default function MinimumHourCalculator({
 
 
   // Sincronizar valores iniciais (quando carrega um cálculo salvo)
+  // Usamos uma ref para disparar o efeito apenas quando o array realmente mudar,
+  // evitando o anti-pattern de JSON.stringify como dependência
+  const prevInitialExpensesRef = useRef<string>("");
   useEffect(() => {
+    const serialized = JSON.stringify(initialFixedExpenses || []);
+    if (serialized === prevInitialExpensesRef.current) return;
+    prevInitialExpensesRef.current = serialized;
     if (initialFixedExpenses) {
       setFixedExpenses(initialFixedExpenses);
       onFixedExpensesChange?.(initialFixedExpenses);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(initialFixedExpenses || [])]);
+  }, [initialFixedExpenses]);
 
   useEffect(() => {
     if (typeof initialProLabore === 'number') {
