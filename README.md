@@ -1,18 +1,22 @@
 # Calcularq
 
-Calculadora de precificação por complexidade para projetos de arquitetura. O arquiteto informa suas despesas, configura os fatores de complexidade do projeto e recebe o preço de venda ideal como resultado.
+Calculadora de precificação por complexidade para projetos de arquitetura.  
+O arquiteto informa suas despesas, configura os fatores de complexidade do projeto e recebe o preço de venda ideal como resultado.
 
-**Acesso:** [calcularq-cloudflare.pages.dev](https://calcularq-cloudflare.pages.dev)
+**Acesso:**  
+https://calcularq-cloudflare.pages.dev
 
 ---
 
 ## O que o sistema faz
 
-- Cadastro e login de usuários
-- Recuperação de senha por email
-- Pagamento único via Stripe (R$19,90) para liberar o acesso
+- Cadastro e login de usuários com JWT seguro (via cookie HttpOnly)
+- Recuperação de senha por email (Brevo)
+- Pagamento único via Stripe (R$19,90) para liberar acesso
+- Webhook Stripe com validação de assinatura
 - Calculadora com 6 fatores de complexidade configuráveis
 - Histórico de cálculos salvos por usuário
+- Paywall controlado por variável de ambiente
 
 ---
 
@@ -23,8 +27,8 @@ Calculadora de precificação por complexidade para projetos de arquitetura. O a
 | Interface (frontend) | React + TypeScript + Tailwind CSS |
 | Servidor (backend) | Cloudflare Pages Functions |
 | Banco de dados | Cloudflare D1 (SQLite) |
-| Pagamentos | Stripe |
-| Emails | Brevo |
+| Pagamentos | Stripe (Checkout + Webhook) |
+| Emails | Brevo (SMTP API) |
 | Deploy | Cloudflare Pages |
 
 ---
@@ -33,42 +37,49 @@ Calculadora de precificação por complexidade para projetos de arquitetura. O a
 
 ```
 src/
-  pages/          → Telas do app (Home, Login, Calculator, etc.)
+  pages/          → Telas do app (Home, Login, Calculator, Payment, etc.)
   components/     → Componentes reutilizáveis
-  contexts/       → Gerenciamento de sessão do usuário (AuthContext)
-  lib/            → Clientes de API e banco de dados local
+  contexts/       → Gerenciamento de sessão (AuthContext)
+  lib/            → Cliente da API
   utils/          → Funções auxiliares
 
 functions/
   api/
     auth/         → Login, registro, logout, recuperação de senha
-    stripe/       → Criação de sessão de pagamento e webhook
-    user/         → Status de pagamento do usuário
-    budgets/      → Salvar, listar e excluir cálculos
+    stripe/       → Checkout session + webhook
+    user/         → Status de pagamento
+    budgets/      → CRUD dos cálculos
 
 migrations/
-  0001_init.sql   → Estrutura do banco de dados
+  0001_init.sql   → Estrutura inicial do banco
 ```
 
 ---
 
 ## Variáveis de ambiente
 
-As variáveis sensíveis (senhas, chaves de API) **nunca** ficam no código. Elas são configuradas como secrets no Cloudflare via terminal:
+As variáveis sensíveis **nunca ficam no código**.  
+São configuradas como *secrets* no Cloudflare:
 
 ```bash
 npx wrangler pages secret put NOME_DA_VARIAVEL --project-name calcularq-cloudflare
 ```
 
+### Secrets obrigatórios
+
 | Variável | O que é |
 |---|---|
-| `JWT_SECRET` | Chave para assinar os tokens de sessão (qualquer texto longo e aleatório) |
-| `STRIPE_SECRET_KEY` | Chave secreta da Stripe (`sk_live_...`) |
+| `JWT_SECRET` | Chave para assinar tokens de sessão |
+| `STRIPE_SECRET_KEY` | Chave secreta da Stripe (`sk_test_...` ou `sk_live_...`) |
 | `STRIPE_PRICE_ID` | ID do produto na Stripe (`price_...`) |
-| `STRIPE_WEBHOOK_SECRET` | Chave do webhook da Stripe (`whsec_...`) |
-| `BREVO_API_KEY` | Chave da API do Brevo para envio de emails |
+| `STRIPE_WEBHOOK_SECRET` | Chave do webhook Stripe (`whsec_...`) |
+| `BREVO_API_KEY` | API Key do Brevo |
+| `BREVO_SENDER_EMAIL` | Email remetente do Brevo |
+| `BREVO_SENDER_NAME` | Nome do remetente |
 
-As variáveis não-sensíveis ficam no `wrangler.toml`:
+---
+
+### Variáveis públicas (wrangler.toml)
 
 ```toml
 [vars]
@@ -79,42 +90,88 @@ STRIPE_CANCEL_PATH = "/payment"
 DEBUG_EMAIL_TOKENS = "0"
 ```
 
-> ⚠️ Nunca mude `DEBUG_EMAIL_TOKENS` para `"1"` em produção — isso expõe links de redefinição de senha na resposta da API.
+> ⚠️ Nunca use `DEBUG_EMAIL_TOKENS = "1"` em produção.
 
 ---
 
-## Como rodar localmente
+## Fluxo de Pagamento (Stripe)
 
-### Pré-requisitos
-- [Node.js](https://nodejs.org) instalado
-- Conta no Cloudflare com o projeto criado
+1. Usuário cria conta
+2. Sistema bloqueia acesso se `has_paid = 0`
+3. Checkout Stripe é aberto
+4. Stripe envia evento para `/api/stripe/webhook`
+5. Backend valida assinatura (`STRIPE_WEBHOOK_SECRET`)
+6. Banco é atualizado (`has_paid = 1`)
+7. Frontend libera acesso automaticamente
 
-### Passo a passo
+### Eventos escutados:
 
-1. Clone o repositório e instale as dependências:
-```bash
-npm install
-```
-
-2. Faça login no Cloudflare pelo terminal:
-```bash
-npx wrangler login
-```
-
-3. Inicie o servidor de desenvolvimento:
-```bash
-npm run dev
-```
-
-O app abre em `http://localhost:5173`. As funções de backend rodam automaticamente junto.
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
 
 ---
 
-## Como fazer deploy
+## Recuperação de senha (Brevo)
 
-Todo push para o branch `main` dispara um deploy automático no Cloudflare Pages.
+Fluxo:
 
-Para fazer deploy manual pelo terminal:
+1. Usuário solicita redefinição
+2. Token é gerado e salvo como hash no banco
+3. Email é enviado via Brevo
+4. Token expira em 1 hora
+5. Após uso, token é removido
+
+O remetente é configurável via:
+
+- `BREVO_SENDER_EMAIL`
+- `BREVO_SENDER_NAME`
+
+---
+
+## Banco de dados (D1)
+
+### Tabelas
+
+- `users`
+- `budgets`
+- `reset_tokens`
+
+Rodar migration:
+
+```bash
+npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
+```
+
+---
+
+## Comandos úteis (produção)
+
+### Listar usuários
+
+```bash
+npx wrangler d1 execute calcularq --remote --command "SELECT id, email, has_paid FROM users;"
+```
+
+### Liberar acesso manualmente
+
+```bash
+npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 1, payment_date = datetime('now') WHERE email = 'email@exemplo.com';"
+```
+
+### Revogar acesso
+
+```bash
+npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 0 WHERE email = 'email@exemplo.com';"
+```
+
+---
+
+## Deploy
+
+Todo push para `main` dispara deploy automático.
+
+Manual:
+
 ```bash
 npm run build
 npx wrangler pages deploy dist --project-name calcularq-cloudflare
@@ -122,203 +179,26 @@ npx wrangler pages deploy dist --project-name calcularq-cloudflare
 
 ---
 
-## Banco de dados
+## Segurança
 
-O banco usa Cloudflare D1 (SQLite). Para rodar a migration e criar as tabelas:
-
-```bash
-# Em produção (remoto)
-npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
-
-# Local (desenvolvimento)
-npx wrangler d1 execute calcularq --local --file=migrations/0001_init.sql
-```
-
-### Tabelas
-
-- **users** — dados dos usuários, status de pagamento e ID do cliente Stripe
-- **budgets** — cálculos salvos por usuário
-- **reset_tokens** — tokens temporários para redefinição de senha (expiram em 1 hora)
+- JWT armazenado em cookie HttpOnly
+- Assinatura de webhook validada
+- Tokens de reset armazenados como hash (SHA-256)
+- Secrets nunca versionados
+- Normalização de URLs de redirect do Stripe
 
 ---
-
-## Serviços externos
-
-### Stripe
-Configurado para pagamento único. O webhook em `/api/stripe/webhook` recebe a confirmação do pagamento e atualiza o usuário no banco automaticamente.
-
-Eventos escutados:
-- `checkout.session.completed`
-- `checkout.session.async_payment_succeeded`
-
-### Brevo
-Usado para enviar o email de recuperação de senha. O remetente configurado é `atendimento@calcularq.com.br`.
-
----
-
-
----
-
-## Comandos úteis de suporte
-
-Todos os comandos abaixo consultam ou alteram o banco de dados em produção. Execute pelo terminal na pasta do projeto.
-
-> 💡 Substitua `calcularq` pelo nome do seu banco configurado no `wrangler.toml` se for diferente.
-
----
-
-### Usuários
-
-**Buscar um usuário pelo email:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT id, name, email, has_paid, payment_date, stripe_customer_id, created_at FROM users WHERE email = 'email@exemplo.com';"
-```
-
-**Listar todos os usuários:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT id, name, email, has_paid, created_at FROM users ORDER BY created_at DESC;"
-```
-
-**Contar total de usuários cadastrados:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT COUNT(*) as total FROM users;"
-```
-
-**Contar usuários que já pagaram:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT COUNT(*) as pagantes FROM users WHERE has_paid = 1;"
-```
-
----
-
-### Pagamentos
-
-**Liberar acesso manualmente para um usuário** (quando o pagamento foi confirmado fora do Stripe, por exemplo):
-```bash
-npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 1, payment_date = datetime('now') WHERE email = 'email@exemplo.com';"
-```
-
-**Revogar acesso de um usuário:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 0, payment_date = NULL WHERE email = 'email@exemplo.com';"
-```
-
-**Verificar se um usuário específico pagou:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT email, has_paid, payment_date FROM users WHERE email = 'email@exemplo.com';"
-```
-
----
-
-### Cálculos salvos
-
-**Ver todos os cálculos de um usuário:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT b.id, b.name, b.client_name, b.updated_at FROM budgets b JOIN users u ON b.user_id = u.id WHERE u.email = 'email@exemplo.com' ORDER BY b.updated_at DESC;"
-```
-
-**Contar quantos cálculos um usuário tem salvos:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT COUNT(*) as total FROM budgets b JOIN users u ON b.user_id = u.id WHERE u.email = 'email@exemplo.com';"
-```
-
-**Excluir todos os cálculos de um usuário:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "DELETE FROM budgets WHERE user_id = (SELECT id FROM users WHERE email = 'email@exemplo.com');"
-```
-
----
-
-### Reembolso
-
-O prazo legal de reembolso é de 7 dias corridos a partir da data da compra, conforme o Código de Defesa do Consumidor.
-
-**Passo a passo:**
-
-1. Acesse o painel da Stripe em [dashboard.stripe.com](https://dashboard.stripe.com)
-2. Vá em **Payments** e localize o pagamento pelo email do cliente
-3. Clique no pagamento e depois em **Refund**
-4. Confirme o valor e o motivo
-
-O reembolso cai automaticamente no cartão do cliente em até 5 dias úteis. Após processar, revogue o acesso do usuário no banco:
-
-```bash
-npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 0, payment_date = NULL WHERE email = 'email@exemplo.com';"
-```
-
-### Redefinição de senha
-
-**Ver tokens de redefinição de senha ativos:**
-```bash
-npx wrangler d1 execute calcularq --remote --command "SELECT u.email, rt.expires_at, rt.created_at FROM reset_tokens rt JOIN users u ON rt.user_id = u.id ORDER BY rt.created_at DESC;"
-```
-
-**Limpar tokens de senha expirados** (boa prática fazer periodicamente):
-```bash
-npx wrangler d1 execute calcularq --remote --command "DELETE FROM reset_tokens WHERE expires_at < datetime('now');"
-```
-
-**Forçar redefinição de senha de um usuário** (apaga a senha atual — o usuário precisará usar o fluxo de "esqueci minha senha"):
-```bash
-npx wrangler d1 execute calcularq --remote --command "UPDATE users SET password_hash = '' WHERE email = 'email@exemplo.com';"
-```
-
----
-
-### Excluir conta
-
-**Excluir um usuário e todos os seus dados** (cálculos são apagados automaticamente por cascade):
-```bash
-npx wrangler d1 execute calcularq --remote --command "DELETE FROM users WHERE email = 'email@exemplo.com';"
-```
-
----
-
-### Banco de dados
-
-**Ver o tamanho total do banco:**
-```bash
-npx wrangler d1 info calcularq --remote
-```
-
-**Fazer backup do banco de dados:**
-```bash
-npx wrangler d1 export calcularq --remote --output=backup-$(date +%Y%m%d).sql
-```
 
 ## Gerenciamento de Chaves
 
-Todas as chaves de produção estão salvas no **Bitwarden** sob a entrada **"Calcularq - Produção"**.
-
-As chaves armazenadas são:
-
-| Chave | Onde encontrar se precisar recriar |
-|---|---|
-| `JWT_SECRET` | Gere um novo com: `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` |
-| `STRIPE_SECRET_KEY` | [dashboard.stripe.com](https://dashboard.stripe.com) → Developers → API Keys |
-| `STRIPE_PRICE_ID` | [dashboard.stripe.com](https://dashboard.stripe.com) → Products → seu produto |
-| `STRIPE_WEBHOOK_SECRET` | [dashboard.stripe.com](https://dashboard.stripe.com) → Developers → Webhooks |
-| `BREVO_API_KEY` | [app.brevo.com](https://app.brevo.com) → Settings → API Keys |
-
-**Para gerar um novo JWT_SECRET**, rode no terminal (funciona em qualquer pasta):
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-Copie o resultado, salve no Bitwarden e depois atualize no Cloudflare:
-```bash
-npx wrangler pages secret put JWT_SECRET --project-name calcularq-cloudflare
-```
-> ⚠️ Ao trocar o JWT_SECRET todos os usuários logados serão desconectados e precisarão fazer login novamente.
-
-**Para atualizar qualquer outra chave no Cloudflare:**
-```bash
-npx wrangler pages secret put NOME_DA_CHAVE --project-name calcularq-cloudflare
-```
+Todas as chaves de produção estão armazenadas no **Bitwarden**  
+Entrada: **"Calcularq - Produção"**
 
 ---
 
-## Boas práticas para este repositório
+## Boas práticas
 
-- **Nunca commite** chaves de API, senhas ou qualquer dado sensível
-- **Nunca suba** as pastas `node_modules/` ou `dist/` (já estão no `.gitignore`)
-- Sempre teste localmente antes de fazer push para `main`
+- Nunca commitar chaves
+- Sempre testar no Stripe Test Mode antes de usar `sk_live`
+- Fazer backup periódico do D1
+- Validar logs do Cloudflare após mudanças no webhook
