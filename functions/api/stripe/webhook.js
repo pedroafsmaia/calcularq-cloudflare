@@ -106,14 +106,17 @@ export async function onRequest(context) {
     console.log("Stripe event:", type, "User:", userId);
 
     if (userId) {
+      const stripeCustomerId = session?.customer ?? null;
+
       await env.DB.prepare(
         `UPDATE users
          SET has_paid = 1,
-             payment_date = CURRENT_TIMESTAMP
+             payment_date = CURRENT_TIMESTAMP,
+             stripe_customer_id = COALESCE(?, stripe_customer_id)
          WHERE id = ?`
-      ).bind(String(userId)).run();
+      ).bind(stripeCustomerId, String(userId)).run();
 
-      console.log("User marked as paid:", userId);
+      console.log("User marked as paid:", userId, "| stripe_customer_id:", stripeCustomerId);
     }
   }
 
