@@ -84,7 +84,7 @@ export default function Footer() {
                 Sobre
               </h3>
               <p className="text-sm text-white/80 leading-relaxed">
-                A CalculArq é uma ferramenta precisa que precifica projetos de arquitetura e interiores com cálculos automáticos baseados em horas técnicas e fatores de complexidade.
+                A Calcularq é uma ferramenta precisa que precifica projetos de arquitetura e interiores com cálculos automáticos baseados em horas técnicas e fatores de complexidade.
               </p>
             </div>
           </div>
