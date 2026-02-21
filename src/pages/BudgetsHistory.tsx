@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { Budget } from "@/lib/database";
+import { Budget } from "@/lib/api";
 import { api } from "@/lib/api";
 import { History, Trash2, Eye, Plus, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
