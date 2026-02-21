@@ -16,3 +16,4 @@ Veja:
 - **Não** commite arquivos `.env` ou segredos.
 - Pastas como `node_modules/` e `dist/` não fazem parte do repositório (são geradas no build).
 trigger rebuild
+trigger deploy after Stripe setup
