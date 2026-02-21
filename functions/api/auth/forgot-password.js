@@ -1,5 +1,4 @@
 import { jsonResponse } from "../_utils.js";
-import crypto from "crypto";
 
 // Envia email via Brevo
 async function sendBrevoEmail({
@@ -36,6 +35,7 @@ export async function onRequestPost(context) {
     const { request, env } = context;
     const { email } = await request.json();
 
+    // Sempre retorna resposta genérica (anti enumeração)
     if (!email) {
       return jsonResponse(
         { message: "Se o email existir, você receberá instruções." },
@@ -48,7 +48,6 @@ export async function onRequestPost(context) {
       .bind(email)
       .first();
 
-    // Sempre retorna resposta genérica (evita enumeração)
     if (!user) {
       return jsonResponse(
         { message: "Se o email existir, você receberá instruções." },
@@ -56,11 +55,24 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Gerar token seguro
-    const rawToken = crypto.randomBytes(32).toString("hex");
-    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    // ===============================
+    // 🔐 GERAR TOKEN (WebCrypto)
+    // ===============================
 
-    // Expiração em 1 hora
+    const rawTokenBytes = new Uint8Array(32);
+    crypto.getRandomValues(rawTokenBytes);
+
+    const rawToken = Array.from(rawTokenBytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    const tokenBuf = new TextEncoder().encode(rawToken);
+    const hashBuf = await crypto.subtle.digest("SHA-256", tokenBuf);
+
+    const tokenHash = Array.from(new Uint8Array(hashBuf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
     // Apagar tokens antigos
@@ -69,7 +81,7 @@ export async function onRequestPost(context) {
       .bind(user.id)
       .run();
 
-    // Salvar novo token (hash)
+    // Salvar novo token (apenas hash)
     await env.DB
       .prepare(
         "INSERT INTO reset_tokens (user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))"
@@ -151,7 +163,6 @@ export async function onRequestPost(context) {
       }
     }
 
-    // DEBUG opcional
     if (env.DEBUG_EMAIL_TOKENS === "1") {
       return jsonResponse({
         message: "DEBUG MODE",
