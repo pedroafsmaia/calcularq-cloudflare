@@ -102,43 +102,43 @@ export async function onRequestPost(context) {
       try {
         const subject = "Redefinição de senha - Calcularq";
 
-        const html = `
+       const html = `
 <div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 8px;">
     
-    <h2 style="color: #002b5b; margin-bottom: 20px;">
+    <h2 style="color: #0b3a75; margin-bottom: 24px;">
       Redefinição de senha
     </h2>
 
-    <p style="font-size: 16px; color: #333;">
+    <p style="font-size: 16px; color: #333; margin-bottom: 16px;">
       Olá, ${user.name || "usuário"}.
     </p>
 
-    <p style="font-size: 16px; color: #333;">
+    <p style="font-size: 16px; color: #333; margin-bottom: 24px;">
       Recebemos uma solicitação para redefinir sua senha.
       Clique no botão abaixo (válido por 1 hora):
     </p>
 
-    <div style="text-align: center; margin: 30px 0;">
+    <div style="margin-bottom: 24px;">
       <a href="${resetUrl}"
-         style="background-color: #fc7338;
+         style="background-color: #0b3a75;
                 color: #ffffff;
-                padding: 12px 24px;
+                padding: 12px 22px;
                 text-decoration: none;
                 border-radius: 6px;
-                font-weight: bold;
+                font-weight: 600;
                 display: inline-block;">
         Redefinir minha senha
       </a>
     </div>
 
-    <p style="font-size: 14px; color: #666;">
+    <p style="font-size: 14px; color: #666; margin-bottom: 24px;">
       Se você não solicitou essa redefinição, ignore este email.
     </p>
 
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+    <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
 
-    <p style="font-size: 12px; color: #999; text-align: center;">
+    <p style="font-size: 12px; color: #999;">
       Calcularq © ${new Date().getFullYear()}
     </p>
 
