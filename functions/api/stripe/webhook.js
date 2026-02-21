@@ -1,5 +1,4 @@
 function parseStripeSignatureHeader(sigHeader) {
-  // Exemplo: "t=1700000000,v1=abc,v1=def"
   const parts = sigHeader.split(",").map(s => s.trim());
   const out = { t: null, v1: [] };
 
@@ -61,7 +60,7 @@ async function verifyStripeWebhook({ rawBody, sigHeader, secret, toleranceSec = 
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // GET só para debug/manual check
+  // Permite testar no navegador
   if (request.method === "GET") {
     return new Response("webhook endpoint alive", {
       status: 200,
@@ -73,7 +72,7 @@ export async function onRequest(context) {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  // 1) Validar assinatura Stripe usando raw body
+  // 1) Validar assinatura Stripe
   const sigHeader = request.headers.get("Stripe-Signature");
   const rawBody = await request.text();
 
@@ -103,28 +102,19 @@ export async function onRequest(context) {
     const session = event.data?.object;
 
     const userId = session?.client_reference_id;
-    const sessionId = session?.id || null;
-    const eventId = event?.id || null;
 
-    console.log("Stripe event:", type, "eventId:", eventId, "sessionId:", sessionId, "userId:", userId);
+    console.log("Stripe event:", type, "User:", userId);
 
-    if (!userId) {
-      return new Response("Missing client_reference_id", { status: 200 });
+    if (userId) {
+      await env.DB.prepare(
+        `UPDATE users
+         SET has_paid = 1,
+             payment_date = CURRENT_TIMESTAMP
+         WHERE id = ?`
+      ).bind(String(userId)).run();
+
+      console.log("User marked as paid:", userId);
     }
-
-    // 4) Atualizar usuário como pago
-    // Ajuste o nome da coluna de data se necessário:
-    // - Se você usa payment_date, troque paid_at -> payment_date
-    // - Se não tiver coluna de data, remova a linha toda
-    await env.DB.prepare(
-      `UPDATE users
-       SET has_paid = 1,
-           paid_at = CURRENT_TIMESTAMP
-       WHERE id = ?`
-    ).bind(String(userId)).run();
-
-    // Opcional: log simples
-    console.log("User marked as paid:", userId);
   }
 
   return new Response("ok", { status: 200 });
