@@ -175,7 +175,7 @@ export default function Calculator() {
       : 0;
 
     const projectPriceWithDiscount = projectPrice * (1 - commercialDiscount / 100);
-    const displayValues.discountAmount = projectPrice * (commercialDiscount / 100);
+    const discountAmount = projectPrice * (commercialDiscount / 100);
     const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
 
     const profit = productiveHours > 0 && projectPriceWithDiscount > 0 && estimatedHours > 0
@@ -187,7 +187,7 @@ export default function Calculator() {
       adjustedHourlyRate,
       projectPrice,
       projectPriceWithDiscount,
-      displayValues.discountAmount,
+      discountAmount,
       finalSalePrice,
       profit,
     };
