@@ -18,6 +18,11 @@ export async function onRequestPost(context) {
     const successPath = env.STRIPE_SUCCESS_PATH || "/payment/close";
     const cancelPath = env.STRIPE_CANCEL_PATH || "/payment";
 
+    // ✅ Normalizar FRONTEND_URL e paths (evita //payment e outras combinações erradas)
+    const frontendBase = String(env.FRONTEND_URL || "").replace(/\/$/, "");
+    const success = String(successPath).startsWith("/") ? String(successPath) : `/${successPath}`;
+    const cancel = String(cancelPath).startsWith("/") ? String(cancelPath) : `/${cancelPath}`;
+
     // 3) Criar Checkout Session (pagamento único)
     const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
@@ -29,8 +34,8 @@ export async function onRequestPost(context) {
         mode: "payment",
         "line_items[0][price]": env.STRIPE_PRICE_ID,
         "line_items[0][quantity]": "1",
-        success_url: `${env.FRONTEND_URL}${successPath}`,
-        cancel_url: `${env.FRONTEND_URL}${cancelPath}`,
+        success_url: `${frontendBase}${success}`,
+        cancel_url: `${frontendBase}${cancel}`,
         client_reference_id: String(userId),
         customer_creation: "always",
       }),
