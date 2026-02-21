@@ -48,11 +48,13 @@ export default function Payment() {
   };
 
   // Verificar se já pagou
+  // Redireciona automaticamente apenas se o usuário já chegou na página com pagamento feito
+  // (não durante o fluxo de confirmação, para não interromper a tela de sucesso)
   useEffect(() => {
-    if (user?.hasPaid) {
+    if (user?.hasPaid && !isProcessing) {
       navigate(createPageUrl("Calculator"), { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, isProcessing]);
 
   // Limpar todos os intervalos e o popup ao desmontar
   useEffect(() => {
