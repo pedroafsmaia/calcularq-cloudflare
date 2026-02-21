@@ -1,6 +1,6 @@
 import { jsonResponse, readJson, generateResetToken, hashResetToken } from "../_utils.js";
 
-async function sendBrevoEmail({ apiKey, toEmail, toName, subject, html }) {
+async function sendBrevoEmail({ apiKey, senderEmail, senderName, toEmail, toName, subject, html }) {
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
@@ -8,12 +8,13 @@ async function sendBrevoEmail({ apiKey, toEmail, toName, subject, html }) {
       "api-key": apiKey,
     },
     body: JSON.stringify({
-      sender: { name: "Calcularq", email: "atendimento@calcularq.com.br" },
+      sender: { name: senderName, email: senderEmail },
       to: [{ email: toEmail, name: toName || toEmail }],
       subject,
       htmlContent: html,
     }),
   });
+
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
     throw new Error(`Falha ao enviar email (Brevo): ${res.status} ${txt}`);
@@ -56,19 +57,34 @@ export async function onRequest(context) {
   // Se existir BREVO_API_KEY, envia email. Se não, mantém fluxo para teste.
   const brevoKey = context.env.BREVO_API_KEY;
   if (brevoKey && resetUrl) {
-    try {
-      const subject = "Redefinição de senha - Calcularq";
-      const html = `
-        <p>Olá, ${user.name || "usuário"}.</p>
-        <p>Para redefinir sua senha, clique no link abaixo (válido por 1 hora):</p>
-        <p><a href="${resetUrl}">Redefinir minha senha</a></p>
-        <p>Se você não solicitou isso, ignore este email.</p>
-      `;
-      await sendBrevoEmail({ apiKey: brevoKey, toEmail: user.email, toName: user.name, subject, html });
-    } catch {
-      // Não revelar detalhes para o usuário final; logs ficam no painel Cloudflare
-    }
+  const senderEmail = context.env.BREVO_SENDER_EMAIL || "atendimento@calcularq.com.br";
+  const senderName = context.env.BREVO_SENDER_NAME || "Calcularq";
+
+  try {
+    const subject = "Redefinição de senha - Calcularq";
+    const html = `
+Olá, ${user.name || "usuário"}.
+
+Para redefinir sua senha, clique no link abaixo (válido por 1 hora):
+
+<a href="${resetUrl}">Redefinir minha senha</a>
+
+Se você não solicitou isso, ignore este email.
+`;
+    await sendBrevoEmail({
+      apiKey: brevoKey,
+      senderEmail,
+      senderName,
+      toEmail: user.email,
+      toName: user.name,
+      subject,
+      html,
+    });
+  } catch (err) {
+    console.log("Erro ao enviar email pelo Brevo:", err?.message || String(err));
+    // mantém resposta genérica para o usuário
   }
+}
 
   // Em ambiente de teste, você pode querer ver o link/ token sem email:
   const debug = String(context.env.DEBUG_EMAIL_TOKENS || "0") === "1";
