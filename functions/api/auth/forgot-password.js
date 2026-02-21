@@ -1,15 +1,6 @@
-import { jsonResponse, readJson, hashResetToken } from "../_utils.js";
+import { jsonResponse, readJson, generateResetToken, hashResetToken } from "../_utils.js";
 
-// Envia email via Brevo
-async function sendBrevoEmail({
-  apiKey,
-  senderEmail,
-  senderName,
-  toEmail,
-  toName,
-  subject,
-  html,
-}) {
+async function sendBrevoEmail({ apiKey, senderEmail, senderName, toEmail, toName, subject, html }) {
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
@@ -23,93 +14,57 @@ async function sendBrevoEmail({
       htmlContent: html,
     }),
   });
-
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
     throw new Error(`Falha ao enviar email (Brevo): ${res.status} ${txt}`);
   }
 }
 
-export async function onRequestPost(context) {
-  try {
-    const { request, env } = context;
+export async function onRequest(context) {
+  if (context.request.method !== "POST") {
+    return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
+  }
 
-    const body = await readJson(request);
-    const email = body?.email;
+  const body = await readJson(context.request);
+  const email = body?.email?.toLowerCase()?.trim();
 
-    // Sempre retorna resposta genérica (anti-enumeração)
-    if (!email) {
-      return jsonResponse(
-        { message: "Se o email existir, você receberá instruções." },
-        { status: 200 }
-      );
-    }
+  // Resposta sempre genérica (evita enumeração de emails)
+  const okResponse = (extra = {}) =>
+    jsonResponse({ success: true, message: "Se o email existir, você receberá instruções para redefinir sua senha.", ...extra });
 
-    const user = await env.DB
-      .prepare("SELECT id, name, email FROM users WHERE email = ?")
-      .bind(email)
-      .first();
+  if (!email) return okResponse();
 
-    // Sempre retorna resposta genérica (anti-enumeração)
-    if (!user) {
-      return jsonResponse(
-        { message: "Se o email existir, você receberá instruções." },
-        { status: 200 }
-      );
-    }
+  const db = context.env.DB;
 
-    // ===============================
-    // 🔐 GERAR TOKEN (WebCrypto)
-    // ===============================
-    // Token enviado por email (raw) + hash (armazenado no banco)
-    // IMPORTANTE: o hash precisa ser o mesmo formato usado em reset-password.js (hashResetToken)
-    const rawTokenBytes = new Uint8Array(32);
-    crypto.getRandomValues(rawTokenBytes);
+  const user = await db.prepare("SELECT id, email, name FROM users WHERE email = ?").bind(email).first();
+  if (!user) return okResponse();
 
-    const rawToken = Array.from(rawTokenBytes)
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+  const token = await generateResetToken();
+  const token_hash = await hashResetToken(token);
+  const expires_at = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hora
 
-    const tokenHash = await hashResetToken(rawToken);
+  // Invalida tokens antigos
+  await db.prepare("DELETE FROM reset_tokens WHERE user_id = ?").bind(user.id).run();
 
-    // Expiração: 1 hora
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  await db.prepare(
+    "INSERT INTO reset_tokens (id, user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?, ?)"
+  ).bind(crypto.randomUUID(), user.id, token_hash, expires_at, new Date().toISOString()).run();
 
-    // Apagar tokens antigos (um token ativo por usuário)
-    await env.DB
-      .prepare("DELETE FROM reset_tokens WHERE user_id = ?")
-      .bind(user.id)
-      .run();
+  const frontendUrl = context.env.FRONTEND_URL || "";
+  const resetUrl = frontendUrl ? `${frontendUrl.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}` : "";
 
-    // Salvar novo token (hash) + id
-    const id = crypto.randomUUID();
-    await env.DB
-      .prepare(
-        "INSERT INTO reset_tokens (id, user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?, datetime('now'))"
-      )
-      .bind(id, user.id, tokenHash, expiresAt)
-      .run();
+  const brevoKey = context.env.BREVO_API_KEY;
+  const senderEmail = context.env.BREVO_SENDER_EMAIL || "atendimento@calcularq.com.br";
+  const senderName = context.env.BREVO_SENDER_NAME || "Calcularq";
 
-    const frontendBase = String(env.FRONTEND_URL || "").replace(/\/$/, "");
-    const resetUrl = `${frontendBase}/reset-password?token=${rawToken}`;
-
-    const brevoKey = env.BREVO_API_KEY;
-    if (brevoKey) {
-      const senderEmail =
-        env.BREVO_SENDER_EMAIL || "atendimento@calcularq.com.br";
-      const senderName = env.BREVO_SENDER_NAME || "Calcularq";
-
-      try {
-        const subject = "Redefinição de senha - Calcularq";
-
-        // Botão azul e alinhado à esquerda (evita competir com o CTA de compra)
-        const html = `
+  if (brevoKey && resetUrl) {
+    try {
+      const subject = "Redefinição de senha - Calcularq";
+      const html = `
 <div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;">
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 8px;">
-    
-    <h2 style="color: #0b3a75; margin-bottom: 24px;">
-      Redefinição de senha
-    </h2>
+
+    <h2 style="color: #0b3a75; margin-bottom: 24px;">Redefinição de senha</h2>
 
     <p style="font-size: 16px; color: #333; margin-bottom: 16px;">
       Olá, ${user.name || "usuário"}.
@@ -122,13 +77,8 @@ export async function onRequestPost(context) {
 
     <div style="margin-bottom: 24px;">
       <a href="${resetUrl}"
-         style="background-color: #0b3a75;
-                color: #ffffff;
-                padding: 12px 22px;
-                text-decoration: none;
-                border-radius: 6px;
-                font-weight: 600;
-                display: inline-block;">
+         style="background-color: #0b3a75; color: #ffffff; padding: 12px 22px;
+                text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">
         Redefinir minha senha
       </a>
     </div>
@@ -146,37 +96,12 @@ export async function onRequestPost(context) {
   </div>
 </div>
 `;
-
-        await sendBrevoEmail({
-          apiKey: brevoKey,
-          senderEmail,
-          senderName,
-          toEmail: user.email,
-          toName: user.name,
-          subject,
-          html,
-        });
-      } catch (err) {
-        console.log(
-          "Erro ao enviar email pelo Brevo:",
-          err?.message || String(err)
-        );
-      }
+      await sendBrevoEmail({ apiKey: brevoKey, senderEmail, senderName, toEmail: user.email, toName: user.name, subject, html });
+    } catch {
+      // Não revelar detalhes para o usuário final; logs ficam no painel Cloudflare
     }
-
-    if (env.DEBUG_EMAIL_TOKENS === "1") {
-      return jsonResponse({ message: "DEBUG MODE", resetUrl });
-    }
-
-    return jsonResponse(
-      { message: "Se o email existir, você receberá instruções." },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Erro forgot-password:", error);
-    return jsonResponse(
-      { message: "Erro ao processar solicitação." },
-      { status: 500 }
-    );
   }
+
+  const debug = String(context.env.DEBUG_EMAIL_TOKENS || "0") === "1";
+  return okResponse(debug ? { debugResetUrl: resetUrl, debugToken: token } : {});
 }
