@@ -20,12 +20,14 @@ export default function Payment() {
 
   const [status, setStatus] = useState<"pending" | "success" | "error">("pending");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [pollAttempts, setPollAttempts] = useState(0);
 
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const checkClosedRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const checkoutWindowRef = useRef<Window | null>(null);
 
-  // Evita “status” stale dentro de timeouts/intervals
+  // Refs para evitar valores stale dentro de timeouts/intervals
+  const pollAttemptsRef = useRef(0);
+
   const statusRef = useRef<"pending" | "success" | "error">("pending");
   useEffect(() => {
     statusRef.current = status;
@@ -52,12 +54,16 @@ export default function Payment() {
     }
   }, [user, navigate]);
 
-  // Limpar interval e tentar fechar popup ao desmontar
+  // Limpar todos os intervalos e o popup ao desmontar
   useEffect(() => {
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
         pollIntervalRef.current = null;
+      }
+      if (checkClosedRef.current) {
+        clearInterval(checkClosedRef.current);
+        checkClosedRef.current = null;
       }
       closeCheckoutWindow();
     };
@@ -73,7 +79,9 @@ export default function Payment() {
       return;
     }
 
-    if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+    pollAttemptsRef.current += 1;
+
+    if (pollAttemptsRef.current >= MAX_POLL_ATTEMPTS) {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
         pollIntervalRef.current = null;
@@ -86,49 +94,40 @@ export default function Payment() {
     try {
       const paymentStatus = await api.getPaymentStatus();
 
-      console.log(
-        `🔍 Verificando pagamento - hasPaid: ${paymentStatus.hasPaid}, userId: ${user.id}`
-      );
+      if (pollAttemptsRef.current % 10 === 0) {
+        console.log(`🔍 Verificando pagamento - tentativa ${pollAttemptsRef.current}/${MAX_POLL_ATTEMPTS}, hasPaid: ${paymentStatus.hasPaid}`);
+      }
 
       if (paymentStatus.hasPaid) {
-        // Pagamento confirmado!
-        console.log("✅ Pagamento confirmado! hasPaid = true");
+        console.log("✅ Pagamento confirmado!");
 
+        // Parar todos os intervalos de uma vez
         if (pollIntervalRef.current) {
           clearInterval(pollIntervalRef.current);
           pollIntervalRef.current = null;
         }
+        if (checkClosedRef.current) {
+          clearInterval(checkClosedRef.current);
+          checkClosedRef.current = null;
+        }
 
-        // ✅ Fecha a janela do checkout assim que confirmar
         closeCheckoutWindow();
 
-        // Atualizar usuário local e no contexto
         try {
           await refreshUser();
-          console.log("✅ Usuário atualizado no contexto");
         } catch (refreshError) {
           console.error("Erro ao atualizar usuário:", refreshError);
-          // Continuar mesmo se refresh falhar
         }
 
         setStatus("success");
         setIsProcessing(false);
 
-        // Redirecionar após 1 segundo
         setTimeout(() => {
           navigate(createPageUrl("Calculator"), { replace: true });
         }, 1000);
-      } else {
-        const attempts = pollAttempts + 1;
-        setPollAttempts(attempts);
-        if (attempts % 10 === 0) {
-          console.log(`⏳ Aguardando confirmação... Tentativa ${attempts}/${MAX_POLL_ATTEMPTS}`);
-          console.log(`   Status atual: hasPaid = ${paymentStatus.hasPaid}`);
-        }
       }
     } catch (error) {
       console.error("Erro ao verificar status de pagamento:", error);
-      setPollAttempts((prev: number) => prev + 1);
     }
   };
 
@@ -160,74 +159,48 @@ export default function Payment() {
         return;
       }
 
-      setPollAttempts(0);
+      pollAttemptsRef.current = 0;
 
-      // Iniciar polling para verificar status de pagamento
+      // Iniciar polling principal
       pollIntervalRef.current = setInterval(() => {
         checkPaymentStatus();
       }, POLL_INTERVAL);
 
       // Verificar imediatamente
       checkPaymentStatus();
+
+      // Monitorar quando a janela fechar para dar uma verificação extra
+      checkClosedRef.current = setInterval(() => {
+        if (checkoutWindowRef.current?.closed) {
+          if (checkClosedRef.current) {
+            clearInterval(checkClosedRef.current);
+            checkClosedRef.current = null;
+          }
+          console.log("🪟 Janela do checkout fechada, verificando pagamento...");
+          checkPaymentStatus();
+        }
+      }, 1000);
+
+      // Timeout de segurança (5 minutos) — encerra tudo se o usuário abandonar
+      setTimeout(() => {
+        if (checkClosedRef.current) {
+          clearInterval(checkClosedRef.current);
+          checkClosedRef.current = null;
+        }
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+        closeCheckoutWindow();
+        if (statusRef.current === "pending") {
+          setIsProcessing(false);
+        }
+      }, 300000);
     } catch (error: any) {
       console.error("❌ Erro ao iniciar checkout:", error);
       setStatus("error");
       setIsProcessing(false);
-
-      if (error?.message) {
-        console.error("Detalhes do erro:", error.message);
-      }
-      return;
     }
-
-    // Monitorar quando a janela fechar
-    const checkClosed = setInterval(() => {
-      if (checkoutWindowRef.current?.closed) {
-        clearInterval(checkClosed);
-        console.log("🪟 Janela do checkout fechada, continuando verificação...");
-
-        checkPaymentStatus();
-
-        setTimeout(() => {
-          if (pollIntervalRef.current) {
-            const extendedPolling = setInterval(() => {
-              checkPaymentStatus();
-            }, POLL_INTERVAL);
-
-            setTimeout(() => {
-              clearInterval(extendedPolling);
-
-              if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
-              }
-
-              // ✅ usa statusRef (não o status antigo capturado)
-              if (statusRef.current === "pending") {
-                setIsProcessing(false);
-              }
-            }, 60000);
-          }
-        }, 3000);
-      }
-    }, 1000);
-
-    // Timeout de segurança (5 minutos)
-    setTimeout(() => {
-      clearInterval(checkClosed);
-
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-      }
-
-      closeCheckoutWindow();
-
-      // ✅ usa statusRef (não o status antigo capturado)
-      if (statusRef.current === "pending") {
-        setIsProcessing(false);
-      }
-    }, 300000);
   };
 
   if (!user) {
@@ -289,6 +262,7 @@ export default function Payment() {
           <div className="flex gap-3 justify-center">
             <Button
               onClick={() => {
+                pollAttemptsRef.current = 0;
                 setStatus("pending");
                 setIsProcessing(false);
                 handleStripeCheckout();
