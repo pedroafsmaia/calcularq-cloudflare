@@ -1,4 +1,4 @@
-import { jsonResponse } from "../_utils.js";
+import { jsonResponse, readJson, hashResetToken } from "../_utils.js";
 
 // Envia email via Brevo
 async function sendBrevoEmail({
@@ -33,9 +33,11 @@ async function sendBrevoEmail({
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
-    const { email } = await request.json();
 
-    // Sempre retorna resposta genérica (anti enumeração)
+    const body = await readJson(request);
+    const email = body?.email;
+
+    // Sempre retorna resposta genérica (anti-enumeração)
     if (!email) {
       return jsonResponse(
         { message: "Se o email existir, você receberá instruções." },
@@ -48,6 +50,7 @@ export async function onRequestPost(context) {
       .bind(email)
       .first();
 
+    // Sempre retorna resposta genérica (anti-enumeração)
     if (!user) {
       return jsonResponse(
         { message: "Se o email existir, você receberá instruções." },
@@ -58,7 +61,8 @@ export async function onRequestPost(context) {
     // ===============================
     // 🔐 GERAR TOKEN (WebCrypto)
     // ===============================
-
+    // Token enviado por email (raw) + hash (armazenado no banco)
+    // IMPORTANTE: o hash precisa ser o mesmo formato usado em reset-password.js (hashResetToken)
     const rawTokenBytes = new Uint8Array(32);
     crypto.getRandomValues(rawTokenBytes);
 
@@ -66,34 +70,30 @@ export async function onRequestPost(context) {
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    const tokenBuf = new TextEncoder().encode(rawToken);
-    const hashBuf = await crypto.subtle.digest("SHA-256", tokenBuf);
+    const tokenHash = await hashResetToken(rawToken);
 
-    const tokenHash = Array.from(new Uint8Array(hashBuf))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-
+    // Expiração: 1 hora
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-    // Apagar tokens antigos
+    // Apagar tokens antigos (um token ativo por usuário)
     await env.DB
       .prepare("DELETE FROM reset_tokens WHERE user_id = ?")
       .bind(user.id)
       .run();
 
-    // Salvar novo token (apenas hash)
+    // Salvar novo token (hash) + id
+    const id = crypto.randomUUID();
     await env.DB
       .prepare(
-        "INSERT INTO reset_tokens (user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))"
+        "INSERT INTO reset_tokens (id, user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?, datetime('now'))"
       )
-      .bind(user.id, tokenHash, expiresAt)
+      .bind(id, user.id, tokenHash, expiresAt)
       .run();
 
     const frontendBase = String(env.FRONTEND_URL || "").replace(/\/$/, "");
     const resetUrl = `${frontendBase}/reset-password?token=${rawToken}`;
 
     const brevoKey = env.BREVO_API_KEY;
-
     if (brevoKey) {
       const senderEmail =
         env.BREVO_SENDER_EMAIL || "atendimento@calcularq.com.br";
@@ -102,7 +102,8 @@ export async function onRequestPost(context) {
       try {
         const subject = "Redefinição de senha - Calcularq";
 
-       const html = `
+        // Botão azul e alinhado à esquerda (evita competir com o CTA de compra)
+        const html = `
 <div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;">
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 8px;">
     
@@ -164,10 +165,7 @@ export async function onRequestPost(context) {
     }
 
     if (env.DEBUG_EMAIL_TOKENS === "1") {
-      return jsonResponse({
-        message: "DEBUG MODE",
-        resetUrl,
-      });
+      return jsonResponse({ message: "DEBUG MODE", resetUrl });
     }
 
     return jsonResponse(
