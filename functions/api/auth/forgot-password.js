@@ -1,6 +1,16 @@
-import { jsonResponse, readJson, generateResetToken, hashResetToken } from "../_utils.js";
+import { jsonResponse } from "../_utils.js";
+import crypto from "crypto";
 
-async function sendBrevoEmail({ apiKey, senderEmail, senderName, toEmail, toName, subject, html }) {
+// Envia email via Brevo
+async function sendBrevoEmail({
+  apiKey,
+  senderEmail,
+  senderName,
+  toEmail,
+  toName,
+  subject,
+  html,
+}) {
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
@@ -21,72 +31,143 @@ async function sendBrevoEmail({ apiKey, senderEmail, senderName, toEmail, toName
   }
 }
 
-export async function onRequest(context) {
-  if (context.request.method !== "POST") {
-    return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
-  }
-
-  const body = await readJson(context.request);
-  const email = body?.email?.toLowerCase()?.trim();
-
-  // Resposta sempre genérica (evita enumeração de emails)
-  const okResponse = (extra = {}) =>
-    jsonResponse({ success: true, message: "Se o email existir, você receberá instruções para redefinir sua senha.", ...extra });
-
-  if (!email) return okResponse();
-
-  const db = context.env.DB;
-
-  const user = await db.prepare("SELECT id, email, name FROM users WHERE email = ?").bind(email).first();
-  if (!user) return okResponse();
-
-  const token = await generateResetToken();
-  const token_hash = await hashResetToken(token);
-  const expires_at = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hora
-
-  // invalida tokens antigos
-  await db.prepare("DELETE FROM reset_tokens WHERE user_id = ?").bind(user.id).run();
-
-  await db.prepare(
-    "INSERT INTO reset_tokens (id, user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?, ?)"
-  ).bind(crypto.randomUUID(), user.id, token_hash, expires_at, new Date().toISOString()).run();
-
-  const frontendUrl = context.env.FRONTEND_URL || "";
-  const resetUrl = frontendUrl ? `${frontendUrl.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}` : "";
-
-  // Se existir BREVO_API_KEY, envia email. Se não, mantém fluxo para teste.
-  const brevoKey = context.env.BREVO_API_KEY;
-  if (brevoKey && resetUrl) {
-  const senderEmail = context.env.BREVO_SENDER_EMAIL || "atendimento@calcularq.com.br";
-  const senderName = context.env.BREVO_SENDER_NAME || "Calcularq";
-
+export async function onRequestPost(context) {
   try {
-    const subject = "Redefinição de senha - Calcularq";
-    const html = `
-Olá, ${user.name || "usuário"}.
+    const { request, env } = context;
+    const { email } = await request.json();
 
-Para redefinir sua senha, clique no link abaixo (válido por 1 hora):
+    if (!email) {
+      return jsonResponse(
+        { message: "Se o email existir, você receberá instruções." },
+        { status: 200 }
+      );
+    }
 
-<a href="${resetUrl}">Redefinir minha senha</a>
+    const user = await env.DB
+      .prepare("SELECT id, name, email FROM users WHERE email = ?")
+      .bind(email)
+      .first();
 
-Se você não solicitou isso, ignore este email.
+    // Sempre retorna resposta genérica (evita enumeração)
+    if (!user) {
+      return jsonResponse(
+        { message: "Se o email existir, você receberá instruções." },
+        { status: 200 }
+      );
+    }
+
+    // Gerar token seguro
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    // Expiração em 1 hora
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+    // Apagar tokens antigos
+    await env.DB
+      .prepare("DELETE FROM reset_tokens WHERE user_id = ?")
+      .bind(user.id)
+      .run();
+
+    // Salvar novo token (hash)
+    await env.DB
+      .prepare(
+        "INSERT INTO reset_tokens (user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))"
+      )
+      .bind(user.id, tokenHash, expiresAt)
+      .run();
+
+    const frontendBase = String(env.FRONTEND_URL || "").replace(/\/$/, "");
+    const resetUrl = `${frontendBase}/reset-password?token=${rawToken}`;
+
+    const brevoKey = env.BREVO_API_KEY;
+
+    if (brevoKey) {
+      const senderEmail =
+        env.BREVO_SENDER_EMAIL || "atendimento@calcularq.com.br";
+      const senderName = env.BREVO_SENDER_NAME || "Calcularq";
+
+      try {
+        const subject = "Redefinição de senha - Calcularq";
+
+        const html = `
+<div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px;">
+    
+    <h2 style="color: #002b5b; margin-bottom: 20px;">
+      Redefinição de senha
+    </h2>
+
+    <p style="font-size: 16px; color: #333;">
+      Olá, ${user.name || "usuário"}.
+    </p>
+
+    <p style="font-size: 16px; color: #333;">
+      Recebemos uma solicitação para redefinir sua senha.
+      Clique no botão abaixo (válido por 1 hora):
+    </p>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${resetUrl}"
+         style="background-color: #fc7338;
+                color: #ffffff;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: bold;
+                display: inline-block;">
+        Redefinir minha senha
+      </a>
+    </div>
+
+    <p style="font-size: 14px; color: #666;">
+      Se você não solicitou essa redefinição, ignore este email.
+    </p>
+
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+    <p style="font-size: 12px; color: #999; text-align: center;">
+      Calcularq © ${new Date().getFullYear()}
+    </p>
+
+  </div>
+</div>
 `;
-    await sendBrevoEmail({
-      apiKey: brevoKey,
-      senderEmail,
-      senderName,
-      toEmail: user.email,
-      toName: user.name,
-      subject,
-      html,
-    });
-  } catch (err) {
-    console.log("Erro ao enviar email pelo Brevo:", err?.message || String(err));
-    // mantém resposta genérica para o usuário
-  }
-}
 
-  // Em ambiente de teste, você pode querer ver o link/ token sem email:
-  const debug = String(context.env.DEBUG_EMAIL_TOKENS || "0") === "1";
-  return okResponse(debug ? { debugResetUrl: resetUrl, debugToken: token } : {});
+        await sendBrevoEmail({
+          apiKey: brevoKey,
+          senderEmail,
+          senderName,
+          toEmail: user.email,
+          toName: user.name,
+          subject,
+          html,
+        });
+      } catch (err) {
+        console.log(
+          "Erro ao enviar email pelo Brevo:",
+          err?.message || String(err)
+        );
+      }
+    }
+
+    // DEBUG opcional
+    if (env.DEBUG_EMAIL_TOKENS === "1") {
+      return jsonResponse({
+        message: "DEBUG MODE",
+        resetUrl,
+      });
+    }
+
+    return jsonResponse(
+      { message: "Se o email existir, você receberá instruções." },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Erro forgot-password:", error);
+    return jsonResponse(
+      { message: "Erro ao processar solicitação." },
+      { status: 500 }
+    );
+  }
 }
