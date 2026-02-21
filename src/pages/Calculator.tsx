@@ -160,34 +160,39 @@ export default function Calculator() {
     );
   }, [minHourlyRate, estimatedHours, globalComplexity, variableExpenses]);
 
-  // Calcular valores intermediários para exibição progressiva
-  const totalVariableExpensesForDisplay = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
-  
-  // Calcular hora técnica ajustada mesmo sem horas estimadas
-  const adjustedHourlyRateIntermediate = minHourlyRate && minHourlyRate > 0 && globalComplexity > 0
-    ? minHourlyRate * globalComplexity
-    : 0;
-  
-  // Calcular preço do projeto mesmo sem todas as condições
-  const projectPriceIntermediate = adjustedHourlyRateIntermediate > 0 && estimatedHours > 0
-    ? adjustedHourlyRateIntermediate * estimatedHours
-    : 0;
-  
-  const projectPriceWithDiscount = projectPriceIntermediate > 0
-    ? projectPriceIntermediate * (1 - commercialDiscount / 100)
-    : 0;
-  const discountAmount = projectPriceIntermediate > 0
-    ? projectPriceIntermediate * (commercialDiscount / 100)
-    : 0;
-  const finalSalePriceWithDiscount = projectPriceWithDiscount + totalVariableExpensesForDisplay;
-  
-  const totalFixedExpenses = fixedExpenses.reduce((sum, exp) => sum + exp.value, 0);
-  const fixedCostPerHour = productiveHours > 0 ? totalFixedExpenses / productiveHours : 0;
-  const profit = productiveHours > 0 && projectPriceWithDiscount > 0 && estimatedHours > 0
-    ? projectPriceWithDiscount - (fixedCostPerHour * estimatedHours)
-    : null;
-  
-  // Verificar se há seleções de complexidade
+  // Todos os valores derivados em um único useMemo para evitar duplicação
+  const displayValues = useMemo(() => {
+    const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
+    const totalFixedExpenses = fixedExpenses.reduce((sum, exp) => sum + exp.value, 0);
+    const fixedCostPerHour = productiveHours > 0 ? totalFixedExpenses / productiveHours : 0;
+
+    const adjustedHourlyRate = minHourlyRate && minHourlyRate > 0 && globalComplexity > 0
+      ? minHourlyRate * globalComplexity
+      : 0;
+
+    const projectPrice = adjustedHourlyRate > 0 && estimatedHours > 0
+      ? adjustedHourlyRate * estimatedHours
+      : 0;
+
+    const projectPriceWithDiscount = projectPrice * (1 - commercialDiscount / 100);
+    const displayValues.discountAmount = projectPrice * (commercialDiscount / 100);
+    const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
+
+    const profit = productiveHours > 0 && projectPriceWithDiscount > 0 && estimatedHours > 0
+      ? projectPriceWithDiscount - (fixedCostPerHour * estimatedHours)
+      : null;
+
+    return {
+      totalVariableExpenses,
+      adjustedHourlyRate,
+      projectPrice,
+      projectPriceWithDiscount,
+      displayValues.discountAmount,
+      finalSalePrice,
+      profit,
+    };
+  }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses, fixedExpenses, productiveHours]);
+
   const hasComplexitySelections = Object.keys(selections).length > 0;
 
   const areaFactor = factors.find(f => f.id === "area");
@@ -415,12 +420,12 @@ export default function Calculator() {
                   ) : null}
 
                   {/* Hora Técnica Ajustada */}
-                  {adjustedHourlyRateIntermediate > 0 ? (
+                  {displayValues.adjustedHourlyRate > 0 ? (
                     <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-calcularq-blue">Hora Técnica Ajustada:</span>
                         <span className="text-lg font-bold text-calcularq-blue">
-                          R$ {adjustedHourlyRateIntermediate.toLocaleString("pt-BR", { 
+                          R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { 
                             minimumFractionDigits: 2, 
                             maximumFractionDigits: 2 
                           })}/h
@@ -430,12 +435,12 @@ export default function Calculator() {
                   ) : null}
 
                   {/* Preço do Projeto */}
-                  {projectPriceIntermediate > 0 ? (
+                  {displayValues.projectPrice > 0 ? (
                     <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-calcularq-blue">Preço do Projeto:</span>
                         <span className="text-lg font-bold text-calcularq-blue">
-                          R$ {projectPriceIntermediate.toLocaleString("pt-BR", { 
+                          R$ {displayValues.projectPrice.toLocaleString("pt-BR", { 
                             minimumFractionDigits: 2, 
                             maximumFractionDigits: 2 
                           })}
@@ -445,12 +450,12 @@ export default function Calculator() {
                   ) : null}
 
                   {/* Total de Despesas Variáveis */}
-                  {totalVariableExpensesForDisplay > 0 && (
+                  {displayValues.totalVariableExpenses > 0 && (
                     <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-calcularq-blue">Total de Despesas Variáveis:</span>
                         <span className="text-lg font-bold text-calcularq-blue">
-                          R$ {totalVariableExpensesForDisplay.toLocaleString("pt-BR", { 
+                          R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { 
                             minimumFractionDigits: 2, 
                             maximumFractionDigits: 2 
                           })}
@@ -460,12 +465,12 @@ export default function Calculator() {
                   )}
 
                   {/* Valor do Desconto */}
-                  {discountAmount > 0 && (
+                  {displayValues.discountAmount > 0 && (
                     <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-calcularq-blue">Valor do Desconto:</span>
                         <span className="text-lg font-bold text-calcularq-blue">
-                          R$ {discountAmount.toLocaleString("pt-BR", { 
+                          R$ {displayValues.discountAmount.toLocaleString("pt-BR", { 
                             minimumFractionDigits: 2, 
                             maximumFractionDigits: 2 
                           })}
@@ -475,12 +480,12 @@ export default function Calculator() {
                   )}
 
                   {/* Preço de Venda Final */}
-                  {finalSalePriceWithDiscount > 0 ? (
+                  {displayValues.finalSalePrice > 0 ? (
                     <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-calcularq-blue">Preço de Venda Final:</span>
                         <span className="text-lg font-bold text-calcularq-blue">
-                          R$ {finalSalePriceWithDiscount.toLocaleString("pt-BR", { 
+                          R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { 
                             minimumFractionDigits: 2, 
                             maximumFractionDigits: 2 
                           })}
@@ -490,12 +495,12 @@ export default function Calculator() {
                   ) : null}
 
                   {/* Lucro Estimado */}
-                  {profit !== null && (
+                  {displayValues.profit !== null && (
                     <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-calcularq-blue">Lucro Estimado:</span>
                         <span className="text-lg font-bold text-calcularq-blue">
-                          R$ {profit.toLocaleString("pt-BR", { 
+                          R$ {displayValues.profit!.toLocaleString("pt-BR", { 
                             minimumFractionDigits: 2, 
                             maximumFractionDigits: 2 
                           })}
