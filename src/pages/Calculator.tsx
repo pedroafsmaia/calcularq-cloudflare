@@ -309,7 +309,7 @@ export default function Calculator() {
     <>
       {(!minHourlyRate || minHourlyRate <= 0) ? (
         /* Estado vazio — igual ao padrão do sistema */
-        <div className="p-5 space-y-3">
+        <div className="bg-white p-5 space-y-3">
           <div className="rounded-xl border-2 border-dashed border-slate-200 p-6 text-center">
             <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
               <span className="text-slate-400 text-lg font-bold">1</span>
@@ -321,7 +321,7 @@ export default function Calculator() {
           </div>
         </div>
       ) : (
-        <div className="p-5 space-y-4">
+        <div className="bg-white p-5 space-y-4">
 
           {/* BASE DO CÁLCULO */}
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
