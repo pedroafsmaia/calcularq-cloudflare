@@ -301,8 +301,8 @@ export default function Calculator() {
               className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-blue-50 border border-blue-200 rounded-xl px-5 py-4"
             >
               <p className="text-sm text-blue-800">
-                <strong>Quer usar as despesas do seu último cálculo?</strong>{" "}
-                Encontramos despesas fixas salvas anteriormente.
+                <strong>Preencher com os dados do seu último cálculo salvo?</strong>{" "}
+                Despesas fixas, pró-labore mín. e horas produtivas serão preenchidos automaticamente.
               </p>
               <div className="flex gap-2 shrink-0">
                 <button
