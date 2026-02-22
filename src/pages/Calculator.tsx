@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, X } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { BarChart2, ChevronRight, ChevronLeft, X, CheckCircle2, History, Lightbulb } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 
@@ -10,6 +10,7 @@ import ComplexityConfig from "../components/calculator/ComplexityConfig";
 import AreaFactorCard from "../components/calculator/AreaFactorCard";
 import FactorCard from "../components/pricing/FactorCard";
 import FinalCalculation from "../components/calculator/FinalCalculation";
+import Tooltip from "@/components/ui/Tooltip";
 
 import {
   DEFAULT_FACTORS,
@@ -21,7 +22,6 @@ import {
   AreaInterval,
 } from "../components/pricing/PricingEngine";
 import { createPageUrl } from "@/utils";
-import Tooltip from "@/components/ui/Tooltip";
 
 const STEPS = [
   { n: 1, label: "Hora Técnica" },
@@ -30,48 +30,136 @@ const STEPS = [
   { n: 4, label: "Preço Final" },
 ];
 
+// Sugestões de horas por faixa de complexidade
+function hoursHint(complexity: number): string {
+  if (complexity <= 0) return "";
+  if (complexity < 1.5) return "Projetos simples nessa faixa costumam levar entre 20–40h.";
+  if (complexity < 2.5) return "Projetos nessa faixa costumam levar entre 40–80h.";
+  if (complexity < 3.5) return "Projetos nessa complexidade costumam levar entre 80–150h.";
+  return "Projetos altamente complexos podem demandar 150h ou mais.";
+}
+
+// Chave do localStorage para rascunho
+const DRAFT_KEY = "calcularq_draft_v1";
+
+function saveDraft(data: object) {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch { /* silencioso */ }
+}
+
+function loadDraft(): any | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 export default function Calculator() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const budgetId = searchParams.get("budget");
   const [loadedBudgetName, setLoadedBudgetName] = useState<string | null>(null);
   const [loadedClientName, setLoadedClientName] = useState<string | null>(null);
   const [loadedProjectName, setLoadedProjectName] = useState<string | null>(null);
 
-  // Etapa ativa
   const [currentStep, setCurrentStep] = useState(1);
-
-  // Maior etapa já visitada (evita marcar etapas opcionais como "concluídas" logo ao iniciar)
   const [maxStepReached, setMaxStepReached] = useState(1);
 
-  // Seção 1: Hora Técnica Mínima
+  // Toast de conclusão de etapa
+  const [stepToast, setStepToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (msg: string) => {
+    setStepToast(msg);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setStepToast(null), 2500);
+  };
+
+  // Seção 1
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [fixedExpenses, setFixedExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
   const [proLabore, setProLabore] = useState(0);
   const [productiveHours, setProductiveHours] = useState(0);
 
-  // Seção 2: Configurações
+  // Seção 2
   const [factors, setFactors] = useState<Factor[]>(DEFAULT_FACTORS);
   const [areaIntervals, setAreaIntervals] = useState<AreaInterval[]>(DEFAULT_AREA_INTERVALS);
 
-  // Seção 3: Análise de Complexidade
+  // Seção 3
   const [area, setArea] = useState<number | null>(null);
   const [selections, setSelections] = useState<Record<string, number>>({});
 
-  // Seção 4: Cálculo Final
+  // Seção 4
   const [estimatedHours, setEstimatedHours] = useState(0);
   const [commercialDiscount, setCommercialDiscount] = useState(0);
   const [variableExpenses, setVariableExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
 
-  // Resgatar despesas do último cálculo salvo
+  // Restaurar último cálculo
   const [lastBudgetExpenses, setLastBudgetExpenses] = useState<Array<{ id: string; name: string; value: number }> | null>(null);
   const [lastBudgetProLabore, setLastBudgetProLabore] = useState<number | null>(null);
   const [lastBudgetProductiveHours, setLastBudgetProductiveHours] = useState<number | null>(null);
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
 
-  // Mobile: resumo de resultados (bottom sheet)
+  // Mobile bottom sheet
   const [mobileResultsOpen, setMobileResultsOpen] = useState(false);
 
+  // ── Autosave em localStorage ──────────────────────────────────
+  const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!user || budgetId) return;
+    if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
+    draftSaveRef.current = setTimeout(() => {
+      saveDraft({
+        minHourlyRate, fixedExpenses, proLabore, productiveHours,
+        factors: factors.map(f => ({ id: f.id, weight: f.weight })),
+        areaIntervals, area, selections,
+        estimatedHours, commercialDiscount, variableExpenses,
+        currentStep, maxStepReached,
+        savedAt: Date.now(),
+      });
+    }, 800);
+  }, [
+    minHourlyRate, fixedExpenses, proLabore, productiveHours,
+    factors, areaIntervals, area, selections,
+    estimatedHours, commercialDiscount, variableExpenses,
+    currentStep, maxStepReached,
+  ]);
+
+  // ── Restaurar rascunho do localStorage ao montar ──────────────
+  const draftRestoredRef = useRef(false);
+  useEffect(() => {
+    if (draftRestoredRef.current || budgetId || !user) return;
+    draftRestoredRef.current = true;
+
+    const draft = loadDraft();
+    if (!draft || !draft.minHourlyRate) return;
+
+    // Só restaura se o rascunho for recente (< 24h) e não vier de outro usuário
+    const age = Date.now() - (draft.savedAt || 0);
+    if (age > 24 * 60 * 60 * 1000) return;
+
+    setMinHourlyRate(draft.minHourlyRate ?? null);
+    if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
+    if (draft.proLabore) setProLabore(draft.proLabore);
+    if (draft.productiveHours) setProductiveHours(draft.productiveHours);
+    if (draft.factors) {
+      setFactors(DEFAULT_FACTORS.map(df => {
+        const saved = draft.factors.find((f: any) => f.id === df.id);
+        return saved ? { ...df, weight: saved.weight } : df;
+      }));
+    }
+    if (draft.areaIntervals) setAreaIntervals(draft.areaIntervals);
+    if (draft.area) setArea(draft.area);
+    if (draft.selections) setSelections(draft.selections);
+    if (draft.estimatedHours) setEstimatedHours(draft.estimatedHours);
+    if (draft.commercialDiscount) setCommercialDiscount(draft.commercialDiscount);
+    if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
+    if (draft.currentStep) setCurrentStep(draft.currentStep);
+    if (draft.maxStepReached) setMaxStepReached(draft.maxStepReached);
+  }, [user, budgetId]);
+
+  // ── Buscar último budget para banner de restauração ───────────
   useEffect(() => {
     const fetchLastBudget = async () => {
       if (!user || budgetId) return;
@@ -87,9 +175,7 @@ export default function Calculator() {
             setShowRestorePrompt(true);
           }
         }
-      } catch {
-        // Silencioso
-      }
+      } catch { /* silencioso */ }
     };
     fetchLastBudget();
   }, [user, budgetId]);
@@ -103,7 +189,7 @@ export default function Calculator() {
     setShowRestorePrompt(false);
   };
 
-  // Carregar cálculo salvo se houver ID na URL
+  // ── Carregar orçamento salvo via URL ──────────────────────────
   useEffect(() => {
     const loadBudget = async () => {
       if (!budgetId || !user) return;
@@ -139,8 +225,8 @@ export default function Calculator() {
             setArea((interval.min + max) / 2);
           }
         }
-        // Ao carregar um cálculo salvo, ir direto para a última etapa
         setCurrentStep(4);
+        setMaxStepReached(4);
       } catch (e) {
         console.error("Erro ao carregar cálculo:", e);
       }
@@ -149,10 +235,10 @@ export default function Calculator() {
   }, [budgetId, user]);
 
   useEffect(() => {
-    setMaxStepReached((prev) => Math.max(prev, currentStep));
+    setMaxStepReached(prev => Math.max(prev, currentStep));
   }, [currentStep]);
 
-  // Handlers
+  // ── Handlers ──────────────────────────────────────────────────
   const handleMinHourRateCalculate = useCallback((rate: number) => {
     setMinHourlyRate(rate);
   }, []);
@@ -161,9 +247,7 @@ export default function Calculator() {
     setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
   }, []);
 
-  const handleResetWeights = useCallback(() => {
-    setFactors(DEFAULT_FACTORS);
-  }, []);
+  const handleResetWeights = useCallback(() => setFactors(DEFAULT_FACTORS), []);
 
   const handleAreaChange = useCallback((newArea: number) => {
     setArea(newArea);
@@ -181,7 +265,7 @@ export default function Calculator() {
     setSelections(prev => ({ ...prev, [factorId]: value }));
   }, []);
 
-  // Cálculos
+  // ── Cálculos ──────────────────────────────────────────────────
   const globalComplexity = useMemo(() => calculateGlobalComplexity(factors, selections), [factors, selections]);
 
   const results = useMemo(() => {
@@ -194,78 +278,263 @@ export default function Calculator() {
     const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
     const totalFixedExpenses = fixedExpenses.reduce((sum, exp) => sum + exp.value, 0);
     const fixedCostPerHour = productiveHours > 0 ? totalFixedExpenses / productiveHours : 0;
-    const adjustedHourlyRate = minHourlyRate && minHourlyRate > 0 && globalComplexity > 0 ? minHourlyRate * globalComplexity : 0;
-    const projectPrice = adjustedHourlyRate > 0 && estimatedHours > 0 ? adjustedHourlyRate * estimatedHours : 0;
+    const adjustedHourlyRate = minHourlyRate && minHourlyRate > 0 && globalComplexity > 0
+      ? minHourlyRate * globalComplexity : 0;
+    const projectPrice = adjustedHourlyRate > 0 && estimatedHours > 0
+      ? adjustedHourlyRate * estimatedHours : 0;
     const projectPriceWithDiscount = projectPrice * (1 - commercialDiscount / 100);
     const discountAmount = projectPrice * (commercialDiscount / 100);
     const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
     const profit = productiveHours > 0 && projectPriceWithDiscount > 0 && estimatedHours > 0
-      ? projectPriceWithDiscount - (fixedCostPerHour * estimatedHours)
-      : null;
-    return { totalVariableExpenses, adjustedHourlyRate, projectPrice, projectPriceWithDiscount, discountAmount, finalSalePrice, profit };
+      ? projectPriceWithDiscount - (fixedCostPerHour * estimatedHours) : null;
+    return {
+      totalVariableExpenses, adjustedHourlyRate, projectPrice,
+      projectPriceWithDiscount, discountAmount, finalSalePrice, profit,
+    };
   }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses, fixedExpenses, productiveHours]);
 
-  // CUB médio nacional de referência (R$/m²)
   const CUB_MEDIO = 2800;
-
   const cubPercentage = useMemo(() => {
     if (!area || area <= 0 || displayValues.finalSalePrice <= 0) return null;
-    const obraEstimada = CUB_MEDIO * area;
-    return (displayValues.finalSalePrice / obraEstimada) * 100;
+    return (displayValues.finalSalePrice / (CUB_MEDIO * area)) * 100;
   }, [area, displayValues.finalSalePrice]);
 
   const hasComplexitySelections = Object.keys(selections).length > 0;
+  const totalFactors = factors.length; // inclui área
+  const selectedFactorsCount = Object.keys(selections).length;
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area");
 
-  // Lógica de conclusão e visualização de cada etapa
-  // - "stepComplete": usado apenas para habilitar o botão "Próxima etapa"
-  // - "stepVisualDone": usado apenas para o visual (bolinha ficar preenchida)
-  //
-  // Regra importante: a bolinha NÃO deve ficar escura só porque o usuário preencheu dados;
-  // ela fica "concluída" visualmente apenas quando o usuário AVANÇAR para a etapa seguinte.
+  // ── Stepper ───────────────────────────────────────────────────
   const stepComplete = (n: number) => {
     if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-    // Etapa 2 (Pesos) é opcional: sempre pode avançar.
-    if (n === 2) return true;
-    // Etapa 3: precisa classificar o projeto (seleções)
+    if (n === 2) return true; // opcional
     if (n === 3) return hasComplexitySelections;
-    // Etapa 4: ter um preço final calculado
     return displayValues.finalSalePrice > 0;
   };
-
-  // "Done" visual: só quando o usuário já passou da etapa.
   const stepVisualDone = (n: number) => maxStepReached > n;
-
-  // Botão "Próxima etapa" (etapa 2 nunca bloqueia)
   const canAdvance = stepComplete(currentStep);
-const handleNext = () => {
-    if (currentStep < 4 && canAdvance) setCurrentStep(s => s + 1);
+
+  const handleNext = () => {
+    if (currentStep < 4 && canAdvance) {
+      showToast(`Etapa ${currentStep} concluída ✓`);
+      setCurrentStep(s => s + 1);
+    }
   };
 
   const handleBack = () => {
     if (currentStep > 1) setCurrentStep(s => s - 1);
   };
 
+  // ── Placeholder contextual ────────────────────────────────────
+  const pricePlaceholder = currentStep === 1
+    ? "Conclua a Etapa 1 — Hora Técnica"
+    : currentStep === 2
+    ? "Conclua a Etapa 3 — Complexidade"
+    : currentStep === 3
+    ? "Conclua a Etapa 4 — Preço Final"
+    : "Preencha as horas estimadas acima";
+
+  // ── Painel de resultados (compartilhado desktop/mobile) ────────
+  const ResultsPanel = () => (
+    <>
+      {(!minHourlyRate || minHourlyRate <= 0) ? (
+        /* Estado vazio — igual ao padrão do sistema */
+        <div className="p-5 space-y-3">
+          <div className="rounded-xl border-2 border-dashed border-slate-200 p-6 text-center">
+            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+              <span className="text-slate-400 text-lg font-bold">1</span>
+            </div>
+            <p className="text-sm font-medium text-slate-600 mb-1">Comece pela Etapa 1</p>
+            <p className="text-xs text-slate-400">
+              Preencha sua hora técnica mínima para ver os resultados aqui.
+            </p>
+          </div>
+          {/* Link para histórico */}
+          {user && (
+            <button
+              type="button"
+              onClick={() => navigate(createPageUrl("BudgetsHistory"))}
+              className="w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-calcularq-blue/70 hover:text-calcularq-blue transition-colors"
+            >
+              <History className="w-3.5 h-3.5" />
+              Ver orçamentos anteriores
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="p-5 space-y-4">
+
+          {/* BASE DO CÁLCULO */}
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
+            <div className="space-y-1 text-sm text-slate-600">
+              <div className="flex justify-between gap-3">
+                <span className="min-w-0">Hora Técnica Mínima</span>
+                <span className="font-medium text-slate-800 whitespace-nowrap">
+                  R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                </span>
+              </div>
+              {hasComplexitySelections && (
+                <div className="flex justify-between gap-3">
+                  <span className="min-w-0">Complexidade Global</span>
+                  <span className="font-medium text-slate-800 whitespace-nowrap">{globalComplexity.toFixed(2)}x</span>
+                </div>
+              )}
+              {displayValues.adjustedHourlyRate > 0 && (
+                <div className="flex justify-between gap-3 pt-1 border-t border-slate-200 mt-1">
+                  <span className="font-bold text-calcularq-blue min-w-0">Hora Ajustada</span>
+                  <span className="font-bold text-calcularq-blue whitespace-nowrap">
+                    R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Indicador de fatores — etapa 3 */}
+          {currentStep === 3 && (
+            <div className="flex items-center justify-between px-1 text-xs text-slate-500">
+              <span>Fatores classificados</span>
+              <span className={`font-semibold ${selectedFactorsCount === totalFactors ? "text-green-600" : "text-calcularq-blue"}`}>
+                {selectedFactorsCount} / {totalFactors}
+              </span>
+            </div>
+          )}
+
+          {/* Sugestão de horas — etapa 4 */}
+          {currentStep === 4 && globalComplexity > 0 && estimatedHours === 0 && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+              <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700 leading-relaxed">
+                {hoursHint(globalComplexity)}
+              </p>
+            </div>
+          )}
+
+          {/* LINHAS DE COMPOSIÇÃO */}
+          {displayValues.projectPrice > 0 && (
+            <div className="space-y-2 text-sm px-1">
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 flex-1">
+                  Preço do Projeto
+                  {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 && (
+                    <span className="block text-slate-400 text-xs">
+                      {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  )}
+                </span>
+                <span className="font-semibold text-slate-800 whitespace-nowrap">
+                  R$ {displayValues.projectPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              {displayValues.totalVariableExpenses > 0 && (
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="text-slate-600 min-w-0">(+) Despesas Variáveis</span>
+                  <span className="font-semibold text-slate-800 whitespace-nowrap">
+                    R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+              {displayValues.discountAmount > 0 && (
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="text-slate-600 min-w-0">(-) Desconto ({commercialDiscount}%)</span>
+                  <span className="font-semibold text-red-500 whitespace-nowrap">
+                    - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PREÇO FINAL */}
+          {displayValues.finalSalePrice > 0 ? (
+            <div className="bg-calcularq-blue rounded-lg p-4 text-center">
+              <p className="text-xs font-semibold text-blue-200 mb-1">Preço de Venda Final</p>
+              <p className="text-2xl font-bold text-white">
+                R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-1">
+              <p className="text-xs font-medium text-slate-500">{pricePlaceholder}</p>
+              <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
+            </div>
+          )}
+
+          {/* LUCRO ESTIMADO */}
+          {displayValues.profit !== null && (
+            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
+              <span className="text-sm text-slate-500">Lucro Estimado</span>
+              <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
+                R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+          )}
+
+          {/* % DO VALOR DA OBRA (CUB) */}
+          {cubPercentage !== null && (
+            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
+              <span className="flex items-center gap-1 text-sm text-slate-500">
+                % do valor da obra
+                <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
+              </span>
+              <span className="text-sm font-bold text-calcularq-blue">
+                {cubPercentage.toFixed(1)}%
+              </span>
+            </div>
+          )}
+
+          {/* Link histórico */}
+          {user && (
+            <button
+              type="button"
+              onClick={() => navigate(createPageUrl("BudgetsHistory"))}
+              className="w-full flex items-center justify-center gap-2 pt-2 text-xs font-medium text-calcularq-blue/60 hover:text-calcularq-blue transition-colors border-t border-slate-100"
+            >
+              <History className="w-3.5 h-3.5" />
+              Ver orçamentos anteriores
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-28 lg:pb-12">
 
-        
-{/* Header */}
-<motion.div
-  initial={{ opacity: 0, y: -10 }}
-  animate={{ opacity: 1, y: 0 }}
-  className="mb-10 text-center"
->
-  <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
-    Precifique seu projeto em 4 etapas
-  </h1>
-  <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
-    Descubra sua hora técnica mínima, ajuste os pesos (opcional), classifique a complexidade do projeto e finalize a composição do preço.
-  </p>
+        {/* Toast de conclusão de etapa */}
+        <AnimatePresence>
+          {stepToast && (
+            <motion.div
+              key="toast"
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-calcularq-blue text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-lg"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              {stepToast}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-</motion.div>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10 text-center"
+        >
+          <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
+            Precifique seu projeto em 4 etapas
+          </h1>
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
+            Descubra sua hora técnica mínima, ajuste os pesos (opcional), classifique a complexidade do projeto e finalize a composição do preço.
+          </p>
+        </motion.div>
 
         {/* Stepper horizontal unificado */}
         <div className="mb-10 flex justify-center">
@@ -273,26 +542,21 @@ const handleNext = () => {
             {STEPS.map((step, i) => {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
-
               const handleClick = () => {
                 const canJumpSkipWeights = step.n === 3 && maxStepReached === 1 && stepComplete(1);
                 const canGoToReached = step.n <= maxStepReached;
                 const canGoToNext = step.n === maxStepReached + 1 && stepComplete(step.n - 1);
                 if (canGoToReached || canGoToNext || canJumpSkipWeights) setCurrentStep(step.n);
               };
-
               return (
                 <div key={step.n} className="flex items-start">
-                  {/* Bolinha + label */}
                   <div className="flex flex-col items-center w-20 sm:w-24">
                     <button
                       type="button"
                       onClick={handleClick}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
-                        ${done
-                          ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
-                          : active
-                          ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
+                        ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
+                          : active ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
                           : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
                     >
                       {done ? "✓" : step.n}
@@ -302,11 +566,9 @@ const handleNext = () => {
                       {step.label}
                     </span>
                   </div>
-
-                  {/* Linha conectora — alinhada verticalmente com o centro da bolinha */}
                   {i < STEPS.length - 1 && (
                     <div className="mt-5 h-0.5 w-6 sm:w-10 shrink-0 transition-colors duration-300"
-                      style={{ backgroundColor: done ? "var(--calcularq-blue, #1e3a8a)" : "#e2e8f0" }}
+                      style={{ backgroundColor: done ? "#1e3a8a" : "#e2e8f0" }}
                     />
                   )}
                 </div>
@@ -341,7 +603,7 @@ const handleNext = () => {
               </motion.div>
             )}
 
-            {/* Conteúdo da etapa ativa */}
+            {/* Conteúdo da etapa */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -350,7 +612,6 @@ const handleNext = () => {
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.25 }}
               >
-                {/* ETAPA 1 */}
                 {currentStep === 1 && (
                   <MinimumHourCalculator
                     onCalculate={handleMinHourRateCalculate}
@@ -364,7 +625,6 @@ const handleNext = () => {
                   />
                 )}
 
-                {/* ETAPA 2 */}
                 {currentStep === 2 && (
                   <ComplexityConfig
                     factors={factors}
@@ -373,7 +633,6 @@ const handleNext = () => {
                   />
                 )}
 
-                {/* ETAPA 3 */}
                 {currentStep === 3 && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
@@ -388,8 +647,8 @@ const handleNext = () => {
                       </div>
                     </div>
 
-                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm text-blue-700">
+                    <div className="mb-6 p-4 rounded-lg border border-blue-200" style={{ background: "rgba(239,246,255,0.70)" }}>
+                      <p className="text-sm text-blue-800">
                         <strong>Precisa de apoio na classificação?</strong> Para entender os critérios técnicos e os exemplos práticos por trás de cada Fator e Valor,{" "}
                         <a href={createPageUrl("Manual")} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
                           acesse o manual de instruções
@@ -419,7 +678,6 @@ const handleNext = () => {
                   </div>
                 )}
 
-                {/* ETAPA 4 */}
                 {currentStep === 4 && minHourlyRate && minHourlyRate > 0 && results && (
                   <FinalCalculation
                     budgetId={budgetId || undefined}
@@ -456,7 +714,7 @@ const handleNext = () => {
               </motion.div>
             </AnimatePresence>
 
-            {/* Botões de navegação */}
+            {/* Navegação */}
             <div className="flex items-center justify-between mt-6">
               <button
                 onClick={handleBack}
@@ -468,10 +726,7 @@ const handleNext = () => {
                 Etapa anterior
               </button>
 
-              {/* Indicador mobile */}
-              <span className="text-xs text-slate-400 lg:hidden">
-                {currentStep} de {STEPS.length}
-              </span>
+              <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
 
               {currentStep < 4 ? (
                 <button
@@ -489,146 +744,27 @@ const handleNext = () => {
             </div>
           </div>
 
-          {/* Painel lateral de resultados */}
+          {/* Painel lateral — desktop */}
           <div className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-24">
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="bg-calcularq-blue px-6 py-4">
                   <h3 className="text-lg font-bold text-white text-center">Resultados</h3>
                 </div>
-
-                {(!minHourlyRate || minHourlyRate <= 0) ? (
-                  <div className="px-6 py-10 text-center">
-                    <p className="text-slate-400 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
-                  </div>
-                ) : (
-                  <div className="p-5 space-y-4">
-
-                    {/* BASE DO CÁLCULO */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                      <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
-                      <div className="space-y-1 text-sm text-slate-600">
-                        <div className="flex justify-between">
-                          <span>Hora Técnica Mínima</span>
-                          <span className="font-medium text-slate-800">
-                            R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                          </span>
-                        </div>
-                        {hasComplexitySelections && (
-                          <div className="flex justify-between">
-                            <span>Complexidade Global</span>
-                            <span className="font-medium text-slate-800">{globalComplexity.toFixed(2)}x</span>
-                          </div>
-                        )}
-                        {displayValues.adjustedHourlyRate > 0 && (
-                          <div className="flex justify-between pt-1 border-t border-slate-200 mt-1">
-                            <span className="font-bold text-calcularq-blue">Hora Técnica Ajustada</span>
-                            <span className="font-bold text-calcularq-blue">
-                              R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LINHAS DE COMPOSIÇÃO */}
-                    {displayValues.projectPrice > 0 && (
-                      <div className="space-y-2 text-sm px-1">
-                        <div className="flex justify-between items-start gap-2">
-                          <span className="text-slate-600 flex-1">
-                            Preço do Projeto
-                            {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 && (
-                              <span className="block text-slate-400 text-xs">
-                                {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </span>
-                            )}
-                          </span>
-                          <span className="font-semibold text-slate-800 whitespace-nowrap">
-                            R$ {displayValues.projectPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                        </div>
-
-                        {displayValues.totalVariableExpenses > 0 && (
-                          <div className="flex justify-between items-baseline">
-                            <span className="text-slate-600">(+) Despesas Variáveis</span>
-                            <span className="font-semibold text-slate-800 whitespace-nowrap">
-                              R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </span>
-                          </div>
-                        )}
-
-                        {displayValues.discountAmount > 0 && (
-                          <div className="flex justify-between items-baseline">
-                            <span className="text-slate-600">(-) Desconto ({commercialDiscount}%)</span>
-                            <span className="font-semibold text-red-500 whitespace-nowrap">
-                              - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* PREÇO FINAL */}
-                    {displayValues.finalSalePrice > 0 ? (
-                      <div className="bg-calcularq-blue rounded-lg p-4 text-center">
-                        <p className="text-xs font-semibold text-blue-200 mb-1">Preço de Venda Final</p>
-                        <p className="text-2xl font-bold text-white">
-                          R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-1">
-                        <p className="text-xs font-medium text-slate-500">
-                          {currentStep < 3
-                            ? `Conclua a Etapa ${currentStep + 1} — ${STEPS[currentStep].label}`
-                            : currentStep === 3
-                            ? "Conclua a Etapa 4 — Preço Final"
-                            : "Preencha as horas estimadas para ver o preço"}
-                        </p>
-                        <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
-                      </div>
-                    )}
-
-                    {/* LUCRO ESTIMADO */}
-                    {displayValues.profit !== null && (
-                      <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-                        <span className="text-sm text-slate-500">Lucro Estimado</span>
-                        <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
-                          R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* % DO VALOR DA OBRA (CUB) */}
-                    {cubPercentage !== null && (
-                      <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-                        <span className="flex items-center gap-1 text-sm text-slate-500">
-                          % do valor da obra
-                          <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
-                        </span>
-                        <span className="text-sm font-bold text-calcularq-blue">
-                          {cubPercentage.toFixed(1)}%
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <ResultsPanel />
               </div>
             </div>
           </div>
-
         </div>
 
-        {/* Mobile: barra fixa de resultados + bottom sheet */}
+        {/* Mobile: barra fixa + bottom sheet */}
         <div className="lg:hidden">
           <div className="fixed inset-x-0 bottom-0 z-40" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6">
-              
               <div className="mb-3 rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
                 <div className="bg-calcularq-blue px-4 py-3">
                   <p className="text-base font-bold text-white text-center">Resultados</p>
                 </div>
-
                 <button
                   type="button"
                   onClick={() => setMobileResultsOpen(true)}
@@ -640,7 +776,7 @@ const handleNext = () => {
                         R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     ) : (
-                      <p className="text-sm font-semibold text-slate-400 truncate">Complete as etapas para ver o preço</p>
+                      <p className="text-sm font-semibold text-slate-400 truncate">{pricePlaceholder}</p>
                     )}
                   </div>
                   <div className="shrink-0 text-sm font-semibold text-calcularq-blue flex items-center gap-2">
@@ -673,7 +809,6 @@ const handleNext = () => {
                 >
                   <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-6">
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-                      
                       <div className="bg-calcularq-blue px-5 py-4 flex items-center justify-between">
                         <p className="text-lg font-bold text-white">Resultados</p>
                         <button
@@ -685,118 +820,7 @@ const handleNext = () => {
                           <X className="w-5 h-5" />
                         </button>
                       </div>
-
-                      {(!minHourlyRate || minHourlyRate <= 0) ? (
-                        <div className="px-5 py-10 text-center">
-                          <p className="text-slate-400 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
-                        </div>
-                      ) : (
-                        <div className="p-5 space-y-4">
-                          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                            <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
-                            <div className="space-y-1 text-sm text-slate-600">
-                              <div className="flex justify-between gap-3">
-                                <span className="min-w-0">Hora Técnica Mínima</span>
-                                <span className="font-medium text-slate-800 whitespace-nowrap">
-                                  R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                                </span>
-                              </div>
-                              {hasComplexitySelections && (
-                                <div className="flex justify-between gap-3">
-                                  <span className="min-w-0">Complexidade Global</span>
-                                  <span className="font-medium text-slate-800 whitespace-nowrap">{globalComplexity.toFixed(2)}x</span>
-                                </div>
-                              )}
-                              {displayValues.adjustedHourlyRate > 0 && (
-                                <div className="flex justify-between gap-3 pt-1 border-t border-slate-200 mt-1">
-                                  <span className="font-bold text-calcularq-blue min-w-0">Hora Técnica Ajustada</span>
-                                  <span className="font-bold text-calcularq-blue whitespace-nowrap">
-                                    R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {displayValues.projectPrice > 0 && (
-                            <div className="space-y-2 text-sm px-1">
-                              <div className="flex justify-between items-start gap-2">
-                                <span className="text-slate-600 flex-1">
-                                  Preço do Projeto
-                                  {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 && (
-                                    <span className="block text-slate-400 text-xs">
-                                      {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                  )}
-                                </span>
-                                <span className="font-semibold text-slate-800 whitespace-nowrap">
-                                  R$ {displayValues.projectPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
-                              </div>
-
-                              {displayValues.totalVariableExpenses > 0 && (
-                                <div className="flex justify-between items-baseline gap-2">
-                                  <span className="text-slate-600 min-w-0">(+) Despesas Variáveis</span>
-                                  <span className="font-semibold text-slate-800 whitespace-nowrap">
-                                    R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                  </span>
-                                </div>
-                              )}
-
-                              {displayValues.discountAmount > 0 && (
-                                <div className="flex justify-between items-baseline gap-2">
-                                  <span className="text-slate-600 min-w-0">(-) Desconto ({commercialDiscount}%)</span>
-                                  <span className="font-semibold text-red-500 whitespace-nowrap">
-                                    - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {displayValues.finalSalePrice > 0 ? (
-                            <div className="bg-calcularq-blue rounded-lg p-4 text-center">
-                              <p className="text-xs font-semibold text-blue-200 mb-1">Preço de Venda Final</p>
-                              <p className="text-2xl font-bold text-white">
-                                R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-1">
-                              <p className="text-xs font-medium text-slate-500">
-                                {currentStep < 3
-                                  ? `Conclua a Etapa ${currentStep + 1} — ${STEPS[currentStep].label}`
-                                  : currentStep === 3
-                                  ? "Conclua a Etapa 4 — Preço Final"
-                                  : "Preencha as horas estimadas para ver o preço"}
-                              </p>
-                              <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
-                            </div>
-                          )}
-
-                          {displayValues.profit !== null && (
-                            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-                              <span className="text-sm text-slate-500">Lucro Estimado</span>
-                              <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
-                                R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* % DO VALOR DA OBRA (CUB) */}
-                          {cubPercentage !== null && (
-                            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-                              <span className="flex items-center gap-1 text-sm text-slate-500">
-                                % do valor da obra
-                                <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
-                              </span>
-                              <span className="text-sm font-bold text-calcularq-blue">
-                                {cubPercentage.toFixed(1)}%
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      <ResultsPanel />
                     </div>
                   </div>
                 </motion.div>
@@ -804,6 +828,7 @@ const handleNext = () => {
             )}
           </AnimatePresence>
         </div>
+
       </div>
     </div>
   );
