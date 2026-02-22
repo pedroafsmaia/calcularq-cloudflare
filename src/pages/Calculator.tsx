@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, X, CheckCircle2, History, Lightbulb } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, History, Lightbulb } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -30,13 +30,20 @@ const STEPS = [
   { n: 4, label: "Preço Final" },
 ];
 
-// Sugestões de horas por faixa de complexidade
-function hoursHint(complexity: number): string {
-  if (complexity <= 0) return "";
-  if (complexity < 1.5) return "Projetos simples nessa faixa costumam levar entre 20–40h.";
-  if (complexity < 2.5) return "Projetos nessa faixa costumam levar entre 40–80h.";
-  if (complexity < 3.5) return "Projetos nessa complexidade costumam levar entre 80–150h.";
-  return "Projetos altamente complexos podem demandar 150h ou mais.";
+// Sugestão de horas baseada em área e complexidade
+// Referência: CAU recomenda 0,10–0,25 h/m² conforme complexidade
+function hoursHint(area: number | null, complexity: number): { min: number; max: number } | null {
+  if (!area || area <= 0 || complexity <= 0) return null;
+  // Fator h/m² cresce com a complexidade
+  let minFactor: number, maxFactor: number;
+  if (complexity < 1.5)      { minFactor = 0.08; maxFactor = 0.12; }
+  else if (complexity < 2.5) { minFactor = 0.12; maxFactor = 0.18; }
+  else if (complexity < 3.5) { minFactor = 0.18; maxFactor = 0.25; }
+  else                       { minFactor = 0.25; maxFactor = 0.35; }
+  return {
+    min: Math.round(area * minFactor),
+    max: Math.round(area * maxFactor),
+  };
 }
 
 // Chave do localStorage para rascunho
@@ -65,16 +72,6 @@ export default function Calculator() {
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
 
-  // Toast de conclusão de etapa
-  const [stepToast, setStepToast] = useState<string | null>(null);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const showToast = (msg: string) => {
-    setStepToast(msg);
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = setTimeout(() => setStepToast(null), 2500);
-  };
-
   // Seção 1
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [fixedExpenses, setFixedExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
@@ -99,9 +96,6 @@ export default function Calculator() {
   const [lastBudgetProLabore, setLastBudgetProLabore] = useState<number | null>(null);
   const [lastBudgetProductiveHours, setLastBudgetProductiveHours] = useState<number | null>(null);
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
-
-  // Mobile bottom sheet
-  const [mobileResultsOpen, setMobileResultsOpen] = useState(false);
 
   // ── Autosave em localStorage ──────────────────────────────────
   const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -317,7 +311,6 @@ export default function Calculator() {
 
   const handleNext = () => {
     if (currentStep < 4 && canAdvance) {
-      showToast(`Etapa ${currentStep} concluída ✓`);
       setCurrentStep(s => s + 1);
     }
   };
@@ -326,14 +319,7 @@ export default function Calculator() {
     if (currentStep > 1) setCurrentStep(s => s - 1);
   };
 
-  // ── Placeholder contextual ────────────────────────────────────
-  const pricePlaceholder = currentStep === 1
-    ? "Conclua a Etapa 1 — Hora Técnica"
-    : currentStep === 2
-    ? "Conclua a Etapa 3 — Complexidade"
-    : currentStep === 3
-    ? "Conclua a Etapa 4 — Preço Final"
-    : "Preencha as horas estimadas acima";
+
 
   // ── Painel de resultados (compartilhado desktop/mobile) ────────
   const ResultsPanel = () => (
@@ -402,15 +388,20 @@ export default function Calculator() {
             </div>
           )}
 
-          {/* Sugestão de horas — etapa 4 */}
-          {currentStep === 4 && globalComplexity > 0 && estimatedHours === 0 && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
-              <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-700 leading-relaxed">
-                {hoursHint(globalComplexity)}
-              </p>
-            </div>
-          )}
+          {/* Sugestão de horas — etapa 4, baseada em área × h/m² (referência CAU) */}
+          {currentStep === 4 && globalComplexity > 0 && estimatedHours === 0 && (() => {
+            const hint = hoursHint(area, globalComplexity);
+            if (!hint) return null;
+            return (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  Para {Math.round(area!)}m² com essa complexidade, a referência do CAU sugere entre{" "}
+                  <strong>{hint.min}–{hint.max}h</strong> de projeto.
+                </p>
+              </div>
+            );
+          })()}
 
           {/* LINHAS DE COMPOSIÇÃO */}
           {displayValues.projectPrice > 0 && (
@@ -456,8 +447,7 @@ export default function Calculator() {
               </p>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-1">
-              <p className="text-xs font-medium text-slate-500">{pricePlaceholder}</p>
+            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center">
               <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
             </div>
           )}
@@ -503,24 +493,7 @@ export default function Calculator() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-28 lg:pb-12">
-
-        {/* Toast de conclusão de etapa */}
-        <AnimatePresence>
-          {stepToast && (
-            <motion.div
-              key="toast"
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.2 }}
-              className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-calcularq-blue text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-lg"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              {stepToast}
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
 
         {/* Header */}
         <motion.div
@@ -757,76 +730,20 @@ export default function Calculator() {
           </div>
         </div>
 
-        {/* Mobile: barra fixa + bottom sheet */}
-        <div className="lg:hidden">
-          <div className="fixed inset-x-0 bottom-0 z-40" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6">
-              <div className="mb-3 rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
-                <div className="bg-calcularq-blue px-4 py-3">
-                  <p className="text-base font-bold text-white text-center">Resultados</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileResultsOpen(true)}
-                  className="w-full flex items-center justify-between gap-4 px-4 py-3 bg-white"
-                >
-                  <div className="text-left min-w-0">
-                    {displayValues.finalSalePrice > 0 ? (
-                      <p className="text-lg font-bold text-slate-900 truncate">
-                        R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    ) : (
-                      <p className="text-sm font-semibold text-slate-400 truncate">{pricePlaceholder}</p>
-                    )}
-                  </div>
-                  <div className="shrink-0 text-sm font-semibold text-calcularq-blue flex items-center gap-2">
-                    Ver detalhes
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </button>
+        {/* Mobile: card inline abaixo da calculadora, visível apenas na etapa 4 */}
+        <div className="lg:hidden mt-6">
+          {currentStep === 4 && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"
+            >
+              <div className="bg-calcularq-blue px-5 py-4">
+                <p className="text-lg font-bold text-white text-center">Resultados</p>
               </div>
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {mobileResultsOpen && (
-              <>
-                <motion.button
-                  type="button"
-                  aria-label="Fechar resultados"
-                  className="fixed inset-0 bg-black/30 z-40"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setMobileResultsOpen(false)}
-                />
-                <motion.div
-                  className="fixed inset-x-0 bottom-0 z-50"
-                  initial={{ y: 24, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 24, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-6">
-                    <div className="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-                      <div className="bg-calcularq-blue px-5 py-4 flex items-center justify-between">
-                        <p className="text-lg font-bold text-white">Resultados</p>
-                        <button
-                          type="button"
-                          onClick={() => setMobileResultsOpen(false)}
-                          className="text-white/90 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
-                          aria-label="Fechar"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                      <ResultsPanel />
-                    </div>
-                  </div>
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
+              <ResultsPanel />
+            </motion.div>
+          )}
         </div>
 
       </div>
