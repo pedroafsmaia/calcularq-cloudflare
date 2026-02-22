@@ -112,10 +112,10 @@ export default function MinimumHourCalculator({
           <Calculator className="w-5 h-5 text-calcularq-blue" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-calcularq-blue">
+          <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
             Calculadora da Hora Técnica Mínima
           </h2>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1 leading-relaxed">
             Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
           </p>
         </div>

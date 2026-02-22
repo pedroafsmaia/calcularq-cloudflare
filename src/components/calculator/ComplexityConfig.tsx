@@ -25,12 +25,12 @@ export default function ComplexityConfig({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-calcularq-blue">
+              <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
                 Configurações da Calculadora de Complexidade
               </h2>
               <Tooltip text="Aqui você define o quanto cada fator pesa na Complexidade Global. Se não quiser mexer agora, pode seguir com os valores padrão (Peso 1)." />
             </div>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-500 mt-1 leading-relaxed">
               Ajuste os pesos dos fatores para calcular os preços de acordo com sua estratégia
             </p>
           </div>
