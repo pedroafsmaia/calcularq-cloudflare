@@ -257,46 +257,41 @@ const handleNext = () => {
 
 </motion.div>
 
-        {/* Barra de progresso (mobile/tablet): horizontal e rolável */}
-        <div className="lg:hidden mb-6">
-          <div className="flex items-center gap-4 overflow-x-auto pb-2 -mx-1 px-1">
+        {/* Stepper horizontal unificado — desktop e mobile */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
             {STEPS.map((step, i) => {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
 
+              const handleClick = () => {
+                const canJumpSkipWeights = step.n === 3 && maxStepReached === 1 && stepComplete(1);
+                const canGoToReached = step.n <= maxStepReached;
+                const canGoToNext = step.n === maxStepReached + 1 && stepComplete(step.n - 1);
+                if (canGoToReached || canGoToNext || canJumpSkipWeights) setCurrentStep(step.n);
+              };
+
               return (
-                <div key={step.n} className="flex items-center gap-4 shrink-0">
+                <div key={step.n} className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
-                    onClick={() => {
-                      const canJumpSkipWeights =
-                        step.n === 3 && maxStepReached === 1 && stepComplete(1);
-
-                      const canGoToReached = step.n <= maxStepReached;
-                      const canGoToNext =
-                        step.n === maxStepReached + 1 && stepComplete(step.n - 1);
-
-                      if (canGoToReached || canGoToNext || canJumpSkipWeights) {
-                        setCurrentStep(step.n);
-                      }
-                    }}
+                    onClick={handleClick}
                     className={`h-9 px-3 rounded-full flex items-center gap-2 text-sm font-semibold transition-all duration-300 border
-                      ${done ? "bg-calcularq-blue border-calcularq-blue text-white" :
-                        active ? "bg-white border-calcularq-blue text-calcularq-blue" :
-                        "bg-white border-slate-200 text-slate-500"}`}
+                      ${done
+                        ? "bg-calcularq-blue border-calcularq-blue text-white"
+                        : active
+                        ? "bg-white border-calcularq-blue text-calcularq-blue"
+                        : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
                   >
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border
-                      ${done ? "bg-white/15 border-white/30 text-white" :
-                        active ? "bg-calcularq-blue/10 border-calcularq-blue/30 text-calcularq-blue" :
-                        "bg-slate-50 border-slate-200 text-slate-500"}`}
-                    >
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold
+                      ${done ? "bg-white/20 text-white" : active ? "bg-calcularq-blue/10 text-calcularq-blue" : "text-slate-400"}`}>
                       {done ? "✓" : step.n}
                     </span>
                     <span className="whitespace-nowrap">{step.label}</span>
                   </button>
 
                   {i < STEPS.length - 1 && (
-                    <div className={`h-0.5 w-10 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`} />
+                    <div className={`h-0.5 w-6 sm:w-10 shrink-0 transition-colors duration-300 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`} />
                   )}
                 </div>
               );
@@ -305,51 +300,6 @@ const handleNext = () => {
         </div>
 
         <div className="flex gap-8">
-
-          {/* Barra de progresso vertical */}
-          <div className="hidden lg:flex flex-col items-center pt-2 shrink-0">
-            {STEPS.map((step, i) => {
-              const done = stepVisualDone(step.n);
-              const active = currentStep === step.n;
-              return (
-                <div key={step.n} className="flex flex-col items-center">
-                  <button
-                    onClick={() => {
-                      // Navegação liberada:
-                      // - etapas já alcançadas (<= maxStepReached)
-                      // - próxima etapa (maxStepReached + 1) se a anterior estiver completa
-                      // - pular "Pesos" (etapa 2) indo direto para a 3 quando a etapa 1 estiver completa
-                      const canJumpSkipWeights =
-                        step.n === 3 && maxStepReached === 1 && stepComplete(1);
-
-                      const canGoToReached = step.n <= maxStepReached;
-                      const canGoToNext =
-                        step.n === maxStepReached + 1 && stepComplete(step.n - 1);
-
-                      if (canGoToReached || canGoToNext || canJumpSkipWeights) {
-                        setCurrentStep(step.n);
-                      }
-                    }}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
-                      ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md" :
-                        active ? "bg-white border-calcularq-blue text-calcularq-blue shadow-md" :
-                        "bg-white border-slate-200 text-slate-400"}`}
-                    title={step.label}
-                  >
-                    {done ? "✓" : step.n}
-                  </button>
-                  <span className={`text-xs mt-1 mb-1 font-medium text-center w-20 leading-tight
-                    ${done || active ? "text-calcularq-blue" : "text-slate-400"}`}>
-                    {step.label}
-                  </span>
-                  {i < STEPS.length - 1 && (
-                    <div className={`w-0.5 h-10 transition-colors duration-300 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
           {/* Coluna principal */}
           <div className="flex-1 min-w-0">
 
