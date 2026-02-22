@@ -61,7 +61,7 @@ export default function Tooltip({ text }: TooltipProps) {
 
       {visible && (
         <span
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-80 max-w-[85vw] rounded-xl px-3.5 py-3 shadow-lg pointer-events-none border border-blue-200"
+          className="absolute right-0 top-full mt-2 z-50 w-72 max-w-[85vw] rounded-xl px-3.5 py-3 shadow-lg pointer-events-none border border-blue-200 sm:left-6 sm:right-auto sm:top-1/2 sm:mt-0 sm:w-80 sm:-translate-y-1/2"
           style={{
             background: "rgba(239, 246, 255, 0.76)",
             backdropFilter: "blur(10px)",
@@ -76,7 +76,7 @@ export default function Tooltip({ text }: TooltipProps) {
 
           {/* Setinha */}
           <span
-            className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent"
+            className="hidden sm:block absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent"
             style={{ borderRightColor: "rgba(191, 219, 254, 0.92)" }}
           />
         </span>

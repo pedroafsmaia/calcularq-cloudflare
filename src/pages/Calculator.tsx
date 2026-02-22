@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, History } from "lucide-react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { BarChart2, ChevronRight, ChevronLeft } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 
@@ -46,7 +46,6 @@ function loadDraft(): any | null {
 
 export default function Calculator() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const budgetId = searchParams.get("budget");
   const [loadedBudgetName, setLoadedBudgetName] = useState<string | null>(null);
@@ -320,17 +319,6 @@ export default function Calculator() {
               Preencha sua hora técnica mínima para ver os resultados aqui.
             </p>
           </div>
-          {/* Link para histórico */}
-          {user && (
-            <button
-              type="button"
-              onClick={() => navigate(createPageUrl("BudgetsHistory"))}
-              className="w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-calcularq-blue/70 hover:text-calcularq-blue transition-colors"
-            >
-              <History className="w-3.5 h-3.5" />
-              Ver orçamentos anteriores
-            </button>
-          )}
         </div>
       ) : (
         <div className="p-5 space-y-4">
@@ -444,17 +432,6 @@ export default function Calculator() {
             </div>
           )}
 
-          {/* Link histórico */}
-          {user && (
-            <button
-              type="button"
-              onClick={() => navigate(createPageUrl("BudgetsHistory"))}
-              className="w-full flex items-center justify-center gap-2 pt-2 text-xs font-medium text-calcularq-blue/60 hover:text-calcularq-blue transition-colors border-t border-slate-100"
-            >
-              <History className="w-3.5 h-3.5" />
-              Ver orçamentos anteriores
-            </button>
-          )}
         </div>
       )}
     </>
@@ -647,12 +624,20 @@ export default function Calculator() {
                       <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl border border-slate-200 bg-white shadow-sm"
+                        className="rounded-2xl border border-calcularq-blue/15 bg-gradient-to-br from-calcularq-blue/5 to-white p-3"
                       >
-                        <div className="bg-calcularq-blue px-5 py-4 rounded-t-2xl">
-                          <p className="text-lg font-bold text-white text-center">Resultados</p>
+                        <div className="mb-3 flex items-center justify-between px-1">
+                          <div className="flex items-center gap-2 text-calcularq-blue">
+                            <div className="w-8 h-8 rounded-lg bg-calcularq-blue/10 flex items-center justify-center">
+                              <BarChart2 className="w-4 h-4" />
+                            </div>
+                            <p className="text-sm font-semibold">Resultados</p>
+                          </div>
+                          <span className="text-xs text-slate-500">Resumo</span>
                         </div>
-                        <ResultsPanel />
+                        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                          <ResultsPanel />
+                        </div>
                       </motion.div>
                     }
                   />
@@ -702,7 +687,7 @@ export default function Calculator() {
           <div className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-24">
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
-                <div className="bg-calcularq-blue px-6 py-4">
+                <div className="bg-calcularq-blue px-6 py-4 rounded-t-2xl">
                   <h3 className="text-lg font-bold text-white text-center">Resultados</h3>
                 </div>
                 <ResultsPanel />
