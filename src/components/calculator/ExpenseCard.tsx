@@ -1,5 +1,6 @@
 import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Tooltip from "@/components/ui/Tooltip";
 
 export interface Expense {
   id: string;
@@ -14,6 +15,7 @@ interface ExpenseCardProps {
   onUpdate: (id: string, expense: Partial<Expense>) => void;
   placeholder: string;
   label: string;
+  tooltip?: string;
 }
 
 export default function ExpenseCard({ 
@@ -22,7 +24,8 @@ export default function ExpenseCard({
   onRemove, 
   onUpdate,
   placeholder,
-  label 
+  label,
+  tooltip,
 }: ExpenseCardProps) {
   const total = expenses.reduce((sum, exp) => sum + exp.value, 0);
 
@@ -38,7 +41,10 @@ export default function ExpenseCard({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-slate-700">{label}</label>
+        <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
+          {label}
+          {tooltip && <Tooltip text={tooltip} />}
+        </label>
         <Button
           type="button"
           variant="outline"
@@ -65,9 +71,7 @@ export default function ExpenseCard({
               className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0"
             />
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
-                R$
-              </span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
               <input
                 type="number"
                 min="0"

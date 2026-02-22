@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Calculator } from "lucide-react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface MinimumHourCalculatorProps {
   initialFixedExpenses?: Expense[];
@@ -38,10 +39,6 @@ export default function MinimumHourCalculator({
     return (totalExpenses + proLabore) / productiveHours;
   }, [fixedExpenses, proLabore, productiveHours, useManual, manualMinHourRate]);
 
-
-  // Sincronizar valores iniciais (quando carrega um cálculo salvo)
-  // Usamos uma ref para disparar o efeito apenas quando o array realmente mudar,
-  // evitando o anti-pattern de JSON.stringify como dependência
   const prevInitialExpensesRef = useRef<string>("");
   useEffect(() => {
     const serialized = JSON.stringify(initialFixedExpenses || []);
@@ -92,7 +89,6 @@ export default function MinimumHourCalculator({
     onCalculate(calculatedMinHourRate);
   };
 
-  // Calcular automaticamente quando valores mudarem
   useEffect(() => {
     if (!useManual && calculatedMinHourRate > 0) {
       handleCalculate();
@@ -102,7 +98,6 @@ export default function MinimumHourCalculator({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calculatedMinHourRate, useManual, manualMinHourRate]);
 
-  // Garantir que sempre haja pelo menos um card de despesa fixa
   useEffect(() => {
     if (!useManual && fixedExpenses.length === 0) {
       handleAddExpense({ id: Date.now().toString(), name: "", value: 0 });
@@ -121,8 +116,7 @@ export default function MinimumHourCalculator({
             Calculadora da Hora Técnica Mínima
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Preencha os dados do seu escritório para descobrir o valor da sua hora técnica
-            mínima.
+            Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
           </p>
         </div>
       </div>
@@ -137,20 +131,20 @@ export default function MinimumHourCalculator({
             onChange={(e) => setUseManual(e.target.checked)}
             className="w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
           />
-          <label htmlFor="useManual" className="text-sm font-medium text-slate-700">
+          <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
             Já sei a minha hora técnica mínima.
+            <Tooltip text="Marque esta opção se você já calculou sua hora técnica mínima anteriormente e quer inserir o valor diretamente, sem precisar preencher despesas e pró-labore novamente." />
           </label>
         </div>
 
         {useManual ? (
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
               Hora Técnica Mínima (R$/hora)
+              <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas fixas e pró-labore sem ter prejuízo. Este é o piso financeiro do seu escritório." />
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
-                R$
-              </span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
               <input
                 type="number"
                 min="0"
@@ -172,17 +166,17 @@ export default function MinimumHourCalculator({
               onUpdate={handleUpdateExpense}
               placeholder="Ex: Aluguel, Contador..."
               label="Despesas Fixas Mensais (R$)"
+              tooltip="Todos os custos recorrentes para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU, etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
             />
 
             {/* Pró-labore Mínimo */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
                 Pró-labore Mínimo (R$)
+                <Tooltip text="Sua remuneração mensal mínima para cobrir suas despesas pessoais. Insira o valor necessário para sua segurança financeira. O lucro virá através do multiplicador de complexidade — não subestime este valor." />
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
-                  R$
-                </span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
                 <input
                   type="number"
                   min="0"
@@ -197,19 +191,20 @@ export default function MinimumHourCalculator({
 
             {/* Horas Produtivas Mensais */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
                 Horas Produtivas Mensais
+                <Tooltip text="Total de horas dedicadas efetivamente à produção de projetos por mês. Considere apenas o tempo focado em projeto — cerca de 70% a 80% do tempo total, descontando reuniões, pausas e tarefas administrativas. Ex: de 160h mensais, use ~120h." />
               </label>
               <input
                 type="number"
                 min="0"
                 step="0.5"
-                  value={productiveHours || ""}
-                  onChange={(e) => {
-                    const hours = Number(e.target.value);
-                    setProductiveHours(hours);
-                    onProductiveHoursChange?.(hours);
-                  }}
+                value={productiveHours || ""}
+                onChange={(e) => {
+                  const hours = Number(e.target.value);
+                  setProductiveHours(hours);
+                  onProductiveHoursChange?.(hours);
+                }}
                 className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
                 placeholder="0"
               />
@@ -222,10 +217,7 @@ export default function MinimumHourCalculator({
           <div className="flex items-center justify-between">
             <span className="font-semibold text-calcularq-blue">Hora Técnica Mín. (R$/hora):</span>
             <span className="text-2xl font-bold text-calcularq-blue">
-              R$ {calculatedMinHourRate.toLocaleString("pt-BR", { 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-              })}
+              R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Info, Edit2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AreaInterval, calculateAreaLevel } from "../pricing/PricingEngine";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface AreaFactorCardProps {
   area: number | null;
@@ -67,8 +68,9 @@ export default function AreaFactorCard({
 
       {/* Input de Área */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+        <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
           Área de Projeto (m²)
+          <Tooltip text="Estimativa da metragem total de intervenção. Impacta diretamente o volume de trabalho — quanto maior a área, maior a escala do projeto. Os intervalos de nível podem ser editados para adequar à sua realidade." />
         </label>
         <input
           type="number"

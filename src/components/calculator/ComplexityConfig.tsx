@@ -1,6 +1,7 @@
 import { Settings2, RotateCcw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Factor } from "../pricing/PricingEngine";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface ComplexityConfigProps {
   factors: Factor[];
@@ -9,6 +10,15 @@ interface ComplexityConfigProps {
 }
 
 const WEIGHT_OPTIONS = [0, 0.5, 1, 2, 3, 4, 5, 6];
+
+const FACTOR_TOOLTIPS: Record<string, string> = {
+  area: "Estimativa da metragem total de intervenção. Impacta diretamente o volume de trabalho. Quanto maior a área, maior a escala do projeto e o esforço necessário.",
+  stage: "Define até qual fase do ciclo de desenvolvimento o arquiteto irá trabalhar — de uma simples consultoria até a coordenação completa de todos os projetos complementares.",
+  detail: "Mede a quantidade de desenhos e o esforço criativo exigido. Um projeto de interiores com soluções autorais exige muito mais detalhamento do que um layout simples.",
+  technical: "Define a rigidez das normas e o volume de estudo técnico necessário. Projetos como hospitais ou patrimônios históricos exigem domínio de legislações complexas.",
+  bureaucratic: "Mede a carga administrativa e a gestão de aprovações em órgãos públicos. Inclui prefeitura, bombeiros, vigilância sanitária, licenciamento ambiental, etc.",
+  monitoring: "Frequência de visitas e nível de responsabilidade no canteiro de obras — desde uma visita única de levantamento até a gestão completa da execução.",
+};
 
 export default function ComplexityConfig({
   factors,
@@ -58,8 +68,11 @@ export default function ComplexityConfig({
         {factors.map((factor) => (
           <div key={factor.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
             <div className="flex-1">
-              <div className="font-medium text-slate-900 text-sm mb-1">
+              <div className="flex items-center gap-1.5 font-medium text-slate-900 text-sm mb-1">
                 {factor.name}
+                {FACTOR_TOOLTIPS[factor.id] && (
+                  <Tooltip text={FACTOR_TOOLTIPS[factor.id]} />
+                )}
               </div>
               <div className="text-xs text-slate-500">{factor.description}</div>
             </div>
