@@ -340,7 +340,7 @@ export default function Calculator() {
         <div className="bg-white p-5 space-y-4">
 
           {/* BASE DO CÁLCULO */}
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <div className="bg-calcularq-blue/10 border border-calcularq-blue/20 rounded-lg p-4">
             <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
             <div className="space-y-1 text-sm text-slate-600">
               <div className="flex justify-between gap-3">
