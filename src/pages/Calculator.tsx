@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -39,6 +39,8 @@ export default function Calculator() {
 
   // Etapa ativa
   const [currentStep, setCurrentStep] = useState(1);
+  // Maior etapa já visitada (evita marcar etapas opcionais como "concluídas" logo ao iniciar)
+  const [maxStepReached, setMaxStepReached] = useState(1);
 
   // Seção 1: Hora Técnica Mínima
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
@@ -144,6 +146,10 @@ export default function Calculator() {
     loadBudget();
   }, [budgetId, user]);
 
+  useEffect(() => {
+    setMaxStepReached((prev) => Math.max(prev, currentStep));
+  }, [currentStep]);
+
   // Handlers
   const handleMinHourRateCalculate = useCallback((rate: number) => {
     setMinHourlyRate(rate);
@@ -204,8 +210,9 @@ export default function Calculator() {
   // Lógica de conclusão de cada etapa
   const stepDone = (n: number) => {
     if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-    // Etapa 2 (Pesos) não deve bloquear avanço: valores padrão funcionam.
-    if (n === 2) return true;
+    // Etapa 2 (Pesos) é opcional: não bloqueia o avanço, mas não deve aparecer
+    // como "concluída" antes do usuário chegar na etapa 3.
+    if (n === 2) return maxStepReached >= 3;
     // Etapa 3: precisa classificar o projeto (seleções)
     if (n === 3) return hasComplexitySelections;
     // Etapa 4: ter um preço final calculado
@@ -228,10 +235,12 @@ export default function Calculator() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
-          <h1 className="text-4xl font-bold text-calcularq-blue mb-3">Calculadora de Precificação</h1>
-          <p className="text-lg text-slate-600">
-            Insira suas despesas fixas, calibre os fatores de complexidade e adicione os custos
-            variáveis para chegar a um preço justo, que remunera corretamente a dificuldade do seu trabalho.
+          <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-3">
+            Calcule um preço justo para o seu projeto
+          </h1>
+          <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
+            Defina sua hora técnica mínima, ajuste (ou mantenha) os pesos de complexidade,
+            classifique o projeto e finalize com um valor claro e defensável.
           </p>
         </motion.div>
 
@@ -334,8 +343,8 @@ export default function Calculator() {
                         <BarChart2 className="w-5 h-5 text-calcularq-blue" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold text-calcularq-blue">Análise de Complexidade</h2>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Análise de complexidade</h2>
+                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                           Selecione as características do projeto específico que está precificando
                         </p>
                       </div>
@@ -452,14 +461,14 @@ export default function Calculator() {
 
                 {(!minHourlyRate || minHourlyRate <= 0) ? (
                   <div className="px-6 py-10 text-center">
-                    <p className="text-slate-400 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
+                    <p className="text-slate-500 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
                   </div>
                 ) : (
                   <div className="p-5 space-y-4">
 
                     {/* BASE DO CÁLCULO */}
                     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                      <p className="text-xs font-bold text-calcularq-blue uppercase tracking-widest text-center mb-3">Base do Cálculo</p>
+                      <p className="text-xs font-semibold text-slate-500 text-center mb-3">Base do cálculo</p>
                       <div className="space-y-1 text-sm text-slate-600">
                         <div className="flex justify-between">
                           <span>Hora Técnica Mínima</span>
@@ -524,7 +533,7 @@ export default function Calculator() {
                     {/* PREÇO FINAL */}
                     {displayValues.finalSalePrice > 0 ? (
                       <div className="bg-calcularq-blue rounded-lg p-4 text-center">
-                        <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Preço de Venda Final</p>
+                        <p className="text-xs font-semibold text-blue-200 mb-1">Preço de venda final</p>
                         <p className="text-2xl font-bold text-white">
                           R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
@@ -560,21 +569,29 @@ export default function Calculator() {
                 <button
                   type="button"
                   onClick={() => setMobileResultsOpen(true)}
-                  className="w-full flex items-center justify-between gap-4 px-4 py-3"
+                  className="w-full text-left"
                 >
-                  <div className="text-left min-w-0">
-                    <p className="text-xs text-slate-500">Resultados</p>
-                    {displayValues.finalSalePrice > 0 ? (
-                      <p className="text-lg font-bold text-slate-900 truncate">
-                        R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    ) : (
-                      <p className="text-sm font-semibold text-slate-400 truncate">Complete as etapas para ver o preço</p>
-                    )}
+                  <div className="flex items-center justify-between gap-3 px-4 py-2 bg-calcularq-blue text-white">
+                    <p className="text-sm font-semibold">Resultados</p>
+                    <div className="shrink-0 text-sm font-semibold flex items-center gap-2 text-white/95">
+                      Ver detalhes
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
                   </div>
-                  <div className="shrink-0 text-sm font-semibold text-calcularq-blue flex items-center gap-2">
-                    Ver detalhes
-                    <ChevronRight className="w-4 h-4" />
+
+                  <div className="px-4 py-3">
+                    {displayValues.finalSalePrice > 0 ? (
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-sm text-slate-600 truncate">Preço de venda</p>
+                        <p className="text-lg font-bold text-slate-900 whitespace-nowrap">
+                          {formatCurrency(displayValues.finalSalePrice)}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm font-semibold text-slate-500">
+                        Complete as etapas para ver o preço
+                      </p>
+                    )}
                   </div>
                 </button>
               </div>
@@ -582,6 +599,7 @@ export default function Calculator() {
           </div>
 
           <AnimatePresence>
+
             {mobileResultsOpen && (
               <>
                 <motion.button
@@ -602,11 +620,20 @@ export default function Calculator() {
                 >
                   <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-6">
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-                      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                        <div>
-                          <p className="text-xs text-slate-500">Resultados</p>
-                          <p className="text-lg font-bold text-slate-900">Detalhamento</p>
+                      <div className="flex items-center justify-between px-5 py-4 bg-calcularq-blue text-white">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold">Resultados</p>
+                          <p className="text-xs text-white/80">Detalhamento</p>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => setMobileResultsOpen(false)}
+                          className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                          aria-label="Fechar"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
                         <button
                           type="button"
                           onClick={() => setMobileResultsOpen(false)}
@@ -617,13 +644,13 @@ export default function Calculator() {
                       </div>
 
                       {(!minHourlyRate || minHourlyRate <= 0) ? (
-                        <div className="px-5 py-10 text-center">
-                          <p className="text-slate-400 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
+                        <div className="px-5 py-8 text-center">
+                          <p className="text-slate-500 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
                         </div>
                       ) : (
                         <div className="p-5 space-y-4">
                           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                            <p className="text-xs font-bold text-calcularq-blue uppercase tracking-widest text-center mb-3">Base do Cálculo</p>
+                            <p className="text-xs font-semibold text-slate-500 text-center mb-3">Base do cálculo</p>
                             <div className="space-y-1 text-sm text-slate-600">
                               <div className="flex justify-between gap-3">
                                 <span className="min-w-0">Hora Técnica Mínima</span>
@@ -686,7 +713,7 @@ export default function Calculator() {
 
                           {displayValues.finalSalePrice > 0 ? (
                             <div className="bg-calcularq-blue rounded-lg p-4 text-center">
-                              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Preço de Venda Final</p>
+                              <p className="text-xs font-semibold text-blue-200 mb-1">Preço de venda final</p>
                               <p className="text-2xl font-bold text-white">
                                 R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </p>
