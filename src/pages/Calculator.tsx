@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, History, Lightbulb } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, History } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -29,22 +29,6 @@ const STEPS = [
   { n: 3, label: "Complexidade" },
   { n: 4, label: "Preço Final" },
 ];
-
-// Sugestão de horas baseada em área e complexidade
-// Referência: CAU recomenda 0,10–0,25 h/m² conforme complexidade
-function hoursHint(area: number | null, complexity: number): { min: number; max: number } | null {
-  if (!area || area <= 0 || complexity <= 0) return null;
-  // Fator h/m² cresce com a complexidade
-  let minFactor: number, maxFactor: number;
-  if (complexity < 1.5)      { minFactor = 0.08; maxFactor = 0.12; }
-  else if (complexity < 2.5) { minFactor = 0.12; maxFactor = 0.18; }
-  else if (complexity < 3.5) { minFactor = 0.18; maxFactor = 0.25; }
-  else                       { minFactor = 0.25; maxFactor = 0.35; }
-  return {
-    min: Math.round(area * minFactor),
-    max: Math.round(area * maxFactor),
-  };
-}
 
 // Chave do localStorage para rascunho
 const DRAFT_KEY = "calcularq_draft_v1";
@@ -388,21 +372,6 @@ export default function Calculator() {
             </div>
           )}
 
-          {/* Sugestão de horas — etapa 4, baseada em área × h/m² (referência CAU) */}
-          {currentStep === 4 && globalComplexity > 0 && estimatedHours === 0 && (() => {
-            const hint = hoursHint(area, globalComplexity);
-            if (!hint) return null;
-            return (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
-                <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  Para {Math.round(area!)}m² com essa complexidade, a referência do CAU sugere entre{" "}
-                  <strong>{hint.min}–{hint.max}h</strong> de projeto.
-                </p>
-              </div>
-            );
-          })()}
-
           {/* LINHAS DE COMPOSIÇÃO */}
           {displayValues.projectPrice > 0 && (
             <div className="space-y-2 text-sm px-1">
@@ -452,16 +421,6 @@ export default function Calculator() {
             </div>
           )}
 
-          {/* LUCRO ESTIMADO */}
-          {displayValues.profit !== null && (
-            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-              <span className="text-sm text-slate-500">Lucro Estimado</span>
-              <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
-                R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-            </div>
-          )}
-
           {/* % DO VALOR DA OBRA (CUB) */}
           {cubPercentage !== null && (
             <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
@@ -471,6 +430,16 @@ export default function Calculator() {
               </span>
               <span className="text-sm font-bold text-calcularq-blue">
                 {cubPercentage.toFixed(1)}%
+              </span>
+            </div>
+          )}
+
+          {/* LUCRO ESTIMADO */}
+          {displayValues.profit !== null && (
+            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
+              <span className="text-sm text-slate-500">Lucro Estimado</span>
+              <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
+                R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
           )}
