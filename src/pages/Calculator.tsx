@@ -65,6 +65,9 @@ export default function Calculator() {
   const [lastBudgetProductiveHours, setLastBudgetProductiveHours] = useState<number | null>(null);
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
 
+  // Mobile: resumo de resultados (bottom sheet)
+  const [mobileResultsOpen, setMobileResultsOpen] = useState(false);
+
   useEffect(() => {
     const fetchLastBudget = async () => {
       if (!user || budgetId) return;
@@ -201,8 +204,11 @@ export default function Calculator() {
   // Lógica de conclusão de cada etapa
   const stepDone = (n: number) => {
     if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-    if (n === 2) return hasComplexitySelections;
-    if (n === 3) return hasComplexitySelections && displayValues.finalSalePrice > 0;
+    // Etapa 2 (Pesos) não deve bloquear avanço: valores padrão funcionam.
+    if (n === 2) return true;
+    // Etapa 3: precisa classificar o projeto (seleções)
+    if (n === 3) return hasComplexitySelections;
+    // Etapa 4: ter um preço final calculado
     return displayValues.finalSalePrice > 0;
   };
 
@@ -218,7 +224,7 @@ export default function Calculator() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-28 lg:pb-12">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
@@ -275,7 +281,7 @@ export default function Calculator() {
               >
                 <p className="text-sm text-blue-800">
                   <strong>Preencher com os dados do seu último cálculo salvo?</strong>{" "}
-                  Despesas fixas, pró-labore mín. e horas produtivas serão preenchidos automaticamente.
+                  Despesas fixas, pró-labore mínimo e horas produtivas serão preenchidos automaticamente.
                 </p>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={handleRestoreLastExpenses} className="text-sm font-semibold text-white bg-calcularq-blue px-4 py-2 rounded-lg hover:bg-calcularq-blue/90 transition-colors">
@@ -441,7 +447,7 @@ export default function Calculator() {
             <div className="sticky top-24">
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="bg-calcularq-blue px-6 py-4">
-                  <h3 className="text-lg font-bold text-white tracking-wide text-center uppercase">Resultados</h3>
+                  <h3 className="text-lg font-bold text-white text-center">Resultados</h3>
                 </div>
 
                 {(!minHourlyRate || minHourlyRate <= 0) ? (
@@ -544,6 +550,169 @@ export default function Calculator() {
             </div>
           </div>
 
+        </div>
+
+        {/* Mobile: barra fixa de resultados + bottom sheet */}
+        <div className="lg:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-40" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6">
+              <div className="mb-3 rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setMobileResultsOpen(true)}
+                  className="w-full flex items-center justify-between gap-4 px-4 py-3"
+                >
+                  <div className="text-left min-w-0">
+                    <p className="text-xs text-slate-500">Resultados</p>
+                    {displayValues.finalSalePrice > 0 ? (
+                      <p className="text-lg font-bold text-slate-900 truncate">
+                        R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-semibold text-slate-400 truncate">Complete as etapas para ver o preço</p>
+                    )}
+                  </div>
+                  <div className="shrink-0 text-sm font-semibold text-calcularq-blue flex items-center gap-2">
+                    Ver detalhes
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {mobileResultsOpen && (
+              <>
+                <motion.button
+                  type="button"
+                  aria-label="Fechar resultados"
+                  className="fixed inset-0 bg-black/30 z-40"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setMobileResultsOpen(false)}
+                />
+                <motion.div
+                  className="fixed inset-x-0 bottom-0 z-50"
+                  initial={{ y: 24, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 24, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-6">
+                    <div className="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+                      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                        <div>
+                          <p className="text-xs text-slate-500">Resultados</p>
+                          <p className="text-lg font-bold text-slate-900">Detalhamento</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setMobileResultsOpen(false)}
+                          className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-50"
+                        >
+                          Fechar
+                        </button>
+                      </div>
+
+                      {(!minHourlyRate || minHourlyRate <= 0) ? (
+                        <div className="px-5 py-10 text-center">
+                          <p className="text-slate-400 text-sm">Preencha a Hora Técnica Mínima para ver os resultados.</p>
+                        </div>
+                      ) : (
+                        <div className="p-5 space-y-4">
+                          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                            <p className="text-xs font-bold text-calcularq-blue uppercase tracking-widest text-center mb-3">Base do Cálculo</p>
+                            <div className="space-y-1 text-sm text-slate-600">
+                              <div className="flex justify-between gap-3">
+                                <span className="min-w-0">Hora Técnica Mínima</span>
+                                <span className="font-medium text-slate-800 whitespace-nowrap">
+                                  R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                                </span>
+                              </div>
+                              {hasComplexitySelections && (
+                                <div className="flex justify-between gap-3">
+                                  <span className="min-w-0">Complexidade Global</span>
+                                  <span className="font-medium text-slate-800 whitespace-nowrap">{globalComplexity.toFixed(2)}x</span>
+                                </div>
+                              )}
+                              {displayValues.adjustedHourlyRate > 0 && (
+                                <div className="flex justify-between gap-3 pt-1 border-t border-slate-200 mt-1">
+                                  <span className="font-bold text-calcularq-blue min-w-0">Hora Técnica Ajustada</span>
+                                  <span className="font-bold text-calcularq-blue whitespace-nowrap">
+                                    R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {displayValues.projectPrice > 0 && (
+                            <div className="space-y-2 text-sm px-1">
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-slate-600 flex-1">
+                                  Preço do Projeto
+                                  {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 && (
+                                    <span className="block text-slate-400 text-xs">
+                                      {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="font-semibold text-slate-800 whitespace-nowrap">
+                                  R$ {displayValues.projectPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                              </div>
+
+                              {displayValues.totalVariableExpenses > 0 && (
+                                <div className="flex justify-between items-baseline gap-2">
+                                  <span className="text-slate-600 min-w-0">(+) Despesas Variáveis</span>
+                                  <span className="font-semibold text-slate-800 whitespace-nowrap">
+                                    R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </span>
+                                </div>
+                              )}
+
+                              {displayValues.discountAmount > 0 && (
+                                <div className="flex justify-between items-baseline gap-2">
+                                  <span className="text-slate-600 min-w-0">(-) Desconto ({commercialDiscount}%)</span>
+                                  <span className="font-semibold text-red-500 whitespace-nowrap">
+                                    - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {displayValues.finalSalePrice > 0 ? (
+                            <div className="bg-calcularq-blue rounded-lg p-4 text-center">
+                              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Preço de Venda Final</p>
+                              <p className="text-2xl font-bold text-white">
+                                R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center">
+                              <p className="text-xs text-slate-400">Preencha a Composição Final para ver o preço</p>
+                            </div>
+                          )}
+
+                          {displayValues.profit !== null && (
+                            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
+                              <span className="text-sm text-slate-500">Lucro Estimado</span>
+                              <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
+                                R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
