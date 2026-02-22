@@ -274,8 +274,8 @@ export default function Calculator() {
   const effectiveAreaForCub = useMemo(() => {
     if (typeof area === "number" && Number.isFinite(area) && area > 0) return area;
 
-    const selectedAreaLevel = selections.area;
-    if (!selectedAreaLevel) return null;
+    const selectedAreaLevel = Number(selections.area);
+    if (!Number.isFinite(selectedAreaLevel) || selectedAreaLevel <= 0) return null;
 
     const interval = areaIntervals.find((i) => i.level === selectedAreaLevel);
     if (!interval) return null;
@@ -426,17 +426,15 @@ export default function Calculator() {
           )}
 
           {/* % DO VALOR DA OBRA (CUB) */}
-          {cubPercentage !== null && (
-            <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
-              <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
-                % do valor da obra
-                <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
-              </span>
-              <span className="text-sm font-bold text-calcularq-blue whitespace-nowrap">
-                {cubPercentage.toFixed(1)}%
-              </span>
-            </div>
-          )}
+          <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
+            <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
+              % do valor da obra
+              <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
+            </span>
+            <span className="text-sm font-bold text-calcularq-blue whitespace-nowrap">
+              {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "—"}
+            </span>
+          </div>
 
           {/* LUCRO ESTIMADO */}
           {displayValues.profit !== null && (
@@ -473,7 +471,8 @@ export default function Calculator() {
 
         {/* Stepper horizontal unificado */}
         <div className="mb-10 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
-          <div className="flex min-w-max mx-auto items-start gap-0">
+          <div className="flex min-w-full justify-center">
+            <div className="flex w-max items-start gap-0">
             {STEPS.map((step, i) => {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
@@ -509,6 +508,7 @@ export default function Calculator() {
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
 
