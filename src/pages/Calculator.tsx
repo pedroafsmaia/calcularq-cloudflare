@@ -40,6 +40,9 @@ export default function Calculator() {
   // Etapa ativa
   const [currentStep, setCurrentStep] = useState(1);
 
+  // Maior etapa já visitada (evita marcar etapas opcionais como "concluídas" logo ao iniciar)
+  const [maxStepReached, setMaxStepReached] = useState(1);
+
   // Seção 1: Hora Técnica Mínima
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [fixedExpenses, setFixedExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
@@ -144,6 +147,10 @@ export default function Calculator() {
     loadBudget();
   }, [budgetId, user]);
 
+  useEffect(() => {
+    setMaxStepReached((prev) => Math.max(prev, currentStep));
+  }, [currentStep]);
+
   // Handlers
   const handleMinHourRateCalculate = useCallback((rate: number) => {
     setMinHourlyRate(rate);
@@ -204,15 +211,18 @@ export default function Calculator() {
   // Lógica de conclusão de cada etapa
   const stepDone = (n: number) => {
     if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-    // Etapa 2 (Pesos) não deve bloquear avanço: valores padrão funcionam.
-    if (n === 2) return true;
+
+    // Etapa 2 (Pesos) é opcional: não bloqueia o avanço, mas não deve aparecer
+    // como "concluída" antes do usuário chegar na etapa 3.
+    if (n === 2) return maxStepReached >= 3;
     // Etapa 3: precisa classificar o projeto (seleções)
     if (n === 3) return hasComplexitySelections;
     // Etapa 4: ter um preço final calculado
     return displayValues.finalSalePrice > 0;
   };
 
-  const canAdvance = stepDone(currentStep);
+  // Como a etapa 2 é opcional, o usuário pode sempre avançar nela.
+  const canAdvance = currentStep === 2 ? true : stepDone(currentStep);
 
   const handleNext = () => {
     if (currentStep < 4 && canAdvance) setCurrentStep(s => s + 1);
