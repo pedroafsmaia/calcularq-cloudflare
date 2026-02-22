@@ -79,8 +79,7 @@ export default function FinalCalculation({
   return (
     <div>
       <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
-        <div className="border-2 border-calcularq-blue/20 rounded-2xl p-6 lg:p-8 bg-gradient-to-br from-calcularq-blue/5 to-white">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
               <DollarSign className="w-5 h-5 text-calcularq-blue" />
             </div>
@@ -94,7 +93,13 @@ export default function FinalCalculation({
             </div>
           </div>
 
-          <div className="space-y-6">
+        <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-blue-50/70">
+          <p className="text-sm text-blue-800">
+            Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o impacto no valor final.
+          </p>
+        </div>
+
+        <div className="space-y-6">
             {/* Estimativa de Horas de Projeto */}
             <div>
               <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
@@ -153,7 +158,6 @@ export default function FinalCalculation({
                 </div>
               )}
             </div>
-          </div>
         </div>
 
         {/* Resultados (mobile) antes do menu de salvar */}

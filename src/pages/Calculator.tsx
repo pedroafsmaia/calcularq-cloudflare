@@ -632,7 +632,7 @@ export default function Calculator() {
                           </div>
                           <div>
                             <h3 className="text-lg font-bold text-calcularq-blue">Resultados</h3>
-                            <p className="text-sm text-slate-500">Resumo da precificação atual</p>
+                            <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                           </div>
                         </div>
                         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
