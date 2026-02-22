@@ -113,9 +113,9 @@ export default function MinimumHourCalculator({
         </div>
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
-            Calculadora da Hora Técnica Mínima
+            Hora técnica mínima
           </h2>
-          <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-600 mt-1 leading-relaxed">
             Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function MinimumHourCalculator({
         {useManual ? (
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-              Hora Técnica Mínima (R$/hora)
+              Hora técnica mínima (R$/hora)
               <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas fixas e pró-labore sem ter prejuízo. Este é o piso financeiro do seu escritório." />
             </label>
             <div className="relative">
@@ -215,8 +215,8 @@ export default function MinimumHourCalculator({
         {/* Resultado */}
         <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-calcularq-blue">Hora Técnica Mín. (R$/hora):</span>
-            <span className="text-2xl font-bold text-calcularq-blue">
+            <span className="font-semibold text-calcularq-blue">Hora técnica mínima (R$/hora):</span>
+            <span className="text-xl sm:text-2xl font-bold text-calcularq-blue">
               R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
