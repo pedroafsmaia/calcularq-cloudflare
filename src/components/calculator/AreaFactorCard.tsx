@@ -52,6 +52,13 @@ export default function AreaFactorCard({
     setEditingIntervals(updated);
   };
 
+  const parseAreaValue = (raw: string) => {
+    const normalized = raw.replace(",", ".").trim();
+    if (!normalized) return 0;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-slate-300 hover:shadow-lg transition-all duration-300">
       <div className="mb-4">
@@ -80,7 +87,7 @@ export default function AreaFactorCard({
           min="0"
           step="0.01"
           value={area || ""}
-          onChange={(e) => handleAreaInput(Number(e.target.value))}
+          onChange={(e) => handleAreaInput(parseAreaValue(e.target.value))}
           className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
           placeholder="Digite a área em m²"
         />

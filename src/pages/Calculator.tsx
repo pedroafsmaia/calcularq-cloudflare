@@ -271,10 +271,26 @@ export default function Calculator() {
   }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses, fixedExpenses, productiveHours]);
 
   const CUB_MEDIO = 2800;
+  const effectiveAreaForCub = useMemo(() => {
+    if (typeof area === "number" && Number.isFinite(area) && area > 0) return area;
+
+    const selectedAreaLevel = selections.area;
+    if (!selectedAreaLevel) return null;
+
+    const interval = areaIntervals.find((i) => i.level === selectedAreaLevel);
+    if (!interval) return null;
+
+    if (typeof interval.max === "number" && interval.max > interval.min) {
+      return (interval.min + interval.max) / 2;
+    }
+
+    return interval.min > 0 ? interval.min : null;
+  }, [area, selections.area, areaIntervals]);
+
   const cubPercentage = useMemo(() => {
-    if (!area || area <= 0 || displayValues.finalSalePrice <= 0) return null;
-    return (displayValues.finalSalePrice / (CUB_MEDIO * area)) * 100;
-  }, [area, displayValues.finalSalePrice]);
+    if (!effectiveAreaForCub || effectiveAreaForCub <= 0 || displayValues.finalSalePrice <= 0) return null;
+    return (displayValues.finalSalePrice / (CUB_MEDIO * effectiveAreaForCub)) * 100;
+  }, [effectiveAreaForCub, displayValues.finalSalePrice]);
 
   const hasComplexitySelections = Object.keys(selections).length > 0;
   const totalFactors = factors.length; // inclui área
