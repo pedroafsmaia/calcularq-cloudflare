@@ -121,13 +121,13 @@ export default function FinalCalculation({
 
   return (
     <div>
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
             <DollarSign className="w-5 h-5 text-calcularq-blue" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-calcularq-blue">Composição Final do Preço</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Composição Final do Preço</h2>
             <p className="text-sm text-slate-500 mt-1">Configure os parâmetros finais do projeto</p>
           </div>
         </div>
@@ -198,12 +198,12 @@ export default function FinalCalculation({
           </div>
         </div>
 
-        <div className="hidden lg:block mt-6 pt-6 border-t border-slate-200">{saveActions}</div>
+        <div className="hidden lg:block mt-8 pt-6 border-t border-slate-200">{saveActions}</div>
       </div>
 
       {mobileResultsContent && <div className="mt-6 lg:hidden">{mobileResultsContent}</div>}
 
-      <div className="mt-6 lg:hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">{saveActions}</div>
+      <div className="mt-6 lg:hidden bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">{saveActions}</div>
     </div>
   );
 }

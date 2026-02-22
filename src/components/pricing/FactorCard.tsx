@@ -17,16 +17,16 @@ interface FactorCardProps {
 
 export default function FactorCard({ factor, value, onChange }: FactorCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/60 p-6 hover:border-slate-300 hover:shadow-lg transition-all duration-300">
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-all duration-300">
       <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="flex items-center gap-1.5 font-semibold text-slate-900">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <h3 className="min-w-0 flex items-center gap-1.5 font-semibold text-slate-900">
             {factor.name}
             {FACTOR_TOOLTIPS[factor.id] && (
               <Tooltip text={FACTOR_TOOLTIPS[factor.id]} />
             )}
           </h3>
-          <span className="text-xs text-calcularq-blue bg-calcularq-blue/10 px-2 py-1 rounded">
+          <span className="shrink-0 text-xs text-calcularq-blue bg-calcularq-blue/10 border border-calcularq-blue/20 px-2 py-1 rounded-md">
             Peso: {factor.weight}
           </span>
         </div>
@@ -38,7 +38,7 @@ export default function FactorCard({ factor, value, onChange }: FactorCardProps)
           <label
             key={option.value}
             className={`
-              flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all
+              flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all
               ${
                 value === option.value
                   ? "border-calcularq-blue bg-calcularq-blue/10"

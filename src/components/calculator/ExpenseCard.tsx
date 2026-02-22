@@ -40,7 +40,7 @@ export default function ExpenseCard({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
           {label}
           {tooltip && <Tooltip text={tooltip} />}
@@ -57,7 +57,7 @@ export default function ExpenseCard({
         </Button>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {expenses.map((expense) => (
           <div
             key={expense.id}
@@ -98,7 +98,7 @@ export default function ExpenseCard({
       </div>
 
       {expenses.length > 0 && (
-        <div className="flex items-center justify-between p-3 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
+        <div className="flex items-center justify-between p-3 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
           <span className="font-semibold text-calcularq-blue">Total:</span>
           <span className="font-bold text-calcularq-blue">
             R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

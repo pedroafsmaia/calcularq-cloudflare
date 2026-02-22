@@ -50,9 +50,7 @@ export default function ComplexityConfig({
       </div>
 
       {/* Observação (sem ícone) */}
-      <div className="mb-6 p-4 rounded-lg border border-blue-200"
-        style={{ background: "rgba(239, 246, 255, 0.70)" }}
-      >
+      <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-blue-50/70">
         <p className="text-sm text-blue-800 leading-relaxed">
           <strong>Observação:</strong> Sugerimos manter o peso 1 para todos os fatores inicialmente.
           Isso garante uma precificação equilibrada. Altere o peso quando julgar que um fator específico
@@ -64,7 +62,7 @@ export default function ComplexityConfig({
         {factors.map((factor) => (
           <div
             key={factor.id}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-slate-50 rounded-lg"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-slate-50/80 border border-slate-200 rounded-xl"
           >
             <div className="flex-1 min-w-0">
               <div className="font-medium text-slate-900 text-sm mb-1">

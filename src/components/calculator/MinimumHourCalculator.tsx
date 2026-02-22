@@ -106,7 +106,7 @@ export default function MinimumHourCalculator({
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
           <Calculator className="w-5 h-5 text-calcularq-blue" />
@@ -123,7 +123,7 @@ export default function MinimumHourCalculator({
 
       <div className="space-y-6">
         {/* Opção Manual */}
-        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
+        <div className="flex items-start gap-3 p-4 bg-slate-50/80 border border-slate-200 rounded-xl">
           <input
             type="checkbox"
             id="useManual"
@@ -131,7 +131,7 @@ export default function MinimumHourCalculator({
             onChange={(e) => setUseManual(e.target.checked)}
             className="w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
           />
-          <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
+          <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-relaxed">
             Já sei a minha hora técnica mínima.
             <Tooltip text="Marque esta opção se você já calculou sua hora técnica mínima anteriormente e quer inserir o valor diretamente, sem precisar preencher despesas e pró-labore novamente." />
           </label>
@@ -213,8 +213,8 @@ export default function MinimumHourCalculator({
         )}
 
         {/* Resultado */}
-        <div className="p-4 bg-calcularq-blue/10 rounded-lg border border-calcularq-blue/20">
-          <div className="flex items-center justify-between">
+        <div className="p-4 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <span className="font-semibold text-calcularq-blue">Hora técnica mínima (R$/hora):</span>
             <span className="text-xl sm:text-2xl font-bold text-calcularq-blue">
               R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
