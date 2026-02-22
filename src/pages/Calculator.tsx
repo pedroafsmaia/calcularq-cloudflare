@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -252,9 +252,57 @@ const handleNext = () => {
     Precifique seu projeto em 4 etapas
   </h1>
   <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
-    Descubra sua hora técnica mínima, (opcional) ajuste os pesos, classifique a complexidade do projeto e finalize a composição do preço.
+    Descubra sua hora técnica mínima, ajuste os pesos (opcional), classifique a complexidade do projeto e finalize a composição do preço.
   </p>
+
 </motion.div>
+
+        {/* Barra de progresso (mobile/tablet): horizontal e rolável */}
+        <div className="lg:hidden mb-6">
+          <div className="flex items-center gap-4 overflow-x-auto pb-2 -mx-1 px-1">
+            {STEPS.map((step, i) => {
+              const done = stepVisualDone(step.n);
+              const active = currentStep === step.n;
+
+              return (
+                <div key={step.n} className="flex items-center gap-4 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const canJumpSkipWeights =
+                        step.n === 3 && maxStepReached === 1 && stepComplete(1);
+
+                      const canGoToReached = step.n <= maxStepReached;
+                      const canGoToNext =
+                        step.n === maxStepReached + 1 && stepComplete(step.n - 1);
+
+                      if (canGoToReached || canGoToNext || canJumpSkipWeights) {
+                        setCurrentStep(step.n);
+                      }
+                    }}
+                    className={`h-9 px-3 rounded-full flex items-center gap-2 text-sm font-semibold transition-all duration-300 border
+                      ${done ? "bg-calcularq-blue border-calcularq-blue text-white" :
+                        active ? "bg-white border-calcularq-blue text-calcularq-blue" :
+                        "bg-white border-slate-200 text-slate-500"}`}
+                  >
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border
+                      ${done ? "bg-white/15 border-white/30 text-white" :
+                        active ? "bg-calcularq-blue/10 border-calcularq-blue/30 text-calcularq-blue" :
+                        "bg-slate-50 border-slate-200 text-slate-500"}`}
+                    >
+                      {done ? "✓" : step.n}
+                    </span>
+                    <span className="whitespace-nowrap">{step.label}</span>
+                  </button>
+
+                  {i < STEPS.length - 1 && (
+                    <div className={`h-0.5 w-10 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="flex gap-8">
 
@@ -492,7 +540,7 @@ const handleNext = () => {
 
                     {/* BASE DO CÁLCULO */}
                     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                      <p className="text-xs font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
+                      <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
                       <div className="space-y-1 text-sm text-slate-600">
                         <div className="flex justify-between">
                           <span>Hora Técnica Mínima</span>
@@ -589,14 +637,18 @@ const handleNext = () => {
         <div className="lg:hidden">
           <div className="fixed inset-x-0 bottom-0 z-40" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6">
-              <div className="mb-3 rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden">
+              
+              <div className="mb-3 rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+                <div className="bg-calcularq-blue px-4 py-3">
+                  <p className="text-base font-bold text-white text-center">Resultados</p>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => setMobileResultsOpen(true)}
-                  className="w-full flex items-center justify-between gap-4 px-4 py-3"
+                  className="w-full flex items-center justify-between gap-4 px-4 py-3 bg-white"
                 >
                   <div className="text-left min-w-0">
-                    <p className="text-xs text-slate-500">Resultados</p>
                     {displayValues.finalSalePrice > 0 ? (
                       <p className="text-lg font-bold text-slate-900 truncate">
                         R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -635,17 +687,16 @@ const handleNext = () => {
                 >
                   <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-6">
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-                      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                        <div>
-                          <p className="text-xs text-slate-500">Resultados</p>
-                          <p className="text-lg font-bold text-slate-900">Detalhamento</p>
-                        </div>
+                      
+                      <div className="bg-calcularq-blue px-5 py-4 flex items-center justify-between">
+                        <p className="text-lg font-bold text-white">Resultados</p>
                         <button
                           type="button"
                           onClick={() => setMobileResultsOpen(false)}
-                          className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-50"
+                          className="text-white/90 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                          aria-label="Fechar"
                         >
-                          Fechar
+                          <X className="w-5 h-5" />
                         </button>
                       </div>
 
@@ -656,7 +707,7 @@ const handleNext = () => {
                       ) : (
                         <div className="p-5 space-y-4">
                           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                            <p className="text-xs font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
+                            <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
                             <div className="space-y-1 text-sm text-slate-600">
                               <div className="flex justify-between gap-3">
                                 <span className="min-w-0">Hora Técnica Mínima</span>
