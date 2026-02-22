@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, PieChart } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -624,16 +624,16 @@ export default function Calculator() {
                       <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl border border-calcularq-blue/15 bg-gradient-to-br from-calcularq-blue/5 to-white p-3"
+                        className="rounded-2xl border-2 border-calcularq-blue/20 bg-gradient-to-br from-calcularq-blue/5 to-white p-4"
                       >
-                        <div className="mb-3 flex items-center justify-between px-1">
-                          <div className="flex items-center gap-2 text-calcularq-blue">
-                            <div className="w-8 h-8 rounded-lg bg-calcularq-blue/10 flex items-center justify-center">
-                              <BarChart2 className="w-4 h-4" />
-                            </div>
-                            <p className="text-sm font-semibold">Resultados</p>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
+                            <PieChart className="w-5 h-5 text-calcularq-blue" />
                           </div>
-                          <span className="text-xs text-slate-500">Resumo</span>
+                          <div>
+                            <h3 className="text-lg font-bold text-calcularq-blue">Resultados</h3>
+                            <p className="text-sm text-slate-500">Resumo da precificação atual</p>
+                          </div>
                         </div>
                         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
                           <ResultsPanel />
