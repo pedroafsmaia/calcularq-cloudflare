@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Info } from "lucide-react";
 
 interface TooltipProps {
@@ -6,12 +6,35 @@ interface TooltipProps {
 }
 
 /**
- * Tooltip leve e consistente com as caixas de Observação (azul claro),
- * com fundo semi-transparente e blur.
+ * Tooltip leve e consistente com as caixas de Observação.
+ * - Mesmas cores (texto azul) e borda.
+ * - Fundo levemente transparente + blur.
+ * - Texto formatado em pequenos parágrafos para leitura.
  */
 export default function Tooltip({ text }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const formattedParts = useMemo(() => {
+    const raw = (text || "").trim();
+    if (!raw) return [] as string[];
+
+    // Se houver quebras de linha, respeita.
+    const byLines = raw
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (byLines.length > 1) return byLines;
+
+    // Caso contrário, tenta separar em frases (PT/EN) sem ser agressivo.
+    const bySentences = raw
+      .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÃÕÂÊÎÔÛ])/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    return bySentences.length > 1 ? bySentences : [raw];
+  }, [text]);
 
   const show = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -26,7 +49,7 @@ export default function Tooltip({ text }: TooltipProps) {
     <span className="relative inline-flex items-center">
       <button
         type="button"
-        className="text-blue-600/80 hover:text-blue-700 transition-colors focus:outline-none"
+        className="text-blue-700/90 hover:text-blue-800 transition-colors focus:outline-none"
         onMouseEnter={show}
         onMouseLeave={hide}
         onFocus={show}
@@ -38,14 +61,23 @@ export default function Tooltip({ text }: TooltipProps) {
 
       {visible && (
         <span
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-72 max-w-[80vw] text-blue-900 text-xs rounded-xl px-3 py-2.5 shadow-lg leading-relaxed pointer-events-none border border-blue-200"
-          style={{ background: "rgba(239, 246, 255, 0.88)", backdropFilter: "blur(8px)" }}
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-80 max-w-[85vw] rounded-xl px-3.5 py-3 shadow-lg pointer-events-none border border-blue-200"
+          style={{
+            background: "rgba(239, 246, 255, 0.76)",
+            backdropFilter: "blur(10px)",
+          }}
           role="tooltip"
         >
-          {text}
+          <div className="text-sm text-blue-800 leading-relaxed space-y-1">
+            {formattedParts.map((p, idx) => (
+              <p key={idx}>{p}</p>
+            ))}
+          </div>
+
+          {/* Setinha */}
           <span
             className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent"
-            style={{ borderRightColor: "rgba(191, 219, 254, 0.95)" }}
+            style={{ borderRightColor: "rgba(191, 219, 254, 0.92)" }}
           />
         </span>
       )}
