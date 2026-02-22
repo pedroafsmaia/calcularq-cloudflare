@@ -624,7 +624,7 @@ export default function Calculator() {
                       <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl border-2 border-calcularq-blue/20 bg-gradient-to-br from-calcularq-blue/5 to-white p-4"
+                        className="rounded-2xl border border-slate-200 bg-white shadow-sm p-4"
                       >
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
@@ -635,7 +635,7 @@ export default function Calculator() {
                             <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                           </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                           <ResultsPanel />
                         </div>
                       </motion.div>
@@ -686,7 +686,7 @@ export default function Calculator() {
           {/* Painel lateral — desktop */}
           <div className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-24">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="bg-calcularq-blue px-6 py-4 rounded-t-2xl">
                   <h3 className="text-lg font-bold text-white text-center">Resultados</h3>
                 </div>
