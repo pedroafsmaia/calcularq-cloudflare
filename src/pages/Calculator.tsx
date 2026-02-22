@@ -208,23 +208,28 @@ export default function Calculator() {
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area");
 
-  // Lógica de conclusão de cada etapa
-  const stepDone = (n: number) => {
+  // Lógica de conclusão e visualização de cada etapa
+  // - "stepComplete": usado apenas para habilitar o botão "Próxima etapa"
+  // - "stepVisualDone": usado apenas para o visual (bolinha ficar preenchida)
+  //
+  // Regra importante: a bolinha NÃO deve ficar escura só porque o usuário preencheu dados;
+  // ela fica "concluída" visualmente apenas quando o usuário AVANÇAR para a etapa seguinte.
+  const stepComplete = (n: number) => {
     if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-
-    // Etapa 2 (Pesos) é opcional: não bloqueia o avanço, mas não deve aparecer
-    // como "concluída" antes do usuário chegar na etapa 3.
-    if (n === 2) return maxStepReached >= 3;
+    // Etapa 2 (Pesos) é opcional: sempre pode avançar.
+    if (n === 2) return true;
     // Etapa 3: precisa classificar o projeto (seleções)
     if (n === 3) return hasComplexitySelections;
     // Etapa 4: ter um preço final calculado
     return displayValues.finalSalePrice > 0;
   };
 
-  // Como a etapa 2 é opcional, o usuário pode sempre avançar nela.
-  const canAdvance = currentStep === 2 ? true : stepDone(currentStep);
+  // "Done" visual: só quando o usuário já passou da etapa.
+  const stepVisualDone = (n: number) => maxStepReached > n;
 
-  const handleNext = () => {
+  // Botão "Próxima etapa" (etapa 2 nunca bloqueia)
+  const canAdvance = stepComplete(currentStep);
+const handleNext = () => {
     if (currentStep < 4 && canAdvance) setCurrentStep(s => s + 1);
   };
 
@@ -236,28 +241,46 @@ export default function Calculator() {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-28 lg:pb-12">
 
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
-          <h1 className="text-4xl font-bold text-calcularq-blue mb-3">Calculadora de Precificação</h1>
-          <p className="text-lg text-slate-600">
-            Insira suas despesas fixas, calibre os fatores de complexidade e adicione os custos
-            variáveis para chegar a um preço justo, que remunera corretamente a dificuldade do seu trabalho.
-          </p>
-        </motion.div>
+        
+{/* Header */}
+<motion.div
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="mb-10 text-center"
+>
+  <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
+    Precifique seu projeto em 4 etapas
+  </h1>
+  <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
+    Descubra sua hora técnica mínima, (opcional) ajuste os pesos, classifique a complexidade do projeto e finalize a composição do preço.
+  </p>
+</motion.div>
 
         <div className="flex gap-8">
 
           {/* Barra de progresso vertical */}
           <div className="hidden lg:flex flex-col items-center pt-2 shrink-0">
             {STEPS.map((step, i) => {
-              const done = stepDone(step.n);
+              const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
               return (
                 <div key={step.n} className="flex flex-col items-center">
                   <button
                     onClick={() => {
-                      // Permite navegar para qualquer etapa já liberada ou anterior
-                      if (step.n <= currentStep || stepDone(step.n - 1)) setCurrentStep(step.n);
+                      // Navegação liberada:
+                      // - etapas já alcançadas (<= maxStepReached)
+                      // - próxima etapa (maxStepReached + 1) se a anterior estiver completa
+                      // - pular "Pesos" (etapa 2) indo direto para a 3 quando a etapa 1 estiver completa
+                      const canJumpSkipWeights =
+                        step.n === 3 && maxStepReached === 1 && stepComplete(1);
+
+                      const canGoToReached = step.n <= maxStepReached;
+                      const canGoToNext =
+                        step.n === maxStepReached + 1 && stepComplete(step.n - 1);
+
+                      if (canGoToReached || canGoToNext || canJumpSkipWeights) {
+                        setCurrentStep(step.n);
+                      }
                     }}
                     className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
                       ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md" :
@@ -344,7 +367,7 @@ export default function Calculator() {
                         <BarChart2 className="w-5 h-5 text-calcularq-blue" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold text-calcularq-blue">Análise de Complexidade</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Análise de Complexidade</h2>
                         <p className="text-sm text-slate-500 mt-1">
                           Selecione as características do projeto específico que está precificando
                         </p>
@@ -469,7 +492,7 @@ export default function Calculator() {
 
                     {/* BASE DO CÁLCULO */}
                     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                      <p className="text-xs font-bold text-calcularq-blue uppercase tracking-widest text-center mb-3">Base do Cálculo</p>
+                      <p className="text-xs font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
                       <div className="space-y-1 text-sm text-slate-600">
                         <div className="flex justify-between">
                           <span>Hora Técnica Mínima</span>
@@ -534,7 +557,7 @@ export default function Calculator() {
                     {/* PREÇO FINAL */}
                     {displayValues.finalSalePrice > 0 ? (
                       <div className="bg-calcularq-blue rounded-lg p-4 text-center">
-                        <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Preço de Venda Final</p>
+                        <p className="text-xs font-semibold text-blue-200 mb-1">Preço de Venda Final</p>
                         <p className="text-2xl font-bold text-white">
                           R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
@@ -633,7 +656,7 @@ export default function Calculator() {
                       ) : (
                         <div className="p-5 space-y-4">
                           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                            <p className="text-xs font-bold text-calcularq-blue uppercase tracking-widest text-center mb-3">Base do Cálculo</p>
+                            <p className="text-xs font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
                             <div className="space-y-1 text-sm text-slate-600">
                               <div className="flex justify-between gap-3">
                                 <span className="min-w-0">Hora Técnica Mínima</span>
@@ -696,7 +719,7 @@ export default function Calculator() {
 
                           {displayValues.finalSalePrice > 0 ? (
                             <div className="bg-calcularq-blue rounded-lg p-4 text-center">
-                              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Preço de Venda Final</p>
+                              <p className="text-xs font-semibold text-blue-200 mb-1">Preço de Venda Final</p>
                               <p className="text-2xl font-bold text-white">
                                 R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </p>
