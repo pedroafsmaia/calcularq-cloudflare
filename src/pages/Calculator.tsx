@@ -21,6 +21,7 @@ import {
   AreaInterval,
 } from "../components/pricing/PricingEngine";
 import { createPageUrl } from "@/utils";
+import Tooltip from "@/components/ui/Tooltip";
 
 const STEPS = [
   { n: 1, label: "Hora Técnica" },
@@ -204,6 +205,15 @@ export default function Calculator() {
     return { totalVariableExpenses, adjustedHourlyRate, projectPrice, projectPriceWithDiscount, discountAmount, finalSalePrice, profit };
   }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses, fixedExpenses, productiveHours]);
 
+  // CUB médio nacional de referência (R$/m²)
+  const CUB_MEDIO = 2800;
+
+  const cubPercentage = useMemo(() => {
+    if (!area || area <= 0 || displayValues.finalSalePrice <= 0) return null;
+    const obraEstimada = CUB_MEDIO * area;
+    return (displayValues.finalSalePrice / obraEstimada) * 100;
+  }, [area, displayValues.finalSalePrice]);
+
   const hasComplexitySelections = Object.keys(selections).length > 0;
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area");
@@ -257,9 +267,9 @@ const handleNext = () => {
 
 </motion.div>
 
-        {/* Stepper horizontal unificado — desktop e mobile */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        {/* Stepper horizontal unificado */}
+        <div className="mb-10 flex justify-center">
+          <div className="flex items-start gap-0">
             {STEPS.map((step, i) => {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
@@ -272,26 +282,32 @@ const handleNext = () => {
               };
 
               return (
-                <div key={step.n} className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleClick}
-                    className={`h-9 px-3 rounded-full flex items-center gap-2 text-sm font-semibold transition-all duration-300 border
-                      ${done
-                        ? "bg-calcularq-blue border-calcularq-blue text-white"
-                        : active
-                        ? "bg-white border-calcularq-blue text-calcularq-blue"
-                        : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
-                  >
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold
-                      ${done ? "bg-white/20 text-white" : active ? "bg-calcularq-blue/10 text-calcularq-blue" : "text-slate-400"}`}>
+                <div key={step.n} className="flex items-start">
+                  {/* Bolinha + label */}
+                  <div className="flex flex-col items-center w-20 sm:w-24">
+                    <button
+                      type="button"
+                      onClick={handleClick}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
+                        ${done
+                          ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
+                          : active
+                          ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
+                          : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
+                    >
                       {done ? "✓" : step.n}
+                    </button>
+                    <span className={`mt-1.5 text-xs font-medium text-center leading-tight
+                      ${done || active ? "text-calcularq-blue" : "text-slate-400"}`}>
+                      {step.label}
                     </span>
-                    <span className="whitespace-nowrap">{step.label}</span>
-                  </button>
+                  </div>
 
+                  {/* Linha conectora — alinhada verticalmente com o centro da bolinha */}
                   {i < STEPS.length - 1 && (
-                    <div className={`h-0.5 w-6 sm:w-10 shrink-0 transition-colors duration-300 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`} />
+                    <div className="mt-5 h-0.5 w-6 sm:w-10 shrink-0 transition-colors duration-300"
+                      style={{ backgroundColor: done ? "var(--calcularq-blue, #1e3a8a)" : "#e2e8f0" }}
+                    />
                   )}
                 </div>
               );
@@ -561,8 +577,15 @@ const handleNext = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center">
-                        <p className="text-xs text-slate-400">Preencha a Composição Final para ver o preço</p>
+                      <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-1">
+                        <p className="text-xs font-medium text-slate-500">
+                          {currentStep < 3
+                            ? `Conclua a Etapa ${currentStep + 1} — ${STEPS[currentStep].label}`
+                            : currentStep === 3
+                            ? "Conclua a Etapa 4 — Preço Final"
+                            : "Preencha as horas estimadas para ver o preço"}
+                        </p>
+                        <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
                       </div>
                     )}
 
@@ -572,6 +595,19 @@ const handleNext = () => {
                         <span className="text-sm text-slate-500">Lucro Estimado</span>
                         <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
                           R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* % DO VALOR DA OBRA (CUB) */}
+                    {cubPercentage !== null && (
+                      <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
+                        <span className="flex items-center gap-1 text-sm text-slate-500">
+                          % do valor da obra
+                          <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
+                        </span>
+                        <span className="text-sm font-bold text-calcularq-blue">
+                          {cubPercentage.toFixed(1)}%
                         </span>
                       </div>
                     )}
@@ -726,8 +762,15 @@ const handleNext = () => {
                               </p>
                             </div>
                           ) : (
-                            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center">
-                              <p className="text-xs text-slate-400">Preencha a Composição Final para ver o preço</p>
+                            <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-1">
+                              <p className="text-xs font-medium text-slate-500">
+                                {currentStep < 3
+                                  ? `Conclua a Etapa ${currentStep + 1} — ${STEPS[currentStep].label}`
+                                  : currentStep === 3
+                                  ? "Conclua a Etapa 4 — Preço Final"
+                                  : "Preencha as horas estimadas para ver o preço"}
+                              </p>
+                              <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
                             </div>
                           )}
 
@@ -736,6 +779,19 @@ const handleNext = () => {
                               <span className="text-sm text-slate-500">Lucro Estimado</span>
                               <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
                                 R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* % DO VALOR DA OBRA (CUB) */}
+                          {cubPercentage !== null && (
+                            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
+                              <span className="flex items-center gap-1 text-sm text-slate-500">
+                                % do valor da obra
+                                <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
+                              </span>
+                              <span className="text-sm font-bold text-calcularq-blue">
+                                {cubPercentage.toFixed(1)}%
                               </span>
                             </div>
                           )}
