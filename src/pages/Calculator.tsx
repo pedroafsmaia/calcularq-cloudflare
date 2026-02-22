@@ -647,7 +647,7 @@ export default function Calculator() {
                             <PieChart className="w-5 h-5 text-calcularq-blue" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-bold text-calcularq-blue">Resultados</h3>
+                            <h2 className="text-2xl font-bold text-calcularq-blue">Resultados</h2>
                             <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                           </div>
                         </div>
