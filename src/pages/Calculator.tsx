@@ -64,7 +64,7 @@ export default function Calculator() {
           const last = resp.budgets[0];
           const hasExpenses = last.data?.fixedExpenses && last.data.fixedExpenses.length > 0;
           if (hasExpenses) {
-            setLastBudgetExpenses(last.data.fixedExpenses);
+            setLastBudgetExpenses(last.data.fixedExpenses ?? null);
             setLastBudgetProLabore(last.data.proLabore ?? null);
             setLastBudgetProductiveHours(last.data.productiveHours ?? null);
             setShowRestorePrompt(true);
