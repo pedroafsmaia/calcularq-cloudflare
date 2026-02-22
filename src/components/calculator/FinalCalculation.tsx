@@ -1,5 +1,5 @@
 import { DollarSign } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import SaveBudgetButton from "./SaveBudgetButton";
 import Tooltip from "@/components/ui/Tooltip";
@@ -26,6 +26,7 @@ interface FinalCalculationProps {
   areaIntervals: Array<{ min: number; max: number | null; level: number }>;
   fixedExpenses?: Expense[];
   productiveHours?: number;
+  mobileResultsContent?: ReactNode;
 }
 
 export default function FinalCalculation({
@@ -50,6 +51,7 @@ export default function FinalCalculation({
   areaIntervals,
   fixedExpenses = [],
   productiveHours = 0,
+  mobileResultsContent,
 }: FinalCalculationProps) {
   const handleAddExpense = (expense: Expense) => {
     onVariableExpensesChange([...variableExpenses, expense]);
@@ -153,6 +155,13 @@ export default function FinalCalculation({
             </div>
           </div>
         </div>
+
+        {/* Resultados (mobile) antes do menu de salvar */}
+        {mobileResultsContent && (
+          <div className="mt-6 lg:hidden">
+            {mobileResultsContent}
+          </div>
+        )}
 
         {/* Save Budget Button */}
         <div className="mt-6 pt-6 border-t border-slate-200 space-y-4">

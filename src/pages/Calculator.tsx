@@ -643,6 +643,18 @@ export default function Calculator() {
                     areaIntervals={areaIntervals}
                     fixedExpenses={fixedExpenses}
                     productiveHours={productiveHours}
+                    mobileResultsContent={
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="rounded-2xl border border-slate-200 bg-white shadow-sm"
+                      >
+                        <div className="bg-calcularq-blue px-5 py-4 rounded-t-2xl">
+                          <p className="text-lg font-bold text-white text-center">Resultados</p>
+                        </div>
+                        <ResultsPanel />
+                      </motion.div>
+                    }
                   />
                 )}
                 {currentStep === 4 && (!minHourlyRate || !results) && (
@@ -689,7 +701,7 @@ export default function Calculator() {
           {/* Painel lateral — desktop */}
           <div className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-24">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
                 <div className="bg-calcularq-blue px-6 py-4">
                   <h3 className="text-lg font-bold text-white text-center">Resultados</h3>
                 </div>
@@ -697,22 +709,6 @@ export default function Calculator() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Mobile: card inline abaixo da calculadora, visível apenas na etapa 4 */}
-        <div className="lg:hidden mt-6">
-          {currentStep === 4 && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"
-            >
-              <div className="bg-calcularq-blue px-5 py-4">
-                <p className="text-lg font-bold text-white text-center">Resultados</p>
-              </div>
-              <ResultsPanel />
-            </motion.div>
-          )}
         </div>
 
       </div>
