@@ -1,6 +1,7 @@
 import { Settings2, RotateCcw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Factor } from "../pricing/PricingEngine";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface ComplexityConfigProps {
   factors: Factor[];
@@ -23,9 +24,12 @@ export default function ComplexityConfig({
             <Settings2 className="w-5 h-5 text-calcularq-blue" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-calcularq-blue">
-              Configurações da Calculadora de Complexidade
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-calcularq-blue">
+                Configurações da Calculadora de Complexidade
+              </h2>
+              <Tooltip text="Aqui você define o quanto cada fator pesa na Complexidade Global. Se não quiser mexer agora, pode seguir com os valores padrão (Peso 1)." />
+            </div>
             <p className="text-sm text-slate-500 mt-1">
               Ajuste os pesos dos fatores para calcular os preços de acordo com sua estratégia
             </p>
@@ -50,22 +54,26 @@ export default function ComplexityConfig({
 
       <div className="space-y-4">
         {factors.map((factor) => (
-          <div key={factor.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-            <div className="flex-1">
-              <div className="font-medium text-slate-900 text-sm mb-1">{factor.name}</div>
+          <div key={factor.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-slate-50 rounded-lg">
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-slate-900 text-sm mb-1 flex items-center gap-2">
+                <span className="truncate">{factor.name}</span>
+                <Tooltip text="O Peso aumenta ou diminui a influência deste fator na Complexidade Global. 1 = neutro; acima de 1 reforça; abaixo de 1 reduz." />
+              </div>
               <div className="text-xs text-slate-500">{factor.description}</div>
             </div>
-            <div className="flex items-center gap-3">
+
+            <div className="flex items-center justify-between sm:justify-end gap-3">
               <select
                 value={factor.weight}
                 onChange={(e) => onFactorWeightChange(factor.id, Number(e.target.value))}
-                className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue bg-white"
+                className="w-32 sm:w-auto px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue bg-white"
               >
                 {WEIGHT_OPTIONS.map((weight) => (
                   <option key={weight} value={weight}>{weight}</option>
                 ))}
               </select>
-              <span className="w-12 text-right text-sm font-medium text-calcularq-blue">
+              <span className="text-right text-sm font-medium text-calcularq-blue whitespace-nowrap">
                 Peso: {factor.weight}
               </span>
             </div>
