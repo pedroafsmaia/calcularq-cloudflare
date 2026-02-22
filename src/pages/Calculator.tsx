@@ -453,14 +453,7 @@ export default function Calculator() {
             </motion.section>
           )}
 
-          {/* Mensagem inicial */}
-          {(!minHourlyRate || minHourlyRate <= 0) && (
-            <div className="text-center py-12">
-              <p className="text-slate-500">
-                Preencha os dados acima para continuar.
-              </p>
-            </div>
-          )}
+
           </div>
 
           {/* Coluna Lateral: Resultados Fixos */}
