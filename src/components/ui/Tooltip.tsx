@@ -22,7 +22,7 @@ export default function Tooltip({ text }: TooltipProps) {
     <span className="relative inline-flex items-center">
       <button
         type="button"
-        className="text-slate-400 hover:text-calcularq-blue transition-colors focus:outline-none"
+        className="text-slate-400 hover:text-blue-600 transition-colors focus:outline-none"
         onMouseEnter={show}
         onMouseLeave={hide}
         onFocus={show}
@@ -34,14 +34,14 @@ export default function Tooltip({ text }: TooltipProps) {
 
       {visible && (
         <span
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-64 text-white text-xs rounded-xl px-3 py-2.5 shadow-lg leading-relaxed pointer-events-none"
-          style={{ background: "rgba(30, 64, 175, 0.82)", backdropFilter: "blur(8px)" }}
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-72 text-blue-800 text-xs rounded-xl px-3 py-2.5 shadow-lg leading-relaxed pointer-events-none border border-blue-200"
+          style={{ background: "rgba(239, 246, 255, 0.78)", backdropFilter: "blur(8px)" }}
           role="tooltip"
         >
           {text}
           <span
             className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent"
-            style={{ borderRightColor: "rgba(30, 64, 175, 0.82)" }}
+            style={{ borderRightColor: "rgba(239, 246, 255, 0.78)" }}
           />
         </span>
       )}
