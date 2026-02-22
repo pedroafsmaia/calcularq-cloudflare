@@ -427,12 +427,12 @@ export default function Calculator() {
 
           {/* % DO VALOR DA OBRA (CUB) */}
           {cubPercentage !== null && (
-            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-              <span className="flex items-center gap-1 text-sm text-slate-500">
+            <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
+              <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                 % do valor da obra
                 <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
               </span>
-              <span className="text-sm font-bold text-calcularq-blue">
+              <span className="text-sm font-bold text-calcularq-blue whitespace-nowrap">
                 {cubPercentage.toFixed(1)}%
               </span>
             </div>
@@ -440,9 +440,9 @@ export default function Calculator() {
 
           {/* LUCRO ESTIMADO */}
           {displayValues.profit !== null && (
-            <div className="flex justify-between items-center px-1 pt-1 border-t border-slate-100">
-              <span className="text-sm text-slate-500">Lucro Estimado</span>
-              <span className={`text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
+            <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
+              <span className="min-w-0 text-sm text-slate-500">Lucro Estimado</span>
+              <span className={`text-sm font-bold whitespace-nowrap ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
                 R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
@@ -472,8 +472,8 @@ export default function Calculator() {
         </motion.div>
 
         {/* Stepper horizontal unificado */}
-        <div className="mb-10 flex justify-center">
-          <div className="flex items-start gap-0">
+        <div className="mb-10 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
+          <div className="flex min-w-max mx-auto items-start gap-0">
             {STEPS.map((step, i) => {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
@@ -485,7 +485,7 @@ export default function Calculator() {
               };
               return (
                 <div key={step.n} className="flex items-start">
-                  <div className="flex flex-col items-center w-20 sm:w-24">
+                  <div className="flex flex-col items-center w-16 sm:w-20 md:w-24">
                     <button
                       type="button"
                       onClick={handleClick}
@@ -502,7 +502,7 @@ export default function Calculator() {
                     </span>
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className="mt-5 h-0.5 w-6 sm:w-10 shrink-0 transition-colors duration-300"
+                    <div className="mt-5 h-0.5 w-4 sm:w-6 md:w-10 shrink-0 transition-colors duration-300"
                       style={{ backgroundColor: done ? "#1e3a8a" : "#e2e8f0" }}
                     />
                   )}

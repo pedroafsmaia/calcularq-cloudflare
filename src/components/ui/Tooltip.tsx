@@ -13,7 +13,7 @@ interface TooltipProps {
  */
 export default function Tooltip({ text }: TooltipProps) {
   const [visible, setVisible] = useState(false);
-  const [position, setPosition] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [position, setPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const tooltipRef = useRef<HTMLSpanElement | null>(null);
@@ -88,7 +88,8 @@ export default function Tooltip({ text }: TooltipProps) {
 
       top = Math.min(Math.max(top, padding), viewportH - bubbleRect.height - padding);
 
-      setPosition({ left, top, width });
+      const maxHeight = Math.max(120, viewportH - padding * 2);
+      setPosition({ left, top, width, maxHeight });
     };
 
     const raf = window.requestAnimationFrame(updatePosition);
@@ -131,6 +132,8 @@ export default function Tooltip({ text }: TooltipProps) {
             left: position?.left ?? 8,
             top: position?.top ?? 8,
             width: position?.width ?? undefined,
+            maxHeight: position?.maxHeight ?? undefined,
+            overflowY: "auto",
             background: "rgba(239, 246, 255, 0.76)",
             backdropFilter: "blur(10px)",
           }}
