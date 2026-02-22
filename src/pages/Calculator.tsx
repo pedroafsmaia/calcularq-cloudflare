@@ -37,6 +37,10 @@ function saveDraft(data: object) {
   try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch { /* silencioso */ }
 }
 
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch { /* silencioso */ }
+}
+
 function loadDraft(): any | null {
   try {
     const raw = localStorage.getItem(DRAFT_KEY);
@@ -57,6 +61,7 @@ export default function Calculator() {
 
   // Seção 1
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
+  const [useManualMinHourlyRate, setUseManualMinHourlyRate] = useState(false);
   const [fixedExpenses, setFixedExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
   const [proLabore, setProLabore] = useState(0);
   const [productiveHours, setProductiveHours] = useState(0);
@@ -88,7 +93,7 @@ export default function Calculator() {
     if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
     draftSaveRef.current = setTimeout(() => {
       saveDraft({
-        minHourlyRate, fixedExpenses, proLabore, productiveHours,
+        minHourlyRate, useManualMinHourlyRate, fixedExpenses, proLabore, productiveHours,
         factors: factors.map(f => ({ id: f.id, weight: f.weight })),
         areaIntervals, area, selections,
         estimatedHours, commercialDiscount, variableExpenses,
@@ -97,7 +102,7 @@ export default function Calculator() {
       });
     }, 800);
   }, [
-    minHourlyRate, fixedExpenses, proLabore, productiveHours,
+    minHourlyRate, useManualMinHourlyRate, fixedExpenses, proLabore, productiveHours,
     factors, areaIntervals, area, selections,
     estimatedHours, commercialDiscount, variableExpenses,
     currentStep, maxStepReached,
@@ -117,6 +122,7 @@ export default function Calculator() {
     if (age > 24 * 60 * 60 * 1000) return;
 
     setMinHourlyRate(draft.minHourlyRate ?? null);
+    setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
     if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
     if (draft.proLabore) setProLabore(draft.proLabore);
     if (draft.productiveHours) setProductiveHours(draft.productiveHours);
@@ -178,6 +184,7 @@ export default function Calculator() {
         setLoadedClientName(budget.clientName || null);
         setLoadedProjectName(budget.projectName || null);
         setMinHourlyRate(budget.data.minHourlyRate);
+        setUseManualMinHourlyRate(Boolean(budget.data.useManualMinHourlyRate));
 
         setFactors(budget.data.factors.map((f: any) => {
           const defaultFactor = DEFAULT_FACTORS.find(df => df.id === f.id);
@@ -218,6 +225,37 @@ export default function Calculator() {
   // ── Handlers ──────────────────────────────────────────────────
   const handleMinHourRateCalculate = useCallback((rate: number) => {
     setMinHourlyRate(rate);
+  }, []);
+
+  const handleResetCalculator = useCallback(() => {
+    if (!window.confirm("Limpar este cálculo e recomeçar do zero?")) return;
+
+    clearDraft();
+    if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
+
+    setCurrentStep(1);
+    setMaxStepReached(1);
+
+    setMinHourlyRate(null);
+    setUseManualMinHourlyRate(false);
+    setFixedExpenses([]);
+    setProLabore(0);
+    setProductiveHours(0);
+
+    setFactors(DEFAULT_FACTORS);
+    setAreaIntervals(DEFAULT_AREA_INTERVALS);
+
+    setArea(null);
+    setSelections({});
+
+    setEstimatedHours(0);
+    setCommercialDiscount(0);
+    setVariableExpenses([]);
+
+    setLoadedBudgetName(null);
+    setLoadedClientName(null);
+    setLoadedProjectName(null);
+    setShowRestorePrompt(false);
   }, []);
 
   const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
@@ -551,12 +589,15 @@ export default function Calculator() {
                   <MinimumHourCalculator
                     onCalculate={handleMinHourRateCalculate}
                     initialMinHourRate={minHourlyRate || undefined}
+                    initialUseManual={useManualMinHourlyRate}
+                    onManualModeChange={setUseManualMinHourlyRate}
                     onFixedExpensesChange={setFixedExpenses}
                     onProductiveHoursChange={setProductiveHours}
                     onProLaboreChange={setProLabore}
                     initialFixedExpenses={fixedExpenses}
                     initialProductiveHours={productiveHours}
                     initialProLabore={proLabore}
+                    onClearCalculation={!budgetId ? handleResetCalculator : undefined}
                   />
                 )}
 
@@ -636,6 +677,7 @@ export default function Calculator() {
                     areaIntervals={areaIntervals}
                     fixedExpenses={fixedExpenses}
                     productiveHours={productiveHours}
+                    useManualMinHourlyRate={useManualMinHourlyRate}
                     mobileResultsContent={
                       <motion.div
                         initial={{ opacity: 0, y: 12 }}

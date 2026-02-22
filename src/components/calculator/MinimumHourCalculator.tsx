@@ -12,6 +12,9 @@ interface MinimumHourCalculatorProps {
   initialMinHourRate?: number;
   onFixedExpensesChange?: (expenses: Expense[]) => void;
   onProductiveHoursChange?: (hours: number) => void;
+  initialUseManual?: boolean;
+  onManualModeChange?: (value: boolean) => void;
+  onClearCalculation?: () => void;
 }
 
 export default function MinimumHourCalculator({ 
@@ -23,12 +26,15 @@ export default function MinimumHourCalculator({
   initialFixedExpenses,
   initialProLabore,
   initialProductiveHours,
+  initialUseManual = false,
+  onManualModeChange,
+  onClearCalculation,
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
   const [proLabore, setProLabore] = useState(initialProLabore || 0);
   const [productiveHours, setProductiveHours] = useState(initialProductiveHours || 0);
   const [manualMinHourRate, setManualMinHourRate] = useState<number | undefined>(initialMinHourRate);
-  const [useManual, setUseManual] = useState(!!initialMinHourRate);
+  const [useManual, setUseManual] = useState(initialUseManual);
 
   const calculatedMinHourRate = useMemo(() => {
     if (useManual && manualMinHourRate !== undefined) {
@@ -66,6 +72,14 @@ export default function MinimumHourCalculator({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialProductiveHours]);
+
+  useEffect(() => {
+    setUseManual(initialUseManual);
+  }, [initialUseManual]);
+
+  useEffect(() => {
+    onManualModeChange?.(useManual);
+  }, [useManual, onManualModeChange]);
 
   const handleAddExpense = (expense: Expense) => {
     const updated = [...fixedExpenses, expense];
@@ -107,18 +121,29 @@ export default function MinimumHourCalculator({
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-          <Calculator className="w-5 h-5 text-calcularq-blue" />
-        </div>
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
+            <Calculator className="w-5 h-5 text-calcularq-blue" />
+          </div>
+          <div>
           <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
             Hora técnica mínima
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-1 leading-relaxed">
             Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
           </p>
+          </div>
         </div>
+        {onClearCalculation && (
+          <button
+            type="button"
+            onClick={onClearCalculation}
+            className="self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          >
+            Limpar cálculo
+          </button>
+        )}
       </div>
 
       <div className="space-y-6">

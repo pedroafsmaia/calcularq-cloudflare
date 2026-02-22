@@ -26,6 +26,7 @@ interface FinalCalculationProps {
   areaIntervals: Array<{ min: number; max: number | null; level: number }>;
   fixedExpenses?: Expense[];
   productiveHours?: number;
+  useManualMinHourlyRate?: boolean;
   mobileResultsContent?: ReactNode;
 }
 
@@ -51,6 +52,7 @@ export default function FinalCalculation({
   areaIntervals,
   fixedExpenses = [],
   productiveHours = 0,
+  useManualMinHourlyRate = false,
   mobileResultsContent,
 }: FinalCalculationProps) {
   const handleAddExpense = (expense: Expense) => {
@@ -85,6 +87,7 @@ export default function FinalCalculation({
         projectName={initialProjectName}
         budgetData={{
           minHourlyRate,
+          useManualMinHourlyRate,
           factors: factors.map((factor) => ({
             id: factor.id,
             name: factor.name,

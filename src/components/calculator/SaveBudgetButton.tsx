@@ -11,6 +11,7 @@ interface SaveBudgetButtonProps {
   initialBudgetName?: string;
   budgetData: {
     minHourlyRate: number;
+    useManualMinHourlyRate?: boolean;
     factors: Array<{ id: string; name: string; weight: number; level: number }>;
     areaIntervals: Array<{ min: number; max: number | null; level: number }>;
     selections: Record<string, number>;

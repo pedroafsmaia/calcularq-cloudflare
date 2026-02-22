@@ -27,6 +27,7 @@ export interface Budget {
   projectName?: string;
   data: {
     minHourlyRate: number;
+    useManualMinHourlyRate?: boolean;
     factors: Array<{ id: string; name: string; weight: number; level: number }>;
     areaIntervals: Array<{ min: number; max: number | null; level: number }>;
     selections: Record<string, number>;
