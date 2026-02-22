@@ -122,11 +122,11 @@ export default function MinimumHourCalculator({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3 min-w-0">
           <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
             <Calculator className="w-5 h-5 text-calcularq-blue" />
           </div>
-          <div>
+          <div className="min-w-0">
           <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
             Hora técnica mínima
           </h2>
@@ -139,7 +139,7 @@ export default function MinimumHourCalculator({
           <button
             type="button"
             onClick={onClearCalculation}
-            className="self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            className="self-start w-full sm:w-auto rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             Limpar cálculo
           </button>
