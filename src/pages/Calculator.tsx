@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, PieChart } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, Trash2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -35,10 +35,6 @@ const DRAFT_KEY = "calcularq_draft_v1";
 
 function saveDraft(data: object) {
   try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch { /* silencioso */ }
-}
-
-function clearDraft() {
-  try { localStorage.removeItem(DRAFT_KEY); } catch { /* silencioso */ }
 }
 
 function loadDraft(): any | null {
@@ -80,10 +76,7 @@ export default function Calculator() {
   const [variableExpenses, setVariableExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
 
   // Restaurar último cálculo
-  const [lastBudgetExpenses, setLastBudgetExpenses] = useState<Array<{ id: string; name: string; value: number }> | null>(null);
-  const [lastBudgetProLabore, setLastBudgetProLabore] = useState<number | null>(null);
-  const [lastBudgetProductiveHours, setLastBudgetProductiveHours] = useState<number | null>(null);
-  const [showRestorePrompt, setShowRestorePrompt] = useState(false);
+  const [lastBudgetData, setLastBudgetData] = useState<any | null>(null);
 
   // ── Autosave em localStorage ──────────────────────────────────
   const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -150,27 +143,12 @@ export default function Calculator() {
         const resp = await api.listBudgets();
         if (resp.budgets && resp.budgets.length > 0) {
           const last = resp.budgets[0];
-          const hasExpenses = last.data?.fixedExpenses && last.data.fixedExpenses.length > 0;
-          if (hasExpenses) {
-            setLastBudgetExpenses(last.data.fixedExpenses ?? null);
-            setLastBudgetProLabore(last.data.proLabore ?? null);
-            setLastBudgetProductiveHours(last.data.productiveHours ?? null);
-            setShowRestorePrompt(true);
-          }
+          setLastBudgetData(last.data ?? null);
         }
       } catch { /* silencioso */ }
     };
     fetchLastBudget();
   }, [user, budgetId]);
-
-  const handleRestoreLastExpenses = () => {
-    if (lastBudgetExpenses) {
-      setFixedExpenses(lastBudgetExpenses);
-      if (lastBudgetProLabore !== null) setProLabore(lastBudgetProLabore);
-      if (lastBudgetProductiveHours !== null) setProductiveHours(lastBudgetProductiveHours);
-    }
-    setShowRestorePrompt(false);
-  };
 
   // ── Carregar orçamento salvo via URL ──────────────────────────
   useEffect(() => {
@@ -227,36 +205,82 @@ export default function Calculator() {
     setMinHourlyRate(rate);
   }, []);
 
-  const handleResetCalculator = useCallback(() => {
-    if (!window.confirm("Limpar este cálculo e recomeçar do zero?")) return;
+  const handleImportCurrentStepFromLastBudget = useCallback(() => {
+    if (!lastBudgetData) return;
 
-    clearDraft();
-    if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
+    if (currentStep === 1) {
+      setMinHourlyRate(lastBudgetData.minHourlyRate ?? null);
+      setUseManualMinHourlyRate(Boolean(lastBudgetData.useManualMinHourlyRate));
+      setFixedExpenses(Array.isArray(lastBudgetData.fixedExpenses) ? lastBudgetData.fixedExpenses : []);
+      setProLabore(typeof lastBudgetData.proLabore === "number" ? lastBudgetData.proLabore : 0);
+      setProductiveHours(typeof lastBudgetData.productiveHours === "number" ? lastBudgetData.productiveHours : 0);
+      return;
+    }
 
-    setCurrentStep(1);
-    setMaxStepReached(1);
+    if (currentStep === 2) {
+      if (Array.isArray(lastBudgetData.factors)) {
+        setFactors(DEFAULT_FACTORS.map((df) => {
+          const saved = lastBudgetData.factors.find((f: any) => f.id === df.id);
+          return saved ? { ...df, weight: saved.weight } : df;
+        }));
+      }
+      return;
+    }
 
-    setMinHourlyRate(null);
-    setUseManualMinHourlyRate(false);
-    setFixedExpenses([]);
-    setProLabore(0);
-    setProductiveHours(0);
+    if (currentStep === 3) {
+      if (Array.isArray(lastBudgetData.areaIntervals)) setAreaIntervals(lastBudgetData.areaIntervals);
+      if (lastBudgetData.selections) setSelections(lastBudgetData.selections);
 
-    setFactors(DEFAULT_FACTORS);
-    setAreaIntervals(DEFAULT_AREA_INTERVALS);
+      const areaLevel = Number(lastBudgetData.selections?.area ?? lastBudgetData.factors?.find?.((f: any) => f.id === "area")?.level);
+      const sourceIntervals = Array.isArray(lastBudgetData.areaIntervals) ? lastBudgetData.areaIntervals : areaIntervals;
+      const interval = sourceIntervals.find((i: any) => i.level === areaLevel);
+      if (interval) {
+        const max = typeof interval.max === "number" ? interval.max : interval.min;
+        setArea((interval.min + max) / 2);
+      } else {
+        setArea(null);
+      }
+      return;
+    }
 
-    setArea(null);
-    setSelections({});
+    if (currentStep === 4) {
+      setEstimatedHours(typeof lastBudgetData.estimatedHours === "number" ? lastBudgetData.estimatedHours : 0);
+      setCommercialDiscount(typeof lastBudgetData.commercialDiscount === "number" ? lastBudgetData.commercialDiscount : 0);
+      setVariableExpenses(Array.isArray(lastBudgetData.variableExpenses) ? lastBudgetData.variableExpenses : []);
+    }
+  }, [currentStep, lastBudgetData, areaIntervals]);
 
-    setEstimatedHours(0);
-    setCommercialDiscount(0);
-    setVariableExpenses([]);
+  const handleClearCurrentStep = useCallback(() => {
+    const stepName = STEPS.find((s) => s.n === currentStep)?.label ?? `Etapa ${currentStep}`;
+    if (!window.confirm(`Limpar os dados preenchidos de "${stepName}"?`)) return;
 
-    setLoadedBudgetName(null);
-    setLoadedClientName(null);
-    setLoadedProjectName(null);
-    setShowRestorePrompt(false);
-  }, []);
+    if (currentStep === 1) {
+      setMinHourlyRate(null);
+      setUseManualMinHourlyRate(false);
+      setFixedExpenses([]);
+      setProLabore(0);
+      setProductiveHours(0);
+      return;
+    }
+
+    if (currentStep === 2) {
+      setFactors(DEFAULT_FACTORS);
+      return;
+    }
+
+    if (currentStep === 3) {
+      setArea(null);
+      setSelections({});
+      setAreaIntervals(DEFAULT_AREA_INTERVALS);
+      return;
+    }
+
+    if (currentStep === 4) {
+      setEstimatedHours(0);
+      setCommercialDiscount(0);
+      setVariableExpenses([]);
+    }
+  }, [currentStep]);
 
   const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
     setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
@@ -345,6 +369,8 @@ export default function Calculator() {
   };
   const stepVisualDone = (n: number) => maxStepReached > n;
   const canAdvance = stepComplete(currentStep);
+  const currentStepLabel = STEPS.find((s) => s.n === currentStep)?.label ?? `Etapa ${currentStep}`;
+  const canImportCurrentStep = Boolean(lastBudgetData);
 
   const handleNext = () => {
     if (currentStep < 4 && canAdvance) {
@@ -554,27 +580,39 @@ export default function Calculator() {
           {/* Coluna principal */}
           <div className="flex-1 min-w-0">
 
-            {/* Banner restaurar */}
-            {showRestorePrompt && currentStep === 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 mb-6"
-              >
-                <p className="text-sm text-blue-800">
-                  <strong>Preencher com os dados do seu último cálculo salvo?</strong>{" "}
-                  Despesas fixas, pró-labore mínimo e horas produtivas serão preenchidos automaticamente.
-                </p>
-                <div className="flex gap-2 shrink-0">
-                  <button onClick={handleRestoreLastExpenses} className="text-sm font-semibold text-white bg-calcularq-blue px-4 py-2 rounded-lg hover:bg-calcularq-blue/90 transition-colors">
-                    Restaurar
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-calcularq-blue">A??es da Etapa</p>
+                  <p className="text-xs text-slate-500">
+                    Importe ou limpe apenas os dados de <span className="font-medium">{currentStepLabel}</span>.
+                  </p>
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={handleImportCurrentStepFromLastBudget}
+                    disabled={!canImportCurrentStep}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Download className="h-4 w-4" />
+                    Importar ?ltima etapa
                   </button>
-                  <button onClick={() => setShowRestorePrompt(false)} className="text-sm font-medium text-slate-500 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors">
-                    Ignorar
+                  <button
+                    type="button"
+                    onClick={handleClearCurrentStep}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Limpar etapa
                   </button>
                 </div>
-              </motion.div>
-            )}
+              </div>
+            </motion.div>
 
             {/* Conteúdo da etapa */}
             <AnimatePresence mode="wait">
@@ -597,7 +635,6 @@ export default function Calculator() {
                     initialFixedExpenses={fixedExpenses}
                     initialProductiveHours={productiveHours}
                     initialProLabore={proLabore}
-                    onClearCalculation={!budgetId ? handleResetCalculator : undefined}
                   />
                 )}
 
