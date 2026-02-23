@@ -22,6 +22,7 @@ interface FinalCalculationProps {
   projectPrice: number;
   finalSalePrice: number;
   factorLevels: Record<string, number>;
+  area?: number | null;
   factors: Array<{ id: string; name: string; weight: number }>;
   areaIntervals: Array<{ min: number; max: number | null; level: number }>;
   fixedExpenses?: Expense[];
@@ -48,6 +49,7 @@ export default function FinalCalculation({
   projectPrice,
   finalSalePrice,
   factorLevels,
+  area = null,
   factors,
   areaIntervals,
   fixedExpenses = [],
@@ -88,6 +90,7 @@ export default function FinalCalculation({
         budgetData={{
           minHourlyRate,
           useManualMinHourlyRate,
+          area,
           factors: factors.map((factor) => ({
             id: factor.id,
             name: factor.name,

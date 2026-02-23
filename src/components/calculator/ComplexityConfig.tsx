@@ -1,12 +1,10 @@
-import { Settings2, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Settings2 } from "lucide-react";
 import Tooltip from "@/components/ui/Tooltip";
 import { Factor } from "../pricing/PricingEngine";
 
 interface ComplexityConfigProps {
   factors: Factor[];
   onFactorWeightChange: (factorId: string, weight: number) => void;
-  onResetWeights: () => void;
 }
 
 const WEIGHT_OPTIONS = [0, 0.5, 1, 2, 3, 4, 5, 6];
@@ -14,7 +12,6 @@ const WEIGHT_OPTIONS = [0, 0.5, 1, 2, 3, 4, 5, 6];
 export default function ComplexityConfig({
   factors,
   onFactorWeightChange,
-  onResetWeights,
 }: ComplexityConfigProps) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
@@ -37,16 +34,6 @@ export default function ComplexityConfig({
             </p>
           </div>
         </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onResetWeights}
-          className="flex items-center gap-2 self-start sm:self-auto"
-        >
-          <RotateCcw className="w-4 h-4" />
-          Resetar
-        </Button>
       </div>
 
       {/* Observação (sem ícone) */}

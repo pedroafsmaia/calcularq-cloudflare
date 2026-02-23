@@ -179,12 +179,16 @@ export default function Calculator() {
         if (budget.data.proLabore !== undefined) setProLabore(budget.data.proLabore);
         if (budget.data.productiveHours !== undefined) setProductiveHours(budget.data.productiveHours);
 
-        const areaFactor = budget.data.factors.find((f: any) => f.id === "area");
-        if (areaFactor) {
-          const interval = budget.data.areaIntervals.find((i: any) => i.level === areaFactor.level);
-          if (interval) {
-            const max = interval.max ?? interval.min;
-            setArea((interval.min + max) / 2);
+        if (typeof budget.data.area === "number" && Number.isFinite(budget.data.area)) {
+          setArea(budget.data.area);
+        } else {
+          const areaFactor = budget.data.factors.find((f: any) => f.id === "area");
+          if (areaFactor) {
+            const interval = budget.data.areaIntervals.find((i: any) => i.level === areaFactor.level);
+            if (interval) {
+              const max = interval.max ?? interval.min;
+              setArea((interval.min + max) / 2);
+            }
           }
         }
         setCurrentStep(4);
@@ -231,14 +235,18 @@ export default function Calculator() {
       if (Array.isArray(lastBudgetData.areaIntervals)) setAreaIntervals(lastBudgetData.areaIntervals);
       if (lastBudgetData.selections) setSelections(lastBudgetData.selections);
 
-      const areaLevel = Number(lastBudgetData.selections?.area ?? lastBudgetData.factors?.find?.((f: any) => f.id === "area")?.level);
-      const sourceIntervals = Array.isArray(lastBudgetData.areaIntervals) ? lastBudgetData.areaIntervals : areaIntervals;
-      const interval = sourceIntervals.find((i: any) => i.level === areaLevel);
-      if (interval) {
-        const max = typeof interval.max === "number" ? interval.max : interval.min;
-        setArea((interval.min + max) / 2);
+      if (typeof lastBudgetData.area === "number" && Number.isFinite(lastBudgetData.area)) {
+        setArea(lastBudgetData.area);
       } else {
-        setArea(null);
+        const areaLevel = Number(lastBudgetData.selections?.area ?? lastBudgetData.factors?.find?.((f: any) => f.id === "area")?.level);
+        const sourceIntervals = Array.isArray(lastBudgetData.areaIntervals) ? lastBudgetData.areaIntervals : areaIntervals;
+        const interval = sourceIntervals.find((i: any) => i.level === areaLevel);
+        if (interval) {
+          const max = typeof interval.max === "number" ? interval.max : interval.min;
+          setArea((interval.min + max) / 2);
+        } else {
+          setArea(null);
+        }
       }
       return;
     }
@@ -285,8 +293,6 @@ export default function Calculator() {
   const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
     setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
   }, []);
-
-  const handleResetWeights = useCallback(() => setFactors(DEFAULT_FACTORS), []);
 
   const handleAreaChange = useCallback((newArea: number) => {
     setArea(newArea);
@@ -489,25 +495,29 @@ export default function Calculator() {
             </div>
           )}
 
-          {/* % DO VALOR DA OBRA (CUB) */}
-          <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
-            <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
-              % do valor da obra
-              <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). É apenas uma referência — o valor real da obra varia conforme a região, o padrão construtivo e o tipo de projeto." />
-            </span>
-            <span className="text-sm font-bold text-calcularq-blue whitespace-nowrap">
-              {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "—"}
-            </span>
-          </div>
+          {displayValues.finalSalePrice > 0 && (
+            <>
+              {/* % DO VALOR DA OBRA (CUB) */}
+              <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
+                <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
+                  % do valor da obra
+                  <Tooltip text={"Estimativa baseada no CUB m\u00e9dio nacional (R$ 2.800/m\u00b2). \u00c9 apenas uma refer\u00eancia \u2014 o valor real da obra varia conforme a regi\u00e3o, o padr\u00e3o construtivo e o tipo de projeto."} />
+                </span>
+                <span className="text-sm font-bold text-calcularq-blue whitespace-nowrap">
+                  {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "\u2014"}
+                </span>
+              </div>
 
-          {/* LUCRO ESTIMADO */}
-          {displayValues.profit !== null && (
-            <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
-              <span className="min-w-0 text-sm text-slate-500">Lucro Estimado</span>
-              <span className={`text-sm font-bold whitespace-nowrap ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
-                R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-            </div>
+              {/* LUCRO ESTIMADO */}
+              {displayValues.profit !== null && (
+                <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
+                  <span className="min-w-0 text-sm text-slate-500">Lucro Estimado</span>
+                  <span className={`text-sm font-bold whitespace-nowrap ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
+                    R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+            </>
           )}
 
         </div>
@@ -580,37 +590,27 @@ export default function Calculator() {
           {/* Coluna principal */}
           <div className="flex-1 min-w-0">
 
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-calcularq-blue">A??es da Etapa</p>
-                  <p className="text-xs text-slate-500">
-                    Importe ou limpe apenas os dados de <span className="font-medium">{currentStepLabel}</span>.
-                  </p>
-                </div>
-                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
                     onClick={handleImportCurrentStepFromLastBudget}
                     disabled={!canImportCurrentStep}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    title={`Importar dados do último cálculo para ${currentStepLabel}`}
                   >
                     <Download className="h-4 w-4" />
-                    Importar ?ltima etapa
+                    {"Importar dados do \u00faltimo c\u00e1lculo"}
                   </button>
                   <button
                     type="button"
                     onClick={handleClearCurrentStep}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    title={`Limpar dados da etapa ${currentStepLabel}`}
                   >
                     <Trash2 className="h-4 w-4" />
-                    Limpar etapa
+                    Limpar dados da etapa
                   </button>
-                </div>
               </div>
             </motion.div>
 
@@ -642,7 +642,6 @@ export default function Calculator() {
                   <ComplexityConfig
                     factors={factors}
                     onFactorWeightChange={handleFactorWeightChange}
-                    onResetWeights={handleResetWeights}
                   />
                 )}
 
@@ -710,6 +709,7 @@ export default function Calculator() {
                     projectPrice={results.projectPrice}
                     finalSalePrice={results.finalSalePrice}
                     factorLevels={selections}
+                    area={area}
                     factors={factors}
                     areaIntervals={areaIntervals}
                     fixedExpenses={fixedExpenses}
