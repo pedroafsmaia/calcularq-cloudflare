@@ -1,5 +1,6 @@
 import { Settings2 } from "lucide-react";
 import Tooltip from "@/components/ui/Tooltip";
+import SectionHeader from "./SectionHeader";
 import { Factor } from "../pricing/PricingEngine";
 
 interface ComplexityConfigProps {
@@ -15,25 +16,16 @@ export default function ComplexityConfig({
 }: ComplexityConfigProps) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex items-start gap-3 min-w-0">
-          <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-            <Settings2 className="w-5 h-5 text-calcularq-blue" />
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
-                Pesos dos fatores
-              </h2>
-              <Tooltip text="Os pesos controlam quanto cada fator influencia a Complexidade Global. Se você não souber por onde começar, deixe todos em 1 (padrão) e ajuste depois." />
-            </div>
-
-            <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">
-              (Opcional) Ajuste os pesos para refletir sua estratégia de precificação.
-            </p>
-          </div>
-        </div>
+      <div className="mb-6">
+        <SectionHeader
+          className="mb-0"
+          title="Pesos dos fatores"
+          description="(Opcional) Ajuste os pesos para refletir sua estratégia de precificação."
+          icon={<Settings2 className="w-5 h-5 text-calcularq-blue" />}
+          titleAccessory={
+            <Tooltip text="Os pesos controlam quanto cada fator influencia a Complexidade Global. Se você não souber por onde começar, deixe todos em 1 (padrão) e ajuste depois." />
+          }
+        />
       </div>
 
       {/* Observação (sem ícone) */}

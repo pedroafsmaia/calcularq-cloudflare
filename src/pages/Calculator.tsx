@@ -10,6 +10,7 @@ import ComplexityConfig from "../components/calculator/ComplexityConfig";
 import AreaFactorCard from "../components/calculator/AreaFactorCard";
 import FactorCard from "../components/pricing/FactorCard";
 import FinalCalculation from "../components/calculator/FinalCalculation";
+import SectionHeader from "../components/calculator/SectionHeader";
 import Tooltip from "@/components/ui/Tooltip";
 
 import {
@@ -646,17 +647,11 @@ export default function Calculator() {
 
                 {currentStep === 3 && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-                        <BarChart2 className="w-5 h-5 text-calcularq-blue" />
-                      </div>
-                      <div className="min-w-0">
-                        <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Análise de complexidade</h2>
-                        <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">
-                          Selecione as características do projeto específico que está precificando
-                        </p>
-                      </div>
-                    </div>
+                    <SectionHeader
+                      title="Análise de complexidade"
+                      description="Selecione as características do projeto específico que está precificando"
+                      icon={<BarChart2 className="w-5 h-5 text-calcularq-blue" />}
+                    />
 
                     <div className="mb-6 p-4 rounded-lg border border-blue-200" style={{ background: "rgba(239,246,255,0.70)" }}>
                       <p className="text-sm text-blue-800">
@@ -720,15 +715,12 @@ export default function Calculator() {
                         animate={{ opacity: 1, y: 0 }}
                         className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
                       >
-                        <div className="flex items-center gap-3 mb-5">
-                          <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-                            <PieChart className="w-5 h-5 text-calcularq-blue" />
-                          </div>
-                          <div className="min-w-0">
-                            <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Resultados</h2>
-                            <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
-                          </div>
-                        </div>
+                        <SectionHeader
+                          compact
+                          title="Resultados"
+                          description="Resumo do cálculo atual"
+                          icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                        />
                         <div className="rounded-2xl border border-slate-100 bg-slate-50/30 overflow-hidden">
                           <ResultsPanel />
                         </div>
@@ -753,15 +745,14 @@ export default function Calculator() {
           <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0 self-start">
             <div className="sticky top-24">
               <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-                    <PieChart className="w-5 h-5 text-calcularq-blue" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-xl font-bold text-calcularq-blue">Resultados</h3>
-                    <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
-                  </div>
-                </div>
+                <SectionHeader
+                  compact
+                  title="Resultados"
+                  description="Resumo do cálculo atual"
+                  icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                  titleClassName="text-xl sm:text-xl"
+                  descriptionClassName="text-sm"
+                />
                 <div className="rounded-2xl border border-slate-100 bg-slate-50/30 overflow-hidden">
                   <ResultsPanel />
                 </div>

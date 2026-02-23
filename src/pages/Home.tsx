@@ -280,29 +280,29 @@ export default function Home() {
               Como Funciona
             </h2>
             <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
-              {"Em 4 etapas simples, voc\u00ea organiza as informa\u00e7\u00f5es do projeto e visualiza um valor final com mais clareza."}
+              {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 4 etapas simples."}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <FormulaStep 
                 number="1" 
                 title={"Hora T\u00e9cnica"}
-                description={"Preencha os dados b\u00e1sicos do escrit\u00f3rio para calcular sua hora t\u00e9cnica m\u00ednima."}
+                description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica mínima."}
               />
               <FormulaStep 
                 number="2" 
                 title="Pesos"
-                description={"Ajuste os pesos dos fatores se quiser personalizar como a calculadora considera cada item."}
+                description={"Personalize o quanto cada fator influencia o cálculo. Ou pule e use os valores padrão."}
               />
               <FormulaStep 
                 number="3" 
                 title="Complexidade"
-                description={"Informe a \u00e1rea e classifique os fatores do projeto para montar a complexidade do c\u00e1lculo."}
+                description={"Informe a área e as características do projeto. O Calcularq mede o esforço real envolvido."}
               />
               <FormulaStep 
                 number="4" 
                 title={"Pre\u00e7o Final"}
-                description={"Ajuste horas, despesas e desconto comercial para visualizar o valor final da proposta."}
+                description={"Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."}
               />
             </div>
           </motion.div>

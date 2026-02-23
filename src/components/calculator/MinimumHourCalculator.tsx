@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { Calculator } from "lucide-react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import Tooltip from "@/components/ui/Tooltip";
+import SectionHeader from "./SectionHeader";
 
 interface MinimumHourCalculatorProps {
   initialFixedExpenses?: Expense[];
@@ -122,19 +123,12 @@ export default function MinimumHourCalculator({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-        <div className="flex items-start gap-3 min-w-0">
-          <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-            <Calculator className="w-5 h-5 text-calcularq-blue" />
-          </div>
-          <div className="min-w-0">
-          <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
-            Hora técnica mínima
-          </h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">
-            Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
-          </p>
-          </div>
-        </div>
+        <SectionHeader
+          className="mb-0"
+          title="Hora técnica mínima"
+          description="Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima."
+          icon={<Calculator className="w-5 h-5 text-calcularq-blue" />}
+        />
         {onClearCalculation && (
           <button
             type="button"

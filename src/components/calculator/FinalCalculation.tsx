@@ -3,6 +3,7 @@ import { useEffect, type ReactNode } from "react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import SaveBudgetButton from "./SaveBudgetButton";
 import Tooltip from "@/components/ui/Tooltip";
+import SectionHeader from "./SectionHeader";
 
 interface FinalCalculationProps {
   budgetId?: string;
@@ -128,15 +129,11 @@ export default function FinalCalculation({
   return (
     <div>
       <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-calcularq-blue" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Composição final do preço</h2>
-            <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o preço de venda final.</p>
-          </div>
-        </div>
+        <SectionHeader
+          title="Composição final do preço"
+          description="Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o preço de venda final."
+          icon={<DollarSign className="w-5 h-5 text-calcularq-blue" />}
+        />
 
         <div className="space-y-6">
           <div>
