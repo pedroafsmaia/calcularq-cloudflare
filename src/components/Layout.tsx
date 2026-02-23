@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
   const currentPageName = getCurrentPageName();
 
   const desktopNavItem = (isActive: boolean) =>
-    `shrink-0 flex items-center justify-center gap-2 h-10 min-w-10 px-3 sm:px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
+    `shrink-0 flex items-center justify-center gap-0 xl:gap-2 h-10 w-10 xl:w-auto min-w-10 xl:min-w-10 px-0 xl:px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
       isActive
         ? "bg-calcularq-blue text-white border-calcularq-blue shadow-sm shadow-calcularq-blue/20"
         : "text-slate-600 border-transparent hover:bg-slate-100 hover:text-calcularq-blue"
@@ -61,7 +61,7 @@ export default function Layout({ children }: LayoutProps) {
                   return (
                     <Link key={item.name} to={createPageUrl(item.page)} className={desktopNavItem(isActive)}>
                       <item.icon className="w-4 h-4" />
-                      <span>{item.name}</span>
+                      <span className="hidden xl:inline">{item.name}</span>
                     </Link>
                   );
                 })}
@@ -70,30 +70,30 @@ export default function Layout({ children }: LayoutProps) {
                   <>
                     <Link to="/budgets" className={desktopNavItem(false)}>
                       <History className="w-4 h-4" />
-                      <span>Meus Cálculos</span>
+                      <span className="hidden xl:inline">Meus Cálculos</span>
                     </Link>
 
                     {user.hasPaid && (
                       <Link to={createPageUrl("Manual")} className={desktopNavItem(currentPageName === "Manual")}>
                         <BookOpen className="w-4 h-4" />
-                        <span>Manual</span>
+                        <span className="hidden xl:inline">Manual</span>
                       </Link>
                     )}
 
-                    <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600">
+                    <div className="hidden 2xl:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600">
                       <User className="w-4 h-4" />
                       <span>{user.name}</span>
                     </div>
 
                     <button onClick={logout} className={desktopNavItem(false)}>
                       <LogOut className="w-4 h-4" />
-                      <span>Sair</span>
+                      <span className="hidden xl:inline">Sair</span>
                     </button>
                   </>
                 ) : (
                   <Link to={createPageUrl("Login")} className={desktopNavItem(false)}>
                     <LogIn className="w-4 h-4" />
-                    <span>Entrar</span>
+                    <span className="hidden xl:inline">Entrar</span>
                   </Link>
                 )}
               </div>
