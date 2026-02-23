@@ -523,8 +523,8 @@ export default function Calculator() {
                       iconClassName="text-amber-600 hover:text-amber-700"
                       text={
                         cubPercentage < 2
-                          ? "Abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos."
-                          : "Acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos de maior complexidade técnica."
+                          ? "% abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos."
+                          : "% acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos de maior complexidade técnica."
                       }
                     />
                   )}
