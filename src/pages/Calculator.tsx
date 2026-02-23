@@ -652,7 +652,7 @@ export default function Calculator() {
                       </div>
                       <div className="min-w-0">
                         <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Análise de complexidade</h2>
-                        <p className="text-sm text-slate-500 mt-1 leading-relaxed max-w-[52ch]">
+                        <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">
                           Selecione as características do projeto específico que está precificando
                         </p>
                       </div>
@@ -750,7 +750,7 @@ export default function Calculator() {
           </div>
 
           {/* Painel lateral — desktop */}
-          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0">
+          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0 self-start">
             <div className="sticky top-24">
               <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
                 <div className="flex items-center gap-3 mb-5">

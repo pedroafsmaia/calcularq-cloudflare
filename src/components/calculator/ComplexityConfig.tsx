@@ -29,7 +29,7 @@ export default function ComplexityConfig({
               <Tooltip text="Os pesos controlam quanto cada fator influencia a Complexidade Global. Se você não souber por onde começar, deixe todos em 1 (padrão) e ajuste depois." />
             </div>
 
-            <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[54ch]">
+            <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">
               (Opcional) Ajuste os pesos para refletir sua estratégia de precificação.
             </p>
           </div>

@@ -130,7 +130,7 @@ export default function MinimumHourCalculator({
           <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
             Hora técnica mínima
           </h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[52ch]">
+          <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[64ch]">
             Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
           </p>
           </div>
