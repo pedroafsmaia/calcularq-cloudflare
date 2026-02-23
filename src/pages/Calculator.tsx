@@ -504,34 +504,30 @@ export default function Calculator() {
                   % do valor da obra
                   <Tooltip text={"Estimativa baseada no CUB médio nacional (R$ 2.800/m²). A faixa de referência do CAU/BR costuma ficar entre 2% e 11% do valor da obra. É apenas uma referência — o valor real varia conforme a região, o padrão e o tipo de projeto."} />
                 </span>
-                <span className={`text-sm font-bold whitespace-nowrap ${
-                  cubPercentage !== null
-                    ? cubPercentage < 2
-                      ? "text-red-500"
-                      : cubPercentage > 11
-                        ? "text-amber-500"
-                        : "text-green-600"
-                    : "text-calcularq-blue"
-                }`}>
-                  {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "—"}
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  <span className={`text-sm font-bold ${
+                    cubPercentage !== null
+                      ? cubPercentage < 2
+                        ? "text-red-500"
+                        : cubPercentage > 11
+                          ? "text-amber-500"
+                          : "text-green-600"
+                      : "text-calcularq-blue"
+                  }`}>
+                    {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "—"}
+                  </span>
+                  {cubPercentage !== null && (cubPercentage < 2 || cubPercentage > 11) && (
+                    <Tooltip
+                      iconClassName={cubPercentage < 2 ? "text-red-500 hover:text-red-600" : "text-amber-500 hover:text-amber-600"}
+                      text={
+                        cubPercentage < 2
+                          ? "Atenção: abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos."
+                          : "Atenção: acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos de maior complexidade técnica."
+                      }
+                    />
+                  )}
                 </span>
               </div>
-
-              {/* Alerta contextual baseado na faixa */}
-              {cubPercentage !== null && cubPercentage < 2 && (
-                <div className="mx-1 mt-1 p-2.5 bg-red-50 rounded-lg border border-red-200">
-                  <p className="text-xs text-red-700">
-                    <strong>Atenção: abaixo da faixa de referência.</strong> Seu honorário representa {cubPercentage.toFixed(1)}% do valor estimado da obra. A faixa mínima de referência do CAU/BR é 2%. Isso pode indicar necessidade de revisar as horas estimadas ou o escopo do projeto.
-                  </p>
-                </div>
-              )}
-              {cubPercentage !== null && cubPercentage > 11 && (
-                <div className="mx-1 mt-1 p-2.5 bg-amber-50 rounded-lg border border-amber-200">
-                  <p className="text-xs text-amber-700">
-                    <strong>Atenção: acima da faixa típica.</strong> Seu honorário representa {cubPercentage.toFixed(1)}% do valor estimado da obra. A faixa típica de referência vai até 11%. Isso pode ser adequado em projetos de maior complexidade técnica.
-                  </p>
-                </div>
-              )}
 
               {/* LUCRO ESTIMADO */}
               {displayValues.profit !== null && (

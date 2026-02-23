@@ -3,6 +3,7 @@ import { Info } from "lucide-react";
 
 interface TooltipProps {
   text: string;
+  iconClassName?: string;
 }
 
 /**
@@ -11,7 +12,7 @@ interface TooltipProps {
  * - Fundo levemente transparente + blur.
  * - Texto formatado em pequenos parágrafos para leitura.
  */
-export default function Tooltip({ text }: TooltipProps) {
+export default function Tooltip({ text, iconClassName }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,7 +115,7 @@ export default function Tooltip({ text }: TooltipProps) {
       <button
         ref={buttonRef}
         type="button"
-        className="text-blue-700/90 hover:text-blue-800 transition-colors focus:outline-none"
+        className={`transition-colors focus:outline-none ${iconClassName ?? "text-blue-700/90 hover:text-blue-800"}`}
         onMouseEnter={show}
         onMouseLeave={hide}
         onFocus={show}
