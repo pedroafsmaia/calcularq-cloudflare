@@ -279,7 +279,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
               Como Funciona
             </h2>
-            <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[44ch] sm:max-w-3xl mx-auto leading-relaxed" style={{ textWrap: "balance" }}>
               {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 4 etapas simples."}
             </p>
 
@@ -318,8 +318,8 @@ function FormulaStep({ number, title, description }: { number: string; title: st
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-tight">{title}</h3>
-      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed">
+      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-tight max-w-[18ch] mx-auto" style={{ textWrap: "balance" }}>{title}</h3>
+      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[30ch] mx-auto" style={{ textWrap: "pretty" }}>
         {description}
       </p>
     </div>

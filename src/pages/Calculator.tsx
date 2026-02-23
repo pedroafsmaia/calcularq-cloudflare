@@ -742,20 +742,18 @@ export default function Calculator() {
           </div>
 
           {/* Painel lateral — desktop */}
-          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0 self-start">
-            <div className="sticky top-24">
-              <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-                <SectionHeader
-                  compact
-                  title="Resultados"
-                  description="Resumo do cálculo atual"
-                  icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
-                  titleClassName="text-xl sm:text-xl"
-                  descriptionClassName="text-sm"
-                />
-                <div className="rounded-2xl border border-slate-100 bg-slate-50/30 overflow-hidden">
-                  <ResultsPanel />
-                </div>
+          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0 self-start sticky top-24">
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
+              <SectionHeader
+                compact
+                title="Resultados"
+                description="Resumo do cálculo atual"
+                icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                titleClassName="text-xl sm:text-xl"
+                descriptionClassName="text-sm"
+              />
+              <div className="rounded-2xl border border-slate-100 bg-slate-50/30 overflow-hidden">
+                <ResultsPanel />
               </div>
             </div>
           </div>

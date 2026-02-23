@@ -127,7 +127,7 @@ export default function Tooltip({ text }: TooltipProps) {
       {visible && (
         <span
           ref={tooltipRef}
-          className="fixed z-50 rounded-xl px-3.5 py-3 shadow-lg pointer-events-none border border-blue-200"
+          className="fixed z-50 rounded-xl px-3.5 py-3 shadow-lg pointer-events-none border border-blue-200 font-normal"
           style={{
             left: position?.left ?? 8,
             top: position?.top ?? 8,
@@ -139,7 +139,7 @@ export default function Tooltip({ text }: TooltipProps) {
           }}
           role="tooltip"
         >
-          <div className="text-sm text-blue-800 leading-relaxed space-y-1">
+          <div className="text-sm text-blue-800 leading-relaxed space-y-1 font-normal">
             {formattedParts.map((p, idx) => (
               <p key={idx}>{p}</p>
             ))}
