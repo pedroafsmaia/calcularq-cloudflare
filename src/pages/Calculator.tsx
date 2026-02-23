@@ -534,7 +534,10 @@ export default function Calculator() {
               {/* LUCRO ESTIMADO */}
               {displayValues.profit !== null && (
                 <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
-                  <span className="min-w-0 text-sm text-slate-500">Lucro Estimado</span>
+                  <span className="min-w-0 inline-flex items-center gap-1 text-sm text-slate-500">
+                    Lucro Estimado
+                    <Tooltip text="Valor projetado que pode restar após cobrir as despesas fixas do escritório durante o tempo estimado de projeto." />
+                  </span>
                   <span className={`text-sm font-bold whitespace-nowrap ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
                     R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
