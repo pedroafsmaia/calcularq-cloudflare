@@ -147,6 +147,12 @@ export default function Home() {
                     </div>
                   ) : null}
 
+                  {!user?.hasPaid ? (
+                    <p className="mb-2.5 sm:mb-3 text-center text-xs sm:text-sm text-slate-600">
+                      Pagamento único. Acesso imediato ao cálculo completo.
+                    </p>
+                  ) : null}
+
                   {/* CTA Button */}
                   <Link 
                     to={user ? createPageUrl("Calculator") : createPageUrl("Login")} 
@@ -163,7 +169,7 @@ export default function Home() {
                       ) : (
                         <>
                           <span className="hidden sm:inline">Acesse agora por apenas R$19,90</span>
-                          <span className="sm:hidden">Apenas R$19,90</span>
+                          <span className="sm:hidden">Acessar por R$19,90</span>
                         </>
                       )}
                     </Button>
@@ -190,6 +196,14 @@ export default function Home() {
                   <p className="text-center text-sm text-slate-600">
                     Pagamento único. Sem mensalidades.
                   </p>
+                  {!user?.hasPaid ? (
+                    <a
+                      href="#como-funciona"
+                      className="mt-2 block text-center text-sm text-slate-500 underline underline-offset-4 hover:text-calcularq-blue"
+                    >
+                      Ver como funciona
+                    </a>
+                  ) : null}
                 </motion.div>
               </div>
             </div>
@@ -230,7 +244,7 @@ export default function Home() {
         </div>
 
         {/* Factors Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
+        <div id="como-funciona" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 scroll-mt-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
