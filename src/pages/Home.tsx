@@ -82,7 +82,7 @@ export default function Home() {
         {/* Hero Section - Novo Banner */}
         <div className="relative bg-calcularq-blue overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-            <div className="lg:hidden relative z-20 mx-auto mb-[-2.5rem] sm:mb-[-3rem] max-w-[24rem] px-2">
+            <div className="lg:hidden relative z-20 mx-auto mb-[-1.25rem] sm:mb-[-1.75rem] max-w-[24rem] px-2">
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}

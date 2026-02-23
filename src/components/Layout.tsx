@@ -53,7 +53,7 @@ export default function Layout({ children }: LayoutProps) {
 
             {/* Navigation Links */}
             <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-end gap-1 overflow-x-auto">
+            <div className="flex items-center justify-end gap-1.5 overflow-x-auto py-1">
               {navigation.map((item) => {
                 const isActive = currentPageName === item.page;
                 return (
@@ -61,14 +61,14 @@ export default function Layout({ children }: LayoutProps) {
                     key={item.name}
                     to={createPageUrl(item.page)}
                     className={`
-                      shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all
+                      shrink-0 flex items-center justify-center gap-2 h-10 min-w-10 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all
                       ${isActive 
                         ? "bg-calcularq-blue text-white" 
                         : "text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue"
                       }
                     `}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className="w-[18px] h-[18px] sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">{item.name}</span>
                   </Link>
                 );
@@ -79,22 +79,22 @@ export default function Layout({ children }: LayoutProps) {
                 <>
                   <Link
                     to="/budgets"
-                    className="shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
+                    className="shrink-0 flex items-center justify-center gap-2 h-10 min-w-10 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
                   >
-                    <History className="w-4 h-4" />
+                    <History className="w-[18px] h-[18px] sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">Meus Cálculos</span>
                   </Link>
                   {/* Manual - só para usuários que pagaram */}
                   {user.hasPaid && (
                     <Link
                       to={createPageUrl("Manual")}
-                      className={`shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`shrink-0 flex items-center justify-center gap-2 h-10 min-w-10 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         currentPageName === "Manual"
                           ? "bg-calcularq-blue text-white"
                           : "text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue"
                       }`}
                     >
-                      <BookOpen className="w-4 h-4" />
+                      <BookOpen className="w-[18px] h-[18px] sm:w-4 sm:h-4" />
                       <span className="hidden sm:inline">Manual</span>
                     </Link>
                   )}
@@ -104,18 +104,18 @@ export default function Layout({ children }: LayoutProps) {
                   </div>
                   <button
                     onClick={logout}
-                    className="shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
+                    className="shrink-0 flex items-center justify-center gap-2 h-10 min-w-10 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-[18px] h-[18px] sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">Sair</span>
                   </button>
                 </>
               ) : (
                 <Link
                   to={createPageUrl("Login")}
-                  className="shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
+                  className="shrink-0 flex items-center justify-center gap-2 h-10 min-w-10 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
                 >
-                  <LogIn className="w-4 h-4" />
+                  <LogIn className="w-[18px] h-[18px] sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Entrar</span>
                 </Link>
               )}
