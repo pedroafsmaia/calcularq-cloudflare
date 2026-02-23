@@ -518,6 +518,7 @@ export default function Calculator() {
                   </span>
                   {cubPercentage !== null && (cubPercentage < 2 || cubPercentage > 11) && (
                     <Tooltip
+                      tone={cubPercentage < 2 ? "danger" : "warning"}
                       iconClassName={cubPercentage < 2 ? "text-red-500 hover:text-red-600" : "text-amber-500 hover:text-amber-600"}
                       text={
                         cubPercentage < 2

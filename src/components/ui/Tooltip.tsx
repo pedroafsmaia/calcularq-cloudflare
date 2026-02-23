@@ -4,6 +4,7 @@ import { Info } from "lucide-react";
 interface TooltipProps {
   text: string;
   iconClassName?: string;
+  tone?: "info" | "danger" | "warning";
 }
 
 /**
@@ -12,7 +13,7 @@ interface TooltipProps {
  * - Fundo levemente transparente + blur.
  * - Texto formatado em pequenos parágrafos para leitura.
  */
-export default function Tooltip({ text, iconClassName }: TooltipProps) {
+export default function Tooltip({ text, iconClassName, tone = "info" }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -128,19 +129,40 @@ export default function Tooltip({ text, iconClassName }: TooltipProps) {
       {visible && (
         <span
           ref={tooltipRef}
-          className="fixed z-50 rounded-xl px-3.5 py-3 shadow-lg pointer-events-none border border-blue-200 font-normal"
+          className={`fixed z-50 rounded-xl px-3.5 py-3 shadow-lg pointer-events-none font-normal whitespace-normal break-words ${
+            tone === "danger"
+              ? "border border-red-200"
+              : tone === "warning"
+                ? "border border-amber-200"
+                : "border border-blue-200"
+          }`}
           style={{
             left: position?.left ?? 8,
             top: position?.top ?? 8,
             width: position?.width ?? undefined,
             maxHeight: position?.maxHeight ?? undefined,
             overflowY: "auto",
-            background: "rgba(239, 246, 255, 0.76)",
-            backdropFilter: "blur(10px)",
+            overflowX: "hidden",
+            whiteSpace: "normal",
+            background:
+              tone === "danger"
+                ? "rgba(254, 242, 242, 0.96)"
+                : tone === "warning"
+                  ? "rgba(255, 251, 235, 0.96)"
+                  : "rgba(239, 246, 255, 0.92)",
+            ...(tone === "info" ? { backdropFilter: "blur(10px)" } : {}),
           }}
           role="tooltip"
         >
-          <div className="text-sm text-blue-800 leading-relaxed space-y-1 font-normal">
+          <div
+            className={`text-sm leading-relaxed space-y-1 font-normal whitespace-normal break-words ${
+              tone === "danger"
+                ? "text-red-700"
+                : tone === "warning"
+                  ? "text-amber-700"
+                  : "text-blue-800"
+            }`}
+          >
             {formattedParts.map((p, idx) => (
               <p key={idx}>{p}</p>
             ))}
