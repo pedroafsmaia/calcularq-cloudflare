@@ -201,9 +201,6 @@ export default function Calculator() {
     loadBudget();
   }, [budgetId, user]);
 
-  useEffect(() => {
-    setMaxStepReached(prev => Math.max(prev, currentStep));
-  }, [currentStep]);
 
   // ── Handlers ──────────────────────────────────────────────────
   const handleMinHourRateCalculate = useCallback((rate: number) => {
@@ -374,6 +371,24 @@ export default function Calculator() {
     if (n === 3) return hasComplexitySelections;
     return displayValues.finalSalePrice > 0;
   };
+
+  useEffect(() => {
+    // Regride o progresso visual quando etapas essenciais perdem dados.
+    // A etapa 2 é opcional, então a etapa 3 fica acessível após concluir a etapa 1.
+    const nextMaxStepReached = !stepComplete(1)
+      ? 1
+      : stepComplete(3)
+        ? 4
+        : 3;
+
+    setMaxStepReached((prev) => (prev === nextMaxStepReached ? prev : nextMaxStepReached));
+
+    // Se a etapa atual ficar acima da última etapa válida, volta automaticamente.
+    if (currentStep > nextMaxStepReached) {
+      setCurrentStep(nextMaxStepReached);
+    }
+  }, [minHourlyRate, hasComplexitySelections, displayValues.finalSalePrice, currentStep]);
+
   const stepVisualDone = (n: number) => maxStepReached > n;
   const canAdvance = stepComplete(currentStep);
   const currentStepLabel = STEPS.find((s) => s.n === currentStep)?.label ?? `Etapa ${currentStep}`;
