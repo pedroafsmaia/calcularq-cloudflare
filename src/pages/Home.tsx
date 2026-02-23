@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -12,12 +12,10 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { createPageUrl } from "@/utils";
-import { fadeLeft, fadeUp, motionTiming } from "@/lib/motion";
 
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const reduceMotion = !!useReducedMotion();
 
   // Carregar script do Senja.io
   useEffect(() => {
@@ -25,37 +23,13 @@ export default function Home() {
       return;
     }
 
-    let timeoutId: number | null = null;
-    let idleId: number | null = null;
-    let cancelled = false;
-
-    const mountSenjaScript = () => {
-      if (cancelled) return;
-      const existing = document.querySelector('script[src*="widget.senja.io"]');
-      if (existing) return;
-
-      const script = document.createElement('script');
-      script.src = 'https://widget.senja.io/widget/5c4b77f9-c453-43c6-8dd1-8c015286d9e7/platform.js';
-      script.type = 'text/javascript';
-      script.async = true;
-      document.body.appendChild(script);
-    };
-
-    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number; cancelIdleCallback?: (id: number) => void };
-    if (typeof w.requestIdleCallback === "function") {
-      idleId = w.requestIdleCallback(mountSenjaScript);
-    } else {
-      timeoutId = window.setTimeout(mountSenjaScript, 450);
-    }
+    const script = document.createElement('script');
+    script.src = 'https://widget.senja.io/widget/5c4b77f9-c453-43c6-8dd1-8c015286d9e7/platform.js';
+    script.type = 'text/javascript';
+    script.async = true;
+    document.body.appendChild(script);
 
     return () => {
-      cancelled = true;
-      if (idleId !== null && typeof w.cancelIdleCallback === "function") {
-        w.cancelIdleCallback(idleId);
-      }
-      if (timeoutId !== null) {
-        window.clearTimeout(timeoutId);
-      }
       // Limpar script ao desmontar
       const existingScript = document.querySelector('script[src*="widget.senja.io"]');
       if (existingScript) {
@@ -117,8 +91,9 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-20">
             <div className="lg:hidden relative z-20 mx-auto mb-[-0.75rem] sm:mb-[-1rem] max-w-[21.5rem] sm:max-w-[22.5rem] px-2">
               <motion.div
-                {...fadeUp(reduceMotion, 18)}
-                transition={{ ...motionTiming.normal, delay: 0.2 }}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
               >
                 <img
                   src="/mockup.png"
@@ -131,8 +106,9 @@ export default function Home() {
             <div className="relative z-10 grid lg:grid-cols-[1.02fr_0.98fr] gap-8 lg:gap-12 items-center">
               <div className="hidden lg:block">
                 <motion.div
-                  {...fadeLeft(reduceMotion, 20)}
-                  transition={{ ...motionTiming.normal, delay: 0.3 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
                   className="relative px-2"
                 >
                   <img
@@ -145,8 +121,8 @@ export default function Home() {
 
               <div className="relative z-10">
                 <motion.div
-                  {...fadeUp(reduceMotion, 20)}
-                  transition={{ ...motionTiming.normal, delay: 0.18 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="bg-white rounded-2xl p-5 pt-10 sm:p-8 sm:pt-12 lg:p-10 lg:pt-10 shadow-2xl"
                 >
                   {/* Logo removido do banner conforme feedback */}
@@ -155,7 +131,7 @@ export default function Home() {
                     SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
                   </h1>
 
-                  <p className={`text-[0.98rem] sm:text-lg text-slate-700 leading-relaxed text-center ${user?.hasPaid ? "mb-4 sm:mb-5" : "mb-6 sm:mb-7"}`}>
+                  <p className="text-[0.98rem] sm:text-lg text-slate-700 mb-6 sm:mb-7 leading-relaxed text-center">
                     Precifique seus projetos de arquitetura. A Calcularq é uma ferramenta precisa para alinhar seus cálculos à dedicação que cada projeto exige.
                   </p>
 
@@ -170,7 +146,7 @@ export default function Home() {
                       />
                     </div>
                   ) : (
-                    <div className="mb-4 sm:mb-5 text-center">
+                    <div className="mb-5 sm:mb-6 text-center">
                       <a
                         href="https://senja.io/p/calcularq/r/GRdv6A"
                         target="_blank"
@@ -190,7 +166,7 @@ export default function Home() {
                   >
                     <Button 
                       size="lg" 
-                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-[box-shadow,background-color] font-semibold sm:text-lg text-base"
+                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold sm:text-lg text-base"
                       style={{ backgroundColor: '#fc7338' }}
                     >
                       {user?.hasPaid ? (
@@ -217,16 +193,20 @@ export default function Home() {
         {/* Features Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
           <motion.div
-            initial={fadeUp(reduceMotion, 20).initial}
-            whileInView={fadeUp(reduceMotion, 20).whileInView}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ ...motionTiming.normal, delay: 0.12 }}
+            transition={{ delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {features.map((feature) => (
-              <div
+            {features.map((feature, index) => (
+              <motion.div
                 key={feature.title}
-                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-[border-color,box-shadow] duration-300 text-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 + index * 0.1 }}
+                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center"
               >
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
@@ -237,7 +217,7 @@ export default function Home() {
                 <p className="text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed">
                   {feature.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         </div>
@@ -245,10 +225,10 @@ export default function Home() {
         {/* Factors Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={fadeUp(reduceMotion, 20).initial}
-            whileInView={fadeUp(reduceMotion, 20).whileInView}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ ...motionTiming.slow, delay: 0.16 }}
+            transition={{ delay: 0.4 }}
             className="bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue rounded-3xl p-6 sm:p-8 md:p-12"
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -271,14 +251,18 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {factorsList.map((factor) => (
-                  <div
+                {factorsList.map((factor, index) => (
+                  <motion.div
                     key={factor}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
                     className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-3"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span className="text-white text-sm sm:text-[0.95rem]">{factor}</span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -288,10 +272,10 @@ export default function Home() {
         {/* How It Works Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={fadeUp(reduceMotion, 20).initial}
-            whileInView={fadeUp(reduceMotion, 20).whileInView}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ ...motionTiming.normal, delay: 0.2 }}
+            transition={{ delay: 0.6 }}
             className="text-center"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
@@ -332,7 +316,7 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-[border-color,box-shadow] duration-300 text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
