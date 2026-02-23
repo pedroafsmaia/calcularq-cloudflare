@@ -82,27 +82,45 @@ export default function Home() {
         {/* Hero Section - Novo Banner */}
         <div className="relative bg-calcularq-blue overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="relative z-10 mx-auto mb-6 lg:mb-10 max-w-5xl"
-            >
-              <div className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-3 sm:p-4 lg:p-5">
+            <div className="lg:hidden relative z-10 mx-auto mb-6 max-w-[26rem]">
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-3 sm:p-4"
+              >
                 <img
                   src="/mockup.png"
                   alt="Interface da Calculadora Calcularq"
                   className="w-full h-auto object-contain drop-shadow-2xl"
                 />
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
-            <div className="relative z-10 mx-auto max-w-4xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 md:p-8 lg:p-10 shadow-2xl"
-              >
+            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
+              <div className="hidden lg:block">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="relative"
+                >
+                  <div className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-4">
+                    <img
+                      src="/mockup.png"
+                      alt="Interface da Calculadora Calcularq"
+                      className="w-full h-auto rounded-2xl object-contain scale-[1.03] drop-shadow-2xl"
+                    />
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="relative z-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-2xl p-6 md:p-8 lg:p-10 shadow-2xl"
+                >
                   {/* Logo removido do banner conforme feedback */}
 
                   <h1 className="text-3xl md:text-4xl lg:text-[2.8rem] font-bold text-calcularq-blue mb-5 leading-tight tracking-tight text-center">
@@ -165,7 +183,7 @@ export default function Home() {
                   </p>
                 </motion.div>
               </div>
-
+            </div>
           </div>
         </div>
 
