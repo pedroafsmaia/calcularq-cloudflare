@@ -82,7 +82,7 @@ export default function Home() {
         {/* Hero Section - Novo Banner */}
         <div className="relative bg-calcularq-blue overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
               {/* Left Side - Mockup */}
               <div className="hidden lg:block">
                 <motion.div
@@ -91,11 +91,11 @@ export default function Home() {
                   transition={{ delay: 0.3 }}
                   className="relative"
                 >
-                  <div className="transparent">
+                  <div className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-4">
                     <img 
                       src="/mockup.png" 
                       alt="Interface da Calculadora Calcularq" 
-                      className="w-full h-auto rounded-xl scale-105"
+                      className="w-full h-auto rounded-2xl object-contain scale-[1.03] drop-shadow-2xl"
                     />
                   </div>
                 </motion.div>
@@ -110,16 +110,16 @@ export default function Home() {
                 >
                   {/* Logo removido do banner conforme feedback */}
 
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-calcularq-blue mb-6 leading-tight text-center">
+                  <h1 className="text-3xl md:text-4xl lg:text-[2.8rem] font-bold text-calcularq-blue mb-5 leading-tight tracking-tight text-center">
                     SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
                   </h1>
 
-                  <p className="text-lg text-slate-700 mb-8 leading-relaxed text-center">
+                  <p className="text-base sm:text-lg text-slate-700 mb-7 leading-relaxed text-center">
                     Precifique seus projetos de arquitetura. A Calcularq é uma ferramenta precisa para alinhar seus cálculos à dedicação que cada projeto exige.
                   </p>
 
                   {/* Senja.io Widget */}
-                  <div className="mb-6 flex items-center justify-center">
+                  <div className="mb-5 flex items-center justify-center">
                     <div 
                       className="senja-embed" 
                       data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
@@ -147,7 +147,7 @@ export default function Home() {
                   <Link 
                     to={user ? createPageUrl("Calculator") : createPageUrl("Login")} 
                     onClick={handleCalculatorClick}
-                    className="block mb-3"
+                    className="block mb-2"
                   >
                     <Button 
                       size="lg" 
@@ -171,12 +171,12 @@ export default function Home() {
                 </motion.div>
               </div>
 
-              <div className="lg:hidden -mt-8 sm:-mt-10 relative z-10">
+              <div className="lg:hidden -mt-10 sm:-mt-12 relative z-10">
                 <motion.div
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
-                  className="relative mx-auto max-w-md px-2"
+                  className="relative mx-auto max-w-[26rem] px-2"
                 >
                   <img
                     src="/mockup.png"
@@ -281,24 +281,29 @@ export default function Home() {
               Como Funciona
             </h2>
             <p className="text-lg text-slate-700 mb-12 max-w-3xl mx-auto">
-              Em 3 passos simples você chega ao preço ideal do seu projeto, considerando suas despesas, a complexidade e os custos variáveis.
+              {"Em 4 etapas simples você define sua base de preço, ajusta os pesos, classifica a complexidade e finaliza a composição do valor de venda."}
             </p>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <FormulaStep 
                 number="1" 
-                title="Insira seus dados"
-                description="Cadastre suas despesas e sua disponibilidade de horas no mês. O sistema define automaticamente o valor mínimo da sua hora técnica."
+                title={"Hora T\u00e9cnica"}
+                description={"Defina sua hora t\u00e9cnica m\u00ednima com despesas fixas, pr\u00f3-labore e horas produtivas do escrit\u00f3rio."}
               />
               <FormulaStep 
                 number="2" 
-                title="Configure o Projeto"
-                description="Avalie o nível de dificuldade do projeto ajustando os 6 fatores de complexidade da Calcularq."
+                title="Pesos"
+                description={"Ajuste opcionalmente o peso de cada fator para refletir sua estrat\u00e9gia de precifica\u00e7\u00e3o."}
               />
               <FormulaStep 
                 number="3" 
-                title="Obtenha o Preço"
-                description="Visualize instantaneamente o preço ideal do projeto, considerando sua complexidade."
+                title="Complexidade"
+                description={"Classifique \u00e1rea e fatores do projeto para calcular a complexidade global da proposta."}
+              />
+              <FormulaStep 
+                number="4" 
+                title={"Pre\u00e7o Final"}
+                description={"Ajuste horas, despesas vari\u00e1veis e desconto comercial para chegar ao pre\u00e7o de venda final."}
               />
             </div>
           </motion.div>
@@ -310,11 +315,11 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-left sm:text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="font-semibold text-calcularq-blue mb-3 text-lg">{title}</h3>
+      <h3 className="font-semibold text-calcularq-blue mb-2 text-lg leading-tight">{title}</h3>
       <p className="text-slate-600 text-sm leading-relaxed">
         {description}
       </p>
