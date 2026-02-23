@@ -82,21 +82,6 @@ export default function Home() {
         {/* Hero Section - Novo Banner */}
         <div className="relative bg-calcularq-blue overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-            <div className="lg:hidden relative z-10 mx-auto mb-6 max-w-[26rem]">
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-3 sm:p-4"
-              >
-                <img
-                  src="/mockup.png"
-                  alt="Interface da Calculadora Calcularq"
-                  className="w-full h-auto object-contain drop-shadow-2xl"
-                />
-              </motion.div>
-            </div>
-
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
               <div className="hidden lg:block">
                 <motion.div
@@ -183,6 +168,20 @@ export default function Home() {
                   </p>
                 </motion.div>
               </div>
+            </div>
+
+            <div className="lg:hidden relative z-20 mx-auto -mt-12 sm:-mt-16 max-w-[24rem] px-2">
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <img
+                  src="/mockup.png"
+                  alt="Interface da Calculadora Calcularq"
+                  className="w-full h-auto object-contain drop-shadow-2xl"
+                />
+              </motion.div>
             </div>
           </div>
         </div>
