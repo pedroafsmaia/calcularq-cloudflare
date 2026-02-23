@@ -130,7 +130,7 @@ export default function MinimumHourCalculator({
           <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">
             Hora técnica mínima
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 mt-1 leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-500 mt-1 leading-relaxed max-w-[52ch]">
             Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima.
           </p>
           </div>
@@ -148,15 +148,15 @@ export default function MinimumHourCalculator({
 
       <div className="space-y-6">
         {/* Opção Manual */}
-        <div className="flex items-start gap-3 p-4 bg-slate-50/80 border border-slate-200 rounded-xl">
+        <div className="flex items-start gap-3 p-3 sm:p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl">
           <input
             type="checkbox"
             id="useManual"
             checked={useManual}
             onChange={(e) => setUseManual(e.target.checked)}
-            className="w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
+            className="mt-0.5 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
           />
-          <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-relaxed">
+          <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
             Já sei a minha hora técnica mínima.
             <Tooltip text="Marque esta opção se você já calculou sua hora técnica mínima anteriormente e quer inserir o valor diretamente, sem precisar preencher despesas e pró-labore novamente." />
           </label>

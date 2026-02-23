@@ -558,11 +558,11 @@ export default function Calculator() {
               };
               return (
                 <div key={step.n} className="flex items-start">
-                  <div className="flex flex-col items-center w-16 sm:w-20 md:w-24">
+                  <div className="flex flex-col items-center w-[4.4rem] sm:w-[5.4rem] md:w-[6.4rem]">
                     <button
                       type="button"
                       onClick={handleClick}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
                         ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
                           : active ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
                           : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
@@ -575,7 +575,7 @@ export default function Calculator() {
                     </span>
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className="mt-5 h-0.5 w-4 sm:w-6 md:w-10 shrink-0 transition-colors duration-300"
+                    <div className="mt-[1.35rem] sm:mt-6 h-0.5 sm:h-1 w-5 sm:w-7 md:w-11 shrink-0 rounded-full transition-colors duration-300"
                       style={{ backgroundColor: done ? "#1e3a8a" : "#e2e8f0" }}
                     />
                   )}
@@ -596,7 +596,7 @@ export default function Calculator() {
                     type="button"
                     onClick={handleImportCurrentStepFromLastBudget}
                     disabled={!canImportCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-transparent px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados do último cálculo para ${currentStepLabel}`}
                   >
                     <Download className="h-4 w-4" />
@@ -605,7 +605,7 @@ export default function Calculator() {
                   <button
                     type="button"
                     onClick={handleClearCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-transparent px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
                     title={`Limpar dados da etapa ${currentStepLabel}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -651,9 +651,9 @@ export default function Calculator() {
                       <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
                         <BarChart2 className="w-5 h-5 text-calcularq-blue" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Análise de complexidade</h2>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-slate-500 mt-1 leading-relaxed max-w-[52ch]">
                           Selecione as características do projeto específico que está precificando
                         </p>
                       </div>
@@ -725,7 +725,7 @@ export default function Calculator() {
                           <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
                             <PieChart className="w-5 h-5 text-calcularq-blue" />
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Resultados</h2>
                             <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                           </div>
@@ -779,14 +779,14 @@ export default function Calculator() {
           </div>
 
           {/* Painel lateral — desktop */}
-          <div className="hidden lg:block w-72 shrink-0">
+          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0 pt-14">
             <div className="sticky top-24">
               <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
                     <PieChart className="w-5 h-5 text-calcularq-blue" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-xl font-bold text-calcularq-blue">Resultados</h3>
                     <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                   </div>

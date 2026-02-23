@@ -132,9 +132,9 @@ export default function FinalCalculation({
           <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
             <DollarSign className="w-5 h-5 text-calcularq-blue" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Composição final do preço</h2>
-            <p className="text-sm text-slate-500 mt-1">Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o preço de venda final.</p>
+            <p className="text-sm text-slate-500 mt-1 leading-relaxed max-w-[56ch]">Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o preço de venda final.</p>
           </div>
         </div>
 
