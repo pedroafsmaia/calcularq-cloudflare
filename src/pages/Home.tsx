@@ -189,7 +189,7 @@ export default function Home() {
         </div>
 
         {/* Features Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -209,10 +209,10 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
                 </div>
-                <h3 className="text-lg font-semibold text-calcularq-blue mb-2">
+                <h3 className="text-base sm:text-lg font-semibold text-calcularq-blue mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
+                <p className="text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -221,20 +221,20 @@ export default function Home() {
         </div>
 
         {/* Factors Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue rounded-3xl p-8 md:p-12"
+            className="bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue rounded-3xl p-6 sm:p-8 md:p-12"
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 tracking-tight">
                   Fatores de Complexidade
                 </h2>
-                <p className="text-slate-300 mb-6">
+                <p className="text-sm sm:text-base lg:text-lg text-slate-300 mb-6 leading-relaxed">
                   Nossa calculadora considera 6 fatores essenciais para 
                   determinar a complexidade real do seu projeto.
                 </p>
@@ -259,7 +259,7 @@ export default function Home() {
                     className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-3"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    <span className="text-white text-sm">{factor}</span>
+                    <span className="text-white text-sm sm:text-[0.95rem]">{factor}</span>
                   </motion.div>
                 ))}
               </div>
@@ -268,7 +268,7 @@ export default function Home() {
         </div>
 
         {/* How It Works Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -276,10 +276,10 @@ export default function Home() {
             transition={{ delay: 0.6 }}
             className="text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-calcularq-blue mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
               Como Funciona
             </h2>
-            <p className="text-lg text-slate-700 mb-12 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
               {"Em 4 etapas simples, voc\u00ea organiza as informa\u00e7\u00f5es do projeto e visualiza um valor final com mais clareza."}
             </p>
 
@@ -314,12 +314,12 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="font-semibold text-calcularq-blue mb-2 text-lg leading-tight">{title}</h3>
-      <p className="text-slate-600 text-sm leading-relaxed">
+      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-tight">{title}</h3>
+      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed">
         {description}
       </p>
     </div>
