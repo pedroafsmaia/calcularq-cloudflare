@@ -586,10 +586,6 @@ export default function Calculator() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Coluna principal */}
-          <div className="flex-1 min-w-0">
-
             <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
@@ -614,7 +610,10 @@ export default function Calculator() {
               </div>
             </motion.div>
 
-            {/* Conteúdo da etapa */}
+        <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
+          {/* Coluna principal */}
+          <div className="flex-1 min-w-0">
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -748,38 +747,10 @@ export default function Calculator() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Navegação */}
-            <div className="flex items-center justify-between mt-6">
-              <button
-                onClick={handleBack}
-                disabled={currentStep === 1}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors
-                  ${currentStep === 1 ? "text-slate-300 cursor-not-allowed" : "text-slate-600 hover:bg-slate-100"}`}
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Etapa anterior
-              </button>
-
-              <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
-
-              {currentStep < 4 ? (
-                <button
-                  onClick={handleNext}
-                  disabled={!canAdvance}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors
-                    ${canAdvance ? "bg-calcularq-blue text-white hover:bg-calcularq-blue/90 shadow-sm" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}
-                >
-                  Próxima etapa
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <div className="w-32" />
-              )}
-            </div>
           </div>
 
           {/* Painel lateral — desktop */}
-          <div className={`hidden lg:block w-80 xl:w-[22rem] shrink-0 ${currentStep === 4 ? "pt-0" : "pt-14"}`}>
+          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0">
             <div className="sticky top-24">
               <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
                 <div className="flex items-center gap-3 mb-5">
@@ -797,6 +768,35 @@ export default function Calculator() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Navegação */}
+        <div className="flex items-center justify-between mt-6">
+          <button
+            onClick={handleBack}
+            disabled={currentStep === 1}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors
+              ${currentStep === 1 ? "text-slate-300 cursor-not-allowed" : "text-slate-600 hover:bg-slate-100"}`}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Etapa anterior
+          </button>
+
+          <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
+
+          {currentStep < 4 ? (
+            <button
+              onClick={handleNext}
+              disabled={!canAdvance}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors
+                ${canAdvance ? "bg-calcularq-blue text-white hover:bg-calcularq-blue/90 shadow-sm" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}
+            >
+              Próxima etapa
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <div className="w-32" />
+          )}
         </div>
 
       </div>
