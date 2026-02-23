@@ -114,7 +114,7 @@ export default function Home() {
                   <img
                     src="/mockup.png"
                     alt="Interface da Calculadora Calcularq"
-                    className="w-full h-auto object-contain scale-[0.98] xl:scale-[1.02] drop-shadow-2xl"
+                    className="w-full h-auto object-contain scale-[0.96] xl:scale-100 drop-shadow-2xl"
                   />
                 </motion.div>
               </div>
@@ -127,7 +127,7 @@ export default function Home() {
                 >
                   {/* Logo removido do banner conforme feedback */}
 
-                  <h1 className="text-[2.05rem] sm:text-4xl lg:text-[2.75rem] font-bold text-calcularq-blue mb-4 sm:mb-5 leading-[1.08] tracking-tight text-center">
+                  <h1 className="text-[2.05rem] sm:text-4xl lg:text-[2.5rem] xl:text-[2.65rem] font-bold text-calcularq-blue mb-4 sm:mb-5 leading-[1.08] tracking-tight text-center">
                     SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
                   </h1>
 
@@ -151,7 +151,7 @@ export default function Home() {
                   <Link 
                     to={user ? createPageUrl("Calculator") : createPageUrl("Login")} 
                     onClick={handleCalculatorClick}
-                    className="block mb-3"
+                    className="block mb-2.5 sm:mb-3"
                   >
                     <Button 
                       size="lg" 
@@ -173,13 +173,13 @@ export default function Home() {
                     href="https://senja.io/p/calcularq/r/GRdv6A"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block mb-3 sm:mb-4"
+                    className="block mb-3 sm:mb-3.5"
                   >
                     <Button
                       type="button"
                       size="lg"
                       variant="outline"
-                      className="w-full px-8 py-6 text-base sm:text-lg rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-calcularq-blue shadow-sm"
+                      className="w-full px-8 py-6 text-base sm:text-lg rounded-xl border-slate-200/90 text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue shadow-sm"
                     >
                       Avalie a Calcularq
                     </Button>
