@@ -169,21 +169,23 @@ export default function Home() {
                     </Button>
                   </Link>
 
-                  <a
-                    href="https://senja.io/p/calcularq/r/GRdv6A"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block mb-3 sm:mb-3.5"
-                  >
-                    <Button
-                      type="button"
-                      size="lg"
-                      variant="outline"
-                      className="w-full px-8 py-6 text-base sm:text-lg rounded-xl border-slate-200/90 text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue shadow-sm"
+                  {user?.hasPaid ? (
+                    <a
+                      href="https://senja.io/p/calcularq/r/GRdv6A"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block mb-3 sm:mb-3.5"
                     >
-                      Avalie a Calcularq
-                    </Button>
-                  </a>
+                      <Button
+                        type="button"
+                        size="lg"
+                        variant="outline"
+                        className="w-full px-8 py-6 text-base sm:text-lg rounded-xl border-slate-200/90 text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue shadow-sm"
+                      >
+                        Avalie a Calcularq
+                      </Button>
+                    </a>
+                  ) : null}
 
                   <p className="text-center text-sm text-slate-600">
                     Pagamento único. Sem mensalidades.
