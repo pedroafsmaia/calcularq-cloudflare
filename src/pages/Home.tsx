@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -16,6 +16,7 @@ import { createPageUrl } from "@/utils";
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   // Carregar script do Senja.io
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function Home() {
                     SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
                   </h1>
 
-                  <p className="text-[0.98rem] sm:text-lg text-slate-700 mb-6 sm:mb-7 leading-relaxed text-center">
+                  <p className={`text-[0.98rem] sm:text-lg text-slate-700 leading-relaxed text-center ${user?.hasPaid ? "mb-4 sm:mb-5" : "mb-6 sm:mb-7"}`}>
                     Precifique seus projetos de arquitetura. A Calcularq é uma ferramenta precisa para alinhar seus cálculos à dedicação que cada projeto exige.
                   </p>
 
@@ -146,7 +147,7 @@ export default function Home() {
                       />
                     </div>
                   ) : (
-                    <div className="mb-5 sm:mb-6 text-center">
+                    <div className="mb-4 sm:mb-5 text-center">
                       <a
                         href="https://senja.io/p/calcularq/r/GRdv6A"
                         target="_blank"
@@ -166,7 +167,7 @@ export default function Home() {
                   >
                     <Button 
                       size="lg" 
-                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold sm:text-lg text-base"
+                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-[box-shadow,background-color] font-semibold sm:text-lg text-base"
                       style={{ backgroundColor: '#fc7338' }}
                     >
                       {user?.hasPaid ? (
@@ -193,20 +194,16 @@ export default function Home() {
         {/* Features Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.12, duration: 0.35 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {features.map((feature, index) => (
-              <motion.div
+            {features.map((feature) => (
+              <div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 + index * 0.1 }}
-                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center"
+                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-[border-color,box-shadow] duration-300 text-center"
               >
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
@@ -217,7 +214,7 @@ export default function Home() {
                 <p className="text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed">
                   {feature.description}
                 </p>
-              </motion.div>
+              </div>
             ))}
           </motion.div>
         </div>
@@ -225,10 +222,10 @@ export default function Home() {
         {/* Factors Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.16, duration: 0.4 }}
             className="bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue rounded-3xl p-6 sm:p-8 md:p-12"
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -251,18 +248,14 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {factorsList.map((factor, index) => (
-                  <motion.div
+                {factorsList.map((factor) => (
+                  <div
                     key={factor}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
                     className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-3"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span className="text-white text-sm sm:text-[0.95rem]">{factor}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -272,10 +265,10 @@ export default function Home() {
         {/* How It Works Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.2, duration: 0.35 }}
             className="text-center"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
@@ -316,7 +309,7 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-[border-color,box-shadow] duration-300 text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>

@@ -134,8 +134,7 @@ export default function Tooltip({ text }: TooltipProps) {
             width: position?.width ?? undefined,
             maxHeight: position?.maxHeight ?? undefined,
             overflowY: "auto",
-            background: "rgba(239, 246, 255, 0.76)",
-            backdropFilter: "blur(10px)",
+            background: "rgba(239, 246, 255, 0.92)",
           }}
           role="tooltip"
         >
