@@ -508,18 +508,18 @@ export default function Calculator() {
                   <span className={`text-sm font-bold ${
                     cubPercentage !== null
                       ? cubPercentage < 2
-                        ? "text-red-500"
+                        ? "text-amber-600"
                         : cubPercentage > 11
-                          ? "text-amber-500"
-                          : "text-green-600"
+                          ? "text-amber-600"
+                          : "text-slate-700"
                       : "text-calcularq-blue"
                   }`}>
                     {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "—"}
                   </span>
                   {cubPercentage !== null && (cubPercentage < 2 || cubPercentage > 11) && (
                     <Tooltip
-                      tone={cubPercentage < 2 ? "danger" : "warning"}
-                      iconClassName={cubPercentage < 2 ? "text-red-500 hover:text-red-600" : "text-amber-500 hover:text-amber-600"}
+                      tone="warning"
+                      iconClassName="text-amber-600 hover:text-amber-700"
                       text={
                         cubPercentage < 2
                           ? "Atenção: abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos."
