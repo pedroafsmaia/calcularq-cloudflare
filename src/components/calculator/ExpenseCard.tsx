@@ -50,7 +50,7 @@ export default function ExpenseCard({
           variant="outline"
           size="sm"
           onClick={handleAdd}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-9 px-3"
         >
           <Plus className="w-4 h-4" />
           Adicionar
@@ -61,7 +61,7 @@ export default function ExpenseCard({
         {expenses.map((expense) => (
           <div
             key={expense.id}
-            className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200 flex-wrap sm:flex-nowrap"
+            className="flex items-center gap-2 p-2.5 bg-slate-50/80 rounded-lg border border-slate-200 flex-wrap sm:flex-nowrap"
           >
             <input
               type="text"
@@ -88,7 +88,7 @@ export default function ExpenseCard({
                 variant="ghost"
                 size="icon"
                 onClick={() => onRemove(expense.id)}
-                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                className="h-9 w-9 text-slate-400 hover:text-red-600 hover:bg-red-50"
               >
                 <X className="w-4 h-4" />
               </Button>

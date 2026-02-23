@@ -410,24 +410,24 @@ export default function Calculator() {
         <div className="bg-white p-4 sm:p-5 space-y-4">
 
           {/* BASE DO CÁLCULO */}
-          <div className="bg-calcularq-blue/10 border border-calcularq-blue/20 rounded-xl p-4">
+          <div className="bg-calcularq-blue/10 border border-calcularq-blue/15 rounded-xl p-4 sm:p-5">
             <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
-            <div className="space-y-1 text-sm text-slate-600">
-              <div className="flex justify-between gap-3">
-                <span className="min-w-0">Hora Técnica Mínima</span>
+            <div className="space-y-2 text-sm text-slate-600">
+              <div className="flex items-start justify-between gap-3">
+                <span className="min-w-0 leading-snug">Hora Técnica Mínima</span>
                 <span className="font-medium text-slate-800 whitespace-nowrap">
                   R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
                 </span>
               </div>
               {hasComplexitySelections && (
-                <div className="flex justify-between gap-3">
-                  <span className="min-w-0">Complexidade Global</span>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="min-w-0 leading-snug">Complexidade Global</span>
                   <span className="font-medium text-slate-800 whitespace-nowrap">{globalComplexity.toFixed(2)}x</span>
                 </div>
               )}
               {displayValues.adjustedHourlyRate > 0 && (
-                <div className="flex justify-between gap-3 pt-1 border-t border-slate-200 mt-1">
-                  <span className="font-bold text-calcularq-blue min-w-0">Hora Ajustada</span>
+                <div className="flex items-start justify-between gap-3 pt-2 border-t border-slate-200 mt-1">
+                  <span className="font-bold text-calcularq-blue min-w-0 leading-snug">Hora Ajustada</span>
                   <span className="font-bold text-calcularq-blue whitespace-nowrap">
                     R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
                   </span>
@@ -450,7 +450,7 @@ export default function Calculator() {
           {displayValues.projectPrice > 0 && (
             <div className="space-y-2 text-sm px-1 py-1">
               <div className="flex justify-between items-start gap-2">
-                <span className="text-slate-600 flex-1">
+                <span className="text-slate-600 flex-1 leading-snug">
                   Preço do Projeto
                   {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 && (
                     <span className="block text-slate-400 text-xs">
@@ -464,7 +464,7 @@ export default function Calculator() {
               </div>
               {displayValues.totalVariableExpenses > 0 && (
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="text-slate-600 min-w-0">(+) Despesas Variáveis</span>
+                  <span className="text-slate-600 min-w-0 leading-snug">(+) Despesas Variáveis</span>
                   <span className="font-semibold text-slate-800 whitespace-nowrap">
                     R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -472,7 +472,7 @@ export default function Calculator() {
               )}
               {displayValues.discountAmount > 0 && (
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="text-slate-600 min-w-0">(-) Desconto ({commercialDiscount}%)</span>
+                  <span className="text-slate-600 min-w-0 leading-snug">(-) Desconto ({commercialDiscount}%)</span>
                   <span className="font-semibold text-red-500 whitespace-nowrap">
                     - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -533,18 +533,18 @@ export default function Calculator() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10 text-center"
+          className="mb-7 sm:mb-8 text-center"
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
             Calculadora de Precificação
           </h1>
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
             Descubra sua hora técnica mínima, ajuste os pesos (opcional), classifique a complexidade do projeto e finalize a composição do preço.
           </p>
         </motion.div>
 
         {/* Stepper horizontal unificado */}
-        <div className="mb-10 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
+        <div className="mb-7 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
           <div className="flex min-w-full justify-center">
             <div className="flex w-max items-start gap-0">
             {STEPS.map((step, i) => {
@@ -569,7 +569,7 @@ export default function Calculator() {
                     >
                       {done ? "✓" : step.n}
                     </button>
-                    <span className={`mt-1.5 text-xs font-medium text-center leading-tight
+                    <span className={`mt-1.5 text-[13px] sm:text-sm font-medium text-center leading-tight
                       ${done || active ? "text-calcularq-blue" : "text-slate-400"}`}>
                       {step.label}
                     </span>
@@ -590,13 +590,13 @@ export default function Calculator() {
           {/* Coluna principal */}
           <div className="flex-1 min-w-0">
 
-            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
                     onClick={handleImportCurrentStepFromLastBudget}
                     disabled={!canImportCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-transparent px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados do último cálculo para ${currentStepLabel}`}
                   >
                     <Download className="h-4 w-4" />
@@ -605,7 +605,7 @@ export default function Calculator() {
                   <button
                     type="button"
                     onClick={handleClearCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-transparent px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
                     title={`Limpar dados da etapa ${currentStepLabel}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -730,7 +730,7 @@ export default function Calculator() {
                             <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                           </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                        <div className="rounded-2xl border border-slate-100 bg-slate-50/30 overflow-hidden">
                           <ResultsPanel />
                         </div>
                       </motion.div>
@@ -791,7 +791,7 @@ export default function Calculator() {
                     <p className="text-sm text-slate-500">Resumo do cálculo atual</p>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/30 overflow-hidden">
                   <ResultsPanel />
                 </div>
               </div>
