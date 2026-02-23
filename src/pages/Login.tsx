@@ -8,6 +8,8 @@ import { createPageUrl } from "@/utils";
 import { api } from "@/lib/api";
 
 export default function Login() {
+  const REMEMBER_ME_KEY = "calcularq_remember_me";
+  const REMEMBER_ME_EMAIL_KEY = "calcularq_remember_me_email";
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +17,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -48,6 +51,19 @@ export default function Login() {
     document.title = isLogin ? "Entrar - Calcularq" : "Criar Conta - Calcularq";
   }, [isLogin]);
 
+  useEffect(() => {
+    try {
+      const remembered = localStorage.getItem(REMEMBER_ME_KEY) === "1";
+      const rememberedEmail = localStorage.getItem(REMEMBER_ME_EMAIL_KEY) ?? "";
+      if (remembered && rememberedEmail) {
+        setRememberMe(true);
+        setEmail(rememberedEmail);
+      }
+    } catch {
+      // no-op
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -55,6 +71,17 @@ export default function Login() {
 
     try {
       if (isLogin) {
+        try {
+          if (rememberMe && email.trim()) {
+            localStorage.setItem(REMEMBER_ME_KEY, "1");
+            localStorage.setItem(REMEMBER_ME_EMAIL_KEY, email.trim());
+          } else {
+            localStorage.removeItem(REMEMBER_ME_KEY);
+            localStorage.removeItem(REMEMBER_ME_EMAIL_KEY);
+          }
+        } catch {
+          // no-op
+        }
         await login(email, password);
       } else {
         if (!name.trim()) {
@@ -73,22 +100,22 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+        <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8">
           {/* Logo */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-7 sm:mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-calcularq-blue mb-4">
               <img src="/logomarca-branca.png" alt="Calcularq" className="w-8 h-8 object-contain" />
             </div>
             <h1 className="text-3xl font-bold text-calcularq-blue mb-2">
               {isLogin ? "Entrar" : "Criar Conta"}
             </h1>
-            <p className="text-slate-600">
+            <p className="text-slate-600 leading-relaxed max-w-[30ch] mx-auto">
               {isLogin 
                 ? "Acesse sua conta para usar a calculadora e salvar seus cálculos"
                 : "Crie sua conta gratuitamente para acessar a calculadora"
@@ -169,11 +196,20 @@ export default function Login() {
             </div>
 
             {isLogin && (
-              <div className="text-right">
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <label className="inline-flex items-center gap-2 text-sm text-slate-600 select-none cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-calcularq-blue focus:ring-calcularq-blue"
+                  />
+                  Lembre de mim
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-calcularq-blue hover:underline"
+                  className="text-sm text-calcularq-blue hover:underline underline-offset-4"
                 >
                   Esqueci minha senha
                 </button>
@@ -219,7 +255,7 @@ export default function Login() {
                 setIsLogin(!isLogin);
                 setError("");
               }}
-              className="text-sm text-calcularq-blue hover:underline"
+              className="text-sm text-calcularq-blue hover:underline underline-offset-4"
             >
               {isLogin 
                 ? "Não tem uma conta? Criar conta"

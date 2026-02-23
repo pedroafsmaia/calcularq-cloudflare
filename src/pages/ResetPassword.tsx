@@ -50,9 +50,9 @@ export default function ResetPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
@@ -70,15 +70,15 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-          <div className="text-center mb-8">
+        <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8">
+          <div className="text-center mb-7 sm:mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-calcularq-blue mb-4">
-              <img src="/logomarca-branca.png" alt="Calcularq" className="w-12 h-12 object-contain" />
+              <img src="/logomarca-branca.png" alt="Calcularq" className="w-8 h-8 object-contain" />
             </div>
             <h1 className="text-3xl font-bold text-calcularq-blue mb-2">Redefinir Senha</h1>
-            <p className="text-slate-600">Digite sua nova senha abaixo</p>
+            <p className="text-slate-600 leading-relaxed max-w-[28ch] mx-auto">Digite sua nova senha abaixo</p>
           </div>
 
           {error && (
