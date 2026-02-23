@@ -518,12 +518,13 @@ export default function Calculator() {
                   </span>
                   {cubPercentage !== null && (cubPercentage < 2 || cubPercentage > 11) && (
                     <Tooltip
+                      title="Atenção"
                       tone="warning"
                       iconClassName="text-amber-600 hover:text-amber-700"
                       text={
                         cubPercentage < 2
-                          ? "Atenção: abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos."
-                          : "Atenção: acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos de maior complexidade técnica."
+                          ? "Abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos."
+                          : "Acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos de maior complexidade técnica."
                       }
                     />
                   )}

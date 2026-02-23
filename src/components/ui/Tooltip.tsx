@@ -5,6 +5,7 @@ interface TooltipProps {
   text: string;
   iconClassName?: string;
   tone?: "info" | "danger" | "warning";
+  title?: string;
 }
 
 /**
@@ -13,7 +14,7 @@ interface TooltipProps {
  * - Fundo levemente transparente + blur.
  * - Texto formatado em pequenos parágrafos para leitura.
  */
-export default function Tooltip({ text, iconClassName, tone = "info" }: TooltipProps) {
+export default function Tooltip({ text, iconClassName, tone = "info", title }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -163,6 +164,7 @@ export default function Tooltip({ text, iconClassName, tone = "info" }: TooltipP
                   : "text-blue-800"
             }`}
           >
+            {title ? <p className="font-semibold">{title}</p> : null}
             {formattedParts.map((p, idx) => (
               <p key={idx}>{p}</p>
             ))}
