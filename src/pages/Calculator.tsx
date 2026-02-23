@@ -129,7 +129,7 @@ export default function Calculator() {
     if (draft.area) setArea(draft.area);
     if (draft.selections) setSelections(draft.selections);
     if (draft.estimatedHours) setEstimatedHours(draft.estimatedHours);
-    if (draft.commercialDiscount) setCommercialDiscount(draft.commercialDiscount);
+    if (draft.commercialDiscount !== undefined) setCommercialDiscount(draft.commercialDiscount);
     if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
     if (draft.currentStep) setCurrentStep(draft.currentStep);
     if (draft.maxStepReached) setMaxStepReached(draft.maxStepReached);

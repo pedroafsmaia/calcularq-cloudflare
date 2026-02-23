@@ -134,14 +134,8 @@ export default function FinalCalculation({
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-calcularq-blue">Composição Final do Preço</h2>
-            <p className="text-sm text-slate-500 mt-1">Configure os parâmetros finais do projeto</p>
+            <p className="text-sm text-slate-500 mt-1">Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o preço de venda final.</p>
           </div>
-        </div>
-
-        <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-blue-50/70">
-          <p className="text-sm text-blue-800">
-            Ajuste as horas, despesas e desconto comercial para finalizar o cálculo e visualizar o impacto no valor final.
-          </p>
         </div>
 
         <div className="space-y-6">
