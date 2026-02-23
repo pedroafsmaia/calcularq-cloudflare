@@ -147,12 +147,6 @@ export default function Home() {
                     </div>
                   ) : null}
 
-                  {!user?.hasPaid ? (
-                    <p className="mb-2.5 sm:mb-3 text-center text-xs sm:text-sm text-slate-600">
-                      Pagamento único. Acesso imediato ao cálculo completo.
-                    </p>
-                  ) : null}
-
                   {/* CTA Button */}
                   <Link 
                     to={user ? createPageUrl("Calculator") : createPageUrl("Login")} 
@@ -196,14 +190,6 @@ export default function Home() {
                   <p className="text-center text-sm text-slate-600">
                     Pagamento único. Sem mensalidades.
                   </p>
-                  {!user?.hasPaid ? (
-                    <a
-                      href="#como-funciona"
-                      className="mt-2 block text-center text-sm text-slate-500 underline underline-offset-4 hover:text-calcularq-blue"
-                    >
-                      Ver como funciona
-                    </a>
-                  ) : null}
                 </motion.div>
               </div>
             </div>
