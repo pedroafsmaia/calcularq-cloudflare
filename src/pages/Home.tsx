@@ -82,6 +82,20 @@ export default function Home() {
         {/* Hero Section - Novo Banner */}
         <div className="relative bg-calcularq-blue overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+            <div className="lg:hidden relative z-20 mx-auto mb-[-2.5rem] sm:mb-[-3rem] max-w-[24rem] px-2">
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <img
+                  src="/mockup.png"
+                  alt="Interface da Calculadora Calcularq"
+                  className="w-full h-auto object-contain drop-shadow-2xl"
+                />
+              </motion.div>
+            </div>
+
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
               <div className="hidden lg:block">
                 <motion.div
@@ -90,13 +104,11 @@ export default function Home() {
                   transition={{ delay: 0.3 }}
                   className="relative"
                 >
-                  <div className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-4">
-                    <img
-                      src="/mockup.png"
-                      alt="Interface da Calculadora Calcularq"
-                      className="w-full h-auto rounded-2xl object-contain scale-[1.03] drop-shadow-2xl"
-                    />
-                  </div>
+                  <img
+                    src="/mockup.png"
+                    alt="Interface da Calculadora Calcularq"
+                    className="w-full h-auto object-contain scale-[1.03] drop-shadow-2xl"
+                  />
                 </motion.div>
               </div>
 
@@ -134,7 +146,7 @@ export default function Home() {
                         href="https://senja.io/p/calcularq/r/GRdv6A"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#fc7338] hover:underline font-medium"
+                        className="text-[#fc7338] hover:underline underline underline-offset-4 font-medium"
                       >
                         Avalie a Calcularq
                       </a>
@@ -170,19 +182,6 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="lg:hidden relative z-20 mx-auto -mt-12 sm:-mt-16 max-w-[24rem] px-2">
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <img
-                  src="/mockup.png"
-                  alt="Interface da Calculadora Calcularq"
-                  className="w-full h-auto object-contain drop-shadow-2xl"
-                />
-              </motion.div>
-            </div>
           </div>
         </div>
 
