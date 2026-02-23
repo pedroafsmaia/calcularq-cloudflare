@@ -23,6 +23,7 @@ import {
   AreaInterval,
 } from "../components/pricing/PricingEngine";
 import { createPageUrl } from "@/utils";
+import { fadeDown, fadeUp, motionTiming } from "@/lib/motion";
 
 const STEPS = [
   { n: 1, label: "Hora Técnica" },
@@ -46,7 +47,7 @@ function loadDraft(): any | null {
 }
 
 export default function Calculator() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = !!useReducedMotion();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const budgetId = searchParams.get("budget");
@@ -533,8 +534,8 @@ export default function Calculator() {
 
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          {...fadeDown(reduceMotion, 10)}
+          transition={motionTiming.normal}
           className="mb-7 sm:mb-8 text-center"
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
@@ -588,7 +589,7 @@ export default function Calculator() {
           </div>
         </div>
 
-            <motion.div initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }} animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="mb-5">
+            <motion.div {...fadeDown(reduceMotion, 6)} transition={motionTiming.fast} className="mb-5">
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
@@ -619,8 +620,8 @@ export default function Calculator() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-                animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                initial={fadeUp(reduceMotion, 10).initial}
+                animate={fadeUp(reduceMotion, 10).animate}
                 exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
                 transition={{ duration: reduceMotion ? 0.16 : 0.2 }}
               >
@@ -712,8 +713,8 @@ export default function Calculator() {
                     useManualMinHourlyRate={useManualMinHourlyRate}
                     mobileResultsContent={
                       <motion.div
-                        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-                        animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                        initial={fadeUp(reduceMotion, 8).initial}
+                        animate={fadeUp(reduceMotion, 8).animate}
                         transition={{ duration: 0.18 }}
                         className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
                       >

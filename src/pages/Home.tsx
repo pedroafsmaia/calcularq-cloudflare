@@ -12,11 +12,12 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { createPageUrl } from "@/utils";
+import { fadeLeft, fadeUp, motionTiming } from "@/lib/motion";
 
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = !!useReducedMotion();
 
   // Carregar script do Senja.io
   useEffect(() => {
@@ -24,13 +25,37 @@ export default function Home() {
       return;
     }
 
-    const script = document.createElement('script');
-    script.src = 'https://widget.senja.io/widget/5c4b77f9-c453-43c6-8dd1-8c015286d9e7/platform.js';
-    script.type = 'text/javascript';
-    script.async = true;
-    document.body.appendChild(script);
+    let timeoutId: number | null = null;
+    let idleId: number | null = null;
+    let cancelled = false;
+
+    const mountSenjaScript = () => {
+      if (cancelled) return;
+      const existing = document.querySelector('script[src*="widget.senja.io"]');
+      if (existing) return;
+
+      const script = document.createElement('script');
+      script.src = 'https://widget.senja.io/widget/5c4b77f9-c453-43c6-8dd1-8c015286d9e7/platform.js';
+      script.type = 'text/javascript';
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number; cancelIdleCallback?: (id: number) => void };
+    if (typeof w.requestIdleCallback === "function") {
+      idleId = w.requestIdleCallback(mountSenjaScript);
+    } else {
+      timeoutId = window.setTimeout(mountSenjaScript, 450);
+    }
 
     return () => {
+      cancelled = true;
+      if (idleId !== null && typeof w.cancelIdleCallback === "function") {
+        w.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
       // Limpar script ao desmontar
       const existingScript = document.querySelector('script[src*="widget.senja.io"]');
       if (existingScript) {
@@ -92,9 +117,8 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-20">
             <div className="lg:hidden relative z-20 mx-auto mb-[-0.75rem] sm:mb-[-1rem] max-w-[21.5rem] sm:max-w-[22.5rem] px-2">
               <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                {...fadeUp(reduceMotion, 18)}
+                transition={{ ...motionTiming.normal, delay: 0.2 }}
               >
                 <img
                   src="/mockup.png"
@@ -107,9 +131,8 @@ export default function Home() {
             <div className="relative z-10 grid lg:grid-cols-[1.02fr_0.98fr] gap-8 lg:gap-12 items-center">
               <div className="hidden lg:block">
                 <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
+                  {...fadeLeft(reduceMotion, 20)}
+                  transition={{ ...motionTiming.normal, delay: 0.3 }}
                   className="relative px-2"
                 >
                   <img
@@ -122,8 +145,8 @@ export default function Home() {
 
               <div className="relative z-10">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  {...fadeUp(reduceMotion, 20)}
+                  transition={{ ...motionTiming.normal, delay: 0.18 }}
                   className="bg-white rounded-2xl p-5 pt-10 sm:p-8 sm:pt-12 lg:p-10 lg:pt-10 shadow-2xl"
                 >
                   {/* Logo removido do banner conforme feedback */}
@@ -194,10 +217,10 @@ export default function Home() {
         {/* Features Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
           <motion.div
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-            whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            initial={fadeUp(reduceMotion, 20).initial}
+            whileInView={fadeUp(reduceMotion, 20).whileInView}
             viewport={{ once: true }}
-            transition={{ delay: 0.12, duration: 0.35 }}
+            transition={{ ...motionTiming.normal, delay: 0.12 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {features.map((feature) => (
@@ -222,10 +245,10 @@ export default function Home() {
         {/* Factors Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-            whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            initial={fadeUp(reduceMotion, 20).initial}
+            whileInView={fadeUp(reduceMotion, 20).whileInView}
             viewport={{ once: true }}
-            transition={{ delay: 0.16, duration: 0.4 }}
+            transition={{ ...motionTiming.slow, delay: 0.16 }}
             className="bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue rounded-3xl p-6 sm:p-8 md:p-12"
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -265,10 +288,10 @@ export default function Home() {
         {/* How It Works Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-            whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            initial={fadeUp(reduceMotion, 20).initial}
+            whileInView={fadeUp(reduceMotion, 20).whileInView}
             viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.35 }}
+            transition={{ ...motionTiming.normal, delay: 0.2 }}
             className="text-center"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
