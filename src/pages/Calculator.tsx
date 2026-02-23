@@ -779,7 +779,7 @@ export default function Calculator() {
           </div>
 
           {/* Painel lateral — desktop */}
-          <div className="hidden lg:block w-80 xl:w-[22rem] shrink-0 pt-14">
+          <div className={`hidden lg:block w-80 xl:w-[22rem] shrink-0 ${currentStep === 4 ? "pt-0" : "pt-14"}`}>
             <div className="sticky top-24">
               <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
                 <div className="flex items-center gap-3 mb-5">
