@@ -17,7 +17,7 @@ export default function ComplexityConfig({
     <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-start gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
             <Settings2 className="w-5 h-5 text-calcularq-blue" />
           </div>
 

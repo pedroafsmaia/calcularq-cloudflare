@@ -129,7 +129,7 @@ export default function FinalCalculation({
     <div>
       <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
+          <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
             <DollarSign className="w-5 h-5 text-calcularq-blue" />
           </div>
           <div>
