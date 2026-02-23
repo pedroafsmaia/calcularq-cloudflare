@@ -136,7 +136,7 @@ export default function Home() {
                   </p>
 
                   {!user?.hasPaid ? (
-                    <div className="mb-3 sm:mb-4 flex items-center justify-center">
+                    <div className="mb-4 sm:mb-5 flex items-center justify-center">
                       <div 
                         className="senja-embed" 
                         data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
@@ -145,24 +145,13 @@ export default function Home() {
                         style={{ display: 'block', width: '100%', transform: 'scale(1.2)', transformOrigin: 'center', margin: '0 auto' }}
                       />
                     </div>
-                  ) : (
-                    <div className="mb-5 sm:mb-6 text-center">
-                      <a
-                        href="https://senja.io/p/calcularq/r/GRdv6A"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#fc7338] hover:underline underline underline-offset-4 text-sm sm:text-base font-medium"
-                      >
-                        Avalie a Calcularq
-                      </a>
-                    </div>
-                  )}
+                  ) : null}
 
                   {/* CTA Button */}
                   <Link 
                     to={user ? createPageUrl("Calculator") : createPageUrl("Login")} 
                     onClick={handleCalculatorClick}
-                    className="block mb-3 sm:mb-2"
+                    className="block mb-3"
                   >
                     <Button 
                       size="lg" 
@@ -179,6 +168,22 @@ export default function Home() {
                       )}
                     </Button>
                   </Link>
+
+                  <a
+                    href="https://senja.io/p/calcularq/r/GRdv6A"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mb-3 sm:mb-4"
+                  >
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="outline"
+                      className="w-full px-8 py-6 text-base sm:text-lg rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-calcularq-blue shadow-sm"
+                    >
+                      Avalie a Calcularq
+                    </Button>
+                  </a>
 
                   <p className="text-center text-sm text-slate-600">
                     Pagamento único. Sem mensalidades.
