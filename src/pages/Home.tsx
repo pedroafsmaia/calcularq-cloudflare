@@ -170,6 +170,21 @@ export default function Home() {
                   </p>
                 </motion.div>
               </div>
+
+              <div className="lg:hidden -mt-8 sm:-mt-10 relative z-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="relative mx-auto max-w-md px-2"
+                >
+                  <img
+                    src="/mockup.png"
+                    alt="Interface da Calculadora Calcularq"
+                    className="w-full h-auto object-contain drop-shadow-2xl"
+                  />
+                </motion.div>
+              </div>
             </div>
           </div>
         </div>

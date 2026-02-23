@@ -38,21 +38,22 @@ export default function Layout({ children }: LayoutProps) {
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center gap-2 sm:gap-4 h-16">
             {/* Logo - Logo completa em vez de logomarca */}
             <Link 
               to={createPageUrl("Home")}
-              className="flex items-center"
+              className="flex items-center shrink-0"
             >
               <img 
                 src="/logo.png" 
                 alt="Calcularq" 
-                className="h-10 w-auto object-contain"
+                className="h-10 w-auto max-w-[160px] sm:max-w-none object-contain"
               />
             </Link>
 
             {/* Navigation Links */}
-            <div className="flex items-center gap-1">
+            <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-end gap-1 overflow-x-auto">
               {navigation.map((item) => {
                 const isActive = currentPageName === item.page;
                 return (
@@ -60,7 +61,7 @@ export default function Layout({ children }: LayoutProps) {
                     key={item.name}
                     to={createPageUrl(item.page)}
                     className={`
-                      flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                      shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all
                       ${isActive 
                         ? "bg-calcularq-blue text-white" 
                         : "text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue"
@@ -78,7 +79,7 @@ export default function Layout({ children }: LayoutProps) {
                 <>
                   <Link
                     to="/budgets"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
+                    className="shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
                   >
                     <History className="w-4 h-4" />
                     <span className="hidden sm:inline">Meus Cálculos</span>
@@ -87,7 +88,7 @@ export default function Layout({ children }: LayoutProps) {
                   {user.hasPaid && (
                     <Link
                       to={createPageUrl("Manual")}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         currentPageName === "Manual"
                           ? "bg-calcularq-blue text-white"
                           : "text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue"
@@ -103,7 +104,7 @@ export default function Layout({ children }: LayoutProps) {
                   </div>
                   <button
                     onClick={logout}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
+                    className="shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
                   >
                     <LogOut className="w-4 h-4" />
                     <span className="hidden sm:inline">Sair</span>
@@ -112,12 +113,13 @@ export default function Layout({ children }: LayoutProps) {
               ) : (
                 <Link
                   to={createPageUrl("Login")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
+                  className="shrink-0 flex items-center gap-2 px-2.5 sm:px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-all"
                 >
                   <LogIn className="w-4 h-4" />
                   <span className="hidden sm:inline">Entrar</span>
                 </Link>
               )}
+            </div>
             </div>
           </div>
         </div>

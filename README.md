@@ -84,13 +84,31 @@ npx wrangler pages secret put NOME_DA_VARIAVEL --project-name calcularq-cloudfla
 ```toml
 [vars]
 FRONTEND_URL = "https://calcularq-cloudflare.pages.dev"
-REQUIRE_PAYMENT = "1"
 STRIPE_SUCCESS_PATH = "/payment/close"
 STRIPE_CANCEL_PATH = "/payment"
 DEBUG_EMAIL_TOKENS = "0"
 ```
 
 > ⚠️ Nunca use `DEBUG_EMAIL_TOKENS = "1"` em produção.
+
+### Toggle de paywall (`REQUIRE_PAYMENT`)
+
+O paywall da calculadora é controlado pela variável `REQUIRE_PAYMENT` no Cloudflare Pages (configurada como secret), para permitir testes sem `commit/push`.
+
+- `REQUIRE_PAYMENT = "1"`: paywall ativo
+- `REQUIRE_PAYMENT = "0"`: paywall desativado (teste)
+
+Configurar com Wrangler:
+
+```bash
+# Desativar paywall (teste)
+echo 0 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
+
+# Ativar paywall novamente
+echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
+```
+
+> Após alterar a variável, faça um redeploy no Cloudflare Pages para aplicar imediatamente.
 
 ---
 
