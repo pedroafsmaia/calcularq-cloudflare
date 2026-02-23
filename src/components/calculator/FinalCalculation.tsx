@@ -183,7 +183,7 @@ export default function FinalCalculation({
             {commercialDiscount > 0 && (
               <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/95 px-3.5 py-3">
                 <p className="text-sm leading-relaxed text-amber-700">
-                  <span className="font-medium">Impacto do desconto:</span> sua remuneração pode ser reduzida em R${" "}
+                  <span className="font-medium">Impacto do desconto:</span> sua remuneração será reduzida em R${" "}
                   {discountAmount.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
