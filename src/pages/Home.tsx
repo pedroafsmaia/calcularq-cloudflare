@@ -19,6 +19,10 @@ export default function Home() {
 
   // Carregar script do Senja.io
   useEffect(() => {
+    if (user?.hasPaid) {
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://widget.senja.io/widget/5c4b77f9-c453-43c6-8dd1-8c015286d9e7/platform.js';
     script.type = 'text/javascript';
@@ -32,7 +36,7 @@ export default function Home() {
         document.body.removeChild(existingScript);
       }
     };
-  }, []);
+  }, [user?.hasPaid]);
 
   const handleCalculatorClick = (e: React.MouseEvent) => {
     if (!user) {
@@ -131,20 +135,18 @@ export default function Home() {
                     Precifique seus projetos de arquitetura. A Calcularq é uma ferramenta precisa para alinhar seus cálculos à dedicação que cada projeto exige.
                   </p>
 
-                  {/* Senja.io Widget */}
-                  <div className="mb-3 sm:mb-4 flex items-center justify-center">
-                    <div 
-                      className="senja-embed" 
-                      data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
-                      data-mode="shadow"
-                      data-lazyload="false"
-                      style={{ display: 'block', width: '100%', transform: 'scale(1.2)', transformOrigin: 'center', margin: '0 auto' }}
-                    />
-                  </div>
-                  
-                  {/* Botão de avaliação para usuários pagos */}
-                  {user?.hasPaid && (
-                    <div className="mb-5 text-center">
+                  {!user?.hasPaid ? (
+                    <div className="mb-3 sm:mb-4 flex items-center justify-center">
+                      <div 
+                        className="senja-embed" 
+                        data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
+                        data-mode="shadow"
+                        data-lazyload="false"
+                        style={{ display: 'block', width: '100%', transform: 'scale(1.2)', transformOrigin: 'center', margin: '0 auto' }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="mb-5 sm:mb-6 text-center">
                       <a
                         href="https://senja.io/p/calcularq/r/GRdv6A"
                         target="_blank"
@@ -279,7 +281,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
               Como Funciona
             </h2>
-            <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[44ch] sm:max-w-3xl mx-auto leading-relaxed" style={{ textWrap: "balance" }}>
+            <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[34ch] sm:max-w-[42ch] md:max-w-[50ch] lg:max-w-[54ch] mx-auto leading-relaxed" style={{ textWrap: "balance" }}>
               {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 4 etapas simples."}
             </p>
 
@@ -318,8 +320,8 @@ function FormulaStep({ number, title, description }: { number: string; title: st
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-tight max-w-[18ch] mx-auto" style={{ textWrap: "balance" }}>{title}</h3>
-      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[30ch] mx-auto" style={{ textWrap: "pretty" }}>
+      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-tight max-w-[16ch] sm:max-w-[18ch] mx-auto" style={{ textWrap: "balance" }}>{title}</h3>
+      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[27ch] sm:max-w-[30ch] lg:max-w-[29ch] mx-auto" style={{ textWrap: "pretty" }}>
         {description}
       </p>
     </div>
