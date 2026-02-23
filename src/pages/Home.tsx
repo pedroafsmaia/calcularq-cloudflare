@@ -80,9 +80,12 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <div className="relative">
         {/* Hero Section - Novo Banner */}
-        <div className="relative bg-calcularq-blue overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-            <div className="lg:hidden relative z-20 mx-auto mb-[-1.25rem] sm:mb-[-1.75rem] max-w-[24rem] px-2">
+        <div className="relative overflow-hidden bg-gradient-to-b from-calcularq-blue via-calcularq-blue to-[#01265c]">
+          <div className="pointer-events-none absolute inset-0 opacity-20">
+            <div className="absolute -top-10 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-white blur-3xl" />
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-20">
+            <div className="lg:hidden relative z-20 mx-auto mb-[-0.75rem] sm:mb-[-1rem] max-w-[21.5rem] sm:max-w-[22.5rem] px-2">
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -96,18 +99,18 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
+            <div className="relative z-10 grid lg:grid-cols-[1.02fr_0.98fr] gap-8 lg:gap-12 items-center">
               <div className="hidden lg:block">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="relative"
+                  className="relative px-2"
                 >
                   <img
                     src="/mockup.png"
                     alt="Interface da Calculadora Calcularq"
-                    className="w-full h-auto object-contain scale-[1.03] drop-shadow-2xl"
+                    className="w-full h-auto object-contain scale-[0.98] xl:scale-[1.02] drop-shadow-2xl"
                   />
                 </motion.div>
               </div>
@@ -116,20 +119,20 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl p-6 md:p-8 lg:p-10 shadow-2xl"
+                  className="bg-white rounded-2xl p-5 pt-10 sm:p-8 sm:pt-12 lg:p-10 lg:pt-10 shadow-2xl"
                 >
                   {/* Logo removido do banner conforme feedback */}
 
-                  <h1 className="text-3xl md:text-4xl lg:text-[2.8rem] font-bold text-calcularq-blue mb-5 leading-tight tracking-tight text-center">
+                  <h1 className="text-[2.05rem] sm:text-4xl lg:text-[2.75rem] font-bold text-calcularq-blue mb-4 sm:mb-5 leading-[1.08] tracking-tight text-center">
                     SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
                   </h1>
 
-                  <p className="text-base sm:text-lg text-slate-700 mb-7 leading-relaxed text-center">
+                  <p className="text-[0.98rem] sm:text-lg text-slate-700 mb-6 sm:mb-7 leading-relaxed text-center">
                     Precifique seus projetos de arquitetura. A Calcularq é uma ferramenta precisa para alinhar seus cálculos à dedicação que cada projeto exige.
                   </p>
 
                   {/* Senja.io Widget */}
-                  <div className="mb-5 flex items-center justify-center">
+                  <div className="mb-3 sm:mb-4 flex items-center justify-center">
                     <div 
                       className="senja-embed" 
                       data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
@@ -141,12 +144,12 @@ export default function Home() {
                   
                   {/* Botão de avaliação para usuários pagos */}
                   {user?.hasPaid && (
-                    <div className="mb-6 text-center">
+                    <div className="mb-5 text-center">
                       <a
                         href="https://senja.io/p/calcularq/r/GRdv6A"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#fc7338] hover:underline underline underline-offset-4 font-medium"
+                        className="text-[#fc7338] hover:underline underline underline-offset-4 text-sm sm:text-base font-medium"
                       >
                         Avalie a Calcularq
                       </a>
@@ -157,7 +160,7 @@ export default function Home() {
                   <Link 
                     to={user ? createPageUrl("Calculator") : createPageUrl("Login")} 
                     onClick={handleCalculatorClick}
-                    className="block mb-2"
+                    className="block mb-3 sm:mb-2"
                   >
                     <Button 
                       size="lg" 
