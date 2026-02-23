@@ -498,16 +498,40 @@ export default function Calculator() {
 
           {displayValues.finalSalePrice > 0 && (
             <>
-              {/* % DO VALOR DA OBRA (CUB) */}
+              {/* % DO VALOR DA OBRA (CUB) COM ALERTA POR FAIXA */}
               <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   % do valor da obra
-                  <Tooltip text={"Estimativa baseada no CUB m\u00e9dio nacional (R$ 2.800/m\u00b2). \u00c9 apenas uma refer\u00eancia \u2014 o valor real da obra varia conforme a regi\u00e3o, o padr\u00e3o construtivo e o tipo de projeto."} />
+                  <Tooltip text={"Estimativa baseada no CUB m?dio nacional (R$ 2.800/m?). A faixa recomendada pelo CAU/BR ? de 2% a 11% do valor da obra. ? apenas uma refer?ncia ? o valor real varia conforme a regi?o, o padr?o e o tipo de projeto."} />
                 </span>
-                <span className="text-sm font-bold text-calcularq-blue whitespace-nowrap">
-                  {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "\u2014"}
+                <span className={`text-sm font-bold whitespace-nowrap ${
+                  cubPercentage !== null
+                    ? cubPercentage < 2
+                      ? "text-red-500"
+                      : cubPercentage > 11
+                        ? "text-amber-500"
+                        : "text-green-600"
+                    : "text-calcularq-blue"
+                }`}>
+                  {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "?"}
                 </span>
               </div>
+
+              {/* Alerta contextual baseado na faixa */}
+              {cubPercentage !== null && cubPercentage < 2 && (
+                <div className="mx-1 mt-1 p-2.5 bg-red-50 rounded-lg border border-red-200">
+                  <p className="text-xs text-red-700">
+                    <strong>?? Abaixo da faixa m?nima.</strong> Seu honor?rio representa {cubPercentage.toFixed(1)}% do valor estimado da obra. A faixa m?nima recomendada pelo CAU/BR ? 2%. Considere revisar as horas estimadas ou o escopo do projeto.
+                  </p>
+                </div>
+              )}
+              {cubPercentage !== null && cubPercentage > 11 && (
+                <div className="mx-1 mt-1 p-2.5 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-xs text-amber-700">
+                    <strong>?? Acima da faixa t?pica.</strong> Seu honor?rio representa {cubPercentage.toFixed(1)}% do valor estimado da obra. A faixa t?pica vai at? 11%. Isso pode ser adequado para projetos de alta complexidade t?cnica.
+                  </p>
+                </div>
+              )}
 
               {/* LUCRO ESTIMADO */}
               {displayValues.profit !== null && (
@@ -701,7 +725,7 @@ export default function Calculator() {
                     variableExpenses={variableExpenses}
                     onVariableExpensesChange={setVariableExpenses}
                     projectPrice={results.projectPrice}
-                    finalSalePrice={results.finalSalePrice}
+                    finalSalePrice={displayValues.finalSalePrice}
                     factorLevels={selections}
                     area={area}
                     factors={factors}

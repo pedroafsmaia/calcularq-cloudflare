@@ -17,6 +17,10 @@ export interface AreaInterval {
   level: number;
 }
 
+// Expoente de compressão — calibrado por simulação contra
+// Tabela IAB, CAU/BR e hora técnica de mercado (30 cenários)
+export const COMPLEXITY_EXPONENT = 0.9;
+
 export const DEFAULT_AREA_INTERVALS: AreaInterval[] = [
   { min: 0, max: 49, level: 1 },
   { min: 50, max: 149, level: 2 },
@@ -139,7 +143,12 @@ export function calculateGlobalComplexity(
   });
 
   if (totalWeight === 0) return 0;
-  return weightedSum / totalWeight;
+
+  const linearComplexity = weightedSum / totalWeight;
+
+  // Compressão sub-linear: amortece crescimento em complexidades altas
+  // C=1 → 1.00 | C=2 → 1.87 | C=3 → 2.69 | C=4 → 3.48 | C=5 → 4.26
+  return Math.pow(linearComplexity, COMPLEXITY_EXPONENT);
 }
 
 export function calculateProjectValue(
