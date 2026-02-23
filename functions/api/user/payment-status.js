@@ -5,6 +5,7 @@ export async function onRequest(context) {
   if (!auth.ok) return auth.response;
 
   const db = context.env.DB;
+  const requirePayment = String(context.env.REQUIRE_PAYMENT || "0") === "1";
   const user = await db.prepare("SELECT id, has_paid, payment_date, stripe_customer_id FROM users WHERE id = ?")
     .bind(auth.userId)
     .first();
@@ -13,7 +14,7 @@ export async function onRequest(context) {
 
   return jsonResponse({
     userId: user.id,
-    hasPaid: !!user.has_paid,
+    hasPaid: requirePayment ? !!user.has_paid : true,
     paymentDate: user.payment_date,
     stripeCustomerId: user.stripe_customer_id
   });
