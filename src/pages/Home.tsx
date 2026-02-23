@@ -82,32 +82,27 @@ export default function Home() {
         {/* Hero Section - Novo Banner */}
         <div className="relative bg-calcularq-blue overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
-              {/* Left Side - Mockup */}
-              <div className="hidden lg:block">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="relative"
-                >
-                  <div className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-4">
-                    <img 
-                      src="/mockup.png" 
-                      alt="Interface da Calculadora Calcularq" 
-                      className="w-full h-auto rounded-2xl object-contain scale-[1.03] drop-shadow-2xl"
-                    />
-                  </div>
-                </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="relative z-10 mx-auto mb-6 lg:mb-10 max-w-5xl"
+            >
+              <div className="rounded-3xl bg-white/5 ring-1 ring-white/10 p-3 sm:p-4 lg:p-5">
+                <img
+                  src="/mockup.png"
+                  alt="Interface da Calculadora Calcularq"
+                  className="w-full h-auto object-contain drop-shadow-2xl"
+                />
               </div>
+            </motion.div>
 
-              {/* Right Side - Content */}
-              <div className="relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl p-6 md:p-8 lg:p-10 shadow-2xl"
-                >
+            <div className="relative z-10 mx-auto max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl p-6 md:p-8 lg:p-10 shadow-2xl"
+              >
                   {/* Logo removido do banner conforme feedback */}
 
                   <h1 className="text-3xl md:text-4xl lg:text-[2.8rem] font-bold text-calcularq-blue mb-5 leading-tight tracking-tight text-center">
@@ -171,21 +166,6 @@ export default function Home() {
                 </motion.div>
               </div>
 
-              <div className="lg:hidden -mt-10 sm:-mt-12 relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="relative mx-auto max-w-[26rem] px-2"
-                >
-                  <img
-                    src="/mockup.png"
-                    alt="Interface da Calculadora Calcularq"
-                    className="w-full h-auto object-contain drop-shadow-2xl"
-                  />
-                </motion.div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -281,29 +261,29 @@ export default function Home() {
               Como Funciona
             </h2>
             <p className="text-lg text-slate-700 mb-12 max-w-3xl mx-auto">
-              {"Em 4 etapas simples você define sua base de preço, ajusta os pesos, classifica a complexidade e finaliza a composição do valor de venda."}
+              {"Em 4 etapas simples, voc\u00ea organiza as informa\u00e7\u00f5es do projeto e visualiza um valor final com mais clareza."}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <FormulaStep 
                 number="1" 
                 title={"Hora T\u00e9cnica"}
-                description={"Defina sua hora t\u00e9cnica m\u00ednima com despesas fixas, pr\u00f3-labore e horas produtivas do escrit\u00f3rio."}
+                description={"Preencha os dados b\u00e1sicos do escrit\u00f3rio para calcular sua hora t\u00e9cnica m\u00ednima."}
               />
               <FormulaStep 
                 number="2" 
                 title="Pesos"
-                description={"Ajuste opcionalmente o peso de cada fator para refletir sua estrat\u00e9gia de precifica\u00e7\u00e3o."}
+                description={"Ajuste os pesos dos fatores se quiser personalizar como a calculadora considera cada item."}
               />
               <FormulaStep 
                 number="3" 
                 title="Complexidade"
-                description={"Classifique \u00e1rea e fatores do projeto para calcular a complexidade global da proposta."}
+                description={"Informe a \u00e1rea e classifique os fatores do projeto para montar a complexidade do c\u00e1lculo."}
               />
               <FormulaStep 
                 number="4" 
                 title={"Pre\u00e7o Final"}
-                description={"Ajuste horas, despesas vari\u00e1veis e desconto comercial para chegar ao pre\u00e7o de venda final."}
+                description={"Ajuste horas, despesas e desconto comercial para visualizar o valor final da proposta."}
               />
             </div>
           </motion.div>
@@ -315,7 +295,7 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-left sm:text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
