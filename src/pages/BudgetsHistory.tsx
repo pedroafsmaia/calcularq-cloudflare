@@ -117,7 +117,7 @@ export default function BudgetsHistory() {
           </div>
 
           {budgets.length > 0 ? (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+            <div className="mt-4 sticky top-20 z-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-xl bg-slate-50/95 backdrop-blur-sm py-1">
               <input
                 type="text"
                 value={searchTerm}
