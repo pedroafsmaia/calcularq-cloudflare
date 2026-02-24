@@ -25,6 +25,7 @@ export interface Budget {
   name: string;
   clientName?: string;
   projectName?: string;
+  description?: string;
   data: {
     minHourlyRate: number;
     useManualMinHourlyRate?: boolean;
@@ -140,7 +141,7 @@ class ApiClient {
     return this.request(`/api/budgets/${id}`);
   }
 
-  async saveBudget(payload: { id?: string; name: string; clientName?: string; projectName?: string; data: any }): Promise<{ success: boolean; budget: Budget }> {
+  async saveBudget(payload: { id?: string; name: string; clientName?: string; projectName?: string; description?: string; data: any }): Promise<{ success: boolean; budget: Budget }> {
     return this.request('/api/budgets', { method: 'POST', body: JSON.stringify(payload) });
   }
 

@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -43,7 +43,7 @@ function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?
         ? "border-slate-200 bg-slate-50 text-slate-700"
         : "border-blue-200 bg-blue-50/70 text-blue-800";
 
-  return <div className={`rounded-xl border px-4 py-3 leading-relaxed ${toneClass}`}>{children}</div>;
+  return <div className={`rounded-xl border px-4 py-3 text-sm leading-relaxed ${toneClass}`}>{children}</div>;
 }
 
 export default function Manual() {
@@ -70,12 +70,16 @@ export default function Manual() {
   );
   const activeManualStep = manualSteps[activeStepIndex] ?? manualSteps[0];
   const mobileSummaryShowsCurrentStep = activeManualStep.id !== "introducao";
+  const mobileSummaryRef = useRef<HTMLDetailsElement>(null);
 
   const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
     const el = document.getElementById(id);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 92;
     window.scrollTo({ top, behavior: "smooth" });
+    if (mobileSummaryRef.current) {
+      mobileSummaryRef.current.open = false;
+    }
   };
 
   useEffect(() => {
@@ -239,7 +243,7 @@ export default function Manual() {
         </div>
 
         <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
-          <details className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
+          <details ref={mobileSummaryRef} className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
             <summary
               className={[
                 "cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors",

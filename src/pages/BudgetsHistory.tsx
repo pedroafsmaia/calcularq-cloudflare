@@ -212,6 +212,9 @@ export default function BudgetsHistory() {
                     <h3 className="font-bold text-calcularq-blue text-lg mb-1 truncate">{budget.name || "Cálculo sem nome"}</h3>
                     {budget.clientName ? <p className="text-sm text-slate-600 truncate">Cliente: {budget.clientName}</p> : null}
                     {budget.projectName ? <p className="text-sm text-slate-600 truncate">Projeto: {budget.projectName}</p> : null}
+                    {budget.description ? (
+                      <p className="text-sm text-slate-500 mt-1 line-clamp-2">{budget.description}</p>
+                    ) : null}
                   </div>
                   <button
                     onClick={(e) => {
