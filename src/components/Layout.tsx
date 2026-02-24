@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { createPageUrl } from "@/utils";
 import { Calculator, Home, BookOpen, LogIn, LogOut, User, History } from "lucide-react";
 import Footer from "./Footer";
@@ -26,6 +27,21 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const currentPageName = getCurrentPageName();
+
+  useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    let pageTitle = "";
+
+    if (path === "/" || path === "/home" || path.includes("home")) pageTitle = "Home";
+    else if (path === "/calculator" || path.includes("calculator")) pageTitle = "Calculadora";
+    else if (path === "/manual" || path.includes("manual")) pageTitle = "Manual";
+    else if (path === "/budgets" || path.includes("budgets")) pageTitle = "Meus Cálculos";
+    else if (path === "/login" || path.includes("/login")) pageTitle = "Entrar";
+    else if (path === "/reset-password" || path.includes("reset-password")) pageTitle = "Redefinir Senha";
+    else if (path === "/payment" || path.includes("/payment")) pageTitle = "Pagamento";
+
+    document.title = pageTitle ? `Calcularq - ${pageTitle}` : "Calcularq";
+  }, [location.pathname]);
 
   const desktopNavItem = (isActive: boolean) =>
     `shrink-0 flex items-center justify-center gap-0 xl:gap-2 h-10 w-10 xl:w-auto min-w-10 xl:min-w-10 px-0 xl:px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
