@@ -282,14 +282,19 @@ export default function Login() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full"
+            className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8 max-w-md w-full"
           >
-            <h2 className="text-2xl font-bold text-calcularq-blue mb-4">
-              Esqueci minha senha
-            </h2>
-            <p className="text-slate-600 mb-6">
-              Digite seu e-mail cadastrado. Enviaremos um link para redefinir sua senha.
-            </p>
+            <div className="text-center mb-6 sm:mb-7">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-calcularq-blue mb-4">
+                <img src="/logomarca-branca.png" alt="Calcularq" className="w-7 h-7 object-contain" />
+              </div>
+              <h2 className="text-2xl sm:text-[1.75rem] font-bold text-calcularq-blue mb-2">
+                Esqueci minha senha
+              </h2>
+              <p className="text-slate-600 leading-relaxed max-w-[30ch] mx-auto">
+                Digite seu e-mail cadastrado. Enviaremos um link para redefinir sua senha.
+              </p>
+            </div>
 
             {forgotPasswordMessage && (
               <div className={`p-3 rounded-lg mb-4 ${
@@ -357,7 +362,7 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-1">
                 <Button
                   type="button"
                   variant="outline"
@@ -366,7 +371,7 @@ export default function Login() {
                     setForgotPasswordEmail("");
                     setForgotPasswordMessage(null);
                   }}
-                  className="flex-1"
+                  className="flex-1 border-slate-200 text-slate-600 hover:bg-slate-50"
                 >
                   Cancelar
                 </Button>
