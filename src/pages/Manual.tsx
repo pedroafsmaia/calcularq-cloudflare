@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Calculator,
   Settings2,
@@ -125,20 +125,30 @@ export default function Manual() {
           <ChevronDown className="w-4 h-4 text-calcularq-blue shrink-0" />
         )}
       </button>
-      {expandedFactors[id] ? (
-        <div className="border-t border-slate-200 px-4 py-4">
-          <p className="text-sm sm:text-base text-slate-700 leading-relaxed mb-4">{definition}</p>
-          <ul className="space-y-2.5 text-sm sm:text-base text-slate-700 leading-relaxed">
-            {items.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-calcularq-blue shrink-0" />
-                <div>{item}</div>
-              </li>
-            ))}
-          </ul>
-          {footer ? <div className="mt-4">{footer}</div> : null}
-        </div>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {expandedFactors[id] ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-slate-200 px-4 py-4">
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed mb-4">{definition}</p>
+              <ul className="space-y-2.5 text-sm sm:text-base text-slate-700 leading-relaxed">
+                {items.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-calcularq-blue shrink-0" />
+                    <div>{item}</div>
+                  </li>
+                ))}
+              </ul>
+              {footer ? <div className="mt-4">{footer}</div> : null}
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 
@@ -212,9 +222,8 @@ export default function Manual() {
                 Manual de Instruções
               </h1>
               <p className="text-slate-600 leading-relaxed max-w-3xl mx-auto text-sm sm:text-base lg:text-lg">
-                Bem-vindo à Calcularq, uma calculadora de precificação por complexidade. O sistema cruza o custo
-                operacional do seu trabalho com o nível de complexidade de cada projeto para gerar um valor de referência
-                mais coerente com o esforço técnico envolvido.
+                A Calcularq precifica projetos de arquitetura pelo esforço real. Ela cruza o custo da sua hora de
+                trabalho com a complexidade do projeto para gerar um preço justo e defendável.
               </p>
               <p className="mt-4 text-slate-700 font-medium text-sm sm:text-base">
                 Navegue pelas etapas abaixo para estudar o manual na mesma lógica da calculadora.
@@ -284,8 +293,8 @@ export default function Manual() {
                 <div id="etapa-1" className="scroll-mt-24">
                   <SectionHeader
                     icon={<Calculator className="w-5 h-5 text-calcularq-blue" />}
-                    title="1. Definição da hora técnica mínima"
-                    description="A primeira etapa define o custo real da sua hora de trabalho. Aqui nasce a referência mínima para o escritório operar sem prejuízo."
+                    title="1. Hora técnica mínima"
+                    description="Quanto custa sua hora de trabalho? Aqui você descobre o mínimo para operar sem prejuízo."
                     compact
                   />
 
@@ -477,7 +486,7 @@ export default function Manual() {
                   <SectionHeader
                     icon={<DollarSign className="w-5 h-5 text-calcularq-blue" />}
                     title="4. Composição final do preço"
-                    description="Nesta etapa você finaliza o cálculo: informa horas estimadas, despesas variáveis e desconto comercial para chegar ao preço de venda final."
+                    description="Informe as horas estimadas, despesas do contrato e desconto comercial para chegar ao preço de venda."
                     compact
                   />
 
@@ -556,7 +565,7 @@ export default function Manual() {
                     Use o manual para entender a lógica das etapas, depois aplique no fluxo real da calculadora. Se precisar, ajuste os pesos e os fatores conforme a realidade do seu escritório.
                   </p>
                   <p>
-                    Revise horas estimadas, confira o impacto do desconto e use os resultados como apoio técnico para negociar com mais segurança.
+                    Os resultados são referência técnica. A negociação e a estratégia comercial são suas.
                   </p>
                 </div>
 

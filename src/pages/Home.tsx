@@ -51,33 +51,33 @@ export default function Home() {
   const features = [
     {
       icon: Calculator,
-      title: "Cálculo da Complexidade",
+      title: "Cálculo da complexidade",
       description: "Garante uma precificação justa ao considerar fatores de complexidade do projeto."
     },
     {
       icon: Globe,
-      title: "Acesso em Qualquer Lugar",
+      title: "Acesso em qualquer lugar",
       description: "Uma ferramenta prática e 100% online, pronta para usar em qualquer dispositivo."
     },
     {
       icon: DollarSign,
-      title: "Preço Acessível",
+      title: "Preço acessível",
       description: "Acesso completo por um valor único e justo, sem mensalidades ou custos surpresa."
     },
     {
       icon: Zap,
-      title: "Agilidade na Entrega",
+      title: "Agilidade na entrega",
       description: "Reduza o tempo de elaboração de propostas e envie cálculos precisos com rapidez."
     }
   ];
 
   const factorsList = [
-    "Área de Projeto",
-    "Etapa do Projeto", 
-    "Nível de Detalhamento",
-    "Exigência Técnica",
-    "Exigência Burocrática",
-    "Dedicação à Obra"
+    "Área de projeto",
+    "Etapa de projeto", 
+    "Nível de detalhamento",
+    "Exigência técnica",
+    "Exigência burocrática",
+    "Dedicação à obra"
   ];
 
   return (
@@ -241,7 +241,7 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 tracking-tight">
-                  Fatores de Complexidade
+                  Fatores de complexidade
                 </h2>
                 <p className="text-sm sm:text-base lg:text-lg text-slate-300 mb-6 leading-relaxed">
                   Nossa calculadora considera 6 fatores essenciais para 
@@ -286,7 +286,7 @@ export default function Home() {
             className="text-center"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
-              Como Funciona
+              Como funciona
             </h2>
             <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[34ch] sm:max-w-[42ch] md:max-w-[50ch] lg:max-w-[54ch] mx-auto leading-relaxed" style={{ textWrap: "balance" }}>
               {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 4 etapas simples."}
@@ -295,7 +295,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <FormulaStep 
                 number="1" 
-                title={"Hora T\u00e9cnica"}
+                title={"Hora técnica"}
                 description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica mínima."}
               />
               <FormulaStep 
@@ -310,7 +310,7 @@ export default function Home() {
               />
               <FormulaStep 
                 number="4" 
-                title={"Pre\u00e7o Final"}
+                title={"Preço final"}
                 description={"Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."}
               />
             </div>
@@ -334,3 +334,4 @@ function FormulaStep({ number, title, description }: { number: string; title: st
     </div>
   );
 }
+
