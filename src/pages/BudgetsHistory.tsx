@@ -105,6 +105,7 @@ export default function BudgetsHistory() {
               title="Meus Cálculos"
               description="Acesse aqui os cálculos que você salvou no sistema."
               titleAccessory={titleCountBadge}
+              iconAlign="center"
               className="mb-0"
             />
 

@@ -9,6 +9,7 @@ type SectionHeaderProps = {
   descriptionClassName?: string;
   titleClassName?: string;
   compact?: boolean;
+  iconAlign?: "start" | "center";
 };
 
 export default function SectionHeader({
@@ -20,9 +21,10 @@ export default function SectionHeader({
   descriptionClassName = "",
   titleClassName = "",
   compact = false,
+  iconAlign = "start",
 }: SectionHeaderProps) {
   return (
-    <div className={`flex items-start gap-3 ${compact ? "mb-5" : "mb-6"} ${className}`.trim()}>
+    <div className={`flex ${iconAlign === "center" ? "items-center" : "items-start"} gap-3 ${compact ? "mb-5" : "mb-6"} ${className}`.trim()}>
       <div className="w-11 h-11 min-w-11 shrink-0 rounded-xl bg-calcularq-blue/10 flex items-center justify-center">
         {icon}
       </div>
