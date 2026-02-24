@@ -68,6 +68,7 @@ export default function Manual() {
     () => Math.max(0, manualSteps.findIndex((step) => step.id === activeStepId)),
     [activeStepId]
   );
+  const activeManualStep = manualSteps[activeStepIndex] ?? manualSteps[0];
 
   const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
     const el = document.getElementById(id);
@@ -158,11 +159,11 @@ export default function Manual() {
                   <span
                     className={[
                       "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
-                      isActive
+                      isCompleted
                         ? "border-calcularq-blue bg-calcularq-blue text-white"
-                        : isCompleted
-                          ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
-                          : "border-slate-300 bg-white text-slate-500 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
+                        : isActive
+                          ? "border-calcularq-blue bg-white text-calcularq-blue"
+                          : "border-slate-200 bg-white text-slate-400 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
                     ].join(" ")}
                   >
                     {isCompleted ? "✓" : circleLabel}
@@ -182,7 +183,7 @@ export default function Manual() {
                   <span
                     className={[
                       "mt-5 mx-1 sm:mx-2 block h-[2px] flex-1 min-w-2 rounded-full",
-                      index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-300",
+                      index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-200",
                     ].join(" ")}
                     aria-hidden="true"
                   />
@@ -227,7 +228,9 @@ export default function Manual() {
         <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
           <details className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
             <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-sm font-semibold text-slate-900">
-              Sumário do manual
+              <span className="min-w-0 truncate">
+                {activeManualStep.id === "introducao" ? "Sumário do manual" : activeManualStep.label}
+              </span>
               <ChevronDown className="w-4 h-4 text-slate-500" />
             </summary>
             <div className="mt-3 space-y-1.5">
@@ -254,11 +257,11 @@ export default function Manual() {
                       <span
                         className={[
                           "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
-                          isActive
+                          isCompleted
                             ? "border-calcularq-blue bg-calcularq-blue text-white"
-                            : isCompleted
-                              ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
-                              : "border-slate-300 bg-white text-slate-500",
+                            : isActive
+                              ? "border-calcularq-blue bg-white text-calcularq-blue"
+                              : "border-slate-200 bg-white text-slate-400",
                         ].join(" ")}
                       >
                         {isCompleted ? "✓" : badgeLabel}
