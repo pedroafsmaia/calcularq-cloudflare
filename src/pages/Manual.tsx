@@ -244,14 +244,14 @@ export default function Manual() {
               className={[
                 "cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors",
                 mobileSummaryShowsCurrentStep
-                  ? "bg-calcularq-blue text-white"
+                  ? "bg-calcularq-blue/5 text-calcularq-blue"
                   : "text-slate-900 hover:bg-slate-50",
               ].join(" ")}
             >
               <span className="min-w-0 truncate">
                 {mobileSummaryShowsCurrentStep ? activeManualStep.short : "Sumário do manual"}
               </span>
-              <ChevronDown className={["w-4 h-4", mobileSummaryShowsCurrentStep ? "text-white" : "text-slate-500"].join(" ")} />
+              <ChevronDown className={["w-4 h-4", mobileSummaryShowsCurrentStep ? "text-calcularq-blue" : "text-slate-500"].join(" ")} />
             </summary>
             <div className="mt-3 space-y-1.5">
               {manualSteps.map((step, index) => {
