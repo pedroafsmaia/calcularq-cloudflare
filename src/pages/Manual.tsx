@@ -69,6 +69,7 @@ export default function Manual() {
     [activeStepId]
   );
   const activeManualStep = manualSteps[activeStepIndex] ?? manualSteps[0];
+  const mobileSummaryShowsCurrentStep = activeManualStep.id !== "introducao";
 
   const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
     const el = document.getElementById(id);
@@ -171,11 +172,11 @@ export default function Manual() {
                 >
                   <span
                     className={[
-                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
+                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300",
                       isCompleted
-                        ? "border-calcularq-blue bg-calcularq-blue text-white"
+                        ? "border-calcularq-blue bg-calcularq-blue text-white shadow-md"
                         : isActive
-                          ? "border-calcularq-blue bg-white text-calcularq-blue"
+                          ? "border-calcularq-blue bg-white text-calcularq-blue shadow-sm"
                           : "border-slate-200 bg-white text-slate-400 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
                     ].join(" ")}
                   >
@@ -184,7 +185,7 @@ export default function Manual() {
                   <span
                     className={[
                       "text-[11px] sm:text-xs leading-snug max-w-full",
-                      isActive ? "text-calcularq-blue font-semibold" : "text-slate-600",
+                      isCompleted || isActive ? "text-calcularq-blue font-semibold" : "text-slate-400",
                     ].join(" ")}
                     style={{ textWrap: "balance" }}
                   >
@@ -239,11 +240,18 @@ export default function Manual() {
 
         <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
           <details className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
-            <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-sm font-semibold text-slate-900">
+            <summary
+              className={[
+                "cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors",
+                mobileSummaryShowsCurrentStep
+                  ? "bg-calcularq-blue text-white"
+                  : "text-slate-900 hover:bg-slate-50",
+              ].join(" ")}
+            >
               <span className="min-w-0 truncate">
-                {activeManualStep.id === "introducao" ? "Sumário do manual" : activeManualStep.short}
+                {mobileSummaryShowsCurrentStep ? activeManualStep.short : "Sumário do manual"}
               </span>
-              <ChevronDown className="w-4 h-4 text-slate-500" />
+              <ChevronDown className={["w-4 h-4", mobileSummaryShowsCurrentStep ? "text-white" : "text-slate-500"].join(" ")} />
             </summary>
             <div className="mt-3 space-y-1.5">
               {manualSteps.map((step, index) => {
