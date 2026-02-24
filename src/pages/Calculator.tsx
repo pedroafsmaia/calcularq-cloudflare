@@ -26,7 +26,7 @@ import { createPageUrl } from "@/utils";
 
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
-  { n: 2, label: "Pesos" },
+  { n: 2, label: "Calibragem dos pesos" },
   { n: 3, label: "Fatores de Complexidade" },
   { n: 4, label: "Composição final" },
 ];
@@ -599,7 +599,7 @@ export default function Calculator() {
               };
               return (
                 <div key={step.n} className="flex items-start">
-                  <div className="flex flex-col items-center w-[4.4rem] sm:w-[5.4rem] md:w-[6.4rem]">
+                  <div className="flex flex-col items-center w-[5.1rem] sm:w-[6.2rem] md:w-[7.8rem]">
                     <button
                       type="button"
                       onClick={handleClick}
@@ -610,8 +610,11 @@ export default function Calculator() {
                     >
                       {done ? "✓" : step.n}
                     </button>
-                    <span className={`mt-1.5 text-[13px] sm:text-sm font-medium text-center leading-tight
-                      ${done || active ? "text-calcularq-blue" : "text-slate-400"}`}>
+                    <span
+                      className={`mt-1.5 text-[13px] sm:text-sm font-medium text-center leading-tight max-w-[12ch]
+                      ${done || active ? "text-calcularq-blue" : "text-slate-400"}`}
+                      style={{ textWrap: "balance" }}
+                    >
                       {step.label}
                     </span>
                   </div>

@@ -21,7 +21,7 @@ type FactorId = "area" | "stage" | "detail" | "technical" | "bureaucratic" | "mo
 const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
   { id: "etapa-1", label: "Hora técnica mínima", short: "Hora técnica mínima" },
-  { id: "etapa-2", label: "Calibração estratégica (pesos)", short: "Pesos" },
+  { id: "etapa-2", label: "Calibragem dos pesos", short: "Calibragem dos pesos" },
   { id: "etapa-3", label: "Análise dos Fatores de Complexidade", short: "Fatores de Complexidade" },
   { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
   { id: "encerramento", label: "Conclusão", short: "Final" },
@@ -138,6 +138,63 @@ export default function Manual() {
     </div>
   );
 
+  const renderManualStepper = () => (
+    <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 sm:p-4 shadow-sm backdrop-blur-sm">
+      <div className="overflow-x-auto">
+        <div className="mx-auto flex min-w-max items-start justify-center gap-2 sm:gap-3 px-1">
+          {manualSteps.map((step, index) => {
+            const isActive = activeStepId === step.id;
+            const isCompleted = index < activeStepIndex;
+            const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
+
+            return (
+              <div key={step.id} className="flex items-start gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(step.id)}
+                  className="group flex min-w-[92px] lg:min-w-[108px] flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
+                  aria-current={isActive ? "step" : undefined}
+                >
+                  <span
+                    className={[
+                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-calcularq-blue bg-calcularq-blue text-white"
+                        : isCompleted
+                          ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
+                          : "border-slate-300 bg-white text-slate-500 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
+                    ].join(" ")}
+                  >
+                    {isCompleted ? "✓" : circleLabel}
+                  </span>
+                  <span
+                    className={[
+                      "text-[11px] sm:text-xs leading-snug max-w-[11ch]",
+                      isActive ? "text-calcularq-blue font-semibold" : "text-slate-600",
+                    ].join(" ")}
+                    style={{ textWrap: "balance" }}
+                  >
+                    {step.short}
+                  </span>
+                </button>
+
+                {index < manualSteps.length - 1 ? (
+                  <span
+                    className={[
+                      "mt-5 block h-[2px] w-5 sm:w-8 lg:w-10 rounded-full",
+                      index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-300",
+                    ].join(" ")}
+                    aria-hidden="true"
+                  />
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
@@ -159,63 +216,39 @@ export default function Manual() {
                 Navegue pelas etapas abaixo para estudar o manual na mesma lógica da calculadora.
               </p>
 
-              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
-                <div className="overflow-x-auto">
-                  <div className="mx-auto flex min-w-max items-start justify-center gap-2 sm:gap-3 px-1">
-                    {manualSteps.map((step, index) => {
-                      const isActive = activeStepId === step.id;
-                      const isCompleted = index < activeStepIndex;
-                      const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
-
-                      return (
-                        <div key={step.id} className="flex items-start gap-2 sm:gap-3">
-                          <button
-                            type="button"
-                            onClick={() => scrollToSection(step.id)}
-                            className="group flex min-w-[78px] sm:min-w-[92px] flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
-                            aria-current={isActive ? "step" : undefined}
-                          >
-                            <span
-                              className={[
-                                "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
-                                isActive
-                                  ? "border-calcularq-blue bg-calcularq-blue text-white"
-                                  : isCompleted
-                                    ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
-                                    : "border-slate-300 bg-white text-slate-500 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
-                              ].join(" ")}
-                            >
-                              {isCompleted ? "✓" : circleLabel}
-                            </span>
-                            <span
-                              className={[
-                                "text-[11px] sm:text-xs leading-snug",
-                                isActive ? "text-calcularq-blue font-semibold" : "text-slate-600",
-                              ].join(" ")}
-                              style={{ textWrap: "balance" }}
-                            >
-                              {step.short}
-                            </span>
-                          </button>
-
-                          {index < manualSteps.length - 1 ? (
-                            <span
-                              className={[
-                                "mt-5 block h-[2px] w-5 sm:w-8 rounded-full",
-                                index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-300",
-                              ].join(" ")}
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
             </div>
           </ManualCard>
         </motion.div>
+
+        <div className="hidden md:block max-w-4xl mx-auto sticky top-20 z-20 mb-6 sm:mb-8">
+          {renderManualStepper()}
+        </div>
+
+        <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
+          <details className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
+            <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-sm font-semibold text-slate-900">
+              Sumário do manual
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            </summary>
+            <div className="mt-3 space-y-1.5">
+              {manualSteps.map((step) => (
+                <button
+                  key={step.id}
+                  type="button"
+                  onClick={() => scrollToSection(step.id)}
+                  className={[
+                    "w-full text-left rounded-lg px-3 py-2 text-sm leading-snug",
+                    activeStepId === step.id
+                      ? "bg-calcularq-blue/5 text-calcularq-blue"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
+                  ].join(" ")}
+                >
+                  {step.label}
+                </button>
+              ))}
+            </div>
+          </details>
+        </div>
 
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
@@ -266,7 +299,7 @@ export default function Manual() {
                 <div id="etapa-2" className="scroll-mt-24">
                   <SectionHeader
                     icon={<Settings2 className="w-5 h-5 text-calcularq-blue" />}
-                    title="2. Calibração estratégica (pesos)"
+                    title="2. Calibragem dos pesos"
                     description="Etapa opcional. Ajuste a influência de cada fator de complexidade para refletir melhor a estratégia do seu escritório."
                     compact
                   />
