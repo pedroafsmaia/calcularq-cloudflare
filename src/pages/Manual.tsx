@@ -500,13 +500,7 @@ export default function Manual() {
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
                     <NoteBox>
-                      <strong>Resumo rápido:</strong> Você informa horas, despesas variáveis e desconto comercial. A calculadora compõe o preço de venda final.
-                    </NoteBox>
-
-                    <NoteBox>
-                      <strong>Índice de Complexidade (C):</strong> é o resultado da etapa 3, formado pelos fatores e pelos pesos.
-                      <br />
-                      <strong>Multiplicador (M):</strong> é o valor usado no cálculo final, derivado do índice com compressão ({`M = C^0,90`}). Isso preserva a lógica de complexidade, mas evita saltos exagerados.
+                      <strong>Resumo rápido:</strong> Você informa horas, despesas variáveis e desconto comercial. A calculadora compõe o preço de venda final usando a complexidade do projeto com multiplicador comprimido ({`M = C^0,90`}).
                     </NoteBox>
 
                     <div>
@@ -524,10 +518,6 @@ export default function Manual() {
                           <strong>Desconto comercial:</strong> ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente.</li>
                       </ul>
                     </div>
-
-                    <NoteBox>
-                      <strong>Faixa de referência do CAU/BR (2% a 11%):</strong> o percentual sobre o valor da obra é uma estimativa de referência comparativa. Ele ajuda a contextualizar o resultado, mas não é o foco principal da Calcularq. O cálculo é estruturado pela hora técnica, complexidade, horas estimadas e composição do preço.
-                    </NoteBox>
 
                     <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
                       <h3 className="font-semibold text-calcularq-blue mb-3">Resultado apresentado ao final</h3>
@@ -551,6 +541,10 @@ export default function Manual() {
                         ))}
                       </ul>
                     </div>
+
+                    <NoteBox>
+                      <strong>Faixa de referência do CAU/BR (2% a 11%):</strong> o percentual sobre o valor da obra é uma estimativa de referência comparativa. Ele ajuda a contextualizar o resultado, mas não é o foco principal da Calcularq. O cálculo é estruturado pela hora técnica, complexidade, horas estimadas e composição do preço.
+                    </NoteBox>
                   </div>
                 </div>
               </ManualCard>
