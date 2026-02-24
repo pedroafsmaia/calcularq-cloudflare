@@ -1,5 +1,5 @@
-﻿import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+﻿import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Budget, api } from "@/lib/api";
@@ -8,9 +8,14 @@ import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import SectionHeader from "@/components/calculator/SectionHeader";
 
+type SortMode = "recent" | "price_desc" | "price_asc" | "name";
+
 export default function BudgetsHistory() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortMode>("recent");
 
   useEffect(() => {
     const load = async () => {
@@ -26,6 +31,34 @@ export default function BudgetsHistory() {
     load();
   }, [user]);
 
+  const visibleBudgets = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+
+    const filtered = budgets.filter((budget) => {
+      if (!q) return true;
+      const haystack = [budget.name ?? "", budget.clientName ?? "", budget.projectName ?? ""]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+
+    const sorted = [...filtered];
+    sorted.sort((a, b) => {
+      if (sortBy === "recent") {
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+      if (sortBy === "price_desc") {
+        return b.data.results.finalSalePrice - a.data.results.finalSalePrice;
+      }
+      if (sortBy === "price_asc") {
+        return a.data.results.finalSalePrice - b.data.results.finalSalePrice;
+      }
+      return (a.name || "").localeCompare(b.name || "", "pt-BR", { sensitivity: "base" });
+    });
+
+    return sorted;
+  }, [budgets, searchTerm, sortBy]);
+
   const handleDelete = async (budgetId: string) => {
     if (!confirm("Tem certeza que deseja excluir este calculo?")) return;
     try {
@@ -35,6 +68,10 @@ export default function BudgetsHistory() {
       alert("Erro ao excluir calculo");
       console.error(e);
     }
+  };
+
+  const openBudget = (budgetId: string) => {
+    navigate(`${createPageUrl("Calculator")}?budget=${budgetId}`);
   };
 
   if (!user) {
@@ -53,11 +90,7 @@ export default function BudgetsHistory() {
   return (
     <div className="bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 sm:mb-8"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <SectionHeader
               compact
@@ -82,11 +115,38 @@ export default function BudgetsHistory() {
                 : `${budgets.length} calculo${budgets.length > 1 ? "s" : ""} salvo${budgets.length > 1 ? "s" : ""}`}
             </span>
             {budgets.length > 0 ? (
-              <span className="hidden sm:inline text-slate-500">
-                Abra um calculo salvo para continuar de onde parou.
-              </span>
+              <span className="hidden sm:inline text-slate-500">Abra um calculo salvo para continuar de onde parou.</span>
             ) : null}
           </div>
+
+          {budgets.length > 0 ? (
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar por nome, cliente ou projeto"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+              />
+
+              <div className="flex items-center gap-2">
+                <label htmlFor="budgets-sort" className="text-sm text-slate-600 whitespace-nowrap">
+                  Ordenar:
+                </label>
+                <select
+                  id="budgets-sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortMode)}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+                >
+                  <option value="recent">Mais recente</option>
+                  <option value="price_desc">Maior preco</option>
+                  <option value="price_asc">Menor preco</option>
+                  <option value="name">Nome (A-Z)</option>
+                </select>
+              </div>
+            </div>
+          ) : null}
         </motion.div>
 
         {budgets.length === 0 ? (
@@ -100,39 +160,57 @@ export default function BudgetsHistory() {
             </div>
             <h3 className="text-xl font-semibold text-slate-800 mb-2">Nenhum cálculo salvo ainda</h3>
             <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-[44ch] mx-auto mb-5">
-              Quando você salvar um cálculo, ele aparecerá aqui com preço final, complexidade e horas estimadas.
+              Quando voce salvar um calculo, ele aparecera aqui com preco final, complexidade e horas estimadas.
             </p>
             <Link to={createPageUrl("Calculator")}>
               <Button className="bg-calcularq-blue hover:bg-[#002366] text-white">
                 <Plus className="w-4 h-4 mr-2" />
-                Criar primeiro cálculo
+                Criar primeiro calculo
               </Button>
             </Link>
           </motion.div>
+        ) : visibleBudgets.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 text-center shadow-sm"
+          >
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">Nenhum resultado encontrado</h3>
+            <p className="text-sm sm:text-base text-slate-500 mb-4">Tente buscar por outro nome, cliente ou projeto.</p>
+            <Button type="button" variant="outline" className="border-slate-200 text-slate-700" onClick={() => setSearchTerm("")}>
+              Limpar busca
+            </Button>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 content-start">
-            {budgets.map((budget, index) => (
+            {visibleBudgets.map((budget, index) => (
               <motion.div
                 key={budget.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:shadow-md transition-shadow flex flex-col"
+                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:shadow-md transition-shadow flex flex-col cursor-pointer"
+                onClick={() => openBudget(budget.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openBudget(budget.id);
+                  }
+                }}
               >
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-calcularq-blue text-lg mb-1 truncate">
-                      {budget.name || "Cálculo sem nome"}
-                    </h3>
-                    {budget.clientName ? (
-                      <p className="text-sm text-slate-600 truncate">Cliente: {budget.clientName}</p>
-                    ) : null}
-                    {budget.projectName ? (
-                      <p className="text-sm text-slate-600 truncate">Projeto: {budget.projectName}</p>
-                    ) : null}
+                    <h3 className="font-bold text-calcularq-blue text-lg mb-1 truncate">{budget.name || "Cálculo sem nome"}</h3>
+                    {budget.clientName ? <p className="text-sm text-slate-600 truncate">Cliente: {budget.clientName}</p> : null}
+                    {budget.projectName ? <p className="text-sm text-slate-600 truncate">Projeto: {budget.projectName}</p> : null}
                   </div>
                   <button
-                    onClick={() => handleDelete(budget.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(budget.id);
+                    }}
                     className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
                     aria-label="Excluir cálculo"
                     title="Excluir cálculo"
@@ -178,12 +256,17 @@ export default function BudgetsHistory() {
                 </div>
 
                 <div className="mt-auto">
-                  <Link to={`${createPageUrl("Calculator")}?budget=${budget.id}`}>
-                    <Button className="w-full bg-calcularq-blue hover:bg-[#002366] text-white">
-                      <Eye className="w-4 h-4 mr-2" />
-                      Ver detalhes
-                    </Button>
-                  </Link>
+                  <Button
+                    type="button"
+                    className="w-full bg-calcularq-blue hover:bg-[#002366] text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openBudget(budget.id);
+                    }}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Ver detalhes
+                  </Button>
                 </div>
               </motion.div>
             ))}
