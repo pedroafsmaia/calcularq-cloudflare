@@ -41,7 +41,7 @@ function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?
       ? "border-amber-200 bg-amber-50 text-amber-800"
       : tone === "slate"
         ? "border-slate-200 bg-slate-50 text-slate-700"
-        : "border-calcularq-blue/15 bg-calcularq-blue/[0.07] text-slate-700";
+        : "border-blue-200 bg-blue-50/70 text-blue-800";
 
   return <div className={`rounded-xl border px-4 py-3 leading-relaxed ${toneClass}`}>{children}</div>;
 }
@@ -423,7 +423,7 @@ export default function Manual() {
                         title="2. Etapa de projeto"
                         definition={<><strong>Definição:</strong> define até qual fase do ciclo de desenvolvimento o escritório entregará o projeto.</>}
                         items={[
-                          <><strong>1. Consultoria:</strong> diagnósticos, visitas técnicas e direcionamento sem produção de projeto executivo.</>,
+                          <><strong>1. Consultoria:</strong> aconselhamento técnico, diagnósticos e direcionamento pontual, sem desenvolvimento de projetos.</>,
                           <><strong>2. Estudo preliminar:</strong> concepção visual, layout e validação funcional (ainda não é material para execução).</>,
                           <><strong>3. Anteprojeto:</strong> define tecnicamente o partido e permite aprovações/orçamentos preliminares.</>,
                           <><strong>4. Projeto executivo:</strong> caderno técnico final para execução da arquitetura.</>,
