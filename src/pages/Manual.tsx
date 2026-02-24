@@ -24,7 +24,7 @@ const manualSteps = [
   { id: "etapa-2", label: "Calibragem dos pesos", short: "Calibragem dos pesos" },
   { id: "etapa-3", label: "Fatores de complexidade", short: "Fatores de complexidade" },
   { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
-  { id: "encerramento", label: "Conclusão", short: "Final" },
+  { id: "encerramento", label: "Conclusão", short: "Conclusão" },
 ] as const;
 
 function ManualCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -160,7 +160,7 @@ export default function Manual() {
           {manualSteps.map((step, index) => {
             const isActive = activeStepId === step.id;
             const isCompleted = index < activeStepIndex;
-            const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
+            const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "C" : String(index);
 
             return (
               <div key={step.id} className="flex min-w-0 flex-1 items-start">
@@ -257,7 +257,7 @@ export default function Manual() {
               {manualSteps.map((step, index) => {
                 const isActive = activeStepId === step.id;
                 const isCompleted = index < activeStepIndex;
-                const badgeLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
+                const badgeLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "C" : String(index);
 
                 return (
                   <button
@@ -308,7 +308,7 @@ export default function Manual() {
 
                   <div className="grid gap-4">
                     <NoteBox>
-                      <strong>Resumo rápido:</strong> Você informa despesas fixas, pró-labore mínimo e horas produtivas mensais. O sistema calcula a Hora Técnica Mínima.
+                      <strong>Resumo rápido:</strong> Informe despesas fixas, pró-labore mínimo e horas produtivas. O sistema retorna sua Hora Técnica Mínima.
                     </NoteBox>
 
                     <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -351,7 +351,7 @@ export default function Manual() {
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
                     <NoteBox>
-                      <strong>Resumo rápido:</strong> se você está começando, mantenha os pesos padrão (1) e avance. A etapa existe para calibrar o comportamento do cálculo, não para travar seu uso.
+                      <strong>Resumo rápido:</strong> Ajuste os pesos se quiser calibrar o cálculo ao perfil do seu escritório. Se preferir, mantenha o padrão e avance.
                     </NoteBox>
 
                     <p className="text-sm text-calcularq-blue font-medium">
@@ -396,7 +396,7 @@ export default function Manual() {
 
                   <div className="space-y-4">
                     <NoteBox>
-                      <strong>Resumo rápido:</strong> aqui você informa área, etapa, detalhamento, exigência técnica, exigência burocrática e dedicação à obra. Esses fatores medem esforço e risco técnico.
+                      <strong>Resumo rápido:</strong> Aqui você descreve o projeto em 6 fatores. O sistema transforma essas escolhas em um índice de complexidade.
                     </NoteBox>
 
                     <div className="space-y-3">
@@ -500,13 +500,13 @@ export default function Manual() {
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
                     <NoteBox>
-                      <strong>Resumo rápido:</strong> a calculadora combina Hora Técnica Mínima + complexidade (com multiplicador comprimido) + horas do projeto + despesas variáveis + desconto.
+                      <strong>Resumo rápido:</strong> Você informa horas, despesas variáveis e desconto comercial. A calculadora compõe o preço de venda final.
                     </NoteBox>
 
                     <NoteBox>
                       <strong>Índice de Complexidade (C):</strong> é o resultado da etapa 3, formado pelos fatores e pelos pesos.
                       <br />
-                      <strong>Multiplicador (M):</strong> é derivado do índice com um ajuste que evita preços desproporcionais em projetos muito complexos. Na prática, complexidade 3,0 gera multiplicador 2,69x (em vez de 3,0x).
+                      <strong>Multiplicador (M):</strong> é o valor usado no cálculo final, derivado do índice com compressão ({`M = C^0,90`}). Isso preserva a lógica de complexidade, mas evita saltos exagerados.
                     </NoteBox>
 
                     <div>
@@ -526,7 +526,7 @@ export default function Manual() {
                     </div>
 
                     <NoteBox tone="amber">
-                      <strong>Faixa de referência do CAU/BR (2% a 11%):</strong> o Conselho de Arquitetura e Urbanismo utiliza essa faixa como referência sobre o valor da obra. A tela de resultados sinaliza quando o percentual fica fora dessa faixa, com alerta contextual (sem bloquear o cálculo).
+                      <strong>Faixa de referência do CAU/BR (2% a 11%):</strong> o percentual sobre o valor da obra é uma estimativa de referência comparativa. Ele ajuda a contextualizar o resultado, mas não é o foco principal da Calcularq. O cálculo é estruturado pela hora técnica, complexidade, horas estimadas e composição do preço.
                     </NoteBox>
 
                     <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
@@ -541,7 +541,7 @@ export default function Manual() {
                           "Despesas Variáveis",
                           "Valor do Desconto (se houver)",
                           "Preço de Venda Final",
-                          "% do valor da obra (com referência CAU)",
+                          "% do valor da obra (indicador comparativo, referência CAU)",
                           "Lucro Estimado",
                         ].map((item) => (
                           <li key={item} className="flex items-start gap-2.5">
@@ -570,10 +570,7 @@ export default function Manual() {
                     O manual existe para reduzir incerteza e transformar a lógica da calculadora em um processo claro de decisão. O sistema entrega referência matemática; sua apresentação e estratégia comercial continuam sendo decisivas.
                   </p>
                   <p>
-                    Use o manual para entender a lógica das etapas, depois aplique no fluxo real da calculadora. Se precisar, ajuste os pesos e os fatores conforme a realidade do seu escritório.
-                  </p>
-                  <p>
-                    Os resultados são referência técnica. A negociação e a estratégia comercial são suas.
+                    Use o manual para entender a lógica das etapas e aplicar o fluxo na calculadora. Os resultados são referência técnica; a negociação e a estratégia comercial continuam sendo suas.
                   </p>
                 </div>
 
