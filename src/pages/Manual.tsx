@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -47,6 +47,7 @@ function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?
 }
 
 export default function Manual() {
+  const [activeStepId, setActiveStepId] = useState<(typeof manualSteps)[number]["id"]>("introducao");
   const [expandedFactors, setExpandedFactors] = useState<Record<FactorId, boolean>>({
     area: true,
     stage: false,
@@ -62,6 +63,38 @@ export default function Manual() {
       [factorId]: !prev[factorId],
     }));
   };
+
+  const activeStepIndex = useMemo(
+    () => Math.max(0, manualSteps.findIndex((step) => step.id === activeStepId)),
+    [activeStepId]
+  );
+
+  const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 92;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const updateActiveStep = () => {
+      let current: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
+      for (const step of manualSteps) {
+        const el = document.getElementById(step.id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= 140) current = step.id;
+      }
+      setActiveStepId(current);
+    };
+
+    updateActiveStep();
+    window.addEventListener("scroll", updateActiveStep, { passive: true });
+    window.addEventListener("resize", updateActiveStep);
+    return () => {
+      window.removeEventListener("scroll", updateActiveStep);
+      window.removeEventListener("resize", updateActiveStep);
+    };
+  }, []);
 
   const FactorAccordion = ({
     id,
@@ -123,14 +156,62 @@ export default function Manual() {
                 mais coerente com o esforço técnico envolvido.
               </p>
               <p className="mt-4 text-slate-700 font-medium text-sm sm:text-base">
-                Siga o roteiro abaixo para entender o sistema e aplicar as 4 etapas com segurança.
+                Navegue pelas etapas abaixo para estudar o manual na mesma lógica da calculadora.
               </p>
 
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 max-w-4xl mx-auto">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">1. Hora técnica</div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">2. Pesos (opcional)</div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">3. Complexidade</div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">4. Preço final</div>
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
+                <div className="overflow-x-auto">
+                  <div className="mx-auto flex min-w-max items-start justify-center gap-2 sm:gap-3 px-1">
+                    {manualSteps.map((step, index) => {
+                      const isActive = activeStepId === step.id;
+                      const isCompleted = index < activeStepIndex;
+                      const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
+
+                      return (
+                        <div key={step.id} className="flex items-start gap-2 sm:gap-3">
+                          <button
+                            type="button"
+                            onClick={() => scrollToSection(step.id)}
+                            className="group flex min-w-[78px] sm:min-w-[92px] flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
+                            aria-current={isActive ? "step" : undefined}
+                          >
+                            <span
+                              className={[
+                                "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
+                                isActive
+                                  ? "border-calcularq-blue bg-calcularq-blue text-white"
+                                  : isCompleted
+                                    ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
+                                    : "border-slate-300 bg-white text-slate-500 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
+                              ].join(" ")}
+                            >
+                              {isCompleted ? "✓" : circleLabel}
+                            </span>
+                            <span
+                              className={[
+                                "text-[11px] sm:text-xs leading-snug",
+                                isActive ? "text-calcularq-blue font-semibold" : "text-slate-600",
+                              ].join(" ")}
+                              style={{ textWrap: "balance" }}
+                            >
+                              {step.short}
+                            </span>
+                          </button>
+
+                          {index < manualSteps.length - 1 ? (
+                            <span
+                              className={[
+                                "mt-5 block h-[2px] w-5 sm:w-8 rounded-full",
+                                index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-300",
+                              ].join(" ")}
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </ManualCard>
@@ -143,14 +224,20 @@ export default function Manual() {
                 <h2 className="text-sm font-semibold text-slate-900 mb-3">Navegação do manual</h2>
                 <nav className="space-y-1.5">
                   {manualSteps.map((step) => (
-                    <a
+                    <button
                       key={step.id}
-                      href={`#${step.id}`}
-                      className="block rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue transition-colors"
+                      type="button"
+                      onClick={() => scrollToSection(step.id)}
+                      className={[
+                        "w-full text-left block rounded-lg px-3 py-2 text-sm transition-colors",
+                        activeStepId === step.id
+                          ? "bg-calcularq-blue/5 text-calcularq-blue"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
+                      ].join(" ")}
                     >
                       {step.short}
                       <span className="block text-xs text-slate-500 mt-0.5">{step.label}</span>
-                    </a>
+                    </button>
                   ))}
                 </nav>
               </ManualCard>
@@ -162,13 +249,19 @@ export default function Manual() {
                 </summary>
                 <div className="mt-3 space-y-1.5">
                   {manualSteps.map((step) => (
-                    <a
+                    <button
                       key={step.id}
-                      href={`#${step.id}`}
-                      className="block rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue"
+                      type="button"
+                      onClick={() => scrollToSection(step.id)}
+                      className={[
+                        "w-full text-left block rounded-lg px-3 py-2 text-sm",
+                        activeStepId === step.id
+                          ? "bg-calcularq-blue/5 text-calcularq-blue"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
+                      ].join(" ")}
                     >
                       {step.label}
-                    </a>
+                    </button>
                   ))}
                 </div>
               </details>
