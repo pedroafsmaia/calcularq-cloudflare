@@ -232,7 +232,7 @@ export default function Manual() {
           <details className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
             <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-sm font-semibold text-slate-900">
               <span className="min-w-0 truncate">
-                {activeManualStep.id === "introducao" ? "Sumário do manual" : activeManualStep.label}
+                {activeManualStep.id === "introducao" ? "Sumário do manual" : activeManualStep.short}
               </span>
               <ChevronDown className="w-4 h-4 text-slate-500" />
             </summary>
@@ -269,7 +269,7 @@ export default function Manual() {
                       >
                         {isCompleted ? "✓" : badgeLabel}
                       </span>
-                      <span className={isActive ? "font-semibold" : undefined}>{step.label}</span>
+                      <span className={isActive ? "font-semibold" : undefined}>{step.short}</span>
                     </span>
                   </button>
                 );
