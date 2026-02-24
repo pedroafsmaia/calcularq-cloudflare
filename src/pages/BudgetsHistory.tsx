@@ -59,6 +59,13 @@ export default function BudgetsHistory() {
     return sorted;
   }, [budgets, searchTerm, sortBy]);
 
+  const titleCountBadge =
+    budgets.length > 0 ? (
+      <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">
+        {budgets.length}
+      </span>
+    ) : null;
+
   const handleDelete = async (budgetId: string) => {
     if (!confirm("Tem certeza que deseja excluir este calculo?")) return;
     try {
@@ -97,6 +104,7 @@ export default function BudgetsHistory() {
               icon={<History className="w-5 h-5 text-calcularq-blue" />}
               title="Meus Cálculos"
               description="Acesse aqui os cálculos que você salvou no sistema."
+              titleAccessory={titleCountBadge}
               className="mb-0"
             />
 
@@ -108,19 +116,8 @@ export default function BudgetsHistory() {
             </Link>
           </div>
 
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm">
-            <span className="text-slate-600">
-              {budgets.length === 0
-                ? "Nenhum calculo salvo"
-                : `${budgets.length} calculo${budgets.length > 1 ? "s" : ""} salvo${budgets.length > 1 ? "s" : ""}`}
-            </span>
-            {budgets.length > 0 ? (
-              <span className="hidden sm:inline text-slate-500">Abra um calculo salvo para continuar de onde parou.</span>
-            ) : null}
-          </div>
-
           {budgets.length > 0 ? (
-            <div className="mt-3 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
               <input
                 type="text"
                 value={searchTerm}
@@ -182,7 +179,16 @@ export default function BudgetsHistory() {
             </Button>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 content-start">
+          <div
+            className={[
+              "grid gap-5 sm:gap-6 content-start",
+              visibleBudgets.length === 1
+                ? "grid-cols-1 max-w-md"
+                : visibleBudgets.length === 2
+                  ? "grid-cols-1 sm:grid-cols-2 max-w-4xl"
+                  : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3",
+            ].join(" ")}
+          >
             {visibleBudgets.map((budget, index) => (
               <motion.div
                 key={budget.id}
@@ -211,7 +217,7 @@ export default function BudgetsHistory() {
                       e.stopPropagation();
                       handleDelete(budget.id);
                     }}
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                     aria-label="Excluir cálculo"
                     title="Excluir cálculo"
                   >
