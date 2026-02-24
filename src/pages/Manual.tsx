@@ -140,19 +140,19 @@ export default function Manual() {
 
   const renderManualStepper = () => (
     <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 sm:p-4 shadow-sm backdrop-blur-sm">
-      <div className="overflow-x-auto">
-        <div className="mx-auto flex min-w-max items-start justify-center gap-2 sm:gap-3 px-1">
+      <div className="px-1">
+        <div className="mx-auto flex w-full items-start justify-between gap-1 sm:gap-2">
           {manualSteps.map((step, index) => {
             const isActive = activeStepId === step.id;
             const isCompleted = index < activeStepIndex;
             const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
 
             return (
-              <div key={step.id} className="flex items-start gap-2 sm:gap-3">
+              <div key={step.id} className="flex min-w-0 flex-1 items-start">
                 <button
                   type="button"
                   onClick={() => scrollToSection(step.id)}
-                  className="group flex min-w-[92px] lg:min-w-[108px] flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
+                  className="group flex w-full min-w-0 flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
                   aria-current={isActive ? "step" : undefined}
                 >
                   <span
@@ -169,7 +169,7 @@ export default function Manual() {
                   </span>
                   <span
                     className={[
-                      "text-[11px] sm:text-xs leading-snug max-w-[11ch]",
+                      "text-[11px] sm:text-xs leading-snug max-w-full",
                       isActive ? "text-calcularq-blue font-semibold" : "text-slate-600",
                     ].join(" ")}
                     style={{ textWrap: "balance" }}
@@ -181,7 +181,7 @@ export default function Manual() {
                 {index < manualSteps.length - 1 ? (
                   <span
                     className={[
-                      "mt-5 block h-[2px] w-5 sm:w-8 lg:w-10 rounded-full",
+                      "mt-5 mx-1 sm:mx-2 block h-[2px] flex-1 min-w-2 rounded-full",
                       index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-300",
                     ].join(" ")}
                     aria-hidden="true"
