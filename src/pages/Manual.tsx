@@ -22,7 +22,7 @@ const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
   { id: "etapa-1", label: "Hora técnica mínima", short: "Etapa 1" },
   { id: "etapa-2", label: "Pesos (opcional)", short: "Etapa 2" },
-  { id: "etapa-3", label: "Fatores de complexidade", short: "Etapa 3" },
+  { id: "etapa-3", label: "Fatores de Complexidade", short: "Etapa 3" },
   { id: "etapa-4", label: "Composição final", short: "Etapa 4" },
   { id: "encerramento", label: "Conclusão", short: "Final" },
 ] as const;
@@ -217,73 +217,7 @@ export default function Manual() {
           </ManualCard>
         </motion.div>
 
-        <div className="grid gap-6 lg:grid-cols-[260px_1fr] xl:grid-cols-[280px_1fr] items-start">
-          <aside className="lg:sticky lg:top-24 self-start">
-            <div className="space-y-4">
-              <ManualCard className="p-4 hidden lg:block">
-                <h2 className="text-sm font-semibold text-slate-900 mb-3">Navegação do manual</h2>
-                <nav className="space-y-1.5">
-                  {manualSteps.map((step) => (
-                    <button
-                      key={step.id}
-                      type="button"
-                      onClick={() => scrollToSection(step.id)}
-                      className={[
-                        "w-full text-left block rounded-lg px-3 py-2 text-sm transition-colors",
-                        activeStepId === step.id
-                          ? "bg-calcularq-blue/5 text-calcularq-blue"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
-                      ].join(" ")}
-                    >
-                      {step.short}
-                      <span className="block text-xs text-slate-500 mt-0.5">{step.label}</span>
-                    </button>
-                  ))}
-                </nav>
-              </ManualCard>
-
-              <details className="lg:hidden rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-                <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-sm font-semibold text-slate-900">
-                  Sumário do manual
-                  <ChevronDown className="w-4 h-4 text-slate-500" />
-                </summary>
-                <div className="mt-3 space-y-1.5">
-                  {manualSteps.map((step) => (
-                    <button
-                      key={step.id}
-                      type="button"
-                      onClick={() => scrollToSection(step.id)}
-                      className={[
-                        "w-full text-left block rounded-lg px-3 py-2 text-sm",
-                        activeStepId === step.id
-                          ? "bg-calcularq-blue/5 text-calcularq-blue"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
-                      ].join(" ")}
-                    >
-                      {step.label}
-                    </button>
-                  ))}
-                </div>
-              </details>
-
-              <ManualCard className="p-4">
-                <h3 className="text-sm font-semibold text-slate-900 mb-2">Uso prático</h3>
-                <ul className="space-y-2 text-sm text-slate-600 leading-relaxed">
-                  <li>Leia por etapa e aplique na calculadora em paralelo.</li>
-                  <li>Use os pesos padrão primeiro e ajuste depois.</li>
-                  <li>Revise as horas estimadas antes de conceder desconto.</li>
-                </ul>
-                <Link to={createPageUrl("Calculator")} className="mt-4 block">
-                  <Button variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50">
-                    Abrir calculadora
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </ManualCard>
-            </div>
-          </aside>
-
-          <div className="space-y-6 sm:space-y-8">
+        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
               <ManualCard>
                 <div id="etapa-1" className="scroll-mt-24">
@@ -370,7 +304,7 @@ export default function Manual() {
                 <div id="etapa-3" className="scroll-mt-24">
                   <SectionHeader
                     icon={<Layers className="w-5 h-5 text-calcularq-blue" />}
-                    title="3. Análise dos fatores de complexidade"
+                    title="3. Análise dos Fatores de Complexidade"
                     description="Classifique os fatores do projeto em uma escala de 1 a 5. A calculadora cruza essas informações para formar a complexidade global."
                     compact
                   />
@@ -530,13 +464,13 @@ export default function Manual() {
                   <Info className="w-6 h-6 mt-0.5 shrink-0" />
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold">Agora você está no controle</h2>
-                    <p className="mt-2 text-white/90 leading-relaxed text-sm sm:text-base">
-                      O manual existe para reduzir incerteza e transformar a lógica da calculadora em um processo claro de decisão. O sistema entrega referência matemática; sua apresentação e estratégia comercial continuam sendo decisivas.
-                    </p>
                   </div>
                 </div>
 
                 <div className="space-y-3 text-white/95 leading-relaxed text-sm sm:text-base">
+                  <p>
+                    O manual existe para reduzir incerteza e transformar a lógica da calculadora em um processo claro de decisão. O sistema entrega referência matemática; sua apresentação e estratégia comercial continuam sendo decisivas.
+                  </p>
                   <p>
                     Use o manual para entender a lógica das etapas, depois aplique no fluxo real da calculadora. Se precisar, ajuste os pesos e os fatores conforme a realidade do seu escritório.
                   </p>
@@ -559,6 +493,5 @@ export default function Manual() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
