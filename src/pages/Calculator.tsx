@@ -25,10 +25,10 @@ import {
 import { createPageUrl } from "@/utils";
 
 const STEPS = [
-  { n: 1, label: "Hora Técnica" },
+  { n: 1, label: "Hora técnica mínima" },
   { n: 2, label: "Pesos" },
-  { n: 3, label: "Complexidade" },
-  { n: 4, label: "Preço Final" },
+  { n: 3, label: "Fatores de Complexidade" },
+  { n: 4, label: "Composição final" },
 ];
 
 // Chave do localStorage para rascunho

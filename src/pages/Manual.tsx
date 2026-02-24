@@ -20,10 +20,10 @@ type FactorId = "area" | "stage" | "detail" | "technical" | "bureaucratic" | "mo
 
 const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
-  { id: "etapa-1", label: "Hora técnica mínima", short: "Etapa 1" },
-  { id: "etapa-2", label: "Pesos (opcional)", short: "Etapa 2" },
-  { id: "etapa-3", label: "Fatores de Complexidade", short: "Etapa 3" },
-  { id: "etapa-4", label: "Composição final", short: "Etapa 4" },
+  { id: "etapa-1", label: "Hora técnica mínima", short: "Hora técnica mínima" },
+  { id: "etapa-2", label: "Calibração estratégica (pesos)", short: "Pesos" },
+  { id: "etapa-3", label: "Análise dos Fatores de Complexidade", short: "Fatores de Complexidade" },
+  { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
   { id: "encerramento", label: "Conclusão", short: "Final" },
 ] as const;
 
@@ -141,7 +141,7 @@ export default function Manual() {
   return (
     <div className="bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8 max-w-4xl mx-auto">
           <ManualCard className="p-6 sm:p-8 lg:p-10">
             <div id="introducao" className="text-center scroll-mt-24">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-calcularq-blue mb-5">
@@ -326,7 +326,11 @@ export default function Manual() {
                           <><strong>4. 500 a 999 m²:</strong> edificações de porte significativo e maior volume de compatibilização.</>,
                           <><strong>5. Acima de 1000 m²:</strong> grandes volumes e programas complexos, incluindo usos institucionais.</>,
                         ]}
-                        footer={<p className="text-sm text-amber-700">Os intervalos são configuráveis. Você pode ajustá-los para a realidade do seu mercado.</p>}
+                        footer={
+                          <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm leading-relaxed text-calcularq-blue">
+                            Os intervalos são configuráveis. Você pode ajustá-los para a realidade do seu mercado.
+                          </div>
+                        }
                       />
 
                       <FactorAccordion
