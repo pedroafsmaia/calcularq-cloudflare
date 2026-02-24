@@ -20,7 +20,7 @@ export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    document.title = "Redefinir Senha - Calcularq";
+    document.title = "Calcularq";
     if (!token) setError("Token inválido. Verifique o link recebido por email.");
   }, [token]);
 

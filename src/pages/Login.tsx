@@ -48,7 +48,7 @@ export default function Login() {
       newLink.href = "/logomarca.png";
       document.head.appendChild(newLink);
     }
-    document.title = isLogin ? "Entrar - Calcularq" : "Criar Conta - Calcularq";
+    document.title = "Calcularq";
   }, [isLogin]);
 
   useEffect(() => {
