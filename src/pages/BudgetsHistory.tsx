@@ -160,9 +160,9 @@ export default function BudgetsHistory() {
               Quando voce salvar um calculo, ele aparecera aqui com preco final, complexidade e horas estimadas.
             </p>
             <Link to={createPageUrl("Calculator")}>
-              <Button className="bg-calcularq-blue hover:bg-[#002366] text-white">
+              <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-calcularq-blue">
                 <Plus className="w-4 h-4 mr-2" />
-                Criar primeiro calculo
+                Criar primeiro cálculo
               </Button>
             </Link>
           </motion.div>
