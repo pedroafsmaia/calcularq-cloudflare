@@ -543,7 +543,7 @@ export default function Manual() {
                     </div>
 
                     <NoteBox>
-                      <strong>Faixa de referência do CAU/BR (2% a 11%):</strong> o percentual sobre o valor da obra é uma estimativa de referência comparativa. Ele ajuda a contextualizar o resultado, mas não é o foco principal da Calcularq. O cálculo é estruturado pela hora técnica, complexidade, horas estimadas e composição do preço.
+                      <strong>% do valor da obra (referência CAU/BR):</strong> indicador comparativo de referência (faixa sugerida: 2% a 11%). Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
                   </div>
                 </div>
