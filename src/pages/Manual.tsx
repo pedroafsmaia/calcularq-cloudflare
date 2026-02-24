@@ -314,10 +314,6 @@ export default function Manual() {
                       <strong>Resumo rápido:</strong> aqui você informa área, etapa, detalhamento, exigência técnica, exigência burocrática e dedicação à obra. Esses fatores medem esforço e risco técnico.
                     </NoteBox>
 
-                    <NoteBox>
-                      <strong>Como a fórmula trata a complexidade:</strong> a calculadora primeiro calcula uma complexidade global ponderada (com base nos fatores e nos pesos) e, em seguida, aplica uma compressão suave no multiplicador usando a fórmula <strong>M = C^0,90</strong>. Isso preserva a lógica relativa entre projetos, mas evita saltos exagerados de preço entre cenários próximos.
-                    </NoteBox>
-
                     <div className="space-y-3">
                       <FactorAccordion
                         id="area"
@@ -418,6 +414,12 @@ export default function Manual() {
                       <strong>Resumo rápido:</strong> a calculadora combina Hora Técnica Mínima + complexidade (com multiplicador comprimido) + horas do projeto + despesas variáveis + desconto.
                     </NoteBox>
 
+                    <NoteBox>
+                      <strong>Índice de Complexidade (C):</strong> é o resultado da etapa 3, formado pelos fatores e pelos pesos.
+                      <br />
+                      <strong>Multiplicador (M):</strong> é o valor usado no cálculo final após compressão suave do índice, com a fórmula <strong>M = C^0,90</strong>.
+                    </NoteBox>
+
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-2">O que você precisa preencher</h3>
                       <ul className="space-y-3">
@@ -434,7 +436,7 @@ export default function Manual() {
                       </ul>
                     </div>
 
-                    <NoteBox>
+                    <NoteBox tone="amber">
                       <strong>Faixa sugerida pelo CAU (2% a 11%):</strong> a tela de resultados mostra o percentual do honorário sobre o valor da obra e sinaliza quando o valor está fora da faixa sugerida, com alerta contextual (sem bloquear o cálculo).
                     </NoteBox>
 
