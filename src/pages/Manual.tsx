@@ -231,21 +231,43 @@ export default function Manual() {
               <ChevronDown className="w-4 h-4 text-slate-500" />
             </summary>
             <div className="mt-3 space-y-1.5">
-              {manualSteps.map((step) => (
-                <button
-                  key={step.id}
-                  type="button"
-                  onClick={() => scrollToSection(step.id)}
-                  className={[
-                    "w-full text-left rounded-lg px-3 py-2 text-sm leading-snug",
-                    activeStepId === step.id
-                      ? "bg-calcularq-blue/5 text-calcularq-blue"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
-                  ].join(" ")}
-                >
-                  {step.label}
-                </button>
-              ))}
+              {manualSteps.map((step, index) => {
+                const isActive = activeStepId === step.id;
+                const isCompleted = index < activeStepIndex;
+                const badgeLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "F" : String(index);
+
+                return (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={() => scrollToSection(step.id)}
+                    className={[
+                      "w-full text-left rounded-lg px-3 py-2 text-sm leading-snug transition-colors",
+                      isActive
+                        ? "bg-calcularq-blue/5 text-calcularq-blue"
+                        : isCompleted
+                          ? "bg-calcularq-blue/[0.03] text-calcularq-blue"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
+                    ].join(" ")}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span
+                        className={[
+                          "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                          isActive
+                            ? "border-calcularq-blue bg-calcularq-blue text-white"
+                            : isCompleted
+                              ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
+                              : "border-slate-300 bg-white text-slate-500",
+                        ].join(" ")}
+                      >
+                        {isCompleted ? "✓" : badgeLabel}
+                      </span>
+                      <span className={isActive ? "font-semibold" : undefined}>{step.label}</span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </details>
         </div>
