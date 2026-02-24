@@ -295,22 +295,22 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <FormulaStep 
                 number="1" 
-                title={"Hora técnica"}
+                title={"Hora técnica mínima"}
                 description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica mínima."}
               />
               <FormulaStep 
                 number="2" 
-                title="Pesos"
+                title="Calibragem dos pesos"
                 description={"Personalize o quanto cada fator influencia o cálculo. Ou pule e use os valores padrão."}
               />
               <FormulaStep 
                 number="3" 
-                title="Complexidade"
+                title="Fatores de complexidade"
                 description={"Informe a área e as características do projeto. O Calcularq mede o esforço real envolvido."}
               />
               <FormulaStep 
                 number="4" 
-                title={"Preço final"}
+                title={"Composição final"}
                 description={"Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."}
               />
             </div>
