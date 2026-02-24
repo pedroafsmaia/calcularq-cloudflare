@@ -138,7 +138,7 @@ export default function FinalCalculation({
         <div className="space-y-6">
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-              Estimativa de Horas de Projeto
+              Estimativa de horas de projeto
               <Tooltip text="Quantidade total de horas que você estima gastar para executar este projeto. O sistema multiplicará esse valor pela sua Hora Técnica Ajustada." />
             </label>
             <input
@@ -158,13 +158,13 @@ export default function FinalCalculation({
             onRemove={handleRemoveExpense}
             onUpdate={handleUpdateExpense}
             placeholder="Ex: RRT, Transporte..."
-            label="Despesas Variáveis do Projeto (R$)"
+            label="Despesas variáveis do projeto (R$)"
             tooltip="Custos específicos deste contrato que serão repassados integralmente ao cliente."
           />
 
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-              Desconto Comercial: {commercialDiscount}%
+              Desconto comercial: {commercialDiscount}%
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
             <input

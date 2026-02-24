@@ -184,14 +184,14 @@ export default function MinimumHourCalculator({
               onRemove={handleRemoveExpense}
               onUpdate={handleUpdateExpense}
               placeholder="Ex: Aluguel, Contador..."
-              label="Despesas Fixas Mensais (R$)"
+              label="Despesas fixas mensais (R$)"
               tooltip="Todos os custos recorrentes para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU, etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
             />
 
             {/* Pró-labore Mínimo */}
             <div>
               <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-                Pró-labore Mínimo (R$)
+                Pró-labore mínimo (R$)
                 <Tooltip text="Sua remuneração mensal mínima para cobrir suas despesas pessoais. Insira o valor necessário para sua segurança financeira. O lucro virá através do multiplicador de complexidade — não subestime este valor." />
               </label>
               <div className="relative">
@@ -211,7 +211,7 @@ export default function MinimumHourCalculator({
             {/* Horas Produtivas Mensais */}
             <div>
               <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-                Horas Produtivas Mensais
+                Horas produtivas mensais
                 <Tooltip text="Total de horas dedicadas efetivamente à produção de projetos por mês. Considere apenas o tempo focado em projeto — cerca de 70% a 80% do tempo total, descontando reuniões, pausas e tarefas administrativas. Ex: de 160h mensais, use ~120h." />
               </label>
               <input

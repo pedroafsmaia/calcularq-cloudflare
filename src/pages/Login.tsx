@@ -113,7 +113,7 @@ export default function Login() {
               <img src="/logomarca-branca.png" alt="Calcularq" className="w-8 h-8 object-contain" />
             </div>
             <h1 className="text-3xl font-bold text-calcularq-blue mb-2">
-              {isLogin ? "Entrar" : "Criar Conta"}
+              {isLogin ? "Entrar" : "Criar conta"}
             </h1>
             <p className="text-slate-600 leading-relaxed max-w-[30ch] mx-auto">
               {isLogin 
@@ -128,7 +128,7 @@ export default function Login() {
             {!isLogin && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Nome Completo
+                  Nome completo
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -239,7 +239,7 @@ export default function Login() {
                   ) : (
                     <>
                       <UserPlus className="w-5 h-5 mr-2" />
-                      Criar Conta
+                      Criar conta
                     </>
                   )}
                 </>

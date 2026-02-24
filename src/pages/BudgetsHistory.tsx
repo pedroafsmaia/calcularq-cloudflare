@@ -24,7 +24,7 @@ export default function BudgetsHistory() {
         const resp = await api.listBudgets();
         setBudgets(resp.budgets);
       } catch (e) {
-        console.error("Erro ao carregar calculos:", e);
+        console.error("Erro ao carregar cálculos:", e);
       }
     };
 
@@ -67,12 +67,12 @@ export default function BudgetsHistory() {
     ) : null;
 
   const handleDelete = async (budgetId: string) => {
-    if (!confirm("Tem certeza que deseja excluir este calculo?")) return;
+    if (!confirm("Tem certeza que deseja excluir este cálculo?")) return;
     try {
       await api.deleteBudget(budgetId);
       setBudgets((prev) => prev.filter((b) => b.id !== budgetId));
     } catch (e) {
-      alert("Erro ao excluir calculo");
+      alert("Erro ao excluir cálculo");
       console.error(e);
     }
   };
@@ -85,7 +85,7 @@ export default function BudgetsHistory() {
     return (
       <div className="bg-slate-50 min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-10">
         <div className="text-center">
-          <p className="text-slate-600 mb-4">Voce precisa estar logado para ver seus calculos</p>
+          <p className="text-slate-600 mb-4">Você precisa estar logado para ver seus cálculos</p>
           <Link to={createPageUrl("Login")}>
             <Button className="bg-calcularq-blue hover:bg-[#002366] text-white">Fazer login</Button>
           </Link>
@@ -102,7 +102,7 @@ export default function BudgetsHistory() {
             <SectionHeader
               compact
               icon={<History className="w-5 h-5 text-calcularq-blue" />}
-              title="Meus Cálculos"
+              title="Meus cálculos"
               description="Acesse aqui os cálculos que você salvou no sistema."
               titleAccessory={titleCountBadge}
               iconAlign="center"
@@ -112,7 +112,7 @@ export default function BudgetsHistory() {
             <Link to={createPageUrl("Calculator")} className="w-full sm:w-auto">
               <Button className="bg-calcularq-blue hover:bg-[#002366] text-white w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
-                Novo Cálculo
+                Novo cálculo
               </Button>
             </Link>
           </div>
@@ -138,8 +138,8 @@ export default function BudgetsHistory() {
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 >
                   <option value="recent">Mais recente</option>
-                  <option value="price_desc">Maior preco</option>
-                  <option value="price_asc">Menor preco</option>
+                  <option value="price_desc">Maior preço</option>
+                  <option value="price_asc">Menor preço</option>
                   <option value="name">Nome (A-Z)</option>
                 </select>
               </div>
@@ -158,7 +158,7 @@ export default function BudgetsHistory() {
             </div>
             <h3 className="text-xl font-semibold text-slate-800 mb-2">Nenhum cálculo salvo ainda</h3>
             <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-[44ch] mx-auto mb-5">
-              Quando voce salvar um calculo, ele aparecera aqui com preco final, complexidade e horas estimadas.
+              Quando você salvar um cálculo, ele aparecerá aqui com preço final, complexidade e horas estimadas.
             </p>
             <Link to={createPageUrl("Calculator")}>
               <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-calcularq-blue">
@@ -196,7 +196,7 @@ export default function BudgetsHistory() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:shadow-md transition-shadow flex flex-col cursor-pointer"
+                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-slate-300 hover:shadow-md transition-colors transition-shadow flex flex-col cursor-pointer"
                 onClick={() => openBudget(budget.id)}
                 role="button"
                 tabIndex={0}

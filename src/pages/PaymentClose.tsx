@@ -7,7 +7,7 @@ export default function PaymentClose() {
     // Tenta fechar o popup automaticamente (funciona quando aberto via window.open)
     window.close();
 
-    // Se após 800ms a janela ainda estiver aberta, o usuário acessou diretamente — exibir mensagem
+    // Se após 800ms a janela ainda estiver aberta, o usuário acessou diretamente
     const timer = setTimeout(() => setShowFallback(true), 800);
     return () => clearTimeout(timer);
   }, []);
@@ -15,10 +15,10 @@ export default function PaymentClose() {
   if (!showFallback) return null;
 
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", fontFamily: "sans-serif", textAlign: "center", padding: "2rem" }}>
+    <div className="flex min-h-screen items-center justify-center p-8 text-center font-sans">
       <div>
-        <h2 style={{ marginBottom: "0.5rem" }}>Pagamento realizado!</h2>
-        <p style={{ color: "#555" }}>Você pode fechar esta aba e voltar ao aplicativo.</p>
+        <h2 className="mb-2 text-2xl font-bold text-calcularq-blue">Pagamento realizado!</h2>
+        <p className="text-slate-500">Você pode fechar esta aba e voltar ao aplicativo.</p>
       </div>
     </div>
   );

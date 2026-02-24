@@ -15,7 +15,7 @@ export default function ComplexityConfig({
   onFactorWeightChange,
 }: ComplexityConfigProps) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
       <div className="mb-6">
         <SectionHeader
           className="mb-0"

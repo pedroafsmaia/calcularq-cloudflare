@@ -35,7 +35,7 @@ export default function Layout({ children }: LayoutProps) {
     if (path === "/" || path === "/home" || path.includes("home")) pageTitle = "Home";
     else if (path === "/calculator" || path.includes("calculator")) pageTitle = "Calculadora";
     else if (path === "/manual" || path.includes("manual")) pageTitle = "Manual";
-    else if (path === "/budgets" || path.includes("budgets")) pageTitle = "Meus Cálculos";
+    else if (path === "/budgets" || path.includes("budgets")) pageTitle = "Meus cálculos";
     else if (path === "/login" || path.includes("/login")) pageTitle = "Entrar";
     else if (path === "/reset-password" || path.includes("reset-password")) pageTitle = "Redefinir Senha";
     else if (path === "/payment" || path.includes("/payment")) pageTitle = "Pagamento";
@@ -86,7 +86,7 @@ export default function Layout({ children }: LayoutProps) {
                   <>
                     <Link to="/budgets" className={desktopNavItem(false)}>
                       <History className="w-4 h-4" />
-                      <span className="hidden xl:inline">Meus Cálculos</span>
+                      <span className="hidden xl:inline">Meus cálculos</span>
                     </Link>
 
                     {user.hasPaid && (

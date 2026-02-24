@@ -619,8 +619,8 @@ export default function Calculator() {
                     </span>
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className="mt-[1.35rem] sm:mt-6 h-0.5 sm:h-1 w-5 sm:w-7 md:w-11 shrink-0 rounded-full transition-colors duration-300"
-                      style={{ backgroundColor: done ? "#1e3a8a" : "#e2e8f0" }}
+                    <div
+                      className={`mt-[1.35rem] sm:mt-6 h-0.5 sm:h-1 w-5 sm:w-7 md:w-11 shrink-0 rounded-full transition-colors duration-300 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`}
                     />
                   )}
                 </div>
@@ -696,7 +696,7 @@ export default function Calculator() {
                       icon={<BarChart2 className="w-5 h-5 text-calcularq-blue" />}
                     />
 
-                    <div className="mb-6 p-4 rounded-lg border border-blue-200" style={{ background: "rgba(239,246,255,0.70)" }}>
+                    <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-blue-50/70">
                       <p className="text-sm text-blue-800">
                         <strong>Precisa de apoio na classificação?</strong> Para entender os critérios técnicos e os exemplos práticos por trás de cada Fator e Valor,{" "}
                         <a href={createPageUrl("Manual")} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
@@ -774,7 +774,7 @@ export default function Calculator() {
                 {currentStep === 4 && (!minHourlyRate || !results) && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center shadow-sm">
                     <p className="text-slate-500">Complete as etapas anteriores para chegar ao cálculo final.</p>
-                    <button onClick={() => setCurrentStep(1)} className="mt-4 text-sm font-semibold text-calcularq-blue underline">
+                    <button type="button" onClick={() => setCurrentStep(1)} className="mt-4 text-sm font-semibold text-calcularq-blue underline">
                       Voltar ao início
                     </button>
                   </div>

@@ -118,7 +118,7 @@ export default function SaveBudgetButton({ budgetId, initialBudgetName, budgetDa
         ) : (
           <>
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? "Salvando..." : "Salvar Cálculo"}
+            {isSaving ? "Salvando..." : "Salvar cálculo"}
           </>
         )}
       </Button>

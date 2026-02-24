@@ -13,7 +13,7 @@ export default function Footer() {
     <>
       <footer className="bg-calcularq-blue text-white border-t border-[#002366]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             {/* Left Section - Logo, Navigation, Email */}
             <div className="space-y-4">
               <Link 
@@ -74,9 +74,6 @@ export default function Footer() {
                 </a>
               </div>
             </div>
-
-            {/* Middle Section - Empty (removed as per specs) */}
-            <div></div>
 
             {/* Right Section - About */}
             <div className="space-y-4">
