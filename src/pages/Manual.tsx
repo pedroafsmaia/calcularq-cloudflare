@@ -307,7 +307,7 @@ export default function Manual() {
                   />
 
                   <div className="grid gap-4">
-                    <NoteBox>
+                    <NoteBox tone="slate">
                       <strong>Resumo rápido:</strong> Informe despesas fixas, pró-labore mínimo e horas produtivas. O sistema retorna sua Hora Técnica Mínima.
                     </NoteBox>
 
@@ -350,7 +350,7 @@ export default function Manual() {
                   />
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
-                    <NoteBox>
+                    <NoteBox tone="slate">
                       <strong>Resumo rápido:</strong> Ajuste os pesos se quiser calibrar o cálculo ao perfil do seu escritório. Se preferir, mantenha o padrão e avance.
                     </NoteBox>
 
@@ -395,7 +395,7 @@ export default function Manual() {
                   />
 
                   <div className="space-y-4">
-                    <NoteBox>
+                    <NoteBox tone="slate">
                       <strong>Resumo rápido:</strong> Aqui você descreve o projeto em 6 fatores. O sistema transforma essas escolhas em um índice de complexidade.
                     </NoteBox>
 
@@ -499,7 +499,7 @@ export default function Manual() {
                   />
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
-                    <NoteBox>
+                    <NoteBox tone="slate">
                       <strong>Resumo rápido:</strong> Você informa horas, despesas variáveis e desconto comercial. A calculadora compõe o preço de venda final usando a complexidade do projeto com multiplicador comprimido ({`M = C^0,90`}).
                     </NoteBox>
 
