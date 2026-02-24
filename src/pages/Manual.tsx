@@ -80,10 +80,13 @@ export default function Manual() {
   useEffect(() => {
     const updateActiveStep = () => {
       let current: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
+      // Troca a etapa um pouco antes do topo da próxima seção para evitar sensação de atraso
+      // quando há elementos sticky (navbar + stepper/sumário) cobrindo parte do conteúdo.
+      const triggerLine = window.innerWidth < 768 ? 132 : 240;
       for (const step of manualSteps) {
         const el = document.getElementById(step.id);
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= 140) current = step.id;
+        if (el.getBoundingClientRect().top <= triggerLine) current = step.id;
       }
       setActiveStepId(current);
     };
