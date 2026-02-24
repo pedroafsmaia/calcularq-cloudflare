@@ -300,13 +300,13 @@ export default function Home() {
               />
               <FormulaStep 
                 number="2" 
-                title="Calibragem dos pesos"
-                description={"Personalize o quanto cada fator influencia o cálculo. Ou pule e use os valores padrão."}
+                title="Fatores de complexidade"
+                description={"Informe a área e as características do projeto. O Calcularq mede o esforço real envolvido."}
               />
               <FormulaStep 
                 number="3" 
-                title="Fatores de complexidade"
-                description={"Informe a área e as características do projeto. O Calcularq mede o esforço real envolvido."}
+                title="Calibragem dos pesos"
+                description={"Personalize o quanto cada fator influencia o cálculo. Ou pule e use os valores padrão."}
               />
               <FormulaStep 
                 number="4" 

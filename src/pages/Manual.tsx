@@ -21,8 +21,8 @@ type FactorId = "area" | "stage" | "detail" | "technical" | "bureaucratic" | "mo
 const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
   { id: "etapa-1", label: "Hora técnica mínima", short: "Hora técnica mínima" },
-  { id: "etapa-2", label: "Calibragem dos pesos", short: "Calibragem dos pesos" },
-  { id: "etapa-3", label: "Fatores de complexidade", short: "Fatores de complexidade" },
+  { id: "etapa-2", label: "Fatores de complexidade", short: "Fatores de complexidade" },
+  { id: "etapa-3", label: "Calibragem dos pesos", short: "Calibragem dos pesos" },
   { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
   { id: "encerramento", label: "Conclusão", short: "Conclusão" },
 ] as const;
@@ -295,8 +295,8 @@ export default function Manual() {
           </details>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6">
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <div className="max-w-4xl mx-auto flex flex-col gap-5 sm:gap-6">
+            <motion.div className="order-1" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
               <ManualCard>
                 <div id="etapa-1" className="scroll-mt-24">
                   <SectionHeader
@@ -339,12 +339,12 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <motion.div className="order-3" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
               <ManualCard>
-                <div id="etapa-2" className="scroll-mt-24">
+                <div id="etapa-3" className="scroll-mt-24">
                   <SectionHeader
                     icon={<Settings2 className="w-5 h-5 text-calcularq-blue" />}
-                    title="2. Calibragem dos pesos"
+                    title="3. Calibragem dos pesos"
                     description="Etapa opcional. Ajuste a influência de cada fator de complexidade para refletir melhor a estratégia do seu escritório."
                     compact
                   />
@@ -384,12 +384,12 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <motion.div className="order-2" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
               <ManualCard>
-                <div id="etapa-3" className="scroll-mt-24">
+                <div id="etapa-2" className="scroll-mt-24">
                   <SectionHeader
                     icon={<Layers className="w-5 h-5 text-calcularq-blue" />}
-                    title="3. Fatores de complexidade"
+                    title="2. Fatores de complexidade"
                     description="Descreva o projeto: tamanho, etapa, detalhamento, exigências e dedicação à obra. A calculadora transforma isso em um índice de complexidade."
                     compact
                   />
@@ -488,7 +488,7 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div className="order-4" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <ManualCard>
                 <div id="etapa-4" className="scroll-mt-24">
                   <SectionHeader
@@ -550,7 +550,7 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+            <motion.div className="order-5" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
               <section id="encerramento" className="scroll-mt-24 rounded-2xl bg-gradient-to-br from-calcularq-blue to-[#002366] p-6 sm:p-8 text-white shadow-sm">
                 <div className="flex items-start gap-3 mb-4">
                   <Info className="w-6 h-6 mt-0.5 shrink-0" />

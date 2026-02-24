@@ -26,8 +26,8 @@ import { createPageUrl } from "@/utils";
 
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
-  { n: 2, label: "Calibragem dos pesos" },
-  { n: 3, label: "Fatores de complexidade" },
+  { n: 2, label: "Fatores de complexidade" },
+  { n: 3, label: "Calibragem dos pesos" },
   { n: 4, label: "Composição final" },
 ];
 
@@ -220,16 +220,6 @@ export default function Calculator() {
     }
 
     if (currentStep === 2) {
-      if (Array.isArray(lastBudgetData.factors)) {
-        setFactors(DEFAULT_FACTORS.map((df) => {
-          const saved = lastBudgetData.factors.find((f: any) => f.id === df.id);
-          return saved ? { ...df, weight: saved.weight } : df;
-        }));
-      }
-      return;
-    }
-
-    if (currentStep === 3) {
       if (Array.isArray(lastBudgetData.areaIntervals)) setAreaIntervals(lastBudgetData.areaIntervals);
       if (lastBudgetData.selections) setSelections(lastBudgetData.selections);
 
@@ -245,6 +235,16 @@ export default function Calculator() {
         } else {
           setArea(null);
         }
+      }
+      return;
+    }
+
+    if (currentStep === 3) {
+      if (Array.isArray(lastBudgetData.factors)) {
+        setFactors(DEFAULT_FACTORS.map((df) => {
+          const saved = lastBudgetData.factors.find((f: any) => f.id === df.id);
+          return saved ? { ...df, weight: saved.weight } : df;
+        }));
       }
       return;
     }
@@ -270,14 +270,14 @@ export default function Calculator() {
     }
 
     if (currentStep === 2) {
-      setFactors(DEFAULT_FACTORS);
+      setArea(null);
+      setSelections({});
+      setAreaIntervals(DEFAULT_AREA_INTERVALS);
       return;
     }
 
     if (currentStep === 3) {
-      setArea(null);
-      setSelections({});
-      setAreaIntervals(DEFAULT_AREA_INTERVALS);
+      setFactors(DEFAULT_FACTORS);
       return;
     }
 
@@ -367,19 +367,19 @@ export default function Calculator() {
   // ── Stepper ───────────────────────────────────────────────────
   const stepComplete = (n: number) => {
     if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-    if (n === 2) return true; // opcional
-    if (n === 3) return hasComplexitySelections;
+    if (n === 2) return hasComplexitySelections;
+    if (n === 3) return true; // opcional
     return displayValues.finalSalePrice > 0;
   };
 
   useEffect(() => {
     // Regride o progresso visual quando etapas essenciais perdem dados.
-    // A etapa 2 é opcional, então a etapa 3 fica acessível após concluir a etapa 1.
+    // A etapa 3 é opcional, então a etapa 4 fica acessível após concluir a etapa 2.
     const nextMaxStepReached = !stepComplete(1)
       ? 1
-      : stepComplete(3)
+      : stepComplete(2)
         ? 4
-        : 3;
+        : 2;
 
     setMaxStepReached((prev) => (prev === nextMaxStepReached ? prev : nextMaxStepReached));
 
@@ -453,7 +453,7 @@ export default function Calculator() {
           </div>
 
           {/* Indicador de fatores — etapa 3 */}
-          {currentStep === 3 && (
+          {currentStep === 2 && (
             <div className="flex items-center justify-between px-1 text-xs text-slate-500">
               <span>Fatores classificados</span>
               <span className={`font-semibold ${selectedFactorsCount === totalFactors ? "text-green-600" : "text-calcularq-blue"}`}>
@@ -580,7 +580,7 @@ export default function Calculator() {
             Calculadora de Precificação
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Descubra sua hora técnica mínima, ajuste os pesos (opcional), classifique a complexidade do projeto e finalize a composição do preço.
+            Descubra sua hora técnica mínima, classifique a complexidade do projeto, ajuste os pesos (opcional) e finalize a composição do preço.
           </p>
         </motion.div>
 
@@ -592,10 +592,9 @@ export default function Calculator() {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
               const handleClick = () => {
-                const canJumpSkipWeights = step.n === 3 && maxStepReached === 1 && stepComplete(1);
                 const canGoToReached = step.n <= maxStepReached;
                 const canGoToNext = step.n === maxStepReached + 1 && stepComplete(step.n - 1);
-                if (canGoToReached || canGoToNext || canJumpSkipWeights) setCurrentStep(step.n);
+                if (canGoToReached || canGoToNext) setCurrentStep(step.n);
               };
               return (
                 <div key={step.n} className="flex items-start">
@@ -681,14 +680,14 @@ export default function Calculator() {
                   />
                 )}
 
-                {currentStep === 2 && (
+                {currentStep === 3 && (
                   <ComplexityConfig
                     factors={factors}
                     onFactorWeightChange={handleFactorWeightChange}
                   />
                 )}
 
-                {currentStep === 3 && (
+                {currentStep === 2 && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
                     <SectionHeader
                       title="Análise de complexidade"
