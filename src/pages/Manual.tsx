@@ -22,14 +22,14 @@ const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
   { id: "etapa-1", label: "Hora técnica mínima", short: "Hora técnica mínima" },
   { id: "etapa-2", label: "Calibragem dos pesos", short: "Calibragem dos pesos" },
-  { id: "etapa-3", label: "Análise dos Fatores de Complexidade", short: "Fatores de Complexidade" },
+  { id: "etapa-3", label: "Fatores de complexidade", short: "Fatores de complexidade" },
   { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
   { id: "encerramento", label: "Conclusão", short: "Final" },
 ] as const;
 
 function ManualCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6 lg:p-8 ${className}`.trim()}>
+    <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6 ${className}`.trim()}>
       {children}
     </section>
   );
@@ -41,7 +41,7 @@ function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?
       ? "border-amber-200 bg-amber-50 text-amber-800"
       : tone === "slate"
         ? "border-slate-200 bg-slate-50 text-slate-700"
-        : "border-calcularq-blue/20 bg-calcularq-blue/5 text-slate-700";
+        : "border-calcularq-blue/15 bg-calcularq-blue/[0.07] text-slate-700";
 
   return <div className={`rounded-xl border px-4 py-3 leading-relaxed ${toneClass}`}>{children}</div>;
 }
@@ -205,8 +205,8 @@ export default function Manual() {
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8 max-w-4xl mx-auto">
           <ManualCard className="p-6 sm:p-8 lg:p-10">
             <div id="introducao" className="text-center scroll-mt-24">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-calcularq-blue mb-5">
-                <BookOpen className="w-7 h-7 text-white" />
+              <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-calcularq-blue mb-5">
+                <BookOpen className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue tracking-tight mb-4">
                 Manual de Instruções
@@ -278,7 +278,7 @@ export default function Manual() {
           </details>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+        <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6">
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
               <ManualCard>
                 <div id="etapa-1" className="scroll-mt-24">
@@ -290,13 +290,13 @@ export default function Manual() {
                   />
 
                   <div className="grid gap-4">
-                    <NoteBox tone="slate">
+                    <NoteBox>
                       <strong>Resumo rápido:</strong> Você informa despesas fixas, pró-labore mínimo e horas produtivas mensais. O sistema calcula a Hora Técnica Mínima.
                     </NoteBox>
 
                     <div className="space-y-4 text-slate-700 leading-relaxed">
                       <div>
-                        <h3 className="font-semibold text-slate-900 mb-2">O que você precisa preencher</h3>
+                        <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
                         <ul className="space-y-3">
                           <li>
                             <strong>Despesas fixas mensais:</strong> adicione os custos recorrentes para manter o escritório funcionando.
@@ -333,14 +333,21 @@ export default function Manual() {
                   />
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
-                    <NoteBox tone="slate">
+                    <NoteBox>
                       <strong>Resumo rápido:</strong> se você está começando, mantenha os pesos padrão (1) e avance. A etapa existe para calibrar o comportamento do cálculo, não para travar seu uso.
                     </NoteBox>
 
+                    <p className="text-sm text-calcularq-blue font-medium">
+                      Primeira vez? Você pode pular esta etapa. Os pesos padrão funcionam bem para começar.
+                    </p>
+
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-2">Como os pesos funcionam (0 a 6)</h3>
+                      <h3 className="text-base font-semibold text-calcularq-blue mb-2">Como os pesos funcionam (0 a 6)</h3>
                       <p>
                         Cada peso define o quanto um fator de complexidade impacta o cálculo final. Quanto maior o peso, maior a influência daquele critério na composição da complexidade global.
+                      </p>
+                      <p className="text-sm text-slate-500 mt-2">
+                        Peso 0 reduz a influência do fator; peso 6 dá influência máxima.
                       </p>
                     </div>
 
@@ -365,13 +372,13 @@ export default function Manual() {
                 <div id="etapa-3" className="scroll-mt-24">
                   <SectionHeader
                     icon={<Layers className="w-5 h-5 text-calcularq-blue" />}
-                    title="3. Análise dos Fatores de Complexidade"
-                    description="Classifique os fatores do projeto em uma escala de 1 a 5. A calculadora cruza essas informações para formar a complexidade global."
+                    title="3. Fatores de complexidade"
+                    description="Descreva o projeto: tamanho, etapa, detalhamento, exigências e dedicação à obra. A calculadora transforma isso em um índice de complexidade."
                     compact
                   />
 
                   <div className="space-y-4">
-                    <NoteBox tone="slate">
+                    <NoteBox>
                       <strong>Resumo rápido:</strong> aqui você informa área, etapa, detalhamento, exigência técnica, exigência burocrática e dedicação à obra. Esses fatores medem esforço e risco técnico.
                     </NoteBox>
 
@@ -475,18 +482,18 @@ export default function Manual() {
                   />
 
                   <div className="space-y-4 text-slate-700 leading-relaxed">
-                    <NoteBox tone="slate">
+                    <NoteBox>
                       <strong>Resumo rápido:</strong> a calculadora combina Hora Técnica Mínima + complexidade (com multiplicador comprimido) + horas do projeto + despesas variáveis + desconto.
                     </NoteBox>
 
                     <NoteBox>
                       <strong>Índice de Complexidade (C):</strong> é o resultado da etapa 3, formado pelos fatores e pelos pesos.
                       <br />
-                      <strong>Multiplicador (M):</strong> é o valor usado no cálculo final após compressão suave do índice, com a fórmula <strong>M = C^0,90</strong>.
+                      <strong>Multiplicador (M):</strong> é derivado do índice com um ajuste que evita preços desproporcionais em projetos muito complexos. Na prática, complexidade 3,0 gera multiplicador 2,69x (em vez de 3,0x).
                     </NoteBox>
 
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-2">O que você precisa preencher</h3>
+                      <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
                       <ul className="space-y-3">
                         <li>
                           <strong>Estimativa de horas de projeto:</strong> total de horas previstas para executar este trabalho.
@@ -502,22 +509,29 @@ export default function Manual() {
                     </div>
 
                     <NoteBox tone="amber">
-                      <strong>Faixa sugerida pelo CAU (2% a 11%):</strong> a tela de resultados mostra o percentual do honorário sobre o valor da obra e sinaliza quando o valor está fora da faixa sugerida, com alerta contextual (sem bloquear o cálculo).
+                      <strong>Faixa de referência do CAU/BR (2% a 11%):</strong> o Conselho de Arquitetura e Urbanismo utiliza essa faixa como referência sobre o valor da obra. A tela de resultados sinaliza quando o percentual fica fora dessa faixa, com alerta contextual (sem bloquear o cálculo).
                     </NoteBox>
 
                     <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
                       <h3 className="font-semibold text-calcularq-blue mb-3">Resultado apresentado ao final</h3>
                       <ul className="space-y-2 text-sm sm:text-base text-slate-700 leading-relaxed">
-                        <li>• Hora Técnica Mínima</li>
-                        <li>• Complexidade Global</li>
-                        <li>• Hora Técnica Ajustada</li>
-                        <li>• Estimativa de Horas de Projeto</li>
-                        <li>• Preço do Projeto (honorários)</li>
-                        <li>• Despesas Variáveis</li>
-                        <li>• Valor do Desconto (se houver)</li>
-                        <li>• Preço de Venda Final</li>
-                        <li>• % do valor da obra (com referência CAU)</li>
-                        <li>• Lucro Estimado</li>
+                        {[
+                          "Hora Técnica Mínima",
+                          "Complexidade Global",
+                          "Hora Técnica Ajustada",
+                          "Estimativa de Horas de Projeto",
+                          "Preço do Projeto (honorários)",
+                          "Despesas Variáveis",
+                          "Valor do Desconto (se houver)",
+                          "Preço de Venda Final",
+                          "% do valor da obra (com referência CAU)",
+                          "Lucro Estimado",
+                        ].map((item) => (
+                          <li key={item} className="flex items-start gap-2.5">
+                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-calcularq-blue/40 shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>

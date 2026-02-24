@@ -27,7 +27,7 @@ import { createPageUrl } from "@/utils";
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
   { n: 2, label: "Calibragem dos pesos" },
-  { n: 3, label: "Fatores de Complexidade" },
+  { n: 3, label: "Fatores de complexidade" },
   { n: 4, label: "Composição final" },
 ];
 

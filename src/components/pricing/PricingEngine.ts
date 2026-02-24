@@ -32,7 +32,7 @@ export const DEFAULT_AREA_INTERVALS: AreaInterval[] = [
 export const DEFAULT_FACTORS: Factor[] = [
   {
     id: "area",
-    name: "Área de Projeto",
+    name: "Área de projeto",
     description: "Estimativa da metragem total de intervenção.",
     weight: 1.0,
     isArea: true,
@@ -46,7 +46,7 @@ export const DEFAULT_FACTORS: Factor[] = [
   },
   {
     id: "stage",
-    name: "Etapa de Projeto",
+    name: "Etapa de projeto",
     description: "Define até qual fase do ciclo de desenvolvimento o arquiteto desenvolverá o projeto.",
     weight: 1.0,
     options: [
@@ -59,7 +59,7 @@ export const DEFAULT_FACTORS: Factor[] = [
   },
   {
     id: "detail",
-    name: "Nível de Detalhamento",
+    name: "Nível de detalhamento",
     description: "Mede a quantidade de desenhos e o esforço criativo exigido.",
     weight: 1.0,
     options: [
@@ -72,7 +72,7 @@ export const DEFAULT_FACTORS: Factor[] = [
   },
   {
     id: "technical",
-    name: "Exigência Técnica",
+    name: "Exigência técnica",
     description: "Define a rigidez das normas, leis e o volume de estudo técnico necessário.",
     weight: 1.0,
     options: [
@@ -85,7 +85,7 @@ export const DEFAULT_FACTORS: Factor[] = [
   },
   {
     id: "bureaucratic",
-    name: "Exigência Burocrática",
+    name: "Exigência burocrática",
     description: "Mede a carga administrativa e a gestão de aprovações em órgãos públicos.",
     weight: 1.0,
     options: [
@@ -98,7 +98,7 @@ export const DEFAULT_FACTORS: Factor[] = [
   },
   {
     id: "monitoring",
-    name: "Dedicação à Obra",
+    name: "Dedicação à obra",
     description: "Frequência de visitas e nível de responsabilidade no canteiro.",
     weight: 1.0,
     options: [
