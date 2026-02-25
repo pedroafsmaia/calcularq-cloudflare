@@ -79,6 +79,14 @@ npm run dev
 npm run build
 ```
 
+### Qualidade (recomendado antes de commit/push)
+
+```bash
+npm run lint
+npm run test:run
+npm run build
+```
+
 ### Preview local
 
 ```bash

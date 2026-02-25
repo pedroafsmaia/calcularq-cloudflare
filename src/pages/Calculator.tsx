@@ -98,10 +98,12 @@ export default function Calculator() {
       });
     }, 800);
   }, [
+    budgetId,
     minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
     factors, areaIntervals, area, selections,
     estimatedHours, commercialDiscount, variableExpenses,
     currentStep, maxStepReached,
+    user,
   ]);
 
   // ── Restaurar rascunho do localStorage ao montar ──────────────
