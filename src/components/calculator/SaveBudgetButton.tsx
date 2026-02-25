@@ -139,7 +139,7 @@ export default function SaveBudgetButton({
         ) : (
           <>
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? "Salvando..." : "Salvar cálculo"}
+            {isSaving ? "Salvando..." : "Salvar o cálculo"}
           </>
         )}
       </Button>
@@ -147,7 +147,7 @@ export default function SaveBudgetButton({
       <AppDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title="Salvar cálculo"
+        title="Salvar o cálculo"
         description="Salve este cálculo para continuar depois e consultar seus resultados."
         footer={
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
