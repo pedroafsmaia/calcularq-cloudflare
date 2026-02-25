@@ -3,7 +3,7 @@ import { Save, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AppDialog from "@/components/ui/AppDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/lib/api";
+import { api, Budget } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -12,28 +12,7 @@ interface SaveBudgetButtonProps {
   initialBudgetName?: string;
   initialClientName?: string;
   initialDescription?: string;
-  budgetData: {
-    description?: string;
-    minHourlyRate: number;
-    useManualMinHourlyRate?: boolean;
-    area?: number | null;
-    factors: Array<{ id: string; name: string; weight: number; level: number }>;
-    areaIntervals: Array<{ min: number; max: number | null; level: number }>;
-    selections: Record<string, number>;
-    estimatedHours: number;
-    fixedExpenses?: Array<{ id: string; name: string; value: number }>;
-    personalExpenses?: Array<{ id: string; name: string; value: number }>;
-    proLabore?: number;
-    productiveHours?: number;
-    commercialDiscount?: number;
-    variableExpenses: Array<{ id: string; name: string; value: number }>;
-    results: {
-      globalComplexity: number;
-      adjustedHourlyRate: number;
-      projectPrice: number;
-      finalSalePrice: number;
-    };
-  };
+  budgetData: Budget["data"];
   projectName?: string;
   clientName?: string;
 }
@@ -54,6 +33,7 @@ export default function SaveBudgetButton({
   const [budgetName, setBudgetName] = useState(initialBudgetName || projectName || "");
   const [clientNameValue, setClientNameValue] = useState(initialClientName || clientName || "");
   const [description, setDescription] = useState(initialDescription || budgetData.description || "");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setBudgetName(initialBudgetName || projectName || "");
@@ -67,11 +47,15 @@ export default function SaveBudgetButton({
     setDescription(initialDescription || budgetData.description || "");
   }, [initialDescription, budgetData.description]);
 
+  useEffect(() => {
+    if (isDialogOpen) setErrorMessage(null);
+  }, [isDialogOpen]);
+
   const canSave = useMemo(() => budgetName.trim().length > 0, [budgetName]);
 
   const handleSave = async () => {
     if (!user) {
-      alert("Você precisa estar logado para salvar cálculos");
+      setErrorMessage("Você precisa estar logado para salvar cálculos.");
       return;
     }
 
@@ -79,6 +63,7 @@ export default function SaveBudgetButton({
     if (!finalName) return;
 
     setIsSaving(true);
+    setErrorMessage(null);
 
     try {
       const payload = {
@@ -105,7 +90,7 @@ export default function SaveBudgetButton({
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      alert("Erro ao salvar cálculo");
+      setErrorMessage("Erro ao salvar cálculo.");
       console.error(error);
     } finally {
       setIsSaving(false);
@@ -171,39 +156,45 @@ export default function SaveBudgetButton({
         }
       >
         <div className="space-y-4">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cálculo *</label>
-                <input
-                  type="text"
-                  value={budgetName}
-                  onChange={(e) => setBudgetName(e.target.value)}
-                  placeholder="Ex.: Proposta residencial base"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cliente (opcional)</label>
-                <input
-                  type="text"
-                  value={clientNameValue}
-                  onChange={(e) => setClientNameValue(e.target.value)}
-                  placeholder="Ex.: Maria Silva"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700">Descrição (opcional)</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  placeholder="Ex.: estudo preliminar, revisão com desconto, versão para negociação..."
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
-                />
-              </div>
+          {errorMessage ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errorMessage}
             </div>
+          ) : null}
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cálculo *</label>
+            <input
+              type="text"
+              value={budgetName}
+              onChange={(e) => setBudgetName(e.target.value)}
+              placeholder="Ex.: Proposta residencial base"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cliente (opcional)</label>
+            <input
+              type="text"
+              value={clientNameValue}
+              onChange={(e) => setClientNameValue(e.target.value)}
+              placeholder="Ex.: Maria Silva"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">Descrição (opcional)</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              placeholder="Ex.: estudo preliminar, revisão com desconto, versão para negociação..."
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
+            />
+          </div>
+        </div>
       </AppDialog>
     </>
   );

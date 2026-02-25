@@ -1,12 +1,13 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react";
+import { LogIn, UserPlus, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { api } from "@/lib/api";
 import { fadeUp } from "@/lib/motion";
+import AppDialog from "@/components/ui/AppDialog";
 
 export default function Login() {
   const prefersReducedMotion = !!useReducedMotion();
@@ -23,24 +24,18 @@ export default function Login() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  
+
   const { login, register, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirecionar se jÃ¡ estiver logado
   useEffect(() => {
     if (!authLoading && user) {
-      if (user.hasPaid) {
-        navigate(createPageUrl("Calculator"), { replace: true });
-      } else {
-        navigate(createPageUrl("Payment"), { replace: true });
-      }
+      navigate(createPageUrl(user.hasPaid ? "Calculator" : "Payment"), { replace: true });
     }
   }, [user, authLoading, navigate]);
 
-  // Atualizar favicon
   useEffect(() => {
-    const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
     if (link) {
       link.href = "/logomarca.png";
     } else {
@@ -87,7 +82,7 @@ export default function Login() {
         await login(email, password);
       } else {
         if (!name.trim()) {
-          setError("Nome Ã© obrigatÃ³rio");
+          setError("Nome é obrigatório");
           setIsLoading(false);
           return;
         }
@@ -95,7 +90,7 @@ export default function Login() {
       }
       navigate(createPageUrl("Calculator"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao realizar operaÃ§Ã£o");
+      setError(err instanceof Error ? err.message : "Erro ao realizar operação");
     } finally {
       setIsLoading(false);
     }
@@ -103,36 +98,24 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
-      <motion.div
-        variants={fadeUp(prefersReducedMotion, 14)}
-        initial="hidden"
-        animate="show"
-        className="w-full max-w-md"
-      >
+      <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8">
-          {/* Logo */}
           <div className="text-center mb-7 sm:mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-calcularq-blue mb-4">
               <img src="/logomarca-branca.png" alt="Calcularq" className="w-8 h-8 object-contain" />
             </div>
-            <h1 className="text-3xl font-bold text-calcularq-blue mb-2">
-              {isLogin ? "Entrar" : "Criar conta"}
-            </h1>
+            <h1 className="text-3xl font-bold text-calcularq-blue mb-2">{isLogin ? "Entrar" : "Criar conta"}</h1>
             <p className="text-slate-600 leading-relaxed max-w-[30ch] mx-auto">
-              {isLogin 
-                ? "Acesse sua conta para usar a calculadora e salvar seus cÃ¡lculos"
-                : "Crie sua conta gratuitamente para acessar a calculadora"
-              }
+              {isLogin
+                ? "Acesse sua conta para usar a calculadora e salvar seus cálculos"
+                : "Crie sua conta gratuitamente para acessar a calculadora"}
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Nome completo
-                </label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nome completo</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
@@ -148,9 +131,7 @@ export default function Login() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                E-mail
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">E-mail</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
@@ -165,9 +146,7 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Senha
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Senha</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
@@ -175,25 +154,16 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="••••••••"
                   required
                   minLength={8}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -219,38 +189,25 @@ export default function Login() {
               </div>
             )}
 
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{error}</div>}
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-calcularq-blue hover:bg-[#002366] text-white py-6 text-lg font-semibold"
-            >
+            <Button type="submit" disabled={isLoading} className="w-full bg-calcularq-blue hover:bg-[#002366] text-white py-6 text-lg font-semibold">
               {isLoading ? (
                 "Processando..."
+              ) : isLogin ? (
+                <>
+                  <LogIn className="w-5 h-5 mr-2" />
+                  Entrar
+                </>
               ) : (
                 <>
-                  {isLogin ? (
-                    <>
-                      <LogIn className="w-5 h-5 mr-2" />
-                      Entrar
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="w-5 h-5 mr-2" />
-                      Criar conta
-                    </>
-                  )}
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Criar conta
                 </>
               )}
             </Button>
           </form>
 
-          {/* Toggle */}
           <div className="mt-6 text-center">
             <button
               type="button"
@@ -260,138 +217,111 @@ export default function Login() {
               }}
               className="text-sm text-calcularq-blue hover:underline underline-offset-4"
             >
-              {isLogin 
-                ? "NÃ£o tem uma conta? Criar conta"
-                : "JÃ¡ tem uma conta? Fazer login"
-              }
+              {isLogin ? "Não tem uma conta? Criar conta" : "Já tem uma conta? Fazer login"}
             </button>
           </div>
 
-          {/* Back to home */}
           <div className="mt-4 text-center">
-            <Link
-              to={createPageUrl("Home")}
-              className="text-sm text-slate-500 hover:text-calcularq-blue"
-            >
-              â† Voltar para Home
+            <Link to={createPageUrl("Home")} className="text-sm text-slate-500 hover:text-calcularq-blue">
+              ← Voltar para Home
             </Link>
           </div>
         </div>
       </motion.div>
 
-      {/* Modal Esqueci minha senha */}
-      {showForgotPassword && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
-            className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8 max-w-md w-full"
-          >
-            <div className="text-center mb-6 sm:mb-7">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-calcularq-blue mb-4">
-                <img src="/logomarca-branca.png" alt="Calcularq" className="w-7 h-7 object-contain" />
-              </div>
-              <h2 className="text-2xl sm:text-[1.75rem] font-bold text-calcularq-blue mb-2">
-                Esqueci minha senha
-              </h2>
-              <p className="text-slate-600 leading-relaxed max-w-[30ch] mx-auto">
-                Digite seu e-mail cadastrado. Enviaremos um link para redefinir sua senha.
-              </p>
-            </div>
-
-            {forgotPasswordMessage && (
-              <div className={`p-3 rounded-lg mb-4 ${
-                forgotPasswordMessage.type === "success" 
-                  ? "bg-green-50 border border-green-200 text-green-700"
-                  : "bg-red-50 border border-red-200 text-red-700"
-              }`}>
-                {forgotPasswordMessage.text}
-              </div>
-            )}
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
+      <AppDialog
+        open={showForgotPassword}
+        onOpenChange={(open) => {
+          setShowForgotPassword(open);
+          if (!open) {
+            setForgotPasswordEmail("");
+            setForgotPasswordMessage(null);
+          }
+        }}
+        title="Esqueci minha senha"
+        description="Digite seu e-mail cadastrado. Enviaremos um link para redefinir sua senha."
+        maxWidthClassName="max-w-md"
+        footer={
+          <div className="flex gap-3 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowForgotPassword(false);
+                setForgotPasswordEmail("");
                 setForgotPasswordMessage(null);
-
+              }}
+              className="flex-1 border-slate-200 text-slate-600 hover:bg-slate-50"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              disabled={isLoading}
+              onClick={async () => {
+                setForgotPasswordMessage(null);
                 if (!forgotPasswordEmail || !forgotPasswordEmail.includes("@")) {
-                  setForgotPasswordMessage({
-                    type: "error",
-                    text: "Por favor, digite um e-mail vÃ¡lido."
-                  });
+                  setForgotPasswordMessage({ type: "error", text: "Por favor, digite um e-mail válido." });
                   return;
                 }
-
                 try {
                   setIsLoading(true);
                   const response = await api.forgotPassword(forgotPasswordEmail);
                   setForgotPasswordMessage({
                     type: "success",
-                    text: response.message || "Se o email existir, vocÃª receberÃ¡ instruÃ§Ãµes para redefinir sua senha."
+                    text: response.message || "Se o e-mail existir, você receberá instruções para redefinir sua senha.",
                   });
-
-                  // Limpar apÃ³s 5 segundos
                   setTimeout(() => {
                     setShowForgotPassword(false);
                     setForgotPasswordEmail("");
                     setForgotPasswordMessage(null);
                   }, 5000);
                 } catch (err) {
-                  console.error('Erro ao solicitar reset de senha:', err);
+                  console.error("Erro ao solicitar reset de senha:", err);
                   setForgotPasswordMessage({
                     type: "error",
-                    text: err instanceof Error ? err.message : "Erro ao processar solicitaÃ§Ã£o. Tente novamente."
+                    text: err instanceof Error ? err.message : "Erro ao processar solicitação. Tente novamente.",
                   });
                 } finally {
                   setIsLoading(false);
                 }
               }}
-              className="space-y-4"
+              className="flex-1 bg-calcularq-blue hover:bg-[#002366] text-white"
             >
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  E-mail
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="email"
-                    value={forgotPasswordEmail}
-                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-              </div>
+              {isLoading ? "Enviando..." : "Enviar"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {forgotPasswordMessage ? (
+            <div
+              className={`p-3 rounded-lg ${
+                forgotPasswordMessage.type === "success"
+                  ? "bg-green-50 border border-green-200 text-green-700"
+                  : "bg-red-50 border border-red-200 text-red-700"
+              }`}
+            >
+              {forgotPasswordMessage.text}
+            </div>
+          ) : null}
 
-              <div className="flex gap-3 pt-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowForgotPassword(false);
-                    setForgotPasswordEmail("");
-                    setForgotPasswordMessage(null);
-                  }}
-                  className="flex-1 border-slate-200 text-slate-600 hover:bg-slate-50"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex-1 bg-calcularq-blue hover:bg-[#002366] text-white"
-                >
-                  {isLoading ? "Enviando..." : "Enviar"}
-                </Button>
-              </div>
-            </form>
-          </motion.div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">E-mail</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="email"
+                value={forgotPasswordEmail}
+                onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                className="w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+                placeholder="seu@email.com"
+                required
+              />
+            </div>
+          </div>
         </div>
-      )}
+      </AppDialog>
     </div>
   );
 }
-

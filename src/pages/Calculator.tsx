@@ -12,6 +12,7 @@ import FactorCard from "../components/pricing/FactorCard";
 import FinalCalculation from "../components/calculator/FinalCalculation";
 import SectionHeader from "../components/calculator/SectionHeader";
 import Tooltip from "@/components/ui/Tooltip";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 import {
   DEFAULT_FACTORS,
@@ -55,6 +56,8 @@ export default function Calculator() {
   const [loadedClientName, setLoadedClientName] = useState<string | null>(null);
   const [loadedProjectName, setLoadedProjectName] = useState<string | null>(null);
   const [loadedBudgetDescription, setLoadedBudgetDescription] = useState<string | null>(null);
+  const [confirmClearStepOpen, setConfirmClearStepOpen] = useState(false);
+  const [confirmClearAllOpen, setConfirmClearAllOpen] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
@@ -264,10 +267,7 @@ export default function Calculator() {
     }
   }, [currentStep, lastBudgetData, areaIntervals]);
 
-  const handleClearCurrentStep = useCallback(() => {
-    const stepName = STEPS.find((s) => s.n === currentStep)?.label ?? `Etapa ${currentStep}`;
-    if (!window.confirm(`Limpar os dados preenchidos de "${stepName}"?`)) return;
-
+  const handleConfirmClearCurrentStep = useCallback(() => {
     if (currentStep === 1) {
       setMinHourlyRate(null);
       setUseManualMinHourlyRate(false);
@@ -297,8 +297,11 @@ export default function Calculator() {
     }
   }, [currentStep]);
 
-  const handleClearAllCalculation = useCallback(() => {
-    if (!window.confirm("Limpar todos os dados preenchidos deste cálculo?")) return;
+  const handleClearCurrentStep = useCallback(() => {
+    setConfirmClearStepOpen(true);
+  }, []);
+
+  const handleConfirmClearAllCalculation = useCallback(() => {
 
     setMinHourlyRate(null);
     setUseManualMinHourlyRate(false);
@@ -325,6 +328,10 @@ export default function Calculator() {
     setLoadedBudgetDescription(null);
 
     try { localStorage.removeItem(DRAFT_KEY); } catch { /* silencioso */ }
+  }, []);
+
+  const handleClearAllCalculation = useCallback(() => {
+    setConfirmClearAllOpen(true);
   }, []);
 
   const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
@@ -930,6 +937,24 @@ export default function Calculator() {
         </div>
 
       </div>
+
+      <ConfirmDialog
+        open={confirmClearStepOpen}
+        onOpenChange={setConfirmClearStepOpen}
+        title="Limpar dados da etapa"
+        description={`Deseja limpar os dados preenchidos de "${currentStepLabel}"?`}
+        confirmLabel="Limpar etapa"
+        onConfirm={handleConfirmClearCurrentStep}
+      />
+
+      <ConfirmDialog
+        open={confirmClearAllOpen}
+        onOpenChange={setConfirmClearAllOpen}
+        title="Limpar todo o cálculo"
+        description="Deseja limpar todos os dados preenchidos deste cálculo?"
+        confirmLabel="Limpar tudo"
+        onConfirm={handleConfirmClearAllCalculation}
+      />
     </div>
   );
 }

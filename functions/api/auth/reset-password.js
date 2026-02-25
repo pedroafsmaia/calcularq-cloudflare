@@ -1,4 +1,4 @@
-﻿import { assertAllowedOrigin, hashPassword, hashResetToken, jsonResponse, readJson } from "../_utils.js";
+import { assertAllowedOrigin, hashPassword, hashResetToken, jsonResponse, rateLimitByIp, readJson } from "../_utils.js";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -9,6 +9,14 @@ export async function onRequest(context) {
 
   const badOrigin = assertAllowedOrigin(context);
   if (badOrigin) return badOrigin;
+
+  const rate = await rateLimitByIp(context, { endpoint: "auth:reset-password", limit: 8, windowMs: 60_000 });
+  if (!rate.ok) {
+    return jsonResponse(
+      { success: false, message: "Muitas tentativas. Tente novamente em instantes." },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+    );
+  }
 
   const body = await readJson(context.request);
   const token = body?.token;

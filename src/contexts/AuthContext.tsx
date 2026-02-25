@@ -25,12 +25,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ...me.user,
           paymentDate: me.user.paymentDate ?? undefined,
           stripeCustomerId: me.user.stripeCustomerId ?? undefined,
-          createdAt: new Date().toISOString(),
+          createdAt: me.user.createdAt ?? new Date().toISOString(),
         };
-        db.setCurrentUser(userData); // cache local
+        db.setCurrentUser(userData);
         setUser(userData);
       } catch {
-        // Sem sessão válida
         db.logout();
         setUser(null);
       }
@@ -38,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     };
 
-    loadUser();
+    void loadUser();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -46,8 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userData: User = {
       ...response.user,
       paymentDate: response.user.paymentDate ?? undefined,
-      stripeCustomerId: (response.user as any).stripeCustomerId ?? undefined,
-      createdAt: new Date().toISOString(),
+      stripeCustomerId: response.user.stripeCustomerId ?? undefined,
+      createdAt: response.user.createdAt ?? new Date().toISOString(),
     };
     db.setCurrentUser(userData);
     setUser(userData);
@@ -58,15 +57,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userData: User = {
       ...response.user,
       paymentDate: response.user.paymentDate ?? undefined,
-      stripeCustomerId: (response.user as any).stripeCustomerId ?? undefined,
-      createdAt: new Date().toISOString(),
+      stripeCustomerId: response.user.stripeCustomerId ?? undefined,
+      createdAt: response.user.createdAt ?? new Date().toISOString(),
     };
     db.setCurrentUser(userData);
     setUser(userData);
   };
 
   const logout = () => {
-    // Melhor esforço: encerra sessão no backend
     api.logout().catch(() => {});
     db.logout();
     setUser(null);
@@ -78,11 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const paymentStatus = await api.getPaymentStatus();
-      db.updateUserPayment(
-        sessionUser.id,
-        paymentStatus.hasPaid,
-        paymentStatus.stripeCustomerId ?? undefined
-      );
+      db.updateUserPayment(sessionUser.id, paymentStatus.hasPaid, paymentStatus.stripeCustomerId ?? undefined);
       setUser(db.getCurrentUser());
     } catch (error) {
       console.error("Erro ao atualizar usuário:", error);

@@ -1,4 +1,4 @@
-﻿import { assertAllowedOrigin, generateResetToken, hashResetToken, jsonResponse, readJson, validateEmail } from "../_utils.js";
+﻿import { assertAllowedOrigin, generateResetToken, hashResetToken, jsonResponse, rateLimitByIp, readJson, validateEmail } from "../_utils.js";
 
 const FORGOT_PASSWORD_COOLDOWN_MS = 60 * 1000;
 
@@ -29,6 +29,9 @@ export async function onRequest(context) {
 
   const badOrigin = assertAllowedOrigin(context);
   if (badOrigin) return badOrigin;
+
+  const rate = await rateLimitByIp(context, { endpoint: "auth:forgot-password", limit: 5, windowMs: 60_000 });
+  if (!rate.ok) return jsonResponse({ success: true, message: "Se o email existir, você receberá instruções para redefinir sua senha." });
 
   const body = await readJson(context.request);
   const email = body?.email?.toLowerCase?.().trim?.();
@@ -98,3 +101,4 @@ export async function onRequest(context) {
   const debug = String(context.env.DEBUG_EMAIL_TOKENS || "0") === "1";
   return okResponse(debug ? { debugResetUrl: resetUrl, debugToken: token } : {});
 }
+

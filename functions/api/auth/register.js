@@ -3,6 +3,7 @@
   hashPassword,
   jsonResponse,
   readJson,
+  rateLimitByIp,
   sanitizeText,
   setSessionCookie,
   signSessionToken,
@@ -18,6 +19,13 @@ export async function onRequest(context) {
 
   const badOrigin = assertAllowedOrigin(context);
   if (badOrigin) return badOrigin;
+  const rate = await rateLimitByIp(context, { endpoint: "auth:register", limit: 6, windowMs: 60_000 });
+  if (!rate.ok) {
+    return jsonResponse(
+      { success: false, message: "Muitas tentativas. Tente novamente em instantes." },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+    );
+  }
 
   const body = await readJson(context.request);
   const email = body?.email?.toLowerCase?.().trim?.();

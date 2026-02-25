@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import AppDialog from "@/components/ui/AppDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { fadeUp } from "@/lib/motion";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
@@ -24,6 +25,9 @@ export default function BudgetsHistory() {
   const [detailClientName, setDetailClientName] = useState("");
   const [detailDescription, setDetailDescription] = useState("");
   const [isSavingDetails, setIsSavingDetails] = useState(false);
+  const [pageMessage, setPageMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
+  const [confirmDeleteBudgetId, setConfirmDeleteBudgetId] = useState<string | null>(null);
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -75,12 +79,12 @@ export default function BudgetsHistory() {
     ) : null;
 
   const handleDelete = async (budgetId: string) => {
-    if (!confirm("Tem certeza que deseja excluir este cálculo?")) return;
     try {
       await api.deleteBudget(budgetId);
       setBudgets((prev) => prev.filter((b) => b.id !== budgetId));
+      setPageMessage({ tone: "success", text: "Cálculo excluído com sucesso." });
     } catch (e) {
-      alert("Erro ao excluir cálculo");
+      setPageMessage({ tone: "error", text: "Erro ao excluir cálculo." });
       console.error(e);
     }
   };
@@ -113,7 +117,10 @@ export default function BudgetsHistory() {
   };
 
   const closeBudgetDetails = (force = false) => {
-    if (!force && detailDirty && !confirm("Descartar alterações deste cálculo?")) return;
+    if (!force && detailDirty) {
+      setConfirmDiscardOpen(true);
+      return;
+    }
     setSelectedBudgetId(null);
     setDetailName("");
     setDetailClientName("");
@@ -139,7 +146,7 @@ export default function BudgetsHistory() {
       setBudgets((prev) => prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget)));
       setSelectedBudgetId(resp.budget.id);
     } catch (e) {
-      alert("Erro ao salvar alterações do cálculo");
+      setPageMessage({ tone: "error", text: "Erro ao salvar alterações do cálculo." });
       console.error(e);
     } finally {
       setIsSavingDetails(false);
@@ -242,6 +249,17 @@ export default function BudgetsHistory() {
               </div>
             </div>
           ) : null}
+          {pageMessage ? (
+            <div
+              className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
+                pageMessage.tone === "error"
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : "border-green-200 bg-green-50 text-green-700"
+              }`}
+            >
+              {pageMessage.text}
+            </div>
+          ) : null}
         </motion.div>
 
         {budgets.length === 0 ? (
@@ -328,7 +346,7 @@ export default function BudgetsHistory() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(budget.id);
+                      setConfirmDeleteBudgetId(budget.id);
                     }}
                     className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                     aria-label="Excluir cálculo"
@@ -564,6 +582,36 @@ export default function BudgetsHistory() {
           </div>
         ) : null}
       </AppDialog>
+
+      <ConfirmDialog
+        open={!!confirmDeleteBudgetId}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDeleteBudgetId(null);
+        }}
+        title="Excluir cálculo"
+        description="Tem certeza que deseja excluir este cálculo? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        confirmVariant="danger"
+        onConfirm={async () => {
+          if (!confirmDeleteBudgetId) return;
+          const id = confirmDeleteBudgetId;
+          setConfirmDeleteBudgetId(null);
+          await handleDelete(id);
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmDiscardOpen}
+        onOpenChange={setConfirmDiscardOpen}
+        title="Descartar alterações?"
+        description="Você tem alterações não salvas neste cálculo. Deseja descartá-las?"
+        confirmLabel="Descartar"
+        confirmVariant="danger"
+        onConfirm={() => {
+          setConfirmDiscardOpen(false);
+          closeBudgetDetails(true);
+        }}
+      />
     </div>
   );
 }

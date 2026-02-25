@@ -1,3 +1,5 @@
+import { ensureSecurityTables } from "../_utils.js";
+
 function parseStripeSignatureHeader(sigHeader) {
   const parts = sigHeader.split(",").map(s => s.trim());
   const out = { t: null, v1: [] };
@@ -96,6 +98,20 @@ export async function onRequest(context) {
   }
 
   const type = event?.type;
+  const eventId = event?.id ? String(event.id) : null;
+
+  if (!eventId) {
+    return new Response("Invalid event id", { status: 400 });
+  }
+
+  await ensureSecurityTables(env.DB);
+  const inserted = await env.DB.prepare(
+    "INSERT OR IGNORE INTO stripe_webhook_events (event_id, event_type, created_at) VALUES (?, ?, ?)"
+  ).bind(eventId, type || null, new Date().toISOString()).run();
+
+  if (!inserted.meta?.changes) {
+    return new Response("ok", { status: 200 });
+  }
 
   // 3) Eventos relevantes
   if (type === "checkout.session.completed" || type === "checkout.session.async_payment_succeeded") {

@@ -4,6 +4,7 @@ import { SignJWT, jwtVerify } from "jose";
 
 const SESSION_COOKIE_NAME = "calcularq_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
+let securityTablesEnsured = false;
 
 function base64urlEncode(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)))
@@ -26,21 +27,13 @@ function base64urlDecode(str) {
 export async function hashPassword(password, iterations = 100_000) {
   const enc = new TextEncoder();
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  const keyMaterial = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    "PBKDF2",
-    false,
-    ["deriveBits"]
-  );
+  const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
     { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
     keyMaterial,
     32 * 8
   );
-  const saltB64 = base64urlEncode(salt);
-  const hashB64 = base64urlEncode(bits);
-  return `pbkdf2$sha256$${iterations}$${saltB64}$${hashB64}`;
+  return `pbkdf2$sha256$${iterations}$${base64urlEncode(salt)}$${base64urlEncode(bits)}`;
 }
 
 export async function verifyPassword(password, stored) {
@@ -55,23 +48,14 @@ export async function verifyPassword(password, stored) {
     const enc = new TextEncoder();
     const salt = base64urlDecode(saltB64);
     const expected = base64urlDecode(hashB64);
-
-    const keyMaterial = await crypto.subtle.importKey(
-      "raw",
-      enc.encode(password),
-      "PBKDF2",
-      false,
-      ["deriveBits"]
-    );
+    const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
     const bits = await crypto.subtle.deriveBits(
       { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
       keyMaterial,
       expected.byteLength * 8
     );
     const actual = new Uint8Array(bits);
-
     if (actual.length !== expected.length) return false;
-    // constant-time compare
     let diff = 0;
     for (let i = 0; i < actual.length; i++) diff |= actual[i] ^ expected[i];
     return diff === 0;
@@ -79,7 +63,6 @@ export async function verifyPassword(password, stored) {
     return false;
   }
 }
-
 
 // Reset token helpers (for password recovery)
 export async function generateResetToken() {
@@ -101,7 +84,7 @@ export function jsonResponse(data, init = {}) {
 
 export function getCookie(request, name) {
   const cookie = request.headers.get("Cookie") || "";
-  const parts = cookie.split(";").map(s => s.trim());
+  const parts = cookie.split(";").map((s) => s.trim());
   for (const p of parts) {
     const idx = p.indexOf("=");
     if (idx === -1) continue;
@@ -138,7 +121,7 @@ export function clearSessionCookie(headers) {
 
 export async function signSessionToken(payload, secret) {
   const key = new TextEncoder().encode(secret);
-  return await new SignJWT(payload)
+  return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
@@ -153,7 +136,9 @@ export async function verifySessionToken(token, secret) {
 
 export async function requireAuth(context) {
   const token = getCookie(context.request, SESSION_COOKIE_NAME);
-  if (!token) return { ok: false, response: jsonResponse({ success: false, message: "Não autenticado" }, { status: 401 }) };
+  if (!token) {
+    return { ok: false, response: jsonResponse({ success: false, message: "Não autenticado" }, { status: 401 }) };
+  }
   try {
     const payload = await verifySessionToken(token, context.env.JWT_SECRET);
     const userId = payload.sub;
@@ -172,8 +157,7 @@ export async function readJson(request) {
   }
 }
 
-export function corsForSameOrigin(request, headers) {
-  // Pages Functions are same-origin by default; keep minimal headers.
+export function corsForSameOrigin(_request, headers) {
   headers.set("Vary", "Origin");
   return headers;
 }
@@ -181,7 +165,6 @@ export function corsForSameOrigin(request, headers) {
 export function validateEmail(email) {
   const value = String(email || "").trim().toLowerCase();
   if (!value) return false;
-  // Intentionally simple, enough for backend input validation.
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
@@ -196,7 +179,7 @@ export function assertAllowedOrigin(context, { allowNoOrigin = true } = {}) {
   const origin = context.request.headers.get("Origin");
   if (!origin && allowNoOrigin) return null;
   if (!origin) {
-    return jsonResponse({ success: false, message: "Origem invÃ¡lida" }, { status: 403 });
+    return jsonResponse({ success: false, message: "Origem inválida" }, { status: 403 });
   }
 
   try {
@@ -207,5 +190,73 @@ export function assertAllowedOrigin(context, { allowNoOrigin = true } = {}) {
     // fall through to deny
   }
 
-  return jsonResponse({ success: false, message: "Origem invÃ¡lida" }, { status: 403 });
+  return jsonResponse({ success: false, message: "Origem inválida" }, { status: 403 });
+}
+
+export function getClientIp(request) {
+  return (
+    request.headers.get("CF-Connecting-IP") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown"
+  );
+}
+
+export async function ensureSecurityTables(db) {
+  if (securityTablesEnsured) return;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS request_rate_limits (
+      key TEXT PRIMARY KEY,
+      count INTEGER NOT NULL,
+      window_start_ms INTEGER NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_request_rate_limits_updated_at ON request_rate_limits(updated_at);
+
+    CREATE TABLE IF NOT EXISTS stripe_webhook_events (
+      event_id TEXT PRIMARY KEY,
+      event_type TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
+  securityTablesEnsured = true;
+}
+
+export async function rateLimitByIp(context, { endpoint = "generic", limit = 10, windowMs = 60_000 } = {}) {
+  const db = context.env.DB;
+  if (!db) return { ok: true };
+  await ensureSecurityTables(db);
+
+  const ip = getClientIp(context.request);
+  const key = `${endpoint}:${ip}`;
+  const now = Date.now();
+  const nowIso = new Date(now).toISOString();
+  const row = await db.prepare(
+    "SELECT count, window_start_ms FROM request_rate_limits WHERE key = ?"
+  ).bind(key).first();
+
+  if (!row) {
+    await db.prepare(
+      "INSERT INTO request_rate_limits (key, count, window_start_ms, updated_at) VALUES (?, 1, ?, ?)"
+    ).bind(key, now, nowIso).run();
+    return { ok: true };
+  }
+
+  const count = Number(row.count || 0);
+  const windowStart = Number(row.window_start_ms || 0);
+  if (!Number.isFinite(windowStart) || now - windowStart >= windowMs) {
+    await db.prepare(
+      "UPDATE request_rate_limits SET count = 1, window_start_ms = ?, updated_at = ? WHERE key = ?"
+    ).bind(now, nowIso, key).run();
+    return { ok: true };
+  }
+
+  if (count >= limit) {
+    const retryAfterSec = Math.max(1, Math.ceil((windowMs - (now - windowStart)) / 1000));
+    return { ok: false, retryAfterSec };
+  }
+
+  await db.prepare(
+    "UPDATE request_rate_limits SET count = ?, updated_at = ? WHERE key = ?"
+  ).bind(count + 1, nowIso, key).run();
+  return { ok: true };
 }
