@@ -1,4 +1,4 @@
-﻿import { assertAllowedOrigin, jsonResponse, readJson, requireAuth, sanitizeText } from "../_utils.js";
+import { assertAllowedOrigin, jsonResponse, readJson, requireAuth, sanitizeText } from "../_utils.js";
 
 const MAX_BUDGETS_PER_USER = 200;
 const MAX_BUDGET_JSON_BYTES = 180_000;

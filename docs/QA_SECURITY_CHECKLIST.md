@@ -105,7 +105,7 @@ Checklist prático para revisão contínua da Calcularq (QA visual/funcional + h
 ### Prioridade baixa (higiene)
 
 - [ ] **LocalStorage**
-  - Confirmar que só dados não sensíveis são persistidos (drafts e “lembrar e-mail”)
+  - Confirmar que só dados não sensíveis são persistidos (drafts e "lembrar e-mail")
   - Verificar ausência de tokens/sessão no localStorage
   - Front: `src/pages/Calculator.tsx`, `src/pages/Login.tsx`
 

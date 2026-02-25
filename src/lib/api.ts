@@ -1,3 +1,5 @@
+import type { BudgetData } from "@/types/budget";
+
 // API client para comunicação com o backend
 
 const getApiBaseUrl = () => {
@@ -24,28 +26,7 @@ export interface Budget {
   name: string;
   clientName?: string;
   projectName?: string;
-  data: {
-    description?: string;
-    minHourlyRate: number;
-    useManualMinHourlyRate?: boolean;
-    area?: number | null;
-    factors: Array<{ id: string; name: string; weight: number; level: number }>;
-    areaIntervals: Array<{ min: number; max: number | null; level: number }>;
-    selections: Record<string, number>;
-    estimatedHours: number;
-    fixedExpenses?: Array<{ id: string; name: string; value: number }>;
-    personalExpenses?: Array<{ id: string; name: string; value: number }>;
-    proLabore?: number;
-    productiveHours?: number;
-    commercialDiscount?: number;
-    variableExpenses: Array<{ id: string; name: string; value: number }>;
-    results: {
-      globalComplexity: number;
-      adjustedHourlyRate: number;
-      projectPrice: number;
-      finalSalePrice: number;
-    };
-  };
+  data: BudgetData;
   createdAt: string;
   updatedAt: string;
 }
@@ -157,7 +138,7 @@ class ApiClient {
     name: string;
     clientName?: string;
     projectName?: string;
-    data: Budget["data"];
+    data: BudgetData;
   }): Promise<{ success: boolean; budget: Budget }> {
     return this.request("/api/budgets", {
       method: "POST",

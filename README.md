@@ -1,85 +1,105 @@
-# Calcularq
+﻿# Calcularq
 
-Calculadora de precificação por complexidade para projetos de arquitetura.  
-O arquiteto informa suas despesas, configura os fatores de complexidade do projeto e recebe o preço de venda ideal como resultado.
+Calculadora de precificacao por complexidade para projetos de arquitetura.
 
-**Acesso:**  
-https://calcularq-cloudflare.pages.dev
+A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e composicao final do preco para gerar um valor de venda com base em dados do escritorio e do projeto.
 
----
-
-## O que o sistema faz
-
-- Cadastro e login de usuários com JWT seguro (via cookie HttpOnly)
-- Recuperação de senha por email (Brevo)
-- Pagamento único via Stripe (R$19,90) para liberar acesso
-- Webhook Stripe com validação de assinatura
-- Calculadora com 6 fatores de complexidade configuráveis
-- Histórico de cálculos salvos por usuário
-- Paywall controlado por variável de ambiente
+**Producao (Pages):** https://calcularq-cloudflare.pages.dev
 
 ---
 
-## Tecnologias usadas
+## Visao geral
 
-| Parte | Tecnologia |
-|---|---|
-| Interface (frontend) | React + TypeScript + Tailwind CSS |
-| Servidor (backend) | Cloudflare Pages Functions |
-| Banco de dados | Cloudflare D1 (SQLite) |
-| Pagamentos | Stripe (Checkout + Webhook) |
-| Emails | Brevo (SMTP API) |
-| Deploy | Cloudflare Pages |
+### Principais recursos
+- Cadastro/login com sessao via cookie HttpOnly
+- Recuperacao de senha por e-mail (Brevo)
+- Pagamento unico via Stripe (Checkout + Webhook)
+- Calculadora em 4 etapas (fatores antes da calibragem de pesos)
+- Historico de calculos por usuario
+- Manual integrado com navegacao por etapas
+
+### Stack
+- Frontend: React + TypeScript + Vite + Tailwind CSS
+- Animacoes: Framer Motion (presets centralizados em `src/lib/motion.ts`)
+- Backend: Cloudflare Pages Functions
+- Banco: Cloudflare D1 (SQLite)
+- Pagamento: Stripe
+- E-mail: Brevo
 
 ---
 
 ## Estrutura do projeto
 
-```
+```text
 src/
-  pages/          → Telas do app (Home, Login, Calculator, Payment, etc.)
-  components/     → Componentes reutilizáveis
-  contexts/       → Gerenciamento de sessão (AuthContext)
-  lib/            → Cliente da API
-  utils/          → Funções auxiliares
+  components/        Componentes reutilizaveis de UI e calculadora
+  contexts/          AuthContext / sessao do usuario
+  lib/               API client, motion presets e helpers
+  pages/             Home, Calculadora, Manual, Auth, Payment, etc.
+  types/             Tipos compartilhados (budget/draft)
+  utils/             Helpers gerais
 
 functions/
   api/
-    auth/         → Login, registro, logout, recuperação de senha
-    stripe/       → Checkout session + webhook
-    user/         → Status de pagamento
-    budgets/      → CRUD dos cálculos
+    auth/            Login, registro, logout, recovery/reset
+    budgets/         CRUD dos calculos salvos
+    stripe/          Checkout + webhook
+    user/            Status de pagamento
+    _utils.js        Sessao, validacoes, respostas, hardening
 
 migrations/
-  0001_init.sql   → Estrutura inicial do banco
+  0001_init.sql
+  0002_security_hardening.sql
+
+docs/
+  QA_SECURITY_CHECKLIST.md
+  ARCHITECTURE.md
+  MAINTENANCE_GUIDE.md
 ```
 
 ---
 
-## Variáveis de ambiente
+## Desenvolvimento local
 
-As variáveis sensíveis **nunca ficam no código**.  
-São configuradas como *secrets* no Cloudflare:
+### Requisitos
+- Node.js 20+
+- npm 10+
+- Wrangler (via `npx` ja atende)
+
+### Rodar frontend
 
 ```bash
-npx wrangler pages secret put NOME_DA_VARIAVEL --project-name calcularq-cloudflare
+npm install
+npm run dev
 ```
 
-### Secrets obrigatórios
+### Build de producao (check principal)
 
-| Variável | O que é |
-|---|---|
-| `JWT_SECRET` | Chave para assinar tokens de sessão |
-| `STRIPE_SECRET_KEY` | Chave secreta da Stripe (`sk_test_...` ou `sk_live_...`) |
-| `STRIPE_PRICE_ID` | ID do produto na Stripe (`price_...`) |
-| `STRIPE_WEBHOOK_SECRET` | Chave do webhook Stripe (`whsec_...`) |
-| `BREVO_API_KEY` | API Key do Brevo |
-| `BREVO_SENDER_EMAIL` | Email remetente do Brevo |
-| `BREVO_SENDER_NAME` | Nome do remetente |
+```bash
+npm run build
+```
+
+### Preview local
+
+```bash
+npm run preview
+```
 
 ---
 
-### Variáveis públicas (wrangler.toml)
+## Cloudflare Pages / Deploy
+
+### Deploy automatico
+Todo push em `main` dispara deploy no Cloudflare Pages.
+
+### Deploy manual
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name calcularq-cloudflare
+```
+
+### Variaveis publicas (`wrangler.toml`)
 
 ```toml
 [vars]
@@ -89,142 +109,101 @@ STRIPE_CANCEL_PATH = "/payment"
 DEBUG_EMAIL_TOKENS = "0"
 ```
 
-> ⚠️ Nunca use `DEBUG_EMAIL_TOKENS = "1"` em produção.
+### Secrets (Cloudflare Pages)
+Secrets sensiveis nao ficam versionados. Configure via dashboard ou Wrangler:
+
+```bash
+npx wrangler pages secret put NOME_DA_VARIAVEL --project-name calcularq-cloudflare
+```
+
+#### Secrets obrigatorios
+- `JWT_SECRET`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_PRICE_ID`
+- `STRIPE_WEBHOOK_SECRET`
+- `BREVO_API_KEY`
+- `BREVO_SENDER_EMAIL`
+- `BREVO_SENDER_NAME`
 
 ### Toggle de paywall (`REQUIRE_PAYMENT`)
-
-O paywall da calculadora é controlado pela variável `REQUIRE_PAYMENT` no Cloudflare Pages (configurada como secret), para permitir testes sem `commit/push`.
-
-- `REQUIRE_PAYMENT = "1"`: paywall ativo
-- `REQUIRE_PAYMENT = "0"`: paywall desativado (teste)
-
-Configurar com Wrangler:
+Configurado como secret no Cloudflare Pages:
+- `"1"` = paywall ativo
+- `"0"` = paywall desativado (teste)
 
 ```bash
 # Desativar paywall (teste)
 echo 0 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
 
-# Ativar paywall novamente
+# Ativar paywall
 echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
 ```
 
-> Após alterar a variável, faça um redeploy no Cloudflare Pages para aplicar imediatamente.
-
----
-
-## Fluxo de Pagamento (Stripe)
-
-1. Usuário cria conta
-2. Sistema bloqueia acesso se `has_paid = 0`
-3. Checkout Stripe é aberto
-4. Stripe envia evento para `/api/stripe/webhook`
-5. Backend valida assinatura (`STRIPE_WEBHOOK_SECRET`)
-6. Banco é atualizado (`has_paid = 1`)
-7. Frontend libera acesso automaticamente
-
-### Eventos escutados:
-
-- `checkout.session.completed`
-- `checkout.session.async_payment_succeeded`
-
----
-
-## Recuperação de senha (Brevo)
-
-Fluxo:
-
-1. Usuário solicita redefinição
-2. Token é gerado e salvo como hash no banco
-3. Email é enviado via Brevo
-4. Token expira em 1 hora
-5. Após uso, token é removido
-
-O remetente é configurável via:
-
-- `BREVO_SENDER_EMAIL`
-- `BREVO_SENDER_NAME`
+> Apos alterar o secret, rode um redeploy no Cloudflare Pages para aplicar imediatamente.
 
 ---
 
 ## Banco de dados (D1)
 
-### Tabelas
-
+### Tabelas principais
 - `users`
 - `budgets`
 - `reset_tokens`
+- `request_rate_limits` (hardening)
+- `stripe_webhook_events` (idempotencia)
 
-Rodar migration:
+### Rodar migrations (remoto)
 
 ```bash
 npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0002_security_hardening.sql
 ```
 
 ---
 
-## QA e Segurança
+## Seguranca (resumo)
 
-Existe um checklist prático de revisão (bugs, UX e hardening de segurança) em:
+Ja implementado no backend:
+- Sessao JWT em cookie HttpOnly (`SameSite=Lax`, `Secure` em producao)
+- Validacao de origem (`Origin`) em endpoints mutaveis
+- Validacao de e-mail e senha minima (8 chars)
+- Cooldown em `forgot-password`
+- Hardening de payload/limites em budgets
+- Idempotencia no webhook Stripe por `event.id`
 
+Checklist de revisao:
 - `docs/QA_SECURITY_CHECKLIST.md`
 
 ---
 
-## Comandos úteis (produção)
+## Documentacao do projeto
 
-### Listar usuários
+- `docs/ARCHITECTURE.md` -> arquitetura, fluxos e responsabilidades por camada
+- `docs/MAINTENANCE_GUIDE.md` -> convencoes, hotspots e roadmap de refatoracao
+- `docs/QA_SECURITY_CHECKLIST.md` -> check/fix de bugs, UX e seguranca
 
+---
+
+## Comandos uteis (D1 / operacao)
+
+### Listar usuarios
 ```bash
 npx wrangler d1 execute calcularq --remote --command "SELECT id, email, has_paid FROM users;"
 ```
 
 ### Liberar acesso manualmente
-
 ```bash
 npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 1, payment_date = datetime('now') WHERE email = 'email@exemplo.com';"
 ```
 
 ### Revogar acesso
-
 ```bash
 npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 0 WHERE email = 'email@exemplo.com';"
 ```
 
 ---
 
-## Deploy
+## Observacoes de manutencao
 
-Todo push para `main` dispara deploy automático.
-
-Manual:
-
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name calcularq-cloudflare
-```
-
----
-
-## Segurança
-
-- JWT armazenado em cookie HttpOnly
-- Assinatura de webhook validada
-- Tokens de reset armazenados como hash (SHA-256)
-- Secrets nunca versionados
-- Normalização de URLs de redirect do Stripe
-
----
-
-## Gerenciamento de Chaves
-
-Todas as chaves de produção estão armazenadas no **Bitwarden**  
-Entrada: **"Calcularq - Produção"**
-
----
-
-## Boas práticas
-
-- Nunca commitar chaves
-- Sempre testar no Stripe Test Mode antes de usar `sk_live`
-- Fazer backup periódico do D1
-- Validar logs do Cloudflare após mudanças no webhook
+- `npm run build` e o check minimo antes de commit/push.
+- O arquivo mais sensivel do projeto hoje e `src/pages/Calculator.tsx` (fluxo, importacao por etapa, draft, reset, resultados, dialogs).
+- As proximas melhorias estruturais recomendadas estao descritas em `docs/MAINTENANCE_GUIDE.md`.

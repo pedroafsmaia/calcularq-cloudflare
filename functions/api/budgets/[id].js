@@ -1,4 +1,4 @@
-﻿import { assertAllowedOrigin, jsonResponse, requireAuth } from "../_utils.js";
+import { assertAllowedOrigin, jsonResponse, requireAuth } from "../_utils.js";
 
 export async function onRequest(context) {
   const auth = await requireAuth(context);

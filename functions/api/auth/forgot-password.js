@@ -1,4 +1,4 @@
-﻿import { assertAllowedOrigin, generateResetToken, hashResetToken, jsonResponse, rateLimitByIp, readJson, validateEmail } from "../_utils.js";
+import { assertAllowedOrigin, generateResetToken, hashResetToken, jsonResponse, rateLimitByIp, readJson, validateEmail } from "../_utils.js";
 
 const FORGOT_PASSWORD_COOLDOWN_MS = 60 * 1000;
 

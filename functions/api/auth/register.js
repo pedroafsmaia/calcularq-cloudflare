@@ -1,4 +1,4 @@
-﻿import {
+import {
   assertAllowedOrigin,
   hashPassword,
   jsonResponse,
