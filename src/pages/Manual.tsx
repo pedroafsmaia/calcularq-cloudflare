@@ -335,22 +335,22 @@ export default function Manual() {
                         <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
                         <ul className="space-y-3">
                           <li>
-                            <strong>Despesas operacionais fixas mensais:</strong> adicione os custos recorrentes para manter o escritório funcionando.
+                          <strong>Despesas operacionais fixas mensais:</strong> Adicione os custos recorrentes para manter o escritório funcionando.
                             <p className="text-sm text-slate-500 mt-1">Ex.: aluguel, softwares, salários, contador, anuidades e serviços essenciais.</p>
                           </li>
                           <li>
-                            <strong>Despesas pessoais essenciais:</strong> valor mensal líquido essencial para cobrir suas despesas pessoais.
+                          <strong>Despesas pessoais essenciais:</strong> Valor mensal líquido essencial para cobrir suas despesas pessoais.
                             <p className="text-sm text-amber-700 mt-1">Atenção: o lucro tende a aparecer na etapa final, via complexidade, horas e composição do preço.</p>
                           </li>
                           <li>
-                            <strong>Horas produtivas mensais:</strong> horas efetivas dedicadas à produção de projeto (não o expediente inteiro).
+                          <strong>Horas produtivas mensais:</strong> Horas efetivas dedicadas à produção de projeto (não o expediente inteiro).
                             <p className="text-sm text-calcularq-blue mt-1">Dica: muitas operações trabalham com algo entre 70% e 80% do tempo total como horas produtivas.</p>
                           </li>
                         </ul>
                       </div>
 
                       <NoteBox>
-                        <strong>Resultado esperado:</strong> a calculadora define sua Hora Técnica Mínima. Esse valor será usado nas próximas etapas como base para o cálculo do preço.
+                        <strong>Resultado esperado:</strong> A calculadora define sua Hora Técnica Mínima. Esse valor será usado nas próximas etapas como base para o cálculo do preço.
                       </NoteBox>
                     </div>
                   </div>
@@ -389,13 +389,13 @@ export default function Manual() {
 
                     <ul className="space-y-3">
                       <li>
-                        <strong>Recomendação:</strong> comece com todos em <strong>Peso 1 (padrão)</strong> para manter uma referência equilibrada.
+                        <strong>Recomendação:</strong> Comece com todos em <strong>Peso 1 (padrão)</strong> para manter uma referência equilibrada.
                       </li>
                       <li>
-                        <strong>Quando alterar:</strong> aumente o peso quando um fator for sistematicamente mais relevante para o tipo de projeto que seu escritório atende.
+                        <strong>Quando alterar:</strong> Aumente o peso quando um fator for sistematicamente mais relevante para o tipo de projeto que seu escritório atende.
                       </li>
                       <li>
-                        <strong>Exemplo:</strong> se seu escritório trabalha com interiores de alto detalhamento, você pode elevar o peso do fator <em>Nível de detalhamento</em>.
+                        <strong>Exemplo:</strong> Se seu escritório trabalha com interiores de alto detalhamento, você pode elevar o peso do fator <em>Nível de detalhamento</em>.
                       </li>
                     </ul>
                   </div>
@@ -526,15 +526,15 @@ export default function Manual() {
                       <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
                       <ul className="space-y-3">
                         <li>
-                          <strong>Estimativa de horas de projeto:</strong> total de horas previstas para executar este trabalho.
-                          <p className="text-sm text-slate-500 mt-1">Esse total é multiplicado pela Hora Técnica Ajustada para formar os honorários-base do projeto.</p>
+                          <strong>Estimativa de horas de projeto:</strong> Total de horas previstas para executar este trabalho.
+                          <p className="text-sm text-slate-500 mt-1">Considere a etapa, o tamanho e a complexidade do projeto. Esse total é multiplicado pela Hora Técnica Ajustada para formar os honorários-base do projeto.</p>
                         </li>
                         <li>
-                          <strong>Despesas variáveis:</strong> custos específicos deste contrato que serão repassados ao cliente.
+                          <strong>Despesas variáveis:</strong> Custos específicos deste contrato que serão repassados ao cliente.
                           <p className="text-sm text-slate-500 mt-1">Ex.: RRT/ART, deslocamentos, plotagens, taxas e custos logísticos.</p>
                         </li>
                         <li>
-                          <strong>Desconto comercial:</strong> ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente.</li>
+                          <strong>Desconto comercial:</strong> Ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente.</li>
                       </ul>
                     </div>
 
@@ -563,11 +563,11 @@ export default function Manual() {
                     </div>
 
                     <NoteBox>
-                      <strong>% do valor da obra (referência CAU/BR):</strong> indicador comparativo de referência (faixa sugerida: 2% a 11%). Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>% do valor da obra (referência CAU/BR):</strong> Indicador comparativo (faixa sugerida: 2% a 11%). A faixa pode variar conforme complexidade, sofisticação, etapa, tipo de projeto e região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
 
                     <NoteBox>
-                      <strong>Preço por m² (referência IAB/CAU):</strong> indicador comparativo de referência (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa pode variar conforme complexidade, sofisticação, etapa, área e região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
                   </div>
                 </div>

@@ -61,11 +61,11 @@ export default function AppDialog({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-4"
             onClick={() => onOpenChange(false)}
           >
             <div
-              className={`w-full ${maxWidthClassName} max-h-[min(90vh,48rem)] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col`}
+              className={`my-4 w-full ${maxWidthClassName} max-h-[min(90vh,48rem)] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
