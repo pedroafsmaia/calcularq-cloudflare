@@ -152,7 +152,7 @@ export default function MinimumHourCalculator({
           />
           <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
             Já sei a minha hora técnica mínima.
-            <Tooltip text="Marque esta opção se você já calculou sua hora técnica mínima anteriormente e quer inserir o valor diretamente, sem precisar preencher despesas e pró-labore novamente." />
+            <Tooltip text="Marque esta opção se você já calculou sua hora técnica mínima anteriormente e quer inserir o valor diretamente, sem precisar preencher despesas operacionais fixas e despesas pessoais essenciais novamente." />
           </label>
         </div>
 
@@ -160,7 +160,7 @@ export default function MinimumHourCalculator({
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
               Hora técnica mínima (R$/hora)
-              <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas fixas e pró-labore sem ter prejuízo. Este é o piso financeiro do seu escritório." />
+              <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas operacionais fixas e despesas pessoais essenciais sem ter prejuízo. Este é o piso financeiro do seu escritório." />
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
@@ -177,22 +177,22 @@ export default function MinimumHourCalculator({
           </div>
         ) : (
           <>
-            {/* Despesas Fixas */}
+            {/* Despesas operacionais fixas */}
             <ExpenseCard
               expenses={fixedExpenses}
               onAdd={handleAddExpense}
               onRemove={handleRemoveExpense}
               onUpdate={handleUpdateExpense}
               placeholder="Ex: Aluguel, Contador..."
-              label="Despesas fixas mensais (R$)"
+              label="Despesas operacionais fixas mensais (R$)"
               tooltip="Todos os custos recorrentes para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU, etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
             />
 
-            {/* Pró-labore Mínimo */}
+            {/* Despesas pessoais essenciais */}
             <div>
               <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-                Pró-labore mínimo (R$)
-                <Tooltip text="Sua remuneração mensal mínima para cobrir suas despesas pessoais. Insira o valor necessário para sua segurança financeira. O lucro virá através do multiplicador de complexidade — não subestime este valor." />
+                Despesas pessoais essenciais (R$)
+                <Tooltip text="Valor mensal mínimo necessário para cobrir suas despesas pessoais essenciais (moradia, alimentação, saúde, transporte, etc.). Este é o piso para sua segurança financeira." />
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>

@@ -26,6 +26,7 @@ export interface Budget {
   clientName?: string;
   projectName?: string;
   data: {
+    description?: string;
     minHourlyRate: number;
     useManualMinHourlyRate?: boolean;
     area?: number | null;

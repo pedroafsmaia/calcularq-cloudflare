@@ -308,7 +308,7 @@ export default function Manual() {
 
                   <div className="grid gap-4">
                     <NoteBox tone="slate">
-                      <strong>Resumo rápido:</strong> Informe despesas fixas, pró-labore mínimo e horas produtivas. O sistema retorna sua Hora Técnica Mínima.
+                      <strong>Resumo rápido:</strong> Informe despesas operacionais fixas, despesas pessoais essenciais e horas produtivas. O sistema retorna sua Hora Técnica Mínima.
                     </NoteBox>
 
                     <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -316,11 +316,11 @@ export default function Manual() {
                         <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
                         <ul className="space-y-3">
                           <li>
-                            <strong>Despesas fixas mensais:</strong> adicione os custos recorrentes para manter o escritório funcionando.
+                            <strong>Despesas operacionais fixas mensais:</strong> adicione os custos recorrentes para manter o escritório funcionando.
                             <p className="text-sm text-slate-500 mt-1">Ex.: aluguel, softwares, salários, contador, anuidades e serviços essenciais.</p>
                           </li>
                           <li>
-                            <strong>Pró-labore mínimo:</strong> valor mensal líquido essencial para cobrir suas despesas pessoais.
+                            <strong>Despesas pessoais essenciais:</strong> valor mensal líquido essencial para cobrir suas despesas pessoais.
                             <p className="text-sm text-amber-700 mt-1">Atenção: o lucro tende a aparecer na etapa final, via complexidade, horas e composição do preço.</p>
                           </li>
                           <li>

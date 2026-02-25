@@ -10,6 +10,7 @@ interface FinalCalculationProps {
   initialBudgetName?: string;
   initialClientName?: string;
   initialProjectName?: string;
+  initialDescription?: string;
   proLabore?: number;
   minHourlyRate: number;
   globalComplexity: number;
@@ -37,6 +38,7 @@ export default function FinalCalculation({
   initialBudgetName,
   initialClientName,
   initialProjectName,
+  initialDescription,
   proLabore = 0,
   minHourlyRate,
   globalComplexity,
@@ -86,6 +88,8 @@ export default function FinalCalculation({
       <SaveBudgetButton
         budgetId={budgetId}
         initialBudgetName={initialBudgetName}
+        initialClientName={initialClientName}
+        initialDescription={initialDescription}
         clientName={initialClientName}
         projectName={initialProjectName}
         budgetData={{

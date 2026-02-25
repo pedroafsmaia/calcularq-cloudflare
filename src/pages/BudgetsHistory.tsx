@@ -36,7 +36,7 @@ export default function BudgetsHistory() {
 
     const filtered = budgets.filter((budget) => {
       if (!q) return true;
-      const haystack = [budget.name ?? "", budget.clientName ?? "", budget.projectName ?? ""]
+      const haystack = [budget.name ?? "", budget.clientName ?? "", budget.projectName ?? "", budget.data?.description ?? ""]
         .join(" ")
         .toLowerCase();
       return haystack.includes(q);
@@ -212,6 +212,19 @@ export default function BudgetsHistory() {
                     <h3 className="font-bold text-calcularq-blue text-lg mb-1 truncate">{budget.name || "Cálculo sem nome"}</h3>
                     {budget.clientName ? <p className="text-sm text-slate-600 truncate">Cliente: {budget.clientName}</p> : null}
                     {budget.projectName ? <p className="text-sm text-slate-600 truncate">Projeto: {budget.projectName}</p> : null}
+                    {budget.data?.description ? (
+                      <p
+                        className="mt-1 text-sm text-slate-500 leading-snug"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {budget.data.description}
+                      </p>
+                    ) : null}
                   </div>
                   <button
                     onClick={(e) => {

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Save, Check } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Save, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
@@ -9,7 +9,10 @@ import { createPageUrl } from "@/utils";
 interface SaveBudgetButtonProps {
   budgetId?: string;
   initialBudgetName?: string;
+  initialClientName?: string;
+  initialDescription?: string;
   budgetData: {
+    description?: string;
     minHourlyRate: number;
     useManualMinHourlyRate?: boolean;
     area?: number | null;
@@ -33,11 +36,36 @@ interface SaveBudgetButtonProps {
   clientName?: string;
 }
 
-export default function SaveBudgetButton({ budgetId, initialBudgetName, budgetData, projectName, clientName }: SaveBudgetButtonProps) {
+export default function SaveBudgetButton({
+  budgetId,
+  initialBudgetName,
+  initialClientName,
+  initialDescription,
+  budgetData,
+  projectName,
+  clientName,
+}: SaveBudgetButtonProps) {
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [budgetName, setBudgetName] = useState(initialBudgetName || projectName || "");
+  const [clientNameValue, setClientNameValue] = useState(initialClientName || clientName || "");
+  const [description, setDescription] = useState(initialDescription || budgetData.description || "");
+
+  useEffect(() => {
+    setBudgetName(initialBudgetName || projectName || "");
+  }, [initialBudgetName, projectName]);
+
+  useEffect(() => {
+    setClientNameValue(initialClientName || clientName || "");
+  }, [initialClientName, clientName]);
+
+  useEffect(() => {
+    setDescription(initialDescription || budgetData.description || "");
+  }, [initialDescription, budgetData.description]);
+
+  const canSave = useMemo(() => budgetName.trim().length > 0, [budgetName]);
 
   const handleSave = async () => {
     if (!user) {
@@ -45,15 +73,8 @@ export default function SaveBudgetButton({ budgetId, initialBudgetName, budgetDa
       return;
     }
 
-    let finalName = budgetName.trim();
-    if (!finalName) {
-      const name = prompt("Digite um nome para este cálculo:");
-      if (!name || !name.trim()) {
-        return;
-      }
-      finalName = name.trim();
-      setBudgetName(finalName);
-    }
+    const finalName = budgetName.trim();
+    if (!finalName) return;
 
     setIsSaving(true);
 
@@ -61,20 +82,24 @@ export default function SaveBudgetButton({ budgetId, initialBudgetName, budgetDa
       const payload = {
         id: budgetId || undefined,
         name: finalName || `Cálculo ${new Date().toLocaleDateString("pt-BR")}`,
-        clientName: clientName || undefined,
+        clientName: clientNameValue.trim() || undefined,
         projectName: projectName || undefined,
-        data: budgetData,
+        data: {
+          ...budgetData,
+          description: description.trim() || undefined,
+        },
       };
 
       const resp = await api.saveBudget(payload);
-      // Atualiza a URL para o ID salvo, se era um novo
       const savedId = resp.budget.id;
-      if (!budgetId && typeof window !== 'undefined') {
+
+      if (!budgetId && typeof window !== "undefined") {
         const url = new URL(window.location.href);
-        url.searchParams.set('budget', savedId);
-        window.history.replaceState({}, '', url.toString());
+        url.searchParams.set("budget", savedId);
+        window.history.replaceState({}, "", url.toString());
       }
 
+      setIsDialogOpen(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
@@ -97,16 +122,10 @@ export default function SaveBudgetButton({ budgetId, initialBudgetName, budgetDa
   }
 
   return (
-    <div className="space-y-2">
-      <input
-        type="text"
-        value={budgetName}
-        onChange={(e) => setBudgetName(e.target.value)}
-        placeholder="Nome do cálculo"
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
-      />
+    <>
       <Button
-        onClick={handleSave}
+        type="button"
+        onClick={() => setIsDialogOpen(true)}
         disabled={isSaving || saved}
         className="w-full bg-calcularq-blue hover:bg-[#002366] text-white"
       >
@@ -122,6 +141,83 @@ export default function SaveBudgetButton({ budgetId, initialBudgetName, budgetDa
           </>
         )}
       </Button>
-    </div>
+
+      {isDialogOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-calcularq-blue">Salvar cálculo</h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  Salve este cálculo para continuar depois e consultar seus resultados.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDialogOpen(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cálculo *</label>
+                <input
+                  type="text"
+                  value={budgetName}
+                  onChange={(e) => setBudgetName(e.target.value)}
+                  placeholder="Ex.: Proposta residencial base"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cliente (opcional)</label>
+                <input
+                  type="text"
+                  value={clientNameValue}
+                  onChange={(e) => setClientNameValue(e.target.value)}
+                  placeholder="Ex.: Maria Silva"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Descrição (opcional)</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  placeholder="Ex.: estudo preliminar, revisão com desconto, versão para negociação..."
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+                className="border-slate-200 text-slate-700 hover:bg-slate-50"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSave}
+                disabled={isSaving || !canSave}
+                className="bg-calcularq-blue hover:bg-[#002366] text-white"
+              >
+                {isSaving ? "Salvando..." : "Salvar"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }

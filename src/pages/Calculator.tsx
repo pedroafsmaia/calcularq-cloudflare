@@ -52,6 +52,7 @@ export default function Calculator() {
   const [loadedBudgetName, setLoadedBudgetName] = useState<string | null>(null);
   const [loadedClientName, setLoadedClientName] = useState<string | null>(null);
   const [loadedProjectName, setLoadedProjectName] = useState<string | null>(null);
+  const [loadedBudgetDescription, setLoadedBudgetDescription] = useState<string | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
@@ -162,6 +163,7 @@ export default function Calculator() {
         setLoadedBudgetName(budget.name || null);
         setLoadedClientName(budget.clientName || null);
         setLoadedProjectName(budget.projectName || null);
+        setLoadedBudgetDescription(typeof budget.data?.description === "string" ? budget.data.description : null);
         setMinHourlyRate(budget.data.minHourlyRate);
         setUseManualMinHourlyRate(Boolean(budget.data.useManualMinHourlyRate));
 
@@ -551,7 +553,7 @@ export default function Calculator() {
                 <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                   <span className="min-w-0 inline-flex items-center gap-1 text-sm text-slate-500">
                     Lucro Estimado
-                    <Tooltip text="Valor projetado que pode restar após cobrir as despesas fixas do escritório durante o tempo estimado de projeto." />
+                    <Tooltip text="Valor projetado que pode restar após cobrir as despesas operacionais fixas do escritório durante o tempo estimado de projeto." />
                   </span>
                   <span className={`text-sm font-bold whitespace-nowrap ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
                     R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -732,6 +734,7 @@ export default function Calculator() {
                     initialBudgetName={loadedBudgetName || undefined}
                     initialClientName={loadedClientName || undefined}
                     initialProjectName={loadedProjectName || undefined}
+                    initialDescription={loadedBudgetDescription || undefined}
                     proLabore={proLabore}
                     minHourlyRate={minHourlyRate}
                     globalComplexity={results.globalComplexity}
