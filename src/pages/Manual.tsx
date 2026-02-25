@@ -75,6 +75,7 @@ export default function Manual() {
   const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
     const el = document.getElementById(id);
     if (!el) return;
+    const sectionAnchor = (el.closest("section") as HTMLElement | null) ?? el;
 
     const isMobile = window.innerWidth < 768;
     const summaryWasOpen = isMobile && Boolean(mobileSummaryRef.current?.open);
@@ -85,7 +86,7 @@ export default function Manual() {
 
     const performScroll = () => {
       const offset = isMobile ? 132 : 92;
-      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      const top = sectionAnchor.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     };
 
