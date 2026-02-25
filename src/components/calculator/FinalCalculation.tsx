@@ -146,7 +146,7 @@ export default function FinalCalculation({
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
               Estimativa de horas de projeto
-              <Tooltip text="Quantidade total de horas que você estima gastar para executar este projeto. O sistema multiplicará esse valor pela sua Hora Técnica Ajustada." />
+              <Tooltip text="Quantidade total de horas que você estima gastar para executar este projeto. Considere a etapa, o tamanho e a complexidade do projeto ao estimar esse tempo. O sistema multiplicará esse valor pela sua Hora Técnica Ajustada." />
             </label>
             <input
               type="number"

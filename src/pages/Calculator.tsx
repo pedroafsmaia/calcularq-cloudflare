@@ -529,7 +529,7 @@ export default function Calculator() {
               <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   % do valor da obra
-                  <Tooltip text={"Estimativa baseada no CUB médio nacional (R$ 2.800/m²). A faixa de referência do CAU/BR costuma ficar entre 2% e 11% do valor da obra. É apenas uma referência — o valor real varia conforme a região, o padrão e o tipo de projeto."} />
+                  <Tooltip text={"Estimativa baseada no CUB médio nacional (R$ 2.800/m²). A faixa de referência do CAU/BR costuma ficar entre 2% e 11% do valor da obra. É apenas uma referência — a faixa real pode variar conforme a complexidade, a sofisticação, a etapa e o tipo de projeto, além da região."} />
                 </span>
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
                   <span className={`text-sm font-bold ${
@@ -550,8 +550,8 @@ export default function Calculator() {
                       iconClassName="text-amber-600 hover:text-amber-700"
                       text={
                         cubPercentage < 2
-                          ? "% abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar necessidade de revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos ou maior eficiência."
-                          : "% acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos de maior complexidade técnica."
+                          ? "% abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar necessidade de revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos, maior eficiência ou um projeto em etapa/nível de sofisticação diferente da referência."
+                          : "% acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos com maior complexidade, maior sofisticação ou etapas de desenvolvimento mais avançadas."
                       }
                     />
                   )}
@@ -562,7 +562,7 @@ export default function Calculator() {
               <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   Preço/m²
-                  <Tooltip text="Honorário dividido pela área do projeto. A faixa de referência do IAB/CAU costuma ficar entre R$ 60 e R$ 200/m² para projetos residenciais. É apenas uma referência — o valor real varia conforme área, padrão e região." />
+                  <Tooltip text="Honorário dividido pela área do projeto. A faixa de referência do IAB/CAU costuma ficar entre R$ 60 e R$ 200/m² para projetos residenciais. É apenas uma referência — a faixa real pode variar conforme a complexidade, a sofisticação, a etapa do projeto, a área e a região." />
                 </span>
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
                   <span
@@ -585,8 +585,8 @@ export default function Calculator() {
                       iconClassName="text-amber-600 hover:text-amber-700"
                       text={
                         pricePerSqm < 60
-                          ? "Valor/m² abaixo da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Comum em projetos de grande porte, mas pode indicar subvalorização do serviço."
-                          : "Valor/m² acima da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Comum em áreas menores ou alta complexidade."
+                          ? "Valor/m² abaixo da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Pode ocorrer em projetos de grande porte, menor sofisticação ou etapas mais simples, mas também pode indicar subvalorização do serviço."
+                          : "Valor/m² acima da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Pode ser adequado em áreas menores, maior complexidade, maior sofisticação ou etapas mais avançadas."
                       }
                     />
                   )}
