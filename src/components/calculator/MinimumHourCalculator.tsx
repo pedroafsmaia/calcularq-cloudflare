@@ -6,9 +6,11 @@ import SectionHeader from "./SectionHeader";
 
 interface MinimumHourCalculatorProps {
   initialFixedExpenses?: Expense[];
+  initialPersonalExpenses?: Expense[];
   initialProLabore?: number;
   initialProductiveHours?: number;
   onProLaboreChange?: (value: number) => void;
+  onPersonalExpensesChange?: (expenses: Expense[]) => void;
   onCalculate: (minHourRate: number) => void;
   initialMinHourRate?: number;
   onFixedExpensesChange?: (expenses: Expense[]) => void;
@@ -24,7 +26,9 @@ export default function MinimumHourCalculator({
   onFixedExpensesChange,
   onProductiveHoursChange,
   onProLaboreChange,
+  onPersonalExpensesChange,
   initialFixedExpenses,
+  initialPersonalExpenses,
   initialProLabore,
   initialProductiveHours,
   initialUseManual = false,
@@ -32,10 +36,19 @@ export default function MinimumHourCalculator({
   onClearCalculation,
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
-  const [proLabore, setProLabore] = useState(initialProLabore || 0);
+  const [personalExpenses, setPersonalExpenses] = useState<Expense[]>(
+    initialPersonalExpenses || (typeof initialProLabore === "number" && initialProLabore > 0
+      ? [{ id: "personal-legacy", name: "Despesa pessoal", value: initialProLabore }]
+      : [])
+  );
   const [productiveHours, setProductiveHours] = useState(initialProductiveHours || 0);
   const [manualMinHourRate, setManualMinHourRate] = useState<number | undefined>(initialMinHourRate);
   const [useManual, setUseManual] = useState(initialUseManual);
+
+  const proLabore = useMemo(
+    () => personalExpenses.reduce((sum, exp) => sum + exp.value, 0),
+    [personalExpenses]
+  );
 
   const calculatedMinHourRate = useMemo(() => {
     if (useManual && manualMinHourRate !== undefined) {
@@ -60,11 +73,28 @@ export default function MinimumHourCalculator({
 
   useEffect(() => {
     if (typeof initialProLabore === 'number') {
-      setProLabore(initialProLabore);
+      if (!initialPersonalExpenses || initialPersonalExpenses.length === 0) {
+        const legacyExpenses =
+          initialProLabore > 0 ? [{ id: "personal-legacy", name: "Despesa pessoal", value: initialProLabore }] : [];
+        setPersonalExpenses(legacyExpenses);
+        onPersonalExpensesChange?.(legacyExpenses);
+      }
       onProLaboreChange?.(initialProLabore);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialProLabore]);
+
+  const prevInitialPersonalExpensesRef = useRef<string>("");
+  useEffect(() => {
+    const serialized = JSON.stringify(initialPersonalExpenses || []);
+    if (serialized === prevInitialPersonalExpensesRef.current) return;
+    prevInitialPersonalExpensesRef.current = serialized;
+    if (initialPersonalExpenses) {
+      setPersonalExpenses(initialPersonalExpenses);
+      onPersonalExpensesChange?.(initialPersonalExpenses);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPersonalExpenses]);
 
   useEffect(() => {
     if (typeof initialProductiveHours === 'number') {
@@ -86,6 +116,27 @@ export default function MinimumHourCalculator({
     const updated = [...fixedExpenses, expense];
     setFixedExpenses(updated);
     onFixedExpensesChange?.(updated);
+  };
+
+  const handleAddPersonalExpense = (expense: Expense) => {
+    const updated = [...personalExpenses, expense];
+    setPersonalExpenses(updated);
+    onPersonalExpensesChange?.(updated);
+    onProLaboreChange?.(updated.reduce((sum, exp) => sum + exp.value, 0));
+  };
+
+  const handleRemovePersonalExpense = (id: string) => {
+    const updated = personalExpenses.filter((exp) => exp.id !== id);
+    setPersonalExpenses(updated);
+    onPersonalExpensesChange?.(updated);
+    onProLaboreChange?.(updated.reduce((sum, exp) => sum + exp.value, 0));
+  };
+
+  const handleUpdatePersonalExpense = (id: string, updates: Partial<Expense>) => {
+    const updated = personalExpenses.map((exp) => (exp.id === id ? { ...exp, ...updates } : exp));
+    setPersonalExpenses(updated);
+    onPersonalExpensesChange?.(updated);
+    onProLaboreChange?.(updated.reduce((sum, exp) => sum + exp.value, 0));
   };
 
   const handleRemoveExpense = (id: string) => {
@@ -114,8 +165,19 @@ export default function MinimumHourCalculator({
   }, [calculatedMinHourRate, useManual, manualMinHourRate]);
 
   useEffect(() => {
+    onProLaboreChange?.(proLabore);
+  }, [proLabore, onProLaboreChange]);
+
+  useEffect(() => {
     if (!useManual && fixedExpenses.length === 0) {
       handleAddExpense({ id: Date.now().toString(), name: "", value: 0 });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!useManual && personalExpenses.length === 0 && (initialProLabore ?? 0) === 0) {
+      handleAddPersonalExpense({ id: `${Date.now()}-personal`, name: "", value: 0 });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -188,25 +250,15 @@ export default function MinimumHourCalculator({
               tooltip="Todos os custos recorrentes para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU, etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
             />
 
-            {/* Despesas pessoais essenciais */}
-            <div>
-              <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-                Despesas pessoais essenciais (R$)
-                <Tooltip text="Valor mensal mínimo necessário para cobrir suas despesas pessoais essenciais (moradia, alimentação, saúde, transporte, etc.). Este é o piso para sua segurança financeira." />
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={proLabore || ""}
-                  onChange={(e) => { const v = Number(e.target.value); setProLabore(v); onProLaboreChange?.(v); }}
-                  className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
-                  placeholder="0,00"
-                />
-              </div>
-            </div>
+            <ExpenseCard
+              expenses={personalExpenses}
+              onAdd={handleAddPersonalExpense}
+              onRemove={handleRemovePersonalExpense}
+              onUpdate={handleUpdatePersonalExpense}
+              placeholder="Ex: Moradia, Alimentação..."
+              label="Despesas pessoais essenciais (R$)"
+              tooltip="Suas despesas pessoais mensais essenciais. Inclua moradia, alimentação, saúde, transporte e outros custos de vida. O total substitui o antigo campo de pró-labore."
+            />
 
             {/* Horas Produtivas Mensais */}
             <div>

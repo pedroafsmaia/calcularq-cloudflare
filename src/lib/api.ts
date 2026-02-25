@@ -35,6 +35,7 @@ export interface Budget {
     selections: Record<string, number>;
     estimatedHours: number;
     fixedExpenses?: Array<{ id: string; name: string; value: number }>;
+    personalExpenses?: Array<{ id: string; name: string; value: number }>;
     proLabore?: number;
     productiveHours?: number;
     commercialDiscount?: number;

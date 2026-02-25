@@ -61,6 +61,7 @@ export default function Calculator() {
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [useManualMinHourlyRate, setUseManualMinHourlyRate] = useState(false);
   const [fixedExpenses, setFixedExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
+  const [personalExpenses, setPersonalExpenses] = useState<Array<{ id: string; name: string; value: number }>>([]);
   const [proLabore, setProLabore] = useState(0);
   const [productiveHours, setProductiveHours] = useState(0);
 
@@ -88,7 +89,7 @@ export default function Calculator() {
     if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
     draftSaveRef.current = setTimeout(() => {
       saveDraft({
-        minHourlyRate, useManualMinHourlyRate, fixedExpenses, proLabore, productiveHours,
+        minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
         factors: factors.map(f => ({ id: f.id, weight: f.weight })),
         areaIntervals, area, selections,
         estimatedHours, commercialDiscount, variableExpenses,
@@ -97,7 +98,7 @@ export default function Calculator() {
       });
     }, 800);
   }, [
-    minHourlyRate, useManualMinHourlyRate, fixedExpenses, proLabore, productiveHours,
+    minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
     factors, areaIntervals, area, selections,
     estimatedHours, commercialDiscount, variableExpenses,
     currentStep, maxStepReached,
@@ -119,6 +120,7 @@ export default function Calculator() {
     setMinHourlyRate(draft.minHourlyRate ?? null);
     setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
     if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
+    if (draft.personalExpenses) setPersonalExpenses(draft.personalExpenses);
     if (draft.proLabore) setProLabore(draft.proLabore);
     if (draft.productiveHours) setProductiveHours(draft.productiveHours);
     if (draft.factors) {
@@ -179,6 +181,7 @@ export default function Calculator() {
 
         if (budget.data.commercialDiscount !== undefined) setCommercialDiscount(budget.data.commercialDiscount);
         if (budget.data.fixedExpenses) setFixedExpenses(budget.data.fixedExpenses);
+        if (budget.data.personalExpenses) setPersonalExpenses(budget.data.personalExpenses);
         if (budget.data.proLabore !== undefined) setProLabore(budget.data.proLabore);
         if (budget.data.productiveHours !== undefined) setProductiveHours(budget.data.productiveHours);
 
@@ -216,6 +219,7 @@ export default function Calculator() {
       setMinHourlyRate(lastBudgetData.minHourlyRate ?? null);
       setUseManualMinHourlyRate(Boolean(lastBudgetData.useManualMinHourlyRate));
       setFixedExpenses(Array.isArray(lastBudgetData.fixedExpenses) ? lastBudgetData.fixedExpenses : []);
+      setPersonalExpenses(Array.isArray(lastBudgetData.personalExpenses) ? lastBudgetData.personalExpenses : []);
       setProLabore(typeof lastBudgetData.proLabore === "number" ? lastBudgetData.proLabore : 0);
       setProductiveHours(typeof lastBudgetData.productiveHours === "number" ? lastBudgetData.productiveHours : 0);
       return;
@@ -266,6 +270,7 @@ export default function Calculator() {
       setMinHourlyRate(null);
       setUseManualMinHourlyRate(false);
       setFixedExpenses([]);
+      setPersonalExpenses([]);
       setProLabore(0);
       setProductiveHours(0);
       return;
@@ -358,6 +363,11 @@ export default function Calculator() {
   const cubPercentage = useMemo(() => {
     if (!effectiveAreaForCub || effectiveAreaForCub <= 0 || displayValues.finalSalePrice <= 0) return null;
     return (displayValues.finalSalePrice / (CUB_MEDIO * effectiveAreaForCub)) * 100;
+  }, [effectiveAreaForCub, displayValues.finalSalePrice]);
+
+  const pricePerSqm = useMemo(() => {
+    if (!effectiveAreaForCub || effectiveAreaForCub <= 0 || displayValues.finalSalePrice <= 0) return null;
+    return displayValues.finalSalePrice / effectiveAreaForCub;
   }, [effectiveAreaForCub, displayValues.finalSalePrice]);
 
   const hasComplexitySelections = Object.keys(selections).length > 0;
@@ -548,6 +558,41 @@ export default function Calculator() {
                 </span>
               </div>
 
+              {/* PREÇO/M² (IAB/CAU) COM ALERTA POR FAIXA */}
+              <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
+                <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
+                  Preço/m²
+                  <Tooltip text="Honorário dividido pela área do projeto. A faixa de referência do IAB/CAU costuma ficar entre R$ 60 e R$ 200/m² para projetos residenciais. É apenas uma referência — o valor real varia conforme área, padrão e região." />
+                </span>
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  <span
+                    className={`text-sm font-bold ${
+                      pricePerSqm !== null
+                        ? pricePerSqm < 60 || pricePerSqm > 200
+                          ? "text-amber-600"
+                          : "text-slate-700"
+                        : "text-calcularq-blue"
+                    }`}
+                  >
+                    {pricePerSqm !== null
+                      ? `R$ ${pricePerSqm.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : "—"}
+                  </span>
+                  {pricePerSqm !== null && (pricePerSqm < 60 || pricePerSqm > 200) && (
+                    <Tooltip
+                      title="Atenção"
+                      tone="warning"
+                      iconClassName="text-amber-600 hover:text-amber-700"
+                      text={
+                        pricePerSqm < 60
+                          ? "Valor/m² abaixo da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Comum em projetos de grande porte, mas pode indicar subvalorização do serviço."
+                          : "Valor/m² acima da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Comum em áreas menores ou alta complexidade."
+                      }
+                    />
+                  )}
+                </span>
+              </div>
+
               {/* LUCRO ESTIMADO */}
               {displayValues.profit !== null && (
                 <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
@@ -676,7 +721,9 @@ export default function Calculator() {
                     onFixedExpensesChange={setFixedExpenses}
                     onProductiveHoursChange={setProductiveHours}
                     onProLaboreChange={setProLabore}
+                    onPersonalExpensesChange={setPersonalExpenses}
                     initialFixedExpenses={fixedExpenses}
+                    initialPersonalExpenses={personalExpenses}
                     initialProductiveHours={productiveHours}
                     initialProLabore={proLabore}
                   />
@@ -752,6 +799,7 @@ export default function Calculator() {
                     factors={factors}
                     areaIntervals={areaIntervals}
                     fixedExpenses={fixedExpenses}
+                    personalExpenses={personalExpenses}
                     productiveHours={productiveHours}
                     useManualMinHourlyRate={useManualMinHourlyRate}
                     mobileResultsContent={

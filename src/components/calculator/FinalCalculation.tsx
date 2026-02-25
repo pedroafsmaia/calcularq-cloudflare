@@ -28,6 +28,7 @@ interface FinalCalculationProps {
   factors: Array<{ id: string; name: string; weight: number }>;
   areaIntervals: Array<{ min: number; max: number | null; level: number }>;
   fixedExpenses?: Expense[];
+  personalExpenses?: Expense[];
   productiveHours?: number;
   useManualMinHourlyRate?: boolean;
   mobileResultsContent?: ReactNode;
@@ -56,6 +57,7 @@ export default function FinalCalculation({
   factors,
   areaIntervals,
   fixedExpenses = [],
+  personalExpenses = [],
   productiveHours = 0,
   useManualMinHourlyRate = false,
   mobileResultsContent,
@@ -106,6 +108,7 @@ export default function FinalCalculation({
           selections: factorLevels,
           estimatedHours,
           fixedExpenses,
+          personalExpenses,
           proLabore,
           productiveHours,
           commercialDiscount,

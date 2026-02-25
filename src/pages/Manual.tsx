@@ -532,6 +532,7 @@ export default function Manual() {
                           "Valor do Desconto (se houver)",
                           "Preço de Venda Final",
                           "% do valor da obra (indicador comparativo, referência CAU)",
+                          "Preço/m² (indicador comparativo, referência IAB/CAU)",
                           "Lucro Estimado",
                         ].map((item) => (
                           <li key={item} className="flex items-start gap-2.5">
@@ -544,6 +545,10 @@ export default function Manual() {
 
                     <NoteBox>
                       <strong>% do valor da obra (referência CAU/BR):</strong> indicador comparativo de referência (faixa sugerida: 2% a 11%). Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                    </NoteBox>
+
+                    <NoteBox>
+                      <strong>Preço por m² (referência IAB/CAU):</strong> indicador comparativo de referência (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
                   </div>
                 </div>
