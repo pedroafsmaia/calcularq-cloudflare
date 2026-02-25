@@ -15,6 +15,7 @@ interface SaveBudgetButtonProps {
   budgetData: Budget["data"];
   projectName?: string;
   clientName?: string;
+  onSaved?: (budget: Budget) => void;
 }
 
 export default function SaveBudgetButton({
@@ -25,6 +26,7 @@ export default function SaveBudgetButton({
   budgetData,
   projectName,
   clientName,
+  onSaved,
 }: SaveBudgetButtonProps) {
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -78,6 +80,7 @@ export default function SaveBudgetButton({
       };
 
       const resp = await api.saveBudget(payload);
+      onSaved?.(resp.budget);
       const savedId = resp.budget.id;
 
       if (!budgetId && typeof window !== "undefined") {

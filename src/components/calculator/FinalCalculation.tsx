@@ -32,6 +32,7 @@ interface FinalCalculationProps {
   productiveHours?: number;
   useManualMinHourlyRate?: boolean;
   mobileResultsContent?: ReactNode;
+  onBudgetSaved?: () => void;
 }
 
 export default function FinalCalculation({
@@ -61,6 +62,7 @@ export default function FinalCalculation({
   productiveHours = 0,
   useManualMinHourlyRate = false,
   mobileResultsContent,
+  onBudgetSaved,
 }: FinalCalculationProps) {
   const handleAddExpense = (expense: Expense) => {
     onVariableExpensesChange([...variableExpenses, expense]);
@@ -94,6 +96,7 @@ export default function FinalCalculation({
         initialDescription={initialDescription}
         clientName={initialClientName}
         projectName={initialProjectName}
+        onSaved={() => onBudgetSaved?.()}
         budgetData={{
           minHourlyRate,
           useManualMinHourlyRate,
