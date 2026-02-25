@@ -12,6 +12,7 @@ interface AppDialogProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidthClassName?: string;
+  scrollBehavior?: "inner" | "mobile-inner";
 }
 
 export default function AppDialog({
@@ -22,6 +23,7 @@ export default function AppDialog({
   children,
   footer,
   maxWidthClassName = "max-w-lg",
+  scrollBehavior = "inner",
 }: AppDialogProps) {
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
@@ -41,6 +43,8 @@ export default function AppDialog({
   }, [open, onOpenChange]);
 
   if (typeof document === "undefined") return null;
+
+  const useMobileInnerScroll = scrollBehavior === "mobile-inner";
 
   return createPortal(
     <AnimatePresence>
@@ -62,10 +66,14 @@ export default function AppDialog({
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-4"
+            style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
             onClick={() => onOpenChange(false)}
           >
             <div
-              className={`my-4 w-full ${maxWidthClassName} max-h-[min(90vh,48rem)] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col`}
+              className={`my-4 w-full ${maxWidthClassName} rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col ${
+                useMobileInnerScroll ? "overflow-hidden sm:overflow-visible max-h-[85dvh] sm:max-h-none" : "overflow-hidden"
+              }`}
+              style={useMobileInnerScroll ? undefined : { maxHeight: "min(48rem, calc(100dvh - 2rem - env(safe-area-inset-bottom, 0px)))" }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
@@ -84,9 +92,18 @@ export default function AppDialog({
                 </Button>
               </div>
 
-              <div className="px-5 py-4 sm:px-6 overflow-y-auto">{children}</div>
+              <div className={`px-5 py-4 sm:px-6 ${useMobileInnerScroll ? "overflow-y-auto sm:overflow-visible" : "overflow-y-auto"}`}>
+                {children}
+              </div>
 
-              {footer ? <div className="border-t border-slate-200 px-5 py-4 sm:px-6">{footer}</div> : null}
+              {footer ? (
+                <div
+                  className="border-t border-slate-200 px-5 py-4 sm:px-6"
+                  style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+                >
+                  {footer}
+                </div>
+              ) : null}
             </div>
           </motion.div>
         </>

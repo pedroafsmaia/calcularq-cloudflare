@@ -397,6 +397,7 @@ export default function BudgetsHistory() {
         title="Detalhes do cálculo"
         description="Edite as informações salvas e consulte um resumo dos resultados."
         maxWidthClassName="max-w-3xl"
+        scrollBehavior="mobile-inner"
         footer={
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
             <Button
