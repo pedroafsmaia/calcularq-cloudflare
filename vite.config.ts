@@ -13,4 +13,10 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['jose'],
   },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/test/setup.ts",
+    include: ["src/**/*.test.{ts,tsx}"],
+  },
 })

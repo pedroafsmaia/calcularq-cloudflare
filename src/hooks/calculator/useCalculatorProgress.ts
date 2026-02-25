@@ -10,6 +10,15 @@ type UseCalculatorProgressParams = {
   finalSalePrice: number;
 };
 
+export function getMaxStepReachedFromState(params: {
+  minHourlyRate: number | null;
+  hasComplexitySelections: boolean;
+}) {
+  const hasMinHour = !!(params.minHourlyRate && params.minHourlyRate > 0);
+  if (!hasMinHour) return 1;
+  return params.hasComplexitySelections ? 4 : 2;
+}
+
 export function useCalculatorProgress({
   currentStep,
   setCurrentStep,
@@ -30,14 +39,24 @@ export function useCalculatorProgress({
 
   useEffect(() => {
     // A etapa 3 é opcional; a etapa 4 pode ser acessada após concluir a etapa 2.
-    const nextMaxStepReached = !stepComplete(1) ? 1 : stepComplete(2) ? 4 : 2;
+    const nextMaxStepReached = getMaxStepReachedFromState({
+      minHourlyRate,
+      hasComplexitySelections,
+    });
 
     setMaxStepReached((prev) => (prev === nextMaxStepReached ? prev : nextMaxStepReached));
 
     if (currentStep > nextMaxStepReached) {
       setCurrentStep(nextMaxStepReached);
     }
-  }, [currentStep, setCurrentStep, setMaxStepReached, stepComplete]);
+  }, [
+    currentStep,
+    hasComplexitySelections,
+    minHourlyRate,
+    setCurrentStep,
+    setMaxStepReached,
+    stepComplete,
+  ]);
 
   const canAdvance = stepComplete(currentStep);
   const stepVisualDone = (n: number, maxStepReached: number) => maxStepReached > n;
