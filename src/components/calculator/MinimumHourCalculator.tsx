@@ -246,8 +246,8 @@ export default function MinimumHourCalculator({
               onRemove={handleRemoveExpense}
               onUpdate={handleUpdateExpense}
               placeholder="Ex: Aluguel, Contador..."
-              label="Despesas operacionais fixas mensais (R$)"
-              tooltip="Todos os custos recorrentes para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU, etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
+              label="Despesas operacionais fixas (R$)"
+              tooltip="Suas despesas operacionais fixas mensais para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
             />
 
             <ExpenseCard
@@ -257,7 +257,7 @@ export default function MinimumHourCalculator({
               onUpdate={handleUpdatePersonalExpense}
               placeholder="Ex: Moradia, Alimentação..."
               label="Despesas pessoais essenciais (R$)"
-              tooltip="Suas despesas pessoais mensais essenciais. Inclua moradia, alimentação, saúde, transporte e outros custos de vida. O total substitui o antigo campo de pró-labore."
+              tooltip="Despesas pessoais essenciais mensais. Inclua moradia, alimentação, saúde, transporte e outros custos de vida."
             />
 
             {/* Horas Produtivas Mensais */}

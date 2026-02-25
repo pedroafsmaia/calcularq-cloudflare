@@ -57,44 +57,46 @@ export default function ExpenseCard({
         </Button>
       </div>
 
-      <div className="space-y-3">
-        {expenses.map((expense) => (
-          <div
-            key={expense.id}
-            className="flex items-center gap-2 p-2.5 bg-slate-50/80 rounded-lg border border-slate-200 flex-wrap sm:flex-nowrap"
-          >
-            <input
-              type="text"
-              placeholder={placeholder}
-              value={expense.name}
-              onChange={(e) => onUpdate(expense.id, { name: e.target.value })}
-              className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0"
-            />
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={expense.value || ""}
-                onChange={(e) => onUpdate(expense.id, { value: Number(e.target.value) })}
-                className="w-28 sm:w-32 pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0"
-                placeholder="0,00"
-              />
+      <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-2.5 sm:p-3">
+        <div className="space-y-2.5">
+          {expenses.map((expense, index) => (
+            <div key={expense.id}>
+              {index > 0 ? <div className="mb-2.5 border-t border-slate-200/80" /> : null}
+              <div className="flex items-center gap-2 p-1 flex-wrap sm:flex-nowrap">
+                <input
+                  type="text"
+                  placeholder={placeholder}
+                  value={expense.name}
+                  onChange={(e) => onUpdate(expense.id, { name: e.target.value })}
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0 bg-white"
+                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={expense.value || ""}
+                    onChange={(e) => onUpdate(expense.id, { value: Number(e.target.value) })}
+                    className="w-28 sm:w-32 pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0 bg-white"
+                    placeholder="0,00"
+                  />
+                </div>
+                {expenses.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onRemove(expense.id)}
+                    className="h-9 w-9 text-slate-400 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
             </div>
-            {expenses.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onRemove(expense.id)}
-                className="h-9 w-9 text-slate-400 hover:text-red-600 hover:bg-red-50"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {expenses.length > 0 && (
