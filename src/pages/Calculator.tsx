@@ -4,7 +4,7 @@ import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, Trash2 } from
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
-import type { BudgetData, ExpenseItem } from "@/types/budget";
+import type { ExpenseItem } from "@/types/budget";
 
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
 import ComplexityConfig from "../components/calculator/ComplexityConfig";
@@ -28,6 +28,9 @@ import {
 import { createPageUrl } from "@/utils";
 import { fadeUp } from "@/lib/motion";
 import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "@/lib/calculatorDraft";
+import { useCalculatorProgress } from "@/hooks/calculator/useCalculatorProgress";
+import { useCalculatorReset } from "@/hooks/calculator/useCalculatorReset";
+import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImport";
 
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
@@ -229,131 +232,56 @@ export default function Calculator() {
     setMinHourlyRate(rate);
   }, []);
 
-  const applyCurrentStepFromBudgetData = useCallback((sourceData: BudgetData) => {
-    if (!sourceData) return;
+  const { handleImportCurrentStepFromSelectedBudget, handleOpenImportStepDialog } = useCalculatorStepImport({
+    currentStep,
+    savedBudgets,
+    selectedImportBudgetId,
+    setSelectedImportBudgetId,
+    setImportStepDialogOpen,
+    areaIntervals,
+    defaultFactors: DEFAULT_FACTORS,
+    setMinHourlyRate,
+    setUseManualMinHourlyRate,
+    setFixedExpenses,
+    setPersonalExpenses,
+    setProLabore,
+    setProductiveHours,
+    setAreaIntervals,
+    setSelections,
+    setArea,
+    setFactors,
+    setEstimatedHours,
+    setCommercialDiscount,
+    setVariableExpenses,
+  });
 
-    if (currentStep === 1) {
-      setMinHourlyRate(sourceData.minHourlyRate ?? null);
-      setUseManualMinHourlyRate(Boolean(sourceData.useManualMinHourlyRate));
-      setFixedExpenses(Array.isArray(sourceData.fixedExpenses) ? sourceData.fixedExpenses : []);
-      setPersonalExpenses(Array.isArray(sourceData.personalExpenses) ? sourceData.personalExpenses : []);
-      setProLabore(typeof sourceData.proLabore === "number" ? sourceData.proLabore : 0);
-      setProductiveHours(typeof sourceData.productiveHours === "number" ? sourceData.productiveHours : 0);
-      return;
-    }
-
-    if (currentStep === 2) {
-      if (Array.isArray(sourceData.areaIntervals)) setAreaIntervals(sourceData.areaIntervals);
-      if (sourceData.selections) setSelections(sourceData.selections);
-
-      if (typeof sourceData.area === "number" && Number.isFinite(sourceData.area)) {
-        setArea(sourceData.area);
-      } else {
-        const areaLevel = Number(sourceData.selections?.area ?? sourceData.factors?.find?.((f) => f.id === "area")?.level);
-        const sourceIntervals = Array.isArray(sourceData.areaIntervals) ? sourceData.areaIntervals : areaIntervals;
-        const interval = sourceIntervals.find((i) => i.level === areaLevel);
-        if (interval) {
-          const max = typeof interval.max === "number" ? interval.max : interval.min;
-          setArea((interval.min + max) / 2);
-        } else {
-          setArea(null);
-        }
-      }
-      return;
-    }
-
-    if (currentStep === 3) {
-      if (Array.isArray(sourceData.factors)) {
-        setFactors(DEFAULT_FACTORS.map((df) => {
-          const saved = sourceData.factors.find((f) => f.id === df.id);
-          return saved ? { ...df, weight: saved.weight } : df;
-        }));
-      }
-      return;
-    }
-
-    if (currentStep === 4) {
-      setEstimatedHours(typeof sourceData.estimatedHours === "number" ? sourceData.estimatedHours : 0);
-      setCommercialDiscount(typeof sourceData.commercialDiscount === "number" ? sourceData.commercialDiscount : 0);
-      setVariableExpenses(Array.isArray(sourceData.variableExpenses) ? sourceData.variableExpenses : []);
-    }
-  }, [currentStep, areaIntervals]);
-
-  const handleImportCurrentStepFromSelectedBudget = useCallback(() => {
-    if (!selectedImportBudgetId) return;
-    const sourceBudget = savedBudgets.find((b) => b.id === selectedImportBudgetId);
-    if (!sourceBudget?.data) return;
-    applyCurrentStepFromBudgetData(sourceBudget.data);
-    setImportStepDialogOpen(false);
-  }, [applyCurrentStepFromBudgetData, savedBudgets, selectedImportBudgetId]);
-
-  const handleOpenImportStepDialog = useCallback(() => {
-    if (!savedBudgets.length) return;
-    setSelectedImportBudgetId((prev) => prev || savedBudgets[0].id);
-    setImportStepDialogOpen(true);
-  }, [savedBudgets]);
-
-  const handleConfirmClearCurrentStep = useCallback(() => {
-    if (currentStep === 1) {
-      setMinHourlyRate(null);
-      setUseManualMinHourlyRate(false);
-      setFixedExpenses([]);
-      setPersonalExpenses([]);
-      setProLabore(0);
-      setProductiveHours(0);
-      return;
-    }
-
-    if (currentStep === 2) {
-      setArea(null);
-      setSelections({});
-      setAreaIntervals(DEFAULT_AREA_INTERVALS);
-      return;
-    }
-
-    if (currentStep === 3) {
-      setFactors(DEFAULT_FACTORS);
-      return;
-    }
-
-    if (currentStep === 4) {
-      setEstimatedHours(0);
-      setCommercialDiscount(0);
-      setVariableExpenses([]);
-    }
-  }, [currentStep]);
-
-  const handleClearCurrentStep = useCallback(() => {
-    setConfirmClearStepOpen(true);
-  }, []);
-
-  const handleConfirmResetCalculation = useCallback(() => {
-
-    setMinHourlyRate(null);
-    setUseManualMinHourlyRate(false);
-    setFixedExpenses([]);
-    setPersonalExpenses([]);
-    setProLabore(0);
-    setProductiveHours(0);
-
-    setFactors(DEFAULT_FACTORS);
-    setAreaIntervals(DEFAULT_AREA_INTERVALS);
-    setArea(null);
-    setSelections({});
-
-    setEstimatedHours(0);
-    setCommercialDiscount(0);
-    setVariableExpenses([]);
-
-    setCurrentStep(1);
-    setMaxStepReached(1);
-
-    clearCalculatorDraft();
-  }, []);
-
-  const handleResetCalculation = useCallback(() => {
-    setConfirmClearAllOpen(true);
-  }, []);
+  const {
+    handleConfirmClearCurrentStep,
+    handleClearCurrentStep,
+    handleConfirmResetCalculation,
+    handleResetCalculation,
+  } = useCalculatorReset({
+    currentStep,
+    defaultFactors: DEFAULT_FACTORS,
+    defaultAreaIntervals: DEFAULT_AREA_INTERVALS,
+    setConfirmClearStepOpen,
+    setConfirmClearAllOpen,
+    setCurrentStep,
+    setMaxStepReached,
+    setMinHourlyRate,
+    setUseManualMinHourlyRate,
+    setFixedExpenses,
+    setPersonalExpenses,
+    setProLabore,
+    setProductiveHours,
+    setFactors,
+    setAreaIntervals,
+    setArea,
+    setSelections,
+    setEstimatedHours,
+    setCommercialDiscount,
+    setVariableExpenses,
+  });
 
   const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
     setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
@@ -437,32 +365,16 @@ export default function Calculator() {
   const otherFactors = factors.filter(f => f.id !== "area");
 
   // ── Stepper ───────────────────────────────────────────────────
-  const stepComplete = (n: number) => {
-    if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
-    if (n === 2) return hasComplexitySelections;
-    if (n === 3) return true; // opcional
-    return displayValues.finalSalePrice > 0;
-  };
-
-  useEffect(() => {
-    // Regride o progresso visual quando etapas essenciais perdem dados.
-    // A etapa 3 é opcional, então a etapa 4 fica acessível após concluir a etapa 2.
-    const nextMaxStepReached = !stepComplete(1)
-      ? 1
-      : stepComplete(2)
-        ? 4
-        : 2;
-
-    setMaxStepReached((prev) => (prev === nextMaxStepReached ? prev : nextMaxStepReached));
-
-    // Se a etapa atual ficar acima da última etapa válida, volta automaticamente.
-    if (currentStep > nextMaxStepReached) {
-      setCurrentStep(nextMaxStepReached);
-    }
-  }, [minHourlyRate, hasComplexitySelections, displayValues.finalSalePrice, currentStep]);
+  const { stepComplete, canAdvance } = useCalculatorProgress({
+    currentStep,
+    setCurrentStep,
+    setMaxStepReached,
+    minHourlyRate,
+    hasComplexitySelections,
+    finalSalePrice: displayValues.finalSalePrice,
+  });
 
   const stepVisualDone = (n: number) => maxStepReached > n;
-  const canAdvance = stepComplete(currentStep);
   const currentStepLabel = STEPS.find((s) => s.n === currentStep)?.label ?? `Etapa ${currentStep}`;
   const canImportCurrentStep = savedBudgets.length > 0;
   const selectedImportBudget = useMemo(
