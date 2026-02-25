@@ -401,8 +401,7 @@ export default function BudgetsHistory() {
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
             <Button
               type="button"
-              variant="outline"
-              className="border-slate-200 text-slate-700 hover:bg-slate-50"
+              className="bg-calcularq-blue hover:bg-[#002366] text-white"
               onClick={() => (selectedBudget ? openBudget(selectedBudget.id) : null)}
               disabled={!selectedBudget}
             >
@@ -430,8 +429,8 @@ export default function BudgetsHistory() {
         }
       >
         {selectedBudget ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
+            <div className="space-y-4 lg:flex lg:h-full lg:flex-col">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cálculo *</label>
                 <input
@@ -452,13 +451,13 @@ export default function BudgetsHistory() {
                 />
               </div>
 
-              <div>
+              <div className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">Descrição (opcional)</label>
                 <textarea
                   rows={4}
                   value={detailDescription}
                   onChange={(e) => setDetailDescription(e.target.value)}
-                  className="w-full min-h-[7rem] max-h-56 resize-y rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                  className="w-full min-h-[7rem] rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue resize-none lg:min-h-0 lg:flex-1"
                 />
               </div>
 
