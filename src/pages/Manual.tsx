@@ -564,11 +564,11 @@ export default function Manual() {
                     </div>
 
                     <NoteBox>
-                      <strong>% do valor da obra (referência CAU/BR):</strong> Indicador comparativo (faixa sugerida: 2% a 11%). A faixa pode variar conforme complexidade, sofisticação, etapa, tipo de projeto e região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>% do valor da obra (referência CAU/BR):</strong> Indicador comparativo (faixa sugerida: 2% a 11%). A faixa de referência pode variar dependendo da complexidade, da etapa do projeto, do tipo de projeto, da sofisticação e da região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
 
                     <NoteBox>
-                      <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa pode variar conforme complexidade, sofisticação, etapa, área e região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa de referência pode variar dependendo da complexidade, da etapa do projeto, da sofisticação, da área e da região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
                   </div>
                 </div>

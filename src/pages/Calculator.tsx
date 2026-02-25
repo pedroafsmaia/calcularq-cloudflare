@@ -529,7 +529,7 @@ export default function Calculator() {
               <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   % do valor da obra
-                  <Tooltip text={"Estimativa baseada no CUB médio nacional (R$ 2.800/m²). A faixa de referência do CAU/BR costuma ficar entre 2% e 11% do valor da obra. É apenas uma referência — a faixa real pode variar conforme a complexidade, a sofisticação, a etapa e o tipo de projeto, além da região."} />
+                  <Tooltip text={"Estimativa baseada no CUB médio nacional (R$ 2.800/m²). A faixa de referência do CAU/BR costuma ficar entre 2% e 11% do valor da obra, dependendo da complexidade, da etapa do projeto, do tipo de projeto, da sofisticação e da região."} />
                 </span>
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
                   <span className={`text-sm font-bold ${
@@ -562,7 +562,7 @@ export default function Calculator() {
               <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   Preço/m²
-                  <Tooltip text="Honorário dividido pela área do projeto. A faixa de referência do IAB/CAU costuma ficar entre R$ 60 e R$ 200/m² para projetos residenciais. É apenas uma referência — a faixa real pode variar conforme a complexidade, a sofisticação, a etapa do projeto, a área e a região." />
+                  <Tooltip text="Honorário dividido pela área do projeto. A faixa de referência do IAB/CAU costuma ficar entre R$ 60 e R$ 200/m² para projetos residenciais, dependendo da complexidade, da etapa do projeto, da sofisticação, da área e da região." />
                 </span>
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
                   <span
