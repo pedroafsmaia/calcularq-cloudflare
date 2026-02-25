@@ -754,9 +754,9 @@ export default function Calculator() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: prefersReducedMotion ? 0.12 : 0.2 }}
               >
                 {currentStep === 1 && (
@@ -851,8 +851,8 @@ export default function Calculator() {
                     useManualMinHourlyRate={useManualMinHourlyRate}
                     mobileResultsContent={
                       <motion.div
-                        initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
                         className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
                       >

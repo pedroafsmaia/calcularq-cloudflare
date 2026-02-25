@@ -63,9 +63,9 @@ export default function AppDialog({
 
           <motion.div
             key="dialog-shell"
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={dialogContentTransition()}
             className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4"
             style={{

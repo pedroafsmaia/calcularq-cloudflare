@@ -227,8 +227,8 @@ export default function Payment() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12, scale: prefersReducedMotion ? 1 : 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full text-center"
         >
@@ -249,8 +249,8 @@ export default function Payment() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12, scale: prefersReducedMotion ? 1 : 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full text-center"
         >
