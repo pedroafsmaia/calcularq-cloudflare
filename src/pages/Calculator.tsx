@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, Trash2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,7 @@ import {
   AreaInterval,
 } from "../components/pricing/PricingEngine";
 import { createPageUrl } from "@/utils";
+import { fadeUp } from "@/lib/motion";
 
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
@@ -46,6 +47,7 @@ function loadDraft(): any | null {
 }
 
 export default function Calculator() {
+  const prefersReducedMotion = !!useReducedMotion();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const budgetId = searchParams.get("budget");
@@ -649,8 +651,9 @@ export default function Calculator() {
 
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          variants={fadeUp(prefersReducedMotion, 10)}
+          initial="hidden"
+          animate="show"
           className="mb-7 sm:mb-8 text-center"
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
@@ -679,7 +682,7 @@ export default function Calculator() {
                     <button
                       type="button"
                       onClick={handleClick}
-                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-colors transition-shadow duration-200 border-2
                         ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
                           : active ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
                           : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
@@ -706,7 +709,12 @@ export default function Calculator() {
           </div>
         </div>
 
-            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
+            <motion.div
+              variants={fadeUp(prefersReducedMotion, 8)}
+              initial="hidden"
+              animate="show"
+              className="mb-5"
+            >
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
@@ -746,10 +754,10 @@ export default function Calculator() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.25 }}
+                exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
+                transition={{ duration: prefersReducedMotion ? 0.12 : 0.2 }}
               >
                 {currentStep === 1 && (
                   <MinimumHourCalculator
@@ -843,8 +851,9 @@ export default function Calculator() {
                     useManualMinHourlyRate={useManualMinHourlyRate}
                     mobileResultsContent={
                       <motion.div
-                        initial={{ opacity: 0, y: 12 }}
+                        initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
                         animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
                         className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
                       >
                         <SectionHeader

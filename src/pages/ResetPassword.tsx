@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { api } from "@/lib/api";
+import { fadeUp } from "@/lib/motion";
 
 export default function ResetPassword() {
+  const prefersReducedMotion = !!useReducedMotion();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ export default function ResetPassword() {
   if (success) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+        <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -71,7 +73,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+      <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8">
           <div className="text-center mb-7 sm:mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-calcularq-blue mb-4">

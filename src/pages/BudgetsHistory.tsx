@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Budget, api } from "@/lib/api";
 import { History, Trash2, Eye, Plus, Calendar } from "lucide-react";
@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import AppDialog from "@/components/ui/AppDialog";
+import { fadeUp } from "@/lib/motion";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
 
 export default function BudgetsHistory() {
+  const prefersReducedMotion = !!useReducedMotion();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [budgets, setBudgets] = useState<Budget[]>([]);
@@ -192,7 +194,7 @@ export default function BudgetsHistory() {
   return (
     <div className="bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
+        <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" className="mb-6 sm:mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <SectionHeader
               compact
@@ -246,6 +248,7 @@ export default function BudgetsHistory() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
             className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-sm min-h-[280px] flex flex-col items-center justify-center"
           >
             <div className="w-16 h-16 rounded-2xl bg-calcularq-blue/5 border border-calcularq-blue/10 flex items-center justify-center mb-5">
@@ -266,6 +269,7 @@ export default function BudgetsHistory() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
             className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 text-center shadow-sm"
           >
             <h3 className="text-lg font-semibold text-slate-800 mb-2">Nenhum resultado encontrado</h3>
@@ -290,7 +294,7 @@ export default function BudgetsHistory() {
                 key={budget.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, delay: prefersReducedMotion ? 0 : index * 0.03 }}
                 className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-slate-300 hover:shadow-md transition-colors transition-shadow flex flex-col cursor-pointer"
                 onClick={() => openBudgetDetails(budget)}
                 role="button"

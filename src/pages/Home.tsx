@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -12,10 +12,12 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { createPageUrl } from "@/utils";
+import { fadeUp, fadeX, listStagger, viewportOnce } from "@/lib/motion";
 
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const prefersReducedMotion = !!useReducedMotion();
 
   // Carregar script do Senja.io
   useEffect(() => {
@@ -91,9 +93,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-20">
             <div className="lg:hidden relative z-20 mx-auto mb-[-0.75rem] sm:mb-[-1rem] max-w-[21.5rem] sm:max-w-[22.5rem] px-2">
               <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                variants={fadeUp(prefersReducedMotion, 14)}
+                initial="hidden"
+                animate="show"
+                transition={{ delay: 0.12 }}
               >
                 <img
                   src="/mockup.png"
@@ -106,9 +109,10 @@ export default function Home() {
             <div className="relative z-10 grid lg:grid-cols-[1.02fr_0.98fr] gap-8 lg:gap-12 items-center">
               <div className="hidden lg:block">
                 <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
+                  variants={fadeX(prefersReducedMotion, 18, -1)}
+                  initial="hidden"
+                  animate="show"
+                  transition={{ delay: 0.18 }}
                   className="relative px-2"
                 >
                   <img
@@ -121,8 +125,10 @@ export default function Home() {
 
               <div className="relative z-10">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  variants={fadeUp(prefersReducedMotion, 16)}
+                  initial="hidden"
+                  animate="show"
+                  transition={{ delay: 0.2 }}
                   className="bg-white rounded-2xl p-5 pt-10 sm:p-8 sm:pt-12 lg:p-10 lg:pt-10 shadow-2xl"
                 >
                   {/* Logo removido do banner conforme feedback */}
@@ -155,7 +161,7 @@ export default function Home() {
                   >
                     <Button 
                       size="lg" 
-                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold sm:text-lg text-base"
+                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-shadow font-semibold sm:text-lg text-base"
                       style={{ backgroundColor: '#fc7338' }}
                     >
                       {user?.hasPaid ? (
@@ -200,20 +206,18 @@ export default function Home() {
         {/* Features Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            variants={listStagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 + index * 0.1 }}
-                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center"
+                variants={fadeUp(prefersReducedMotion, 12)}
+                transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
+                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-colors transition-shadow duration-200 text-center"
               >
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
@@ -232,10 +236,10 @@ export default function Home() {
         {/* Factors Section */}
         <div id="como-funciona" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 scroll-mt-24">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
+            variants={fadeUp(prefersReducedMotion, 14)}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
             className="bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue rounded-3xl p-6 sm:p-8 md:p-12"
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -258,18 +262,14 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {factorsList.map((factor, index) => (
-                  <motion.div
+                {factorsList.map((factor) => (
+                  <div
                     key={factor}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
                     className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-3"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span className="text-white text-sm sm:text-[0.95rem]">{factor}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -279,10 +279,10 @@ export default function Home() {
         {/* How It Works Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.6 }}
+            variants={fadeUp(prefersReducedMotion, 14)}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
             className="text-center"
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">
@@ -323,7 +323,7 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-all duration-300 text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-colors transition-shadow duration-200 text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>

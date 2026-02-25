@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { dialogContentTransition, dialogOverlayTransition } from "@/lib/motion";
 
 interface AppDialogProps {
   open: boolean;
@@ -55,6 +56,7 @@ export default function AppDialog({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={dialogOverlayTransition()}
             className="fixed inset-0 z-[100] bg-black/50"
             onClick={() => onOpenChange(false)}
           />
@@ -64,7 +66,7 @@ export default function AppDialog({
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: 0.18 }}
+            transition={dialogContentTransition()}
             className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4"
             style={{
               paddingTop: "calc(0.75rem + env(safe-area-inset-top, 0px))",

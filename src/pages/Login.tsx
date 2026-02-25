@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { api } from "@/lib/api";
+import { fadeUp } from "@/lib/motion";
 
 export default function Login() {
+  const prefersReducedMotion = !!useReducedMotion();
   const REMEMBER_ME_KEY = "calcularq_remember_me";
   const REMEMBER_ME_EMAIL_KEY = "calcularq_remember_me_email";
   const [isLogin, setIsLogin] = useState(true);
@@ -102,8 +104,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        variants={fadeUp(prefersReducedMotion, 14)}
+        initial="hidden"
+        animate="show"
         className="w-full max-w-md"
       >
         <div className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8">
@@ -280,8 +283,9 @@ export default function Login() {
       {showForgotPassword && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10, scale: prefersReducedMotion ? 1 : 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
             className="bg-white rounded-2xl shadow-lg sm:shadow-xl border border-slate-200 p-6 sm:p-8 max-w-md w-full"
           >
             <div className="text-center mb-6 sm:mb-7">

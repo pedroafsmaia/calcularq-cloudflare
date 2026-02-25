@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { CheckCircle, XCircle, Loader } from "lucide-react";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import LegalModal from "@/components/LegalModal";
 import { termsContent, privacyContent } from "@/lib/legalContent";
+import { fadeUp } from "@/lib/motion";
 
 // Usar API para criar sessão (garante client_reference_id)
 // Fallback para link direto se API não estiver disponível
@@ -15,6 +16,7 @@ const POLL_INTERVAL = 3000; // Verificar a cada 3 segundos
 const MAX_POLL_ATTEMPTS = 60; // Máximo de 3 minutos
 
 export default function Payment() {
+  const prefersReducedMotion = !!useReducedMotion();
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
 
@@ -225,8 +227,9 @@ export default function Payment() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12, scale: prefersReducedMotion ? 1 : 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full text-center"
         >
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -246,8 +249,9 @@ export default function Payment() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12, scale: prefersReducedMotion ? 1 : 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full text-center"
         >
           <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
@@ -289,8 +293,9 @@ export default function Payment() {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          variants={fadeUp(prefersReducedMotion, 14)}
+          initial="hidden"
+          animate="show"
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 lg:p-12"
         >
           <div className="text-center mb-8">

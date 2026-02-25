@@ -17,7 +17,7 @@ interface FactorCardProps {
 
 export default function FactorCard({ factor, value, onChange }: FactorCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-all duration-300">
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-colors transition-shadow duration-200">
       <div className="mb-4">
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3 className="min-w-0 flex items-center gap-1.5 font-semibold text-slate-900">
@@ -38,7 +38,7 @@ export default function FactorCard({ factor, value, onChange }: FactorCardProps)
           <label
             key={option.value}
             className={`
-              flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all
+              flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors
               ${
                 value === option.value
                   ? "border-calcularq-blue bg-calcularq-blue/10"

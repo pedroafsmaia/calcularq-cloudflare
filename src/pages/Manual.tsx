@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Calculator,
   Settings2,
@@ -15,6 +15,7 @@ import {
 import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
+import { fadeUp } from "@/lib/motion";
 
 type FactorId = "area" | "stage" | "detail" | "technical" | "bureaucratic" | "monitoring";
 
@@ -47,6 +48,7 @@ function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?
 }
 
 export default function Manual() {
+  const prefersReducedMotion = !!useReducedMotion();
   const [activeStepId, setActiveStepId] = useState<(typeof manualSteps)[number]["id"]>("introducao");
   const mobileSummaryRef = useRef<HTMLDetailsElement | null>(null);
   const [expandedFactors, setExpandedFactors] = useState<Record<FactorId, boolean>>({
@@ -152,7 +154,7 @@ export default function Manual() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.18 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
             className="overflow-hidden"
           >
             <div className="border-t border-slate-200 px-4 py-4">
@@ -192,7 +194,7 @@ export default function Manual() {
                 >
                   <span
                     className={[
-                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300",
+                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors transition-shadow duration-200",
                       isCompleted
                         ? "border-calcularq-blue bg-calcularq-blue text-white shadow-md"
                         : isActive
@@ -233,7 +235,7 @@ export default function Manual() {
   return (
     <div className="bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8 max-w-4xl mx-auto">
+        <motion.div variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" className="mb-6 sm:mb-8 max-w-4xl mx-auto">
           <ManualCard className="p-6 sm:p-8 lg:p-10">
             <div id="introducao" className="text-center scroll-mt-24">
               <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-calcularq-blue mb-5">
@@ -316,7 +318,7 @@ export default function Manual() {
         </div>
 
         <div className="max-w-4xl mx-auto flex flex-col gap-5 sm:gap-6">
-            <motion.div className="order-1" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+            <motion.div className="order-1" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.03 }}>
               <ManualCard>
                 <div id="etapa-1" className="scroll-mt-24">
                   <SectionHeader
@@ -336,11 +338,11 @@ export default function Manual() {
                         <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
                         <ul className="space-y-3">
                           <li>
-                          <strong>Despesas operacionais fixas mensais:</strong> Adicione os custos recorrentes para manter o escritório funcionando.
+                            <strong>Despesas operacionais fixas (mensais):</strong> Adicione os custos recorrentes para manter o escritório funcionando.
                             <p className="text-sm text-slate-500 mt-1">Ex.: aluguel, softwares, salários, contador, anuidades e serviços essenciais.</p>
                           </li>
                           <li>
-                          <strong>Despesas pessoais essenciais:</strong> Valor mensal líquido essencial para cobrir suas despesas pessoais.
+                            <strong>Despesas pessoais essenciais (mensais):</strong> Valor líquido essencial para cobrir suas despesas pessoais.
                             <p className="text-sm text-amber-700 mt-1">Atenção: o lucro tende a aparecer na etapa final, via complexidade, horas e composição do preço.</p>
                           </li>
                           <li>
@@ -359,7 +361,7 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div className="order-3" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <motion.div className="order-3" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.07 }}>
               <ManualCard>
                 <div id="etapa-3" className="scroll-mt-24">
                   <SectionHeader
@@ -404,7 +406,7 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div className="order-2" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <motion.div className="order-2" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.05 }}>
               <ManualCard>
                 <div id="etapa-2" className="scroll-mt-24">
                   <SectionHeader
@@ -508,7 +510,7 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div className="order-4" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div className="order-4" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.09 }}>
               <ManualCard>
                 <div id="etapa-4" className="scroll-mt-24">
                   <SectionHeader
@@ -575,7 +577,7 @@ export default function Manual() {
               </ManualCard>
             </motion.div>
 
-            <motion.div className="order-5" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+            <motion.div className="order-5" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.11 }}>
               <section id="encerramento" className="scroll-mt-24 rounded-2xl bg-gradient-to-br from-calcularq-blue to-[#002366] p-6 sm:p-8 text-white shadow-sm">
                 <div className="flex items-start gap-3 mb-4">
                   <Info className="w-6 h-6 mt-0.5 shrink-0" />
