@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
+import { ManualCard, NoteBox } from "@/components/manual/ManualCard";
+import ManualStepper from "@/components/manual/ManualStepper";
+import ManualMobileSummary from "@/components/manual/ManualMobileSummary";
 import { createPageUrl } from "@/utils";
 import { fadeUp } from "@/lib/motion";
 
@@ -27,25 +30,6 @@ const manualSteps = [
   { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
   { id: "encerramento", label: "Conclusão", short: "Conclusão" },
 ] as const;
-
-function ManualCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6 ${className}`.trim()}>
-      {children}
-    </section>
-  );
-}
-
-function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?: "blue" | "amber" | "slate" }) {
-  const toneClass =
-    tone === "amber"
-      ? "border-amber-200 bg-amber-50 text-amber-800"
-      : tone === "slate"
-        ? "border-slate-200 bg-slate-50 text-slate-700"
-        : "border-blue-200 bg-blue-50/70 text-blue-800";
-
-  return <div className={`rounded-xl border px-4 py-3 leading-relaxed ${toneClass}`}>{children}</div>;
-}
 
 export default function Manual() {
   const prefersReducedMotion = !!useReducedMotion();
@@ -175,62 +159,7 @@ export default function Manual() {
     </div>
   );
 
-  const renderManualStepper = () => (
-    <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 sm:p-4 shadow-sm backdrop-blur-sm">
-      <div className="px-1">
-        <div className="mx-auto flex w-full items-start justify-between gap-1 sm:gap-2">
-          {manualSteps.map((step, index) => {
-            const isActive = activeStepId === step.id;
-            const isCompleted = index < activeStepIndex;
-            const circleLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "C" : String(index);
 
-            return (
-              <div key={step.id} className="flex min-w-0 flex-1 items-start">
-                <button
-                  type="button"
-                  onClick={() => scrollToSection(step.id)}
-                  className="group flex w-full min-w-0 flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
-                  aria-current={isActive ? "step" : undefined}
-                >
-                  <span
-                    className={[
-                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors transition-shadow duration-150",
-                      isCompleted
-                        ? "border-calcularq-blue bg-calcularq-blue text-white shadow-md"
-                        : isActive
-                          ? "border-calcularq-blue bg-white text-calcularq-blue shadow-sm"
-                          : "border-slate-200 bg-white text-slate-400 group-hover:border-calcularq-blue/40 group-hover:text-calcularq-blue",
-                    ].join(" ")}
-                  >
-                    {isCompleted ? "✓" : circleLabel}
-                  </span>
-                  <span
-                    className={[
-                      "text-[11px] sm:text-xs leading-snug max-w-full",
-                      isCompleted || isActive ? "text-calcularq-blue font-semibold" : "text-slate-400",
-                    ].join(" ")}
-                    style={{ textWrap: "balance" }}
-                  >
-                    {step.short}
-                  </span>
-                </button>
-
-                {index < manualSteps.length - 1 ? (
-                  <span
-                    className={[
-                      "mt-5 mx-1 sm:mx-2 block h-[2px] flex-1 min-w-2 rounded-full",
-                      index < activeStepIndex ? "bg-calcularq-blue" : "bg-slate-200",
-                    ].join(" ")}
-                    aria-hidden="true"
-                  />
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="bg-slate-50">
@@ -257,64 +186,24 @@ export default function Manual() {
         </motion.div>
 
         <div className="hidden md:block max-w-4xl mx-auto sticky top-20 z-20 mb-6 sm:mb-8">
-          {renderManualStepper()}
+          <ManualStepper
+            steps={manualSteps}
+            activeStepId={activeStepId}
+            activeStepIndex={activeStepIndex}
+            onStepClick={(id) => scrollToSection(id as (typeof manualSteps)[number]["id"])}
+          />
         </div>
 
         <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
-          <details ref={mobileSummaryRef} className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
-            <summary
-              className={[
-                "cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors",
-                mobileSummaryShowsCurrentStep
-                  ? "bg-calcularq-blue/5 text-calcularq-blue"
-                  : "text-slate-900 hover:bg-slate-50",
-              ].join(" ")}
-            >
-              <span className="min-w-0 truncate">
-                {mobileSummaryShowsCurrentStep ? activeManualStep.short : "Sumário do manual"}
-              </span>
-              <ChevronDown className={["w-4 h-4", mobileSummaryShowsCurrentStep ? "text-calcularq-blue" : "text-slate-500"].join(" ")} />
-            </summary>
-            <div className="mt-3 space-y-1.5">
-              {manualSteps.map((step, index) => {
-                const isActive = activeStepId === step.id;
-                const isCompleted = index < activeStepIndex;
-                const badgeLabel = step.id === "introducao" ? "I" : step.id === "encerramento" ? "C" : String(index);
-
-                return (
-                  <button
-                    key={step.id}
-                    type="button"
-                    onClick={() => scrollToSection(step.id)}
-                    className={[
-                      "w-full text-left rounded-lg px-3 py-2 text-sm leading-snug transition-colors",
-                      isActive
-                        ? "bg-calcularq-blue/5 text-calcularq-blue"
-                        : isCompleted
-                          ? "bg-calcularq-blue/[0.03] text-calcularq-blue"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
-                    ].join(" ")}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={[
-                          "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
-                          isCompleted
-                            ? "border-calcularq-blue bg-calcularq-blue text-white"
-                            : isActive
-                              ? "border-calcularq-blue bg-white text-calcularq-blue"
-                              : "border-slate-200 bg-white text-slate-400",
-                        ].join(" ")}
-                      >
-                        {isCompleted ? "✓" : badgeLabel}
-                      </span>
-                      <span className={isActive ? "font-semibold" : undefined}>{step.short}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </details>
+          <ManualMobileSummary
+            summaryRef={mobileSummaryRef}
+            steps={manualSteps}
+            activeStepId={activeStepId}
+            activeStepIndex={activeStepIndex}
+            activeStepShort={activeManualStep.short}
+            showsCurrentStep={mobileSummaryShowsCurrentStep}
+            onStepClick={(id) => scrollToSection(id as (typeof manualSteps)[number]["id"])}
+          />
         </div>
 
         <div className="max-w-4xl mx-auto flex flex-col gap-5 sm:gap-6">
@@ -611,4 +500,3 @@ export default function Manual() {
       </div>
   );
 }
-
