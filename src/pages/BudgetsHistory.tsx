@@ -295,7 +295,7 @@ export default function BudgetsHistory() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, delay: prefersReducedMotion ? 0 : index * 0.03 }}
-                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-slate-300 hover:shadow-md transition-colors transition-shadow flex flex-col cursor-pointer"
+                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-slate-300 hover:shadow-sm transition-colors transition-shadow duration-150 flex flex-col cursor-pointer"
                 onClick={() => openBudgetDetails(budget)}
                 role="button"
                 tabIndex={0}
@@ -330,7 +330,7 @@ export default function BudgetsHistory() {
                       e.stopPropagation();
                       handleDelete(budget.id);
                     }}
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                     aria-label="Excluir cálculo"
                     title="Excluir cálculo"
                   >

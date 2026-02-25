@@ -194,7 +194,7 @@ export default function Manual() {
                 >
                   <span
                     className={[
-                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors transition-shadow duration-200",
+                      "inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors transition-shadow duration-150",
                       isCompleted
                         ? "border-calcularq-blue bg-calcularq-blue text-white shadow-md"
                         : isActive

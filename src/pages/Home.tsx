@@ -161,7 +161,7 @@ export default function Home() {
                   >
                     <Button 
                       size="lg" 
-                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-shadow font-semibold sm:text-lg text-base"
+                      className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-150 font-semibold sm:text-lg text-base"
                       style={{ backgroundColor: '#fc7338' }}
                     >
                       {user?.hasPaid ? (
@@ -217,7 +217,7 @@ export default function Home() {
                 key={feature.title}
                 variants={fadeUp(prefersReducedMotion, 12)}
                 transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
-                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue hover:shadow-lg transition-colors transition-shadow duration-200 text-center"
+                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue/80 hover:shadow-md transition-colors transition-shadow duration-150 text-center"
               >
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
@@ -253,7 +253,7 @@ export default function Home() {
                 </p>
                 <Link to={createPageUrl("Calculator")} className="inline-block">
                   <Button 
-                    className="bg-white text-calcularq-blue border-2 border-white hover:bg-slate-50 hover:border-slate-200 shadow-lg font-semibold px-6 py-3"
+                    className="bg-white text-calcularq-blue border-2 border-white hover:bg-slate-50 hover:border-slate-200 shadow-md hover:shadow-lg transition-colors transition-shadow duration-150 font-semibold px-6 py-3"
                   >
                     Experimentar Agora
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -323,7 +323,7 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue hover:shadow-lg transition-colors transition-shadow duration-200 text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue/80 hover:shadow-md transition-colors transition-shadow duration-150 text-center">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>

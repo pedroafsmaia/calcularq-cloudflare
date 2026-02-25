@@ -48,14 +48,14 @@ export default function Layout({ children }: LayoutProps) {
   }, [location.pathname, location.search]);
 
   const desktopNavItem = (isActive: boolean) =>
-    `shrink-0 flex items-center justify-center gap-0 xl:gap-2 h-10 w-10 xl:w-auto min-w-10 xl:min-w-10 px-0 xl:px-4 py-2 rounded-xl text-sm font-medium transition-colors transition-shadow border ${
+    `shrink-0 flex items-center justify-center gap-0 xl:gap-2 h-10 w-10 xl:w-auto min-w-10 xl:min-w-10 px-0 xl:px-4 py-2 rounded-xl text-sm font-medium transition-colors transition-shadow duration-150 border ${
       isActive
         ? "bg-calcularq-blue text-white border-calcularq-blue shadow-sm shadow-calcularq-blue/20"
         : "text-slate-600 border-transparent hover:bg-slate-100 hover:text-calcularq-blue"
     }`;
 
   const mobileIconItem = (isActive = false) =>
-    `shrink-0 flex items-center justify-center h-10 w-10 rounded-xl border transition-colors transition-shadow ${
+    `shrink-0 flex items-center justify-center h-10 w-10 rounded-xl border transition-colors transition-shadow duration-150 ${
       isActive
         ? "bg-calcularq-blue text-white border-calcularq-blue shadow-sm shadow-calcularq-blue/20"
         : "text-slate-600 border-transparent hover:bg-slate-100 hover:text-calcularq-blue"

@@ -682,7 +682,7 @@ export default function Calculator() {
                     <button
                       type="button"
                       onClick={handleClick}
-                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-colors transition-shadow duration-200 border-2
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-colors transition-shadow duration-150 border-2
                         ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
                           : active ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
                           : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
@@ -699,7 +699,7 @@ export default function Calculator() {
                   </div>
                   {i < STEPS.length - 1 && (
                     <div
-                      className={`mt-[1.35rem] sm:mt-6 h-0.5 sm:h-1 w-5 sm:w-7 md:w-11 shrink-0 rounded-full transition-colors duration-300 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`}
+                      className={`mt-[1.35rem] sm:mt-6 h-0.5 sm:h-1 w-5 sm:w-7 md:w-11 shrink-0 rounded-full transition-colors duration-150 ${done ? "bg-calcularq-blue" : "bg-slate-200"}`}
                     />
                   )}
                 </div>
