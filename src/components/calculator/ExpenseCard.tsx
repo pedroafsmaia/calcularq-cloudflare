@@ -68,7 +68,7 @@ export default function ExpenseCard({
                   placeholder={placeholder}
                   value={expense.name}
                   onChange={(e) => onUpdate(expense.id, { name: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0 bg-white"
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded-lg min-w-0 bg-white focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 />
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
@@ -78,7 +78,7 @@ export default function ExpenseCard({
                     step="0.01"
                     value={expense.value || ""}
                     onChange={(e) => onUpdate(expense.id, { value: Number(e.target.value) })}
-                    className="w-28 sm:w-32 pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue min-w-0 bg-white"
+                    className="w-28 sm:w-32 pl-8 pr-3 py-2 border border-slate-300 rounded-lg min-w-0 bg-white focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                     placeholder="0,00"
                   />
                 </div>

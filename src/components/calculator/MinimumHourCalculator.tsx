@@ -210,7 +210,7 @@ export default function MinimumHourCalculator({
             id="useManual"
             checked={useManual}
             onChange={(e) => setUseManual(e.target.checked)}
-            className="mt-0.5 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
+            className="mt-0.5 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-2 focus:ring-calcularq-blue/20 focus:ring-offset-0"
           />
           <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
             Já sei a minha hora técnica mínima.
@@ -232,7 +232,7 @@ export default function MinimumHourCalculator({
                 step="0.01"
                 value={manualMinHourRate || ""}
                 onChange={(e) => setManualMinHourRate(Number(e.target.value))}
-                className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
+                className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 placeholder="0,00"
               />
             </div>
@@ -276,7 +276,7 @@ export default function MinimumHourCalculator({
                   setProductiveHours(hours);
                   onProductiveHoursChange?.(hours);
                 }}
-                className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
+                className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 placeholder="0"
               />
             </div>

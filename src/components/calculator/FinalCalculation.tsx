@@ -154,7 +154,7 @@ export default function FinalCalculation({
               step="0.5"
               value={estimatedHours || ""}
               onChange={(e) => onEstimatedHoursChange(Number(e.target.value))}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue text-lg font-semibold text-calcularq-blue"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg text-lg font-semibold text-calcularq-blue focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
               placeholder="0"
             />
           </div>

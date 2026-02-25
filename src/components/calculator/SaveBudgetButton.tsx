@@ -178,7 +178,7 @@ export default function SaveBudgetButton({
                   value={budgetName}
                   onChange={(e) => setBudgetName(e.target.value)}
                   placeholder="Ex.: Proposta residencial base"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
                 />
               </div>
 
@@ -189,7 +189,7 @@ export default function SaveBudgetButton({
                   value={clientNameValue}
                   onChange={(e) => setClientNameValue(e.target.value)}
                   placeholder="Ex.: Maria Silva"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
                 />
               </div>
 
@@ -200,7 +200,7 @@ export default function SaveBudgetButton({
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   placeholder="Ex.: estudo preliminar, revisão com desconto, versão para negociação..."
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
                 />
               </div>
             </div>

@@ -88,7 +88,7 @@ export default function AreaFactorCard({
           step="0.01"
           value={area || ""}
           onChange={(e) => handleAreaInput(parseAreaValue(e.target.value))}
-          className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
+          className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
           placeholder="Digite a área em m²"
         />
         {currentLevel && (

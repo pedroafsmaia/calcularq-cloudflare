@@ -339,7 +339,7 @@ export default function Payment() {
                 id="acceptTerms"
                 checked={acceptedTerms}
                 onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-calcularq-blue"
+                className="mt-1 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-2 focus:ring-calcularq-blue/20 focus:ring-offset-0"
               />
               <label htmlFor="acceptTerms" className="cursor-pointer">
                 Li e concordo com os{" "}
