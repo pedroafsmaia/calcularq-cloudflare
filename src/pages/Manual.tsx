@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -48,6 +48,7 @@ function NoteBox({ children, tone = "blue" }: { children: React.ReactNode; tone?
 
 export default function Manual() {
   const [activeStepId, setActiveStepId] = useState<(typeof manualSteps)[number]["id"]>("introducao");
+  const mobileSummaryRef = useRef<HTMLDetailsElement | null>(null);
   const [expandedFactors, setExpandedFactors] = useState<Record<FactorId, boolean>>({
     area: true,
     stage: false,
@@ -74,8 +75,26 @@ export default function Manual() {
   const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 92;
-    window.scrollTo({ top, behavior: "smooth" });
+
+    const isMobile = window.innerWidth < 768;
+    const summaryWasOpen = isMobile && Boolean(mobileSummaryRef.current?.open);
+
+    if (summaryWasOpen && mobileSummaryRef.current) {
+      mobileSummaryRef.current.open = false;
+    }
+
+    const performScroll = () => {
+      const offset = isMobile ? 132 : 92;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: "smooth" });
+    };
+
+    if (summaryWasOpen) {
+      requestAnimationFrame(() => requestAnimationFrame(performScroll));
+      return;
+    }
+
+    performScroll();
   };
 
   useEffect(() => {
@@ -239,7 +258,7 @@ export default function Manual() {
         </div>
 
         <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
-          <details className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
+          <details ref={mobileSummaryRef} className="rounded-2xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm p-3">
             <summary
               className={[
                 "cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors",
@@ -589,3 +608,4 @@ export default function Manual() {
       </div>
   );
 }
+
