@@ -7,6 +7,7 @@ import { History, Trash2, Eye, Plus, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import SectionHeader from "@/components/calculator/SectionHeader";
+import AppDialog from "@/components/ui/AppDialog";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
 
@@ -16,6 +17,11 @@ export default function BudgetsHistory() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<SortMode>("recent");
+  const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
+  const [detailName, setDetailName] = useState("");
+  const [detailClientName, setDetailClientName] = useState("");
+  const [detailDescription, setDetailDescription] = useState("");
+  const [isSavingDetails, setIsSavingDetails] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -80,6 +86,95 @@ export default function BudgetsHistory() {
   const openBudget = (budgetId: string) => {
     navigate(`${createPageUrl("Calculator")}?budget=${budgetId}`);
   };
+
+  const selectedBudget = useMemo(
+    () => budgets.find((budget) => budget.id === selectedBudgetId) ?? null,
+    [budgets, selectedBudgetId]
+  );
+
+  const detailDirty = useMemo(() => {
+    if (!selectedBudget) return false;
+    const originalDescription =
+      typeof selectedBudget.data?.description === "string" ? selectedBudget.data.description : "";
+    return (
+      detailName.trim() !== (selectedBudget.name ?? "").trim() ||
+      detailClientName.trim() !== (selectedBudget.clientName ?? "").trim() ||
+      detailDescription.trim() !== originalDescription.trim()
+    );
+  }, [selectedBudget, detailName, detailClientName, detailDescription]);
+
+  const openBudgetDetails = (budget: Budget) => {
+    setSelectedBudgetId(budget.id);
+    setDetailName(budget.name ?? "");
+    setDetailClientName(budget.clientName ?? "");
+    setDetailDescription(typeof budget.data?.description === "string" ? budget.data.description : "");
+  };
+
+  const closeBudgetDetails = (force = false) => {
+    if (!force && detailDirty && !confirm("Descartar alterações deste cálculo?")) return;
+    setSelectedBudgetId(null);
+    setDetailName("");
+    setDetailClientName("");
+    setDetailDescription("");
+    setIsSavingDetails(false);
+  };
+
+  const handleSaveBudgetDetails = async () => {
+    if (!selectedBudget || !detailName.trim()) return;
+    setIsSavingDetails(true);
+    try {
+      const resp = await api.saveBudget({
+        id: selectedBudget.id,
+        name: detailName.trim(),
+        clientName: detailClientName.trim() || undefined,
+        projectName: selectedBudget.projectName || undefined,
+        data: {
+          ...selectedBudget.data,
+          description: detailDescription.trim() || undefined,
+        },
+      });
+
+      setBudgets((prev) => prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget)));
+      setSelectedBudgetId(resp.budget.id);
+    } catch (e) {
+      alert("Erro ao salvar alterações do cálculo");
+      console.error(e);
+    } finally {
+      setIsSavingDetails(false);
+    }
+  };
+
+  const detailPreview = useMemo(() => {
+    if (!selectedBudget) return null;
+    const data = selectedBudget.data;
+    const totalVariableExpenses = Array.isArray(data.variableExpenses)
+      ? data.variableExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0)
+      : 0;
+    const discountPercent = typeof data.commercialDiscount === "number" ? data.commercialDiscount : 0;
+    const discountAmount = (data.results?.projectPrice || 0) * (discountPercent / 100);
+    const area = typeof data.area === "number" && data.area > 0 ? data.area : null;
+    const cubPercentage =
+      area && data.results?.finalSalePrice > 0 ? (data.results.finalSalePrice / (2800 * area)) * 100 : null;
+    const pricePerSqm = area && data.results?.finalSalePrice > 0 ? data.results.finalSalePrice / area : null;
+    const fixedExpensesTotal = Array.isArray(data.fixedExpenses)
+      ? data.fixedExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0)
+      : 0;
+    const fixedCostPerHour = data.productiveHours && data.productiveHours > 0 ? fixedExpensesTotal / data.productiveHours : 0;
+    const projectPriceWithDiscount = (data.results?.projectPrice || 0) * (1 - discountPercent / 100);
+    const profit =
+      fixedCostPerHour > 0 && data.estimatedHours > 0
+        ? projectPriceWithDiscount - fixedCostPerHour * data.estimatedHours
+        : null;
+
+    return {
+      totalVariableExpenses,
+      discountPercent,
+      discountAmount,
+      cubPercentage,
+      pricePerSqm,
+      profit,
+    };
+  }, [selectedBudget]);
 
   if (!user) {
     return (
@@ -197,13 +292,13 @@ export default function BudgetsHistory() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-slate-300 hover:shadow-md transition-colors transition-shadow flex flex-col cursor-pointer"
-                onClick={() => openBudget(budget.id)}
+                onClick={() => openBudgetDetails(budget)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    openBudget(budget.id);
+                    openBudgetDetails(budget);
                   }
                 }}
               >
@@ -281,7 +376,7 @@ export default function BudgetsHistory() {
                     className="w-full bg-calcularq-blue hover:bg-[#002366] text-white"
                     onClick={(e) => {
                       e.stopPropagation();
-                      openBudget(budget.id);
+                      openBudgetDetails(budget);
                     }}
                   >
                     <Eye className="w-4 h-4 mr-2" />
@@ -293,6 +388,178 @@ export default function BudgetsHistory() {
           </div>
         )}
       </div>
+
+      <AppDialog
+        open={!!selectedBudget}
+        onOpenChange={(open) => {
+          if (!open) closeBudgetDetails();
+        }}
+        title="Detalhes do cálculo"
+        description="Edite as informações salvas e consulte um resumo dos resultados."
+        maxWidthClassName="max-w-3xl"
+        footer={
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              className="border-slate-200 text-slate-700 hover:bg-slate-50"
+              onClick={() => (selectedBudget ? openBudget(selectedBudget.id) : null)}
+              disabled={!selectedBudget}
+            >
+              Abrir na calculadora
+            </Button>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                className="border-slate-200 text-slate-700 hover:bg-slate-50"
+                onClick={() => closeBudgetDetails()}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                className="bg-calcularq-blue hover:bg-[#002366] text-white"
+                onClick={handleSaveBudgetDetails}
+                disabled={!selectedBudget || !detailName.trim() || isSavingDetails || !detailDirty}
+              >
+                {isSavingDetails ? "Salvando..." : "Salvar alterações"}
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        {selectedBudget ? (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cálculo *</label>
+                <input
+                  type="text"
+                  value={detailName}
+                  onChange={(e) => setDetailName(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cliente (opcional)</label>
+                <input
+                  type="text"
+                  value={detailClientName}
+                  onChange={(e) => setDetailClientName(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Descrição (opcional)</label>
+                <textarea
+                  rows={4}
+                  value={detailDescription}
+                  onChange={(e) => setDetailDescription(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                />
+              </div>
+
+              {selectedBudget.projectName ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Projeto</p>
+                  <p className="mt-1 text-sm text-slate-700">{selectedBudget.projectName}</p>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <SectionHeader
+                compact
+                className="mb-0"
+                icon={<History className="h-5 w-5 text-calcularq-blue" />}
+                title="Resumo dos resultados"
+                description="Visualização rápida do cálculo salvo."
+                titleClassName="text-lg"
+                descriptionClassName="text-sm"
+              />
+
+              <div className="mt-4 space-y-4">
+                <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-3">
+                  <p className="text-xs font-semibold text-calcularq-blue/80 mb-1">Preço de Venda Final</p>
+                  <p className="text-2xl font-bold text-calcularq-blue">
+                    R$ {selectedBudget.data.results.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-100 bg-slate-50/30 p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-slate-500">Hora técnica mínima</span>
+                    <span className="font-semibold text-slate-800">
+                      R$ {selectedBudget.data.minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-slate-500">Complexidade global</span>
+                    <span className="font-semibold text-slate-800">{selectedBudget.data.results.globalComplexity}x</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-slate-500">Hora ajustada</span>
+                    <span className="font-semibold text-slate-800">
+                      R$ {selectedBudget.data.results.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-slate-500">Preço do projeto</span>
+                    <span className="font-semibold text-slate-800">
+                      R$ {selectedBudget.data.results.projectPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-slate-500">Horas estimadas</span>
+                    <span className="font-semibold text-slate-800">{selectedBudget.data.estimatedHours}h</span>
+                  </div>
+                  {detailPreview && detailPreview.totalVariableExpenses > 0 ? (
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="text-slate-500">Despesas variáveis</span>
+                      <span className="font-semibold text-slate-800">
+                        R$ {detailPreview.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  ) : null}
+                  {detailPreview && detailPreview.discountAmount > 0 ? (
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="text-slate-500">Desconto ({detailPreview.discountPercent}%)</span>
+                      <span className="font-semibold text-red-500">
+                        - R$ {detailPreview.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  ) : null}
+                  {detailPreview && detailPreview.cubPercentage !== null ? (
+                    <div className="flex items-center justify-between gap-3 text-sm border-t border-slate-100 pt-2">
+                      <span className="text-slate-500">% do valor da obra</span>
+                      <span className="font-semibold text-slate-800">{detailPreview.cubPercentage.toFixed(1)}%</span>
+                    </div>
+                  ) : null}
+                  {detailPreview && detailPreview.pricePerSqm !== null ? (
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="text-slate-500">Preço/m²</span>
+                      <span className="font-semibold text-slate-800">
+                        R$ {detailPreview.pricePerSqm.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  ) : null}
+                  {detailPreview && detailPreview.profit !== null ? (
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="text-slate-500">Lucro estimado</span>
+                      <span className={`font-semibold ${detailPreview.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
+                        R$ {detailPreview.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </AppDialog>
     </div>
   );
 }

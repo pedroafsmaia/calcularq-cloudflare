@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Save, Check, X } from "lucide-react";
+import { Save, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AppDialog from "@/components/ui/AppDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { Link } from "react-router-dom";
@@ -143,27 +144,33 @@ export default function SaveBudgetButton({
         )}
       </Button>
 
-      {isDialogOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold text-calcularq-blue">Salvar cálculo</h3>
-                <p className="mt-1 text-sm text-slate-600">
-                  Salve este cálculo para continuar depois e consultar seus resultados.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsDialogOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
-                aria-label="Fechar"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
+      <AppDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        title="Salvar cálculo"
+        description="Salve este cálculo para continuar depois e consultar seus resultados."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              className="border-slate-200 text-slate-700 hover:bg-slate-50"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving || !canSave}
+              className="bg-calcularq-blue hover:bg-[#002366] text-white"
+            >
+              {isSaving ? "Salvando..." : "Salvar"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">Nome do cálculo *</label>
                 <input
@@ -197,28 +204,7 @@ export default function SaveBudgetButton({
                 />
               </div>
             </div>
-
-            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-                className="border-slate-200 text-slate-700 hover:bg-slate-50"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSave}
-                disabled={isSaving || !canSave}
-                className="bg-calcularq-blue hover:bg-[#002366] text-white"
-              >
-                {isSaving ? "Salvando..." : "Salvar"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      </AppDialog>
     </>
   );
 }
