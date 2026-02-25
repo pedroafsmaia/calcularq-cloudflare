@@ -177,3 +177,35 @@ export function corsForSameOrigin(request, headers) {
   headers.set("Vary", "Origin");
   return headers;
 }
+
+export function validateEmail(email) {
+  const value = String(email || "").trim().toLowerCase();
+  if (!value) return false;
+  // Intentionally simple, enough for backend input validation.
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export function sanitizeText(value, { max = 255, allowEmpty = true } = {}) {
+  if (value === undefined || value === null) return allowEmpty ? null : "";
+  const normalized = String(value).replace(/\s+/g, " ").trim();
+  if (!normalized && allowEmpty) return null;
+  return normalized.slice(0, max);
+}
+
+export function assertAllowedOrigin(context, { allowNoOrigin = true } = {}) {
+  const origin = context.request.headers.get("Origin");
+  if (!origin && allowNoOrigin) return null;
+  if (!origin) {
+    return jsonResponse({ success: false, message: "Origem invÃ¡lida" }, { status: 403 });
+  }
+
+  try {
+    const requestOrigin = new URL(context.request.url).origin;
+    const frontendOrigin = context.env.FRONTEND_URL ? new URL(String(context.env.FRONTEND_URL)).origin : null;
+    if (origin === requestOrigin || (frontendOrigin && origin === frontendOrigin)) return null;
+  } catch {
+    // fall through to deny
+  }
+
+  return jsonResponse({ success: false, message: "Origem invÃ¡lida" }, { status: 403 });
+}

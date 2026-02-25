@@ -1,17 +1,37 @@
-import { jsonResponse, readJson, setSessionCookie, signSessionToken, hashPassword } from "../_utils.js";
+﻿import {
+  assertAllowedOrigin,
+  hashPassword,
+  jsonResponse,
+  readJson,
+  sanitizeText,
+  setSessionCookie,
+  signSessionToken,
+  validateEmail,
+} from "../_utils.js";
+
+const MIN_PASSWORD_LENGTH = 8;
 
 export async function onRequest(context) {
   if (context.request.method !== "POST") {
     return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
   }
 
+  const badOrigin = assertAllowedOrigin(context);
+  if (badOrigin) return badOrigin;
+
   const body = await readJson(context.request);
-  const email = body?.email?.toLowerCase()?.trim();
+  const email = body?.email?.toLowerCase?.().trim?.();
   const password = body?.password;
-  const name = (body?.name || "").trim() || "Usuário";
+  const name = sanitizeText(body?.name || "Usuário", { max: 120, allowEmpty: false });
 
   if (!email || !password) {
     return jsonResponse({ success: false, message: "Email e senha são obrigatórios" }, { status: 400 });
+  }
+  if (!validateEmail(email)) {
+    return jsonResponse({ success: false, message: "Email inválido" }, { status: 400 });
+  }
+  if (String(password).length < MIN_PASSWORD_LENGTH) {
+    return jsonResponse({ success: false, message: `A senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres` }, { status: 400 });
   }
 
   const db = context.env.DB;
@@ -24,8 +44,6 @@ export async function onRequest(context) {
   const id = crypto.randomUUID();
   const password_hash = await hashPassword(password);
 
-  // Para ambiente de teste, você pode começar com has_paid = 1 para não bloquear a calculadora.
-  // Quando integrar Stripe, defina como 0 e atualize via webhook.
   const requirePayment = String(context.env.REQUIRE_PAYMENT || "0") === "1";
   const has_paid = requirePayment ? 0 : 1;
   const created_at = new Date().toISOString();

@@ -1,9 +1,14 @@
-import { jsonResponse, readJson, hashPassword, hashResetToken } from "../_utils.js";
+﻿import { assertAllowedOrigin, hashPassword, hashResetToken, jsonResponse, readJson } from "../_utils.js";
+
+const MIN_PASSWORD_LENGTH = 8;
 
 export async function onRequest(context) {
   if (context.request.method !== "POST") {
     return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
   }
+
+  const badOrigin = assertAllowedOrigin(context);
+  if (badOrigin) return badOrigin;
 
   const body = await readJson(context.request);
   const token = body?.token;
@@ -12,8 +17,8 @@ export async function onRequest(context) {
   if (!token || !newPassword) {
     return jsonResponse({ success: false, message: "Token e nova senha são obrigatórios" }, { status: 400 });
   }
-  if (String(newPassword).length < 6) {
-    return jsonResponse({ success: false, message: "A senha deve ter pelo menos 6 caracteres" }, { status: 400 });
+  if (String(newPassword).length < MIN_PASSWORD_LENGTH) {
+    return jsonResponse({ success: false, message: `A senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres` }, { status: 400 });
   }
 
   const db = context.env.DB;

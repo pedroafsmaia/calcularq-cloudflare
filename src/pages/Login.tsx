@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export default function Login() {
   const { login, register, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirecionar se já estiver logado
+  // Redirecionar se jÃ¡ estiver logado
   useEffect(() => {
     if (!authLoading && user) {
       if (user.hasPaid) {
@@ -87,7 +87,7 @@ export default function Login() {
         await login(email, password);
       } else {
         if (!name.trim()) {
-          setError("Nome é obrigatório");
+          setError("Nome Ã© obrigatÃ³rio");
           setIsLoading(false);
           return;
         }
@@ -95,7 +95,7 @@ export default function Login() {
       }
       navigate(createPageUrl("Calculator"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao realizar operação");
+      setError(err instanceof Error ? err.message : "Erro ao realizar operaÃ§Ã£o");
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +120,7 @@ export default function Login() {
             </h1>
             <p className="text-slate-600 leading-relaxed max-w-[30ch] mx-auto">
               {isLogin 
-                ? "Acesse sua conta para usar a calculadora e salvar seus cálculos"
+                ? "Acesse sua conta para usar a calculadora e salvar seus cÃ¡lculos"
                 : "Crie sua conta gratuitamente para acessar a calculadora"
               }
             </p>
@@ -175,9 +175,9 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <button
                   type="button"
@@ -261,8 +261,8 @@ export default function Login() {
               className="text-sm text-calcularq-blue hover:underline underline-offset-4"
             >
               {isLogin 
-                ? "Não tem uma conta? Criar conta"
-                : "Já tem uma conta? Fazer login"
+                ? "NÃ£o tem uma conta? Criar conta"
+                : "JÃ¡ tem uma conta? Fazer login"
               }
             </button>
           </div>
@@ -273,7 +273,7 @@ export default function Login() {
               to={createPageUrl("Home")}
               className="text-sm text-slate-500 hover:text-calcularq-blue"
             >
-              ← Voltar para Home
+              â† Voltar para Home
             </Link>
           </div>
         </div>
@@ -318,7 +318,7 @@ export default function Login() {
                 if (!forgotPasswordEmail || !forgotPasswordEmail.includes("@")) {
                   setForgotPasswordMessage({
                     type: "error",
-                    text: "Por favor, digite um e-mail válido."
+                    text: "Por favor, digite um e-mail vÃ¡lido."
                   });
                   return;
                 }
@@ -328,10 +328,10 @@ export default function Login() {
                   const response = await api.forgotPassword(forgotPasswordEmail);
                   setForgotPasswordMessage({
                     type: "success",
-                    text: response.message || "Se o email existir, você receberá instruções para redefinir sua senha."
+                    text: response.message || "Se o email existir, vocÃª receberÃ¡ instruÃ§Ãµes para redefinir sua senha."
                   });
 
-                  // Limpar após 5 segundos
+                  // Limpar apÃ³s 5 segundos
                   setTimeout(() => {
                     setShowForgotPassword(false);
                     setForgotPasswordEmail("");
@@ -341,7 +341,7 @@ export default function Login() {
                   console.error('Erro ao solicitar reset de senha:', err);
                   setForgotPasswordMessage({
                     type: "error",
-                    text: err instanceof Error ? err.message : "Erro ao processar solicitação. Tente novamente."
+                    text: err instanceof Error ? err.message : "Erro ao processar solicitaÃ§Ã£o. Tente novamente."
                   });
                 } finally {
                   setIsLoading(false);
@@ -394,3 +394,4 @@ export default function Login() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -23,16 +23,16 @@ export default function ResetPassword() {
 
   useEffect(() => {
     document.title = "Calcularq - Redefinir Senha";
-    if (!token) setError("Token inválido. Verifique o link recebido por email.");
+    if (!token) setError("Token invÃ¡lido. Verifique o link recebido por email.");
   }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!token) { setError("Token inválido."); return; }
-    if (password.length < 6) { setError("A senha deve ter pelo menos 6 caracteres."); return; }
-    if (password !== confirmPassword) { setError("As senhas não coincidem."); return; }
+    if (!token) { setError("Token invÃ¡lido."); return; }
+    if (password.length < 6) { setError("A senha deve ter pelo menos 8 caracteres."); return; }
+    if (password !== confirmPassword) { setError("As senhas nÃ£o coincidem."); return; }
 
     setIsLoading(true);
     try {
@@ -41,7 +41,7 @@ export default function ResetPassword() {
         setSuccess(true);
         setTimeout(() => navigate(createPageUrl("Login")), 3000);
       } else {
-        setError("Token inválido ou expirado.");
+        setError("Token invÃ¡lido ou expirado.");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao redefinir senha. Tente novamente.");
@@ -60,10 +60,10 @@ export default function ResetPassword() {
             </div>
             <h1 className="text-2xl font-bold text-calcularq-blue mb-4">Senha Redefinida!</h1>
             <p className="text-slate-600 mb-6">
-              Sua senha foi redefinida com sucesso. Você será redirecionado para o login.
+              Sua senha foi redefinida com sucesso. VocÃª serÃ¡ redirecionado para o login.
             </p>
             <Link to={createPageUrl("Login")} className="text-calcularq-blue hover:underline">
-              Ir para login agora →
+              Ir para login agora â†’
             </Link>
           </div>
         </motion.div>
@@ -97,9 +97,9 @@ export default function ResetPassword() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -117,9 +117,9 @@ export default function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-calcularq-blue focus:border-calcularq-blue"
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -136,7 +136,7 @@ export default function ResetPassword() {
 
           <div className="mt-6 text-center">
             <Link to={createPageUrl("Login")} className="text-sm text-slate-500 hover:text-calcularq-blue">
-              ← Voltar para Login
+              â† Voltar para Login
             </Link>
           </div>
         </div>
@@ -144,3 +144,4 @@ export default function ResetPassword() {
     </div>
   );
 }
+
