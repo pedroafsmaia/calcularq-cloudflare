@@ -65,13 +65,18 @@ export default function AppDialog({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-4"
-            style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+            className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4"
+            style={{
+              paddingTop: "calc(0.75rem + env(safe-area-inset-top, 0px))",
+              paddingBottom: "calc(2.5rem + env(safe-area-inset-bottom, 0px))",
+            }}
             onClick={() => onOpenChange(false)}
           >
             <div
               className={`my-4 w-full ${maxWidthClassName} rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col ${
-                useMobileInnerScroll ? "overflow-hidden sm:overflow-visible max-h-[85dvh] sm:max-h-none" : "overflow-hidden"
+                useMobileInnerScroll
+                  ? "overflow-hidden sm:overflow-visible max-h-[calc(100dvh-7rem)] sm:max-h-none"
+                  : "overflow-hidden"
               }`}
               style={useMobileInnerScroll ? undefined : { maxHeight: "min(48rem, calc(100dvh - 2rem - env(safe-area-inset-bottom, 0px)))" }}
               onClick={(e) => e.stopPropagation()}
@@ -99,7 +104,7 @@ export default function AppDialog({
               {footer ? (
                 <div
                   className="border-t border-slate-200 px-5 py-4 sm:px-6"
-                  style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+                  style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))" }}
                 >
                   {footer}
                 </div>

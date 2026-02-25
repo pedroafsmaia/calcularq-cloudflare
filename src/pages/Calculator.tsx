@@ -295,6 +295,36 @@ export default function Calculator() {
     }
   }, [currentStep]);
 
+  const handleClearAllCalculation = useCallback(() => {
+    if (!window.confirm("Limpar todos os dados preenchidos deste cálculo?")) return;
+
+    setMinHourlyRate(null);
+    setUseManualMinHourlyRate(false);
+    setFixedExpenses([]);
+    setPersonalExpenses([]);
+    setProLabore(0);
+    setProductiveHours(0);
+
+    setFactors(DEFAULT_FACTORS);
+    setAreaIntervals(DEFAULT_AREA_INTERVALS);
+    setArea(null);
+    setSelections({});
+
+    setEstimatedHours(0);
+    setCommercialDiscount(0);
+    setVariableExpenses([]);
+
+    setCurrentStep(1);
+    setMaxStepReached(1);
+
+    setLoadedBudgetName(null);
+    setLoadedClientName(null);
+    setLoadedProjectName(null);
+    setLoadedBudgetDescription(null);
+
+    try { localStorage.removeItem(DRAFT_KEY); } catch { /* silencioso */ }
+  }, []);
+
   const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
     setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
   }, []);
@@ -696,6 +726,15 @@ export default function Calculator() {
                   >
                     <Trash2 className="h-4 w-4" />
                     Limpar dados da etapa
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearAllCalculation}
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
+                    title="Limpar todos os dados do cálculo"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Limpar todo o cálculo
                   </button>
               </div>
             </motion.div>
