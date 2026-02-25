@@ -162,6 +162,14 @@ npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
 
 ---
 
+## QA e Segurança
+
+Existe um checklist prático de revisão (bugs, UX e hardening de segurança) em:
+
+- `docs/QA_SECURITY_CHECKLIST.md`
+
+---
+
 ## Comandos úteis (produção)
 
 ### Listar usuários
