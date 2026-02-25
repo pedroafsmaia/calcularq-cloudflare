@@ -43,6 +43,10 @@ export default function Layout({ children }: LayoutProps) {
     document.title = pageTitle ? `Calcularq - ${pageTitle}` : "Calcularq";
   }, [location.pathname]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname, location.search]);
+
   const desktopNavItem = (isActive: boolean) =>
     `shrink-0 flex items-center justify-center gap-0 xl:gap-2 h-10 w-10 xl:w-auto min-w-10 xl:min-w-10 px-0 xl:px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
       isActive
