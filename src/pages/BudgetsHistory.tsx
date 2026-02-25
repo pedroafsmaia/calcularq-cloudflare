@@ -458,7 +458,7 @@ export default function BudgetsHistory() {
                   rows={4}
                   value={detailDescription}
                   onChange={(e) => setDetailDescription(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
+                  className="w-full min-h-[7rem] max-h-56 resize-y rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue"
                 />
               </div>
 

@@ -65,7 +65,7 @@ export default function AppDialog({
             onClick={() => onOpenChange(false)}
           >
             <div
-              className={`w-full ${maxWidthClassName} rounded-2xl border border-slate-200 bg-white shadow-sm`}
+              className={`w-full ${maxWidthClassName} max-h-[min(90vh,48rem)] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
@@ -84,7 +84,7 @@ export default function AppDialog({
                 </Button>
               </div>
 
-              <div className="px-5 py-4 sm:px-6">{children}</div>
+              <div className="px-5 py-4 sm:px-6 overflow-y-auto">{children}</div>
 
               {footer ? <div className="border-t border-slate-200 px-5 py-4 sm:px-6">{footer}</div> : null}
             </div>
