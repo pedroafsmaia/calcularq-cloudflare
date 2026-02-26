@@ -747,7 +747,7 @@ export default function Calculator() {
                     title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
-                    Importar dados da etapa
+                    Importar etapa
                   </button>
                   <details className="relative w-full sm:w-auto group">
                     <summary className="list-none inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800">
@@ -766,7 +766,7 @@ export default function Calculator() {
                         className="sm:hidden inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Download className="h-4 w-4" />
-                        Importar dados da etapa
+                        Importar etapa
                       </button>
                       <button
                         type="button"
