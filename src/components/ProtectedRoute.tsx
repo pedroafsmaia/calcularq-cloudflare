@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPageUrl } from "@/utils";
+import { PageLoadingState } from "@/components/ui/LoadingStates";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,14 +12,7 @@ export default function ProtectedRoute({ children, requirePayment = true }: Prot
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-calcularq-blue mb-4"></div>
-          <p className="text-slate-600">Carregando...</p>
-        </div>
-      </div>
-    );
+    return <PageLoadingState label="Carregando..." />;
   }
 
   if (!user) {
