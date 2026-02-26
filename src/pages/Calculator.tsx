@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, RotateCcw, Trash2 } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
@@ -627,6 +627,9 @@ export default function Calculator() {
       hasComplexitySelections={hasComplexitySelections}
       globalComplexity={globalComplexity}
       currentStep={currentStep}
+      currentStepLabel={currentStepLabel}
+      currentStepPendingCount={stepPending[currentStep as 1 | 2 | 3 | 4].count}
+      currentStepPendingMissing={stepPending[currentStep as 1 | 2 | 3 | 4].missing}
       selectedFactorsCount={selectedFactorsCount}
       totalFactors={totalFactors}
       estimatedHours={estimatedHours}
@@ -691,8 +694,8 @@ export default function Calculator() {
                       >
                         {done ? "✓" : step.n}
                       </span>
-                      {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 && !done ? (
-                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-1 text-[10px] font-semibold leading-none text-amber-700">
+                    {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 && !done ? (
+                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-1 text-[10px] font-semibold leading-none text-blue-700">
                           {stepPending[step.n as 1 | 2 | 3 | 4].count}
                         </span>
                       ) : null}
@@ -704,8 +707,8 @@ export default function Calculator() {
                     >
                       {step.label}
                     </span>
-                    {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 ? (
-                      <span className="mt-1 text-[10px] sm:text-xs font-medium text-amber-700 text-center leading-tight max-w-[12ch]">
+                    {active && stepPending[step.n as 1 | 2 | 3 | 4].count > 0 ? (
+                      <span className="mt-1 text-[10px] sm:text-xs font-medium text-blue-700 text-center leading-tight max-w-[12ch]">
                         Faltam {stepPending[step.n as 1 | 2 | 3 | 4].count}
                       </span>
                     ) : stepPending[step.n as 1 | 2 | 3 | 4].optional ? (
@@ -730,35 +733,49 @@ export default function Calculator() {
               animate="show"
               className="mb-5"
             >
-              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                   <button
                     type="button"
                     onClick={handleOpenImportStepDialog}
                     disabled={!canImportCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2 text-xs sm:text-sm font-semibold text-calcularq-blue hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
                     Importar dados da etapa
                   </button>
-                  <button
-                    type="button"
-                    onClick={handleClearCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
-                    title={`Reiniciar dados da etapa ${currentStepLabel}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Reiniciar etapa
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleResetCalculation}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
-                    title="Reiniciar todos os dados preenchidos do cálculo"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    Reiniciar cálculo
-                  </button>
+                  <details className="relative w-full sm:w-auto group">
+                    <summary className="list-none inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800">
+                      <MoreHorizontal className="h-4 w-4" />
+                      Mais ações
+                    </summary>
+                    <div className="mt-2 w-full sm:absolute sm:left-0 sm:top-full sm:mt-2 sm:min-w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-sm z-20">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          handleClearCurrentStep();
+                          (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
+                        }}
+                        className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        title={`Reiniciar dados da etapa ${currentStepLabel}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Reiniciar etapa
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          handleResetCalculation();
+                          (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
+                        }}
+                        className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        title="Reiniciar todos os dados preenchidos do cálculo"
+                      >
+                        <RotateCcw className="h-4 w-4" />
+                        Reiniciar cálculo
+                      </button>
+                    </div>
+                  </details>
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                 <span
@@ -768,7 +785,7 @@ export default function Calculator() {
                       : draftStatus === "saved"
                         ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                         : hasUnsavedChanges
-                          ? "border-amber-200 bg-amber-50 text-amber-700"
+                          ? "border-blue-200 bg-blue-50 text-blue-700"
                           : "border-slate-200 bg-white text-slate-500"
                   }`}
                 >
@@ -778,9 +795,14 @@ export default function Calculator() {
                       ? `Rascunho salvo${lastDraftSavedAt ? ` às ${new Date(lastDraftSavedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""}`
                       : hasUnsavedChanges
                         ? "Alterações não salvas"
-                        : "Rascunho local ativo"}
+                        : "Rascunho salvo automaticamente"}
                 </span>
-                <span className="text-slate-400">Atalhos: Alt+← / Alt+→ / Alt+1-4</span>
+                <span
+                  className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-400"
+                  title="Atalhos: Alt+← / Alt+→ / Alt+1-4"
+                >
+                  Atalhos
+                </span>
               </div>
             </motion.div>
 
@@ -792,7 +814,7 @@ export default function Calculator() {
                 <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
               </div>
               {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
-                <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
                   Faltam {stepPending[currentStep as 1 | 2 | 3 | 4].count}
                 </span>
               ) : stepPending[currentStep as 1 | 2 | 3 | 4].optional ? (

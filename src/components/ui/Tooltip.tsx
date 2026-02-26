@@ -134,7 +134,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
             tone === "danger"
               ? "border border-red-200"
               : tone === "warning"
-                ? "border border-amber-200"
+                ? "border border-blue-300"
                 : "border border-blue-200"
           }`}
           style={{
@@ -149,7 +149,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
               tone === "danger"
                 ? "rgba(254, 242, 242, 0.96)"
                 : tone === "warning"
-                  ? "rgba(255, 251, 235, 0.96)"
+                  ? "rgba(239, 246, 255, 0.98)"
                   : "rgba(239, 246, 255, 0.92)",
             ...(tone === "info" ? { backdropFilter: "blur(10px)" } : {}),
           }}
@@ -160,7 +160,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
               tone === "danger"
                 ? "text-red-700"
                 : tone === "warning"
-                  ? "text-amber-700"
+                  ? "text-blue-900"
                   : "text-blue-800"
             }`}
           >

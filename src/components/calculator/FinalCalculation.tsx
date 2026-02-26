@@ -257,8 +257,8 @@ export default function FinalCalculation({
               <span>100%</span>
             </div>
             {commercialDiscount > 0 && (
-              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/95 px-3.5 py-3">
-                <p className="text-sm leading-relaxed text-amber-700">
+              <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/80 px-3.5 py-3">
+                <p className="text-sm leading-relaxed text-blue-800">
                   <span className="font-medium">Impacto do desconto:</span> sua remuneração será reduzida em R${" "}
                   {discountAmount.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,

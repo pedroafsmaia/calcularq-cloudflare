@@ -15,6 +15,9 @@ type Props = {
   hasComplexitySelections: boolean;
   globalComplexity: number;
   currentStep: number;
+  currentStepLabel: string;
+  currentStepPendingCount: number;
+  currentStepPendingMissing: readonly string[];
   selectedFactorsCount: number;
   totalFactors: number;
   estimatedHours: number;
@@ -29,6 +32,9 @@ export default function CalculatorResultsPanel({
   hasComplexitySelections,
   globalComplexity,
   currentStep,
+  currentStepLabel,
+  currentStepPendingCount,
+  currentStepPendingMissing,
   selectedFactorsCount,
   totalFactors,
   estimatedHours,
@@ -46,7 +52,15 @@ export default function CalculatorResultsPanel({
               <span className="text-slate-400 text-lg font-bold">1</span>
             </div>
             <p className="text-sm font-medium text-slate-600 mb-1">Comece pela Etapa 1</p>
-            <p className="text-xs text-slate-400">Preencha sua hora técnica mínima para ver os resultados aqui.</p>
+            <p className="text-xs text-slate-400">
+              Complete {currentStepLabel.toLowerCase()} para liberar a base do cálculo.
+            </p>
+            {currentStepPendingCount > 0 ? (
+              <p className="mt-2 text-xs text-blue-700">
+                Faltam {currentStepPendingCount}
+                {currentStepPendingMissing.length > 0 ? `: ${currentStepPendingMissing.join(", ")}` : ""}
+              </p>
+            ) : null}
           </div>
         </div>
       ) : (
@@ -144,9 +158,9 @@ export default function CalculatorResultsPanel({
                   <span className={`text-sm font-bold ${
                     cubPercentage !== null
                       ? cubPercentage < 2
-                        ? "text-amber-600"
+                        ? "text-blue-700"
                         : cubPercentage > 11
-                          ? "text-amber-600"
+                          ? "text-blue-700"
                           : "text-slate-700"
                       : "text-calcularq-blue"
                   }`}>
@@ -156,7 +170,7 @@ export default function CalculatorResultsPanel({
                     <Tooltip
                       title="Atenção"
                       tone="warning"
-                      iconClassName="text-amber-600 hover:text-amber-700"
+                      iconClassName="text-blue-700 hover:text-blue-800"
                       text={
                         cubPercentage < 2
                           ? "% abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar necessidade de revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos, maior eficiência ou um projeto em etapa/nível de sofisticação diferente da referência."
@@ -176,7 +190,7 @@ export default function CalculatorResultsPanel({
                   <span className={`text-sm font-bold ${
                     pricePerSqm !== null
                       ? pricePerSqm < 60 || pricePerSqm > 200
-                        ? "text-amber-600"
+                        ? "text-blue-700"
                         : "text-slate-700"
                       : "text-calcularq-blue"
                   }`}>
@@ -188,7 +202,7 @@ export default function CalculatorResultsPanel({
                     <Tooltip
                       title="Atenção"
                       tone="warning"
-                      iconClassName="text-amber-600 hover:text-amber-700"
+                      iconClassName="text-blue-700 hover:text-blue-800"
                       text={
                         pricePerSqm < 60
                           ? "Valor/m² abaixo da faixa de referência IAB/CAU (R$ 60 a R$ 200/m²). Pode ocorrer em projetos de grande porte, menor sofisticação ou etapas mais simples, mas também pode indicar subvalorização do serviço."
