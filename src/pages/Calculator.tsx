@@ -439,54 +439,6 @@ export default function Calculator() {
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area");
 
-  const fixedExpensesTotal = fixedExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0);
-  const personalExpensesTotal = personalExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0);
-  const requiredComplexitySelections = otherFactors.length + 1; // + area
-
-  const stepPending = useMemo(() => {
-    const step1Missing: string[] = [];
-    if (useManualMinHourlyRate) {
-      if (!minHourlyRate || minHourlyRate <= 0) step1Missing.push("Hora mínima");
-    } else {
-      if (fixedExpensesTotal <= 0) step1Missing.push("Despesas operacionais");
-      if (personalExpensesTotal <= 0) step1Missing.push("Despesas pessoais");
-      if (productiveHours <= 0) step1Missing.push("Horas produtivas");
-    }
-
-    const step2MissingCount = Math.max(0, requiredComplexitySelections - selectedFactorsCount);
-    const step2Missing =
-      step2MissingCount > 0
-        ? [`${step2MissingCount} fator${step2MissingCount > 1 ? "es" : ""}`]
-        : [];
-
-    const step4Missing: string[] = [];
-    if (estimatedHours <= 0) step4Missing.push("Horas estimadas");
-
-    return {
-      1: { count: step1Missing.length, missing: step1Missing, optional: false },
-      2: { count: step2MissingCount, missing: step2Missing, optional: false },
-      3: { count: 0, missing: [], optional: true },
-      4: { count: step4Missing.length, missing: step4Missing, optional: false },
-    } as const;
-  }, [
-    estimatedHours,
-    fixedExpensesTotal,
-    minHourlyRate,
-    personalExpensesTotal,
-    productiveHours,
-    requiredComplexitySelections,
-    selectedFactorsCount,
-    useManualMinHourlyRate,
-  ]);
-
-  const currentStepPendingDesktopSummary = useMemo(() => {
-    const entry = stepPending[currentStep as 1 | 2 | 3 | 4];
-    if (entry.count <= 0) return "";
-    if (entry.missing.length <= 2) return entry.missing.join(", ");
-    const extra = entry.missing.length - 2;
-    return `${entry.missing.slice(0, 2).join(", ")} e mais ${extra}`;
-  }, [currentStep, stepPending]);
-
   // ── Stepper ───────────────────────────────────────────────────
   const { stepComplete, canAdvance } = useCalculatorProgress({
     currentStep,
@@ -636,8 +588,6 @@ export default function Calculator() {
       globalComplexity={globalComplexity}
       currentStep={currentStep}
       currentStepLabel={currentStepLabel}
-      currentStepPendingCount={stepPending[currentStep as 1 | 2 | 3 | 4].count}
-      currentStepPendingMissing={stepPending[currentStep as 1 | 2 | 3 | 4].missing}
       selectedFactorsCount={selectedFactorsCount}
       totalFactors={totalFactors}
       estimatedHours={estimatedHours}
@@ -686,11 +636,7 @@ export default function Calculator() {
                       type="button"
                       onClick={handleClick}
                       title={
-                        stepPending[step.n as 1 | 2 | 3 | 4].count > 0
-                          ? `Faltam ${stepPending[step.n as 1 | 2 | 3 | 4].missing.join(", ")}`
-                          : stepPending[step.n as 1 | 2 | 3 | 4].optional
-                            ? "Etapa opcional"
-                            : step.label
+                        step.n === 3 ? "Etapa opcional" : step.label
                       }
                       className="relative"
                     >
@@ -702,11 +648,6 @@ export default function Calculator() {
                       >
                         {done ? "✓" : step.n}
                       </span>
-                    {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 && !done ? (
-                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-1 text-[11px] font-semibold leading-none text-blue-700">
-                          {stepPending[step.n as 1 | 2 | 3 | 4].count}
-                        </span>
-                      ) : null}
                     </button>
                     <span
                       className={`mt-1.5 text-[13px] sm:text-sm font-medium text-center leading-tight max-w-[12ch]
@@ -715,9 +656,9 @@ export default function Calculator() {
                     >
                       {step.label}
                     </span>
-                    {stepPending[step.n as 1 | 2 | 3 | 4].optional ? (
-                      <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
-                    ) : null}
+                    {step.n === 3 ? (
+                       <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
+                     ) : null}
                   </div>
                   {i < STEPS.length - 1 && (
                     <div
@@ -743,7 +684,7 @@ export default function Calculator() {
                     type="button"
                     onClick={handleOpenImportStepDialog}
                     disabled={!canImportCurrentStep}
-                    className="hidden sm:inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
@@ -752,22 +693,9 @@ export default function Calculator() {
                   <details className="relative w-full sm:w-auto group">
                     <summary className="list-none inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800">
                       <MoreHorizontal className="h-4 w-4" />
-                      <span className="sm:hidden">Ações da etapa</span>
-                      <span className="hidden sm:inline">Mais ações</span>
+                      <span>Mais ações</span>
                     </summary>
                     <div className="mt-2 w-full sm:absolute sm:left-0 sm:top-full sm:mt-2 sm:min-w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-sm z-20">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          handleOpenImportStepDialog();
-                          (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
-                        }}
-                        disabled={!canImportCurrentStep}
-                        className="sm:hidden inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <Download className="h-4 w-4" />
-                        Importar etapa
-                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -823,12 +751,7 @@ export default function Calculator() {
                 </div>
               </div>
               <div className="mt-2 min-h-5">
-                {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
-                  <p className="hidden sm:block text-sm text-blue-700">
-                    <span className="font-medium">Faltam:</span>{" "}
-                    {currentStepPendingDesktopSummary}
-                  </p>
-                ) : currentStep === 3 ? (
+                {currentStep === 3 ? (
                   <p className="hidden sm:block text-sm text-slate-500">
                     Etapa opcional. Você pode ajustar os pesos ou manter o padrão.
                   </p>
@@ -843,11 +766,7 @@ export default function Calculator() {
                 <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de 4</p>
                 <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
               </div>
-              {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
-                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">
-                  Faltam {stepPending[currentStep as 1 | 2 | 3 | 4].count}
-                </span>
-              ) : stepPending[currentStep as 1 | 2 | 3 | 4].optional ? (
+              {currentStep === 3 ? (
                 <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
                   Opcional
                 </span>
@@ -863,11 +782,6 @@ export default function Calculator() {
                       ? "Alterações não salvas"
                       : "Rascunho automático ativo"}
               </p>
-              {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
-                <p className="text-xs font-medium text-blue-700">
-                  {stepPending[currentStep as 1 | 2 | 3 | 4].missing.slice(0, 2).join(", ")}
-                </p>
-              ) : null}
             </div>
           </div>
         </div>

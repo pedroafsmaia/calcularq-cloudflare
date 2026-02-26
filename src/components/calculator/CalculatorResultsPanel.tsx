@@ -16,8 +16,6 @@ type Props = {
   globalComplexity: number;
   currentStep: number;
   currentStepLabel: string;
-  currentStepPendingCount: number;
-  currentStepPendingMissing: readonly string[];
   selectedFactorsCount: number;
   totalFactors: number;
   estimatedHours: number;
@@ -33,8 +31,6 @@ export default function CalculatorResultsPanel({
   globalComplexity,
   currentStep,
   currentStepLabel,
-  currentStepPendingCount,
-  currentStepPendingMissing,
   selectedFactorsCount,
   totalFactors,
   estimatedHours,
@@ -55,12 +51,6 @@ export default function CalculatorResultsPanel({
             <p className="text-xs text-slate-400">
               Complete {currentStepLabel.toLowerCase()} para liberar a base do cálculo.
             </p>
-            {currentStepPendingCount > 0 ? (
-              <p className="mt-2 text-xs text-blue-700">
-                Faltam {currentStepPendingCount}
-                {currentStepPendingMissing.length > 0 ? `: ${currentStepPendingMissing.join(", ")}` : ""}
-              </p>
-            ) : null}
           </div>
         </div>
       ) : (
