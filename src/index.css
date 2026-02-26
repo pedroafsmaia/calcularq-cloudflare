@@ -6,6 +6,20 @@
   body {
     font-family: 'Inter', sans-serif;
   }
+
+  /* Edge/IE password reveal icon duplicates custom eye button */
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none;
+  }
+
+  input[type="password"]::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
 }
 
 /* Estilos para conteúdo HTML nos modais legais */

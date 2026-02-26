@@ -71,8 +71,21 @@ class ApiClient {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: "Erro desconhecido" }));
-        throw new Error(error.message || error.error || `HTTP error! status: ${response.status}`);
+        const contentType = response.headers.get("content-type") || "";
+        let message = `Falha na requisição (${response.status})`;
+        if (contentType.includes("application/json")) {
+          const error = await response.json().catch(() => ({} as Record<string, unknown>));
+          message =
+            String((error as { message?: string }).message || (error as { error?: string }).error || message);
+        } else {
+          const text = await response.text().catch(() => "");
+          if (response.status >= 500 && text.includes("Error 1101")) {
+            message = "Serviço temporariamente indisponível. Tente novamente em instantes.";
+          } else if (text.trim()) {
+            message = text.slice(0, 180);
+          }
+        }
+        throw new Error(message);
       }
 
       const contentType = response.headers.get("content-type") || "";

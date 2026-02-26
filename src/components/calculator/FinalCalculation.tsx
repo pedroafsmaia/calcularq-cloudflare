@@ -198,7 +198,8 @@ export default function FinalCalculation({
               Desconto comercial: {commercialDiscount}%
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="mb-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div className="flex flex-wrap items-center gap-2">
               {discountPresets.map((preset) => {
                 const active = commercialDiscount === preset;
                 return (
@@ -216,7 +217,8 @@ export default function FinalCalculation({
                   </button>
                 );
               })}
-              <div className="ml-auto flex items-center gap-2">
+              </div>
+              <div className="flex items-center justify-end gap-2">
                 <span className="text-xs font-medium text-slate-500">Valor</span>
                 <div className="relative w-24">
                   <input
@@ -242,19 +244,6 @@ export default function FinalCalculation({
                   <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">%</span>
                 </div>
               </div>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="1"
-              value={commercialDiscount}
-              onChange={(e) => onCommercialDiscountChange(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-calcularq-blue mb-2"
-            />
-            <div className="flex justify-between text-xs text-slate-500 mb-2">
-              <span>0%</span>
-              <span>100%</span>
             </div>
             {commercialDiscount > 0 && (
               <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/80 px-3.5 py-3">

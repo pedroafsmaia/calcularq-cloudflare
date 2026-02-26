@@ -222,41 +222,50 @@ export async function ensureSecurityTables(db) {
 }
 
 export async function rateLimitByIp(context, { endpoint = "generic", limit = 10, windowMs = 60_000 } = {}) {
-  const db = context.env.DB;
-  if (!db) return { ok: true };
-  await ensureSecurityTables(db);
+  try {
+    const db = context.env.DB;
+    if (!db) return { ok: true };
+    await ensureSecurityTables(db);
 
-  const ip = getClientIp(context.request);
-  const key = `${endpoint}:${ip}`;
-  const now = Date.now();
-  const nowIso = new Date(now).toISOString();
-  const row = await db.prepare(
-    "SELECT count, window_start_ms FROM request_rate_limits WHERE key = ?"
-  ).bind(key).first();
+    const ip = getClientIp(context.request);
+    const key = `${endpoint}:${ip}`;
+    const now = Date.now();
+    const nowIso = new Date(now).toISOString();
+    const row = await db
+      .prepare("SELECT count, window_start_ms FROM request_rate_limits WHERE key = ?")
+      .bind(key)
+      .first();
 
-  if (!row) {
-    await db.prepare(
-      "INSERT INTO request_rate_limits (key, count, window_start_ms, updated_at) VALUES (?, 1, ?, ?)"
-    ).bind(key, now, nowIso).run();
+    if (!row) {
+      await db
+        .prepare("INSERT INTO request_rate_limits (key, count, window_start_ms, updated_at) VALUES (?, 1, ?, ?)")
+        .bind(key, now, nowIso)
+        .run();
+      return { ok: true };
+    }
+
+    const count = Number(row.count || 0);
+    const windowStart = Number(row.window_start_ms || 0);
+    if (!Number.isFinite(windowStart) || now - windowStart >= windowMs) {
+      await db
+        .prepare("UPDATE request_rate_limits SET count = 1, window_start_ms = ?, updated_at = ? WHERE key = ?")
+        .bind(now, nowIso, key)
+        .run();
+      return { ok: true };
+    }
+
+    if (count >= limit) {
+      const retryAfterSec = Math.max(1, Math.ceil((windowMs - (now - windowStart)) / 1000));
+      return { ok: false, retryAfterSec };
+    }
+
+    await db
+      .prepare("UPDATE request_rate_limits SET count = ?, updated_at = ? WHERE key = ?")
+      .bind(count + 1, nowIso, key)
+      .run();
+    return { ok: true };
+  } catch (error) {
+    console.error("[rateLimitByIp] fallback due to error:", error);
     return { ok: true };
   }
-
-  const count = Number(row.count || 0);
-  const windowStart = Number(row.window_start_ms || 0);
-  if (!Number.isFinite(windowStart) || now - windowStart >= windowMs) {
-    await db.prepare(
-      "UPDATE request_rate_limits SET count = 1, window_start_ms = ?, updated_at = ? WHERE key = ?"
-    ).bind(now, nowIso, key).run();
-    return { ok: true };
-  }
-
-  if (count >= limit) {
-    const retryAfterSec = Math.max(1, Math.ceil((windowMs - (now - windowStart)) / 1000));
-    return { ok: false, retryAfterSec };
-  }
-
-  await db.prepare(
-    "UPDATE request_rate_limits SET count = ?, updated_at = ? WHERE key = ?"
-  ).bind(count + 1, nowIso, key).run();
-  return { ok: true };
 }

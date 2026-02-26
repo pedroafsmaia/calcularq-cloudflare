@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -90,7 +90,14 @@ export default function Login() {
       }
       navigate(createPageUrl("Calculator"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao realizar operação");
+      const message = err instanceof Error ? err.message : "";
+      if (!message || message === "Erro desconhecido") {
+        setError("Não foi possível concluir o login. Tente novamente.");
+      } else if (message.includes("Failed to fetch")) {
+        setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
+      } else {
+        setError(message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +161,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
                   minLength={8}
                 />
@@ -325,3 +332,5 @@ export default function Login() {
     </div>
   );
 }
+
+

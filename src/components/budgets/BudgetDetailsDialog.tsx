@@ -77,7 +77,12 @@ export default function BudgetDetailsDialog({
             </Button>
             <Button
               type="button"
-              className="bg-calcularq-blue hover:bg-[#002366] text-white"
+              className={[
+                "transition-colors duration-150 disabled:opacity-100",
+                detailDirty
+                  ? "bg-calcularq-blue hover:bg-[#002366] text-white"
+                  : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+              ].join(" ")}
               onClick={onSave}
               disabled={!selectedBudget || !detailName.trim() || isSavingDetails || !detailDirty}
             >

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+﻿import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -217,19 +217,19 @@ export default function Home() {
                 key={feature.title}
                 variants={fadeUp(prefersReducedMotion, 12)}
                 transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
-                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue/80 hover:shadow-md transition-colors transition-shadow duration-150 text-center"
+                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-calcularq-blue/80 hover:shadow-md transition-colors transition-shadow duration-150 text-center flex h-full flex-col"
               >
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
                 </div>
                 <h3
-                  className="text-base sm:text-lg font-semibold text-calcularq-blue mb-2 leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1"
+                  className="min-h-[3.2rem] text-base sm:text-lg font-semibold text-calcularq-blue mb-2 leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1 flex items-center justify-center"
                   style={{ textWrap: "balance" }}
                 >
                   {feature.title}
                 </h3>
                 <p
-                  className="text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed max-w-[28ch] sm:max-w-[31ch] mx-auto px-1 break-words"
+                  className="min-h-[5.75rem] text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed max-w-[28ch] sm:max-w-[31ch] mx-auto px-1 break-words"
                   style={{ textWrap: "pretty" }}
                 >
                   {feature.description}
@@ -307,7 +307,7 @@ export default function Home() {
               <FormulaStep 
                 number="1" 
                 title={"Hora técnica mínima"}
-                description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica mínima."}
+                description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora tÃ©cnica mÃ­nima."}
               />
               <FormulaStep 
                 number="2" 
@@ -322,7 +322,7 @@ export default function Home() {
               <FormulaStep 
                 number="4" 
                 title={"Composição final"}
-                description={"Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."}
+                description={"Estime as horas de projeto, adicione despesas variÃ¡veis e desconto. O preço de venda aparece na hora."}
               />
             </div>
           </motion.div>
@@ -334,15 +334,16 @@ export default function Home() {
 
 function FormulaStep({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue/80 hover:shadow-md transition-colors transition-shadow duration-150 text-center">
+    <div className="h-full bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 hover:border-calcularq-blue/80 hover:shadow-md transition-colors transition-shadow duration-150 text-center flex flex-col">
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1" style={{ textWrap: "balance" }}>{title}</h3>
-      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[26ch] sm:max-w-[30ch] lg:max-w-[29ch] mx-auto px-1 break-words" style={{ textWrap: "pretty" }}>
+      <h3 className="min-h-[3.2rem] font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1 flex items-center justify-center" style={{ textWrap: "balance" }}>{title}</h3>
+      <p className="min-h-[5.75rem] text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[26ch] sm:max-w-[30ch] lg:max-w-[29ch] mx-auto px-1 break-words" style={{ textWrap: "pretty" }}>
         {description}
       </p>
     </div>
   );
 }
+
 

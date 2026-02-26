@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
@@ -91,6 +91,7 @@ export default function Calculator() {
   // ── Autosave em localStorage ──────────────────────────────────
   const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftStatusResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mobileStepperRef = useRef<HTMLDetailsElement | null>(null);
 
   useEffect(() => {
     if (!user || budgetId) return;
@@ -467,6 +468,12 @@ export default function Calculator() {
     if (currentStep > 1) setCurrentStep(s => s - 1);
   };
 
+  const goToStep = useCallback((stepNumber: number) => {
+    const canGoToReached = stepNumber <= maxStepReached;
+    const canGoToNext = stepNumber === maxStepReached + 1 && stepComplete(stepNumber - 1);
+    if (canGoToReached || canGoToNext) setCurrentStep(stepNumber);
+  }, [maxStepReached, stepComplete]);
+
   // `useBlocker` requires a Data Router. This app uses BrowserRouter, so using
   // it here can crash the calculator route at runtime (blank screen).
   // Keep the `beforeunload` warning and disable SPA route blocking for now.
@@ -624,17 +631,12 @@ export default function Calculator() {
             {STEPS.map((step, i) => {
               const done = stepVisualDone(step.n);
               const active = currentStep === step.n;
-              const handleClick = () => {
-                const canGoToReached = step.n <= maxStepReached;
-                const canGoToNext = step.n === maxStepReached + 1 && stepComplete(step.n - 1);
-                if (canGoToReached || canGoToNext) setCurrentStep(step.n);
-              };
               return (
                 <div key={step.n} className="flex items-start">
                   <div className="flex flex-col items-center w-[5.1rem] sm:w-[6.2rem] md:w-[7.8rem]">
                     <button
                       type="button"
-                      onClick={handleClick}
+                      onClick={() => goToStep(step.n)}
                       title={
                         step.n === 3 ? "Etapa opcional" : step.label
                       }
@@ -760,19 +762,66 @@ export default function Calculator() {
             </motion.div>
 
         <div className="lg:hidden sticky top-20 z-10 mb-4">
-          <div className="rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de 4</p>
-                <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
+          <details ref={mobileStepperRef} className="rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur-sm">
+            <summary className="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
+              <div className="flex items-center justify-between gap-3 rounded-lg px-1 py-1.5 hover:bg-slate-50 transition-colors duration-150">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de 4</p>
+                  <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {currentStep === 3 ? (
+                    <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
+                      Opcional
+                    </span>
+                  ) : null}
+                  <ChevronDown className="h-4 w-4 text-slate-500" />
+                </div>
               </div>
-              {currentStep === 3 ? (
-                <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
-                  Opcional
-                </span>
-              ) : null}
+            </summary>
+            <div className="mt-2 space-y-1.5 border-t border-slate-100 pt-2">
+              {STEPS.map((step) => {
+                const done = stepVisualDone(step.n);
+                const active = currentStep === step.n;
+                return (
+                  <button
+                    key={step.n}
+                    type="button"
+                    onClick={() => {
+                      goToStep(step.n);
+                      mobileStepperRef.current?.removeAttribute("open");
+                    }}
+                    className={[
+                      "w-full rounded-lg px-2.5 py-2 text-left transition-colors duration-150",
+                      active
+                        ? "bg-calcularq-blue/5 text-calcularq-blue"
+                        : done
+                          ? "bg-calcularq-blue/[0.03] text-calcularq-blue"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-calcularq-blue",
+                    ].join(" ")}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span
+                        className={[
+                          "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
+                          done
+                            ? "border-calcularq-blue bg-calcularq-blue text-white"
+                            : active
+                              ? "border-calcularq-blue bg-white text-calcularq-blue"
+                              : "border-slate-200 bg-white text-slate-400",
+                        ].join(" ")}
+                      >
+                        {done ? "✓" : step.n}
+                      </span>
+                      <span className={["text-sm leading-snug", active ? "font-semibold" : ""].join(" ")}>
+                        {step.label}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="mt-1.5 flex items-center justify-between gap-3">
+            <div className="mt-2 border-t border-slate-100 pt-2">
               <p className="min-w-0 truncate text-xs text-slate-500">
                 {draftStatus === "saving"
                   ? "Salvando rascunho..."
@@ -780,10 +829,10 @@ export default function Calculator() {
                     ? "Rascunho salvo"
                     : hasUnsavedChanges
                       ? "Alterações não salvas"
-                      : "Rascunho automático ativo"}
+                      : "Rascunho salvo automaticamente"}
               </p>
             </div>
-          </div>
+          </details>
         </div>
 
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
