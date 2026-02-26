@@ -13,7 +13,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import SectionHeader from "@/components/calculator/SectionHeader";
-import { Button } from "@/components/ui/button";
 import { ManualCard, NoteBox } from "@/components/manual/ManualCard";
 import ManualStepper from "@/components/manual/ManualStepper";
 import ManualMobileSummary from "@/components/manual/ManualMobileSummary";
@@ -30,6 +29,16 @@ const manualSteps = [
   { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
   { id: "encerramento", label: "Conclusão", short: "Conclusão" },
 ] as const;
+
+const MANUAL_SCROLL_OFFSET = {
+  mobile: 132,
+  desktop: 92,
+} as const;
+
+const MANUAL_SCROLL_SPY_TOP = {
+  mobile: 132,
+  desktop: 240,
+} as const;
 
 export default function Manual() {
   const prefersReducedMotion = !!useReducedMotion();
@@ -71,7 +80,7 @@ export default function Manual() {
     }
 
     const performScroll = () => {
-      const offset = isMobile ? 132 : 92;
+      const offset = isMobile ? MANUAL_SCROLL_OFFSET.mobile : MANUAL_SCROLL_OFFSET.desktop;
       const top = sectionAnchor.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     };
@@ -87,7 +96,7 @@ export default function Manual() {
   useEffect(() => {
     const updateActiveStep = () => {
       const isMobile = window.innerWidth < 768;
-      const stickyTop = isMobile ? 132 : 240;
+      const stickyTop = isMobile ? MANUAL_SCROLL_SPY_TOP.mobile : MANUAL_SCROLL_SPY_TOP.desktop;
       const viewportHeight = window.innerHeight;
       const viewportBottom = viewportHeight - (isMobile ? 20 : 32);
 
@@ -148,8 +157,12 @@ export default function Manual() {
   }) => (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <button
+        type="button"
         onClick={() => toggleFactor(id)}
         className="flex w-full items-center justify-between gap-3 bg-slate-50 px-4 py-3 text-left hover:bg-slate-100 transition-colors"
+        aria-expanded={expandedFactors[id]}
+        aria-controls={`${id}-panel`}
+        id={`${id}-trigger`}
       >
         <h3 className="text-sm sm:text-base font-semibold text-calcularq-blue">{title}</h3>
         {expandedFactors[id] ? (
@@ -166,6 +179,9 @@ export default function Manual() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
             className="overflow-hidden"
+            id={`${id}-panel`}
+            role="region"
+            aria-labelledby={`${id}-trigger`}
           >
             <div className="border-t border-slate-200 px-4 py-4">
               <p className="text-sm sm:text-base text-slate-700 leading-relaxed mb-4">{definition}</p>
@@ -512,11 +528,12 @@ export default function Manual() {
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                   <p className="font-semibold">Bom projeto!</p>
-                  <Link to={createPageUrl("Calculator")}>
-                    <Button className="bg-white text-calcularq-blue hover:bg-slate-100">
-                      Ir para a calculadora
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+                  <Link
+                    to={createPageUrl("Calculator")}
+                    className="inline-flex h-10 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-calcularq-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-calcularq-blue hover:bg-slate-100"
+                  >
+                    <span>Ir para a calculadora</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </div>
               </section>
