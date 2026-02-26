@@ -743,7 +743,7 @@ export default function Calculator() {
                     type="button"
                     onClick={handleOpenImportStepDialog}
                     disabled={!canImportCurrentStep}
-                    className="hidden sm:inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue disabled:cursor-not-allowed disabled:opacity-50"
+                    className="hidden sm:inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
