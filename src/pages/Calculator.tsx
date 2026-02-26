@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, Trash2 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, RotateCcw, Trash2 } from "lucide-react";
+import { useSearchParams, useBlocker } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
 import type { ExpenseItem } from "@/types/budget";
@@ -15,6 +15,7 @@ import SectionHeader from "../components/calculator/SectionHeader";
 import CalculatorResultsPanel from "../components/calculator/CalculatorResultsPanel";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import AppDialog from "@/components/ui/AppDialog";
+import { useToast } from "@/components/ui/ToastProvider";
 
 import {
   DEFAULT_FACTORS,
@@ -43,6 +44,7 @@ export default function Calculator() {
   const prefersReducedMotion = !!useReducedMotion();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
+  const { toast } = useToast();
   const budgetId = searchParams.get("budget");
   const [loadedBudgetName, setLoadedBudgetName] = useState<string | null>(null);
   const [loadedClientName, setLoadedClientName] = useState<string | null>(null);
@@ -54,6 +56,11 @@ export default function Calculator() {
   const [savedBudgets, setSavedBudgets] = useState<Budget[]>([]);
   const [selectedImportBudgetId, setSelectedImportBudgetId] = useState<string>("");
   const [shouldClearDraftOnExit, setShouldClearDraftOnExit] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [lastDraftSavedAt, setLastDraftSavedAt] = useState<number | null>(null);
+  const [hydrationComplete, setHydrationComplete] = useState(false);
+  const [lastCommittedHash, setLastCommittedHash] = useState<string | null>(null);
+  const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
@@ -83,10 +90,12 @@ export default function Calculator() {
 
   // ── Autosave em localStorage ──────────────────────────────────
   const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftStatusResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!user || budgetId) return;
     if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
+    setDraftStatus("saving");
     draftSaveRef.current = setTimeout(() => {
       saveCalculatorDraft({
         minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
@@ -96,6 +105,10 @@ export default function Calculator() {
         currentStep, maxStepReached,
         savedAt: Date.now(),
       });
+      setLastDraftSavedAt(Date.now());
+      setDraftStatus("saved");
+      if (draftStatusResetRef.current) clearTimeout(draftStatusResetRef.current);
+      draftStatusResetRef.current = setTimeout(() => setDraftStatus("idle"), 1500);
     }, 800);
   }, [
     budgetId,
@@ -113,11 +126,17 @@ export default function Calculator() {
     draftRestoredRef.current = true;
 
     const draft = loadCalculatorDraft();
-    if (!draft || !draft.minHourlyRate) return;
+    if (!draft || !draft.minHourlyRate) {
+      setHydrationComplete(true);
+      return;
+    }
 
     // Só restaura se o rascunho for recente (< 24h) e não vier de outro usuário
     const age = Date.now() - (draft.savedAt || 0);
-    if (age > 24 * 60 * 60 * 1000) return;
+    if (age > 24 * 60 * 60 * 1000) {
+      setHydrationComplete(true);
+      return;
+    }
 
     setMinHourlyRate(draft.minHourlyRate ?? null);
     setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
@@ -140,24 +159,10 @@ export default function Calculator() {
     if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
     if (draft.currentStep) setCurrentStep(draft.currentStep);
     if (draft.maxStepReached) setMaxStepReached(draft.maxStepReached);
+    setLastDraftSavedAt(draft.savedAt ?? null);
+    setDraftStatus("saved");
+    setHydrationComplete(true);
   }, [user, budgetId]);
-
-  useEffect(() => {
-    const clearDraft = () => {
-      if (!shouldClearDraftOnExit) return;
-      clearCalculatorDraft();
-    };
-
-    const onBeforeUnload = () => {
-      clearDraft();
-    };
-
-    window.addEventListener("beforeunload", onBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-      clearDraft();
-    };
-  }, [shouldClearDraftOnExit]);
 
   // ── Buscar último budget para banner de restauração ───────────
   useEffect(() => {
@@ -200,7 +205,6 @@ export default function Calculator() {
         setSelections(budget.data.selections);
         setEstimatedHours(budget.data.estimatedHours);
         setVariableExpenses(budget.data.variableExpenses || []);
-
         if (budget.data.commercialDiscount !== undefined) setCommercialDiscount(budget.data.commercialDiscount);
         if (budget.data.fixedExpenses) setFixedExpenses(budget.data.fixedExpenses);
         if (budget.data.personalExpenses) setPersonalExpenses(budget.data.personalExpenses);
@@ -223,6 +227,8 @@ export default function Calculator() {
         setMaxStepReached(4);
       } catch (e) {
         console.error("Erro ao carregar cálculo:", e);
+      } finally {
+        setHydrationComplete(true);
       }
     };
     loadBudget();
@@ -316,8 +322,6 @@ export default function Calculator() {
 
   const displayValues = useMemo(() => {
     const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
-    const totalFixedExpenses = fixedExpenses.reduce((sum, exp) => sum + exp.value, 0);
-    const fixedCostPerHour = productiveHours > 0 ? totalFixedExpenses / productiveHours : 0;
     const adjustedHourlyRate = minHourlyRate && minHourlyRate > 0 && globalComplexity > 0
       ? minHourlyRate * globalComplexity : 0;
     const projectPrice = adjustedHourlyRate > 0 && estimatedHours > 0
@@ -325,13 +329,14 @@ export default function Calculator() {
     const projectPriceWithDiscount = projectPrice * (1 - commercialDiscount / 100);
     const discountAmount = projectPrice * (commercialDiscount / 100);
     const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
-    const profit = productiveHours > 0 && projectPriceWithDiscount > 0 && estimatedHours > 0
-      ? projectPriceWithDiscount - (fixedCostPerHour * estimatedHours) : null;
+    const profit = minHourlyRate && adjustedHourlyRate > 0 && estimatedHours > 0
+      ? (adjustedHourlyRate - minHourlyRate) * estimatedHours
+      : null;
     return {
       totalVariableExpenses, adjustedHourlyRate, projectPrice,
       projectPriceWithDiscount, discountAmount, finalSalePrice, profit,
     };
-  }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses, fixedExpenses, productiveHours]);
+  }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses]);
 
   const CUB_MEDIO = 2800;
   const effectiveAreaForCub = useMemo(() => {
@@ -360,11 +365,119 @@ export default function Calculator() {
     return displayValues.finalSalePrice / effectiveAreaForCub;
   }, [effectiveAreaForCub, displayValues.finalSalePrice]);
 
+  const calculatorStateHash = useMemo(
+    () =>
+      JSON.stringify({
+        minHourlyRate,
+        useManualMinHourlyRate,
+        fixedExpenses,
+        personalExpenses,
+        proLabore,
+        productiveHours,
+        factors: factors.map((f) => ({ id: f.id, weight: f.weight })),
+        areaIntervals,
+        area,
+        selections,
+        estimatedHours,
+        commercialDiscount,
+        variableExpenses,
+        currentStep,
+      }),
+    [
+      area,
+      areaIntervals,
+      commercialDiscount,
+      currentStep,
+      estimatedHours,
+      factors,
+      fixedExpenses,
+      minHourlyRate,
+      personalExpenses,
+      proLabore,
+      productiveHours,
+      selections,
+      useManualMinHourlyRate,
+      variableExpenses,
+    ]
+  );
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (!hydrationComplete || !lastCommittedHash) return false;
+    if (shouldClearDraftOnExit) return false;
+    return calculatorStateHash !== lastCommittedHash;
+  }, [calculatorStateHash, hydrationComplete, lastCommittedHash, shouldClearDraftOnExit]);
+
+  useEffect(() => {
+    if (!hydrationComplete || lastCommittedHash !== null) return;
+    setLastCommittedHash(calculatorStateHash);
+  }, [calculatorStateHash, hydrationComplete, lastCommittedHash]);
+
+  useEffect(() => {
+    const clearDraft = () => {
+      if (!shouldClearDraftOnExit) return;
+      clearCalculatorDraft();
+    };
+
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+      clearDraft();
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      clearDraft();
+    };
+  }, [hasUnsavedChanges, shouldClearDraftOnExit]);
+
   const hasComplexitySelections = Object.keys(selections).length > 0;
   const totalFactors = factors.length; // inclui área
   const selectedFactorsCount = Object.keys(selections).length;
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area");
+
+  const fixedExpensesTotal = fixedExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0);
+  const personalExpensesTotal = personalExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0);
+  const requiredComplexitySelections = otherFactors.length + 1; // + area
+
+  const stepPending = useMemo(() => {
+    const step1Missing: string[] = [];
+    if (useManualMinHourlyRate) {
+      if (!minHourlyRate || minHourlyRate <= 0) step1Missing.push("Hora mínima");
+    } else {
+      if (fixedExpensesTotal <= 0) step1Missing.push("Despesas operacionais");
+      if (personalExpensesTotal <= 0) step1Missing.push("Despesas pessoais");
+      if (productiveHours <= 0) step1Missing.push("Horas produtivas");
+    }
+
+    const step2MissingCount = Math.max(0, requiredComplexitySelections - selectedFactorsCount);
+    const step2Missing =
+      step2MissingCount > 0
+        ? [`${step2MissingCount} fator${step2MissingCount > 1 ? "es" : ""}`]
+        : [];
+
+    const step4Missing: string[] = [];
+    if (estimatedHours <= 0) step4Missing.push("Horas estimadas");
+
+    return {
+      1: { count: step1Missing.length, missing: step1Missing, optional: false },
+      2: { count: step2MissingCount, missing: step2Missing, optional: false },
+      3: { count: 0, missing: [], optional: true },
+      4: { count: step4Missing.length, missing: step4Missing, optional: false },
+    } as const;
+  }, [
+    estimatedHours,
+    fixedExpensesTotal,
+    minHourlyRate,
+    personalExpensesTotal,
+    productiveHours,
+    requiredComplexitySelections,
+    selectedFactorsCount,
+    useManualMinHourlyRate,
+  ]);
 
   // ── Stepper ───────────────────────────────────────────────────
   const { stepComplete, canAdvance } = useCalculatorProgress({
@@ -393,6 +506,107 @@ export default function Calculator() {
   const handleBack = () => {
     if (currentStep > 1) setCurrentStep(s => s - 1);
   };
+
+  const navigationBlocker = useBlocker(hasUnsavedChanges);
+
+  useEffect(() => {
+    if (navigationBlocker.state !== "blocked") return;
+    setConfirmLeaveOpen(true);
+  }, [navigationBlocker.state]);
+
+  useEffect(() => {
+    if (!shouldClearDraftOnExit || !lastCommittedHash) return;
+    if (calculatorStateHash !== lastCommittedHash) {
+      setShouldClearDraftOnExit(false);
+    }
+  }, [calculatorStateHash, lastCommittedHash, shouldClearDraftOnExit]);
+
+  const handleBudgetSaved = useCallback(() => {
+    setShouldClearDraftOnExit(true);
+    setLastCommittedHash(calculatorStateHash);
+    setHydrationComplete(true);
+    setDraftStatus("idle");
+    toast({
+      tone: "success",
+      title: "Cálculo salvo",
+      description: "Você pode sair da página; o rascunho local será limpo ao recarregar ou navegar.",
+    });
+  }, [calculatorStateHash, toast]);
+
+  const handleImportCurrentStepWithFeedback = useCallback(() => {
+    handleImportCurrentStepFromSelectedBudget();
+    toast({
+      tone: "success",
+      title: "Etapa importada",
+      description: "Somente os dados da etapa atual foram importados.",
+    });
+  }, [handleImportCurrentStepFromSelectedBudget, toast]);
+
+  const handleConfirmClearCurrentStepWithFeedback = useCallback(() => {
+    handleConfirmClearCurrentStep();
+    toast({
+      tone: "info",
+      title: "Etapa reiniciada",
+      description: `Os dados de ${currentStepLabel} foram reiniciados.`,
+    });
+  }, [currentStepLabel, handleConfirmClearCurrentStep, toast]);
+
+  const handleConfirmResetCalculationWithFeedback = useCallback(() => {
+    handleConfirmResetCalculation();
+    setLastCommittedHash(null);
+    setHydrationComplete(true);
+    setShouldClearDraftOnExit(false);
+    toast({
+      tone: "info",
+      title: "Cálculo reiniciado",
+      description: "Os dados preenchidos foram reiniciados sem apagar o cálculo salvo.",
+    });
+  }, [handleConfirmResetCalculation, toast]);
+
+  useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null) => {
+      const el = target as HTMLElement | null;
+      if (!el) return false;
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (isTypingTarget(event.target)) return;
+      if (confirmClearAllOpen || confirmClearStepOpen || importStepDialogOpen || confirmLeaveOpen) return;
+
+      if (event.altKey && event.key === "ArrowRight") {
+        event.preventDefault();
+        if (currentStep < 4 && canAdvance) setCurrentStep((s) => s + 1);
+        return;
+      }
+      if (event.altKey && event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (currentStep > 1) setCurrentStep((s) => s - 1);
+        return;
+      }
+      if (event.altKey && /^[1-4]$/.test(event.key)) {
+        event.preventDefault();
+        const targetStep = Number(event.key);
+        const canGoToReached = targetStep <= maxStepReached;
+        const canGoToNext = targetStep === maxStepReached + 1 && stepComplete(targetStep - 1);
+        if (canGoToReached || canGoToNext) setCurrentStep(targetStep);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    canAdvance,
+    confirmClearAllOpen,
+    confirmClearStepOpen,
+    confirmLeaveOpen,
+    currentStep,
+    importStepDialogOpen,
+    maxStepReached,
+    setCurrentStep,
+    stepComplete,
+  ]);
 
 
 
@@ -450,12 +664,28 @@ export default function Calculator() {
                     <button
                       type="button"
                       onClick={handleClick}
-                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-colors transition-shadow duration-150 border-2
+                      title={
+                        stepPending[step.n as 1 | 2 | 3 | 4].count > 0
+                          ? `Faltam ${stepPending[step.n as 1 | 2 | 3 | 4].missing.join(", ")}`
+                          : stepPending[step.n as 1 | 2 | 3 | 4].optional
+                            ? "Etapa opcional"
+                            : step.label
+                      }
+                      className="relative"
+                    >
+                      <span
+                        className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-colors transition-shadow duration-150 border-2
                         ${done ? "bg-calcularq-blue border-calcularq-blue text-white shadow-md"
                           : active ? "bg-white border-calcularq-blue text-calcularq-blue shadow-sm"
                           : "bg-white border-slate-200 text-slate-400 cursor-default"}`}
-                    >
-                      {done ? "✓" : step.n}
+                      >
+                        {done ? "✓" : step.n}
+                      </span>
+                      {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 && !done ? (
+                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-1 text-[10px] font-semibold leading-none text-amber-700">
+                          {stepPending[step.n as 1 | 2 | 3 | 4].count}
+                        </span>
+                      ) : null}
                     </button>
                     <span
                       className={`mt-1.5 text-[13px] sm:text-sm font-medium text-center leading-tight max-w-[12ch]
@@ -464,6 +694,13 @@ export default function Calculator() {
                     >
                       {step.label}
                     </span>
+                    {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 ? (
+                      <span className="mt-1 text-[10px] sm:text-xs font-medium text-amber-700 text-center leading-tight max-w-[12ch]">
+                        Faltam {stepPending[step.n as 1 | 2 | 3 | 4].count}
+                      </span>
+                    ) : stepPending[step.n as 1 | 2 | 3 | 4].optional ? (
+                      <span className="mt-1 text-[10px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
+                    ) : null}
                   </div>
                   {i < STEPS.length - 1 && (
                     <div
@@ -489,7 +726,7 @@ export default function Calculator() {
                     onClick={handleOpenImportStepDialog}
                     disabled={!canImportCurrentStep}
                     className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-                    title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo`}
+                    title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
                     Importar dados da etapa
@@ -498,22 +735,64 @@ export default function Calculator() {
                     type="button"
                     onClick={handleClearCurrentStep}
                     className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
-                    title={`Limpar dados da etapa ${currentStepLabel}`}
+                    title={`Reiniciar dados da etapa ${currentStepLabel}`}
                   >
                     <Trash2 className="h-4 w-4" />
-                    Limpar dados da etapa
+                    Reiniciar etapa
                   </button>
                   <button
                     type="button"
                     onClick={handleResetCalculation}
                     className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
-                    title="Resetar os dados preenchidos do cálculo"
+                    title="Reiniciar todos os dados preenchidos do cálculo"
                   >
-                    <Trash2 className="h-4 w-4" />
-                    Resetar cálculo
+                    <RotateCcw className="h-4 w-4" />
+                    Reiniciar cálculo
                   </button>
               </div>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                <span
+                  className={`inline-flex items-center rounded-full border px-2.5 py-1 font-medium ${
+                    draftStatus === "saving"
+                      ? "border-blue-200 bg-blue-50 text-blue-700"
+                      : draftStatus === "saved"
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : hasUnsavedChanges
+                          ? "border-amber-200 bg-amber-50 text-amber-700"
+                          : "border-slate-200 bg-white text-slate-500"
+                  }`}
+                >
+                  {draftStatus === "saving"
+                    ? "Salvando rascunho local..."
+                    : draftStatus === "saved"
+                      ? `Rascunho salvo${lastDraftSavedAt ? ` às ${new Date(lastDraftSavedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""}`
+                      : hasUnsavedChanges
+                        ? "Alterações não salvas"
+                        : "Rascunho local ativo"}
+                </span>
+                <span className="text-slate-400">Atalhos: Alt+← / Alt+→ / Alt+1-4</span>
+              </div>
             </motion.div>
+
+        <div className="lg:hidden sticky top-20 z-10 mb-4">
+          <div className="rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de 4</p>
+                <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
+              </div>
+              {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
+                <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                  Faltam {stepPending[currentStep as 1 | 2 | 3 | 4].count}
+                </span>
+              ) : stepPending[currentStep as 1 | 2 | 3 | 4].optional ? (
+                <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                  Opcional
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </div>
 
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
           {/* Coluna principal */}
@@ -617,7 +896,7 @@ export default function Calculator() {
                     personalExpenses={personalExpenses}
                     productiveHours={productiveHours}
                     useManualMinHourlyRate={useManualMinHourlyRate}
-                    onBudgetSaved={() => setShouldClearDraftOnExit(true)}
+                    onBudgetSaved={handleBudgetSaved}
                     mobileResultsContent={
                       <motion.div
                         initial={{ opacity: 0 }}
@@ -703,30 +982,30 @@ export default function Calculator() {
       <ConfirmDialog
         open={confirmClearStepOpen}
         onOpenChange={setConfirmClearStepOpen}
-        title="Limpar dados da etapa"
-        description={`Deseja limpar os dados preenchidos de "${currentStepLabel}"?`}
-        confirmLabel="Limpar etapa"
-        onConfirm={handleConfirmClearCurrentStep}
+        title="Reiniciar etapa"
+        description={`Deseja reiniciar os dados preenchidos de "${currentStepLabel}"?`}
+        confirmLabel="Reiniciar etapa"
+        onConfirm={handleConfirmClearCurrentStepWithFeedback}
       />
 
       <ConfirmDialog
         open={confirmClearAllOpen}
         onOpenChange={setConfirmClearAllOpen}
-        title="Resetar cálculo"
+        title="Reiniciar cálculo"
         description={
           budgetId
-            ? "Deseja resetar todos os dados preenchidos deste cálculo? O cálculo salvo permanecerá intacto."
-            : "Deseja resetar todos os dados preenchidos deste cálculo?"
+            ? "Deseja reiniciar todos os dados preenchidos deste cálculo? O cálculo salvo permanecerá intacto."
+            : "Deseja reiniciar todos os dados preenchidos deste cálculo?"
         }
-        confirmLabel="Resetar"
-        onConfirm={handleConfirmResetCalculation}
+        confirmLabel="Reiniciar cálculo"
+        onConfirm={handleConfirmResetCalculationWithFeedback}
       />
 
       <AppDialog
         open={importStepDialogOpen}
         onOpenChange={setImportStepDialogOpen}
         title="Importar dados da etapa"
-        description={`Escolha de qual cálculo salvo você quer importar os dados para ${currentStepLabel}.`}
+        description={`Escolha de qual cálculo salvo você quer importar os dados para ${currentStepLabel}. Apenas a etapa atual será substituída.`}
         maxWidthClassName="max-w-xl"
         footer={
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -739,7 +1018,7 @@ export default function Calculator() {
             </button>
             <button
               type="button"
-              onClick={handleImportCurrentStepFromSelectedBudget}
+              onClick={handleImportCurrentStepWithFeedback}
               disabled={!selectedImportBudget}
               className="inline-flex items-center justify-center rounded-lg bg-calcularq-blue px-4 py-2 text-sm font-semibold text-white hover:bg-calcularq-blue/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -776,6 +1055,26 @@ export default function Calculator() {
           ) : null}
         </div>
       </AppDialog>
+
+      <ConfirmDialog
+        open={confirmLeaveOpen}
+        onOpenChange={(open) => {
+          setConfirmLeaveOpen(open);
+          if (!open && navigationBlocker.state === "blocked") {
+            navigationBlocker.reset();
+          }
+        }}
+        title="Sair sem salvar?"
+        description="Há alterações não salvas neste cálculo. Se sair agora, você pode perder mudanças recentes."
+        confirmLabel="Sair sem salvar"
+        confirmVariant="danger"
+        onConfirm={() => {
+          setConfirmLeaveOpen(false);
+          if (navigationBlocker.state === "blocked") {
+            navigationBlocker.proceed();
+          }
+        }}
+      />
     </div>
   );
 }

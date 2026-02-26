@@ -292,7 +292,7 @@ export default function Home() {
               {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 4 etapas simples."}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto items-stretch">
               <FormulaStep 
                 number="1" 
                 title={"Hora técnica mínima"}
@@ -327,8 +327,8 @@ function FormulaStep({ number, title, description }: { number: string; title: st
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-tight max-w-[16ch] sm:max-w-[18ch] mx-auto" style={{ textWrap: "balance" }}>{title}</h3>
-      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[27ch] sm:max-w-[30ch] lg:max-w-[29ch] mx-auto" style={{ textWrap: "pretty" }}>
+      <h3 className="font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1" style={{ textWrap: "balance" }}>{title}</h3>
+      <p className="text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[26ch] sm:max-w-[30ch] lg:max-w-[29ch] mx-auto px-1 break-words" style={{ textWrap: "pretty" }}>
         {description}
       </p>
     </div>

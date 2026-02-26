@@ -12,12 +12,14 @@ import { fadeUp } from "@/lib/motion";
 import BudgetsToolbar from "@/components/budgets/BudgetsToolbar";
 import BudgetCard from "@/components/budgets/BudgetCard";
 import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
+import { useToast } from "@/components/ui/ToastProvider";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
 
 export default function BudgetsHistory() {
   const prefersReducedMotion = !!useReducedMotion();
   const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,7 +29,6 @@ export default function BudgetsHistory() {
   const [detailClientName, setDetailClientName] = useState("");
   const [detailDescription, setDetailDescription] = useState("");
   const [isSavingDetails, setIsSavingDetails] = useState(false);
-  const [pageMessage, setPageMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
   const [confirmDeleteBudgetId, setConfirmDeleteBudgetId] = useState<string | null>(null);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
 
@@ -38,12 +39,17 @@ export default function BudgetsHistory() {
         const resp = await api.listBudgets();
         setBudgets(resp.budgets);
       } catch (e) {
+        toast({
+          tone: "error",
+          title: "Erro ao carregar cálculos",
+          description: "Não foi possível carregar seus cálculos agora.",
+        });
         console.error("Erro ao carregar cálculos:", e);
       }
     };
 
     load();
-  }, [user]);
+  }, [user, toast]);
 
   const visibleBudgets = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
@@ -84,9 +90,17 @@ export default function BudgetsHistory() {
     try {
       await api.deleteBudget(budgetId);
       setBudgets((prev) => prev.filter((b) => b.id !== budgetId));
-      setPageMessage({ tone: "success", text: "Cálculo excluído com sucesso." });
+      toast({
+        tone: "success",
+        title: "Cálculo excluído",
+        description: "O cálculo foi removido com sucesso.",
+      });
     } catch (e) {
-      setPageMessage({ tone: "error", text: "Erro ao excluir cálculo." });
+      toast({
+        tone: "error",
+        title: "Erro ao excluir cálculo",
+        description: "Não foi possível excluir este cálculo.",
+      });
       console.error(e);
     }
   };
@@ -147,8 +161,17 @@ export default function BudgetsHistory() {
 
       setBudgets((prev) => prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget)));
       setSelectedBudgetId(resp.budget.id);
+      toast({
+        tone: "success",
+        title: "Alterações salvas",
+        description: "Os detalhes do cálculo foram atualizados.",
+      });
     } catch (e) {
-      setPageMessage({ tone: "error", text: "Erro ao salvar alterações do cálculo." });
+      toast({
+        tone: "error",
+        title: "Erro ao salvar alterações",
+        description: "Não foi possível salvar os detalhes do cálculo.",
+      });
       console.error(e);
     } finally {
       setIsSavingDetails(false);
@@ -167,14 +190,11 @@ export default function BudgetsHistory() {
     const cubPercentage =
       area && data.results?.finalSalePrice > 0 ? (data.results.finalSalePrice / (2800 * area)) * 100 : null;
     const pricePerSqm = area && data.results?.finalSalePrice > 0 ? data.results.finalSalePrice / area : null;
-    const fixedExpensesTotal = Array.isArray(data.fixedExpenses)
-      ? data.fixedExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0)
-      : 0;
-    const fixedCostPerHour = data.productiveHours && data.productiveHours > 0 ? fixedExpensesTotal / data.productiveHours : 0;
-    const projectPriceWithDiscount = (data.results?.projectPrice || 0) * (1 - discountPercent / 100);
     const profit =
-      fixedCostPerHour > 0 && data.estimatedHours > 0
-        ? projectPriceWithDiscount - fixedCostPerHour * data.estimatedHours
+      typeof data.results?.adjustedHourlyRate === "number" &&
+      typeof data.minHourlyRate === "number" &&
+      data.estimatedHours > 0
+        ? (data.results.adjustedHourlyRate - data.minHourlyRate) * data.estimatedHours
         : null;
 
     return {
@@ -230,17 +250,6 @@ export default function BudgetsHistory() {
             onSearchTermChange={setSearchTerm}
             onSortByChange={setSortBy}
           />
-          {pageMessage ? (
-            <div
-              className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
-                pageMessage.tone === "error"
-                  ? "border-red-200 bg-red-50 text-red-700"
-                  : "border-green-200 bg-green-50 text-green-700"
-              }`}
-            >
-              {pageMessage.text}
-            </div>
-          ) : null}
         </motion.div>
 
         {budgets.length === 0 ? (

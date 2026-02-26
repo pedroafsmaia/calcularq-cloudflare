@@ -67,7 +67,9 @@ export default function AppDialog({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={dialogContentTransition()}
-            className="fixed inset-0 z-[101] flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4"
+            className={`fixed inset-0 z-[101] flex items-start sm:items-center justify-center p-3 sm:p-4 ${
+              useMobileInnerScroll ? "overflow-y-auto sm:overflow-visible" : "overflow-y-auto"
+            }`}
             style={{
               paddingTop: "calc(0.75rem + env(safe-area-inset-top, 0px))",
               paddingBottom: "calc(2.5rem + env(safe-area-inset-bottom, 0px))",

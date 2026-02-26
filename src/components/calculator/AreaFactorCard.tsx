@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Edit2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AreaInterval, calculateAreaLevel } from "../pricing/PricingEngine";
 import Tooltip from "@/components/ui/Tooltip";
+import { formatNumberPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 
 interface AreaFactorCardProps {
   area: number | null;
@@ -21,8 +22,14 @@ export default function AreaFactorCard({
 }: AreaFactorCardProps) {
   const [isEditingIntervals, setIsEditingIntervals] = useState(false);
   const [editingIntervals, setEditingIntervals] = useState<AreaInterval[]>(intervals);
+  const [areaDraft, setAreaDraft] = useState("");
 
   const currentLevel = area !== null ? calculateAreaLevel(area, intervals) : null;
+
+  const formatArea = (value: number) => {
+    const hasFraction = Math.abs(value % 1) > 0.000001;
+    return formatNumberPtBr(value, hasFraction ? 2 : 0);
+  };
 
   const handleAreaInput = (value: number) => {
     onAreaChange(value);
@@ -53,11 +60,14 @@ export default function AreaFactorCard({
   };
 
   const parseAreaValue = (raw: string) => {
-    const normalized = raw.replace(",", ".").trim();
-    if (!normalized) return 0;
-    const parsed = Number(normalized);
-    return Number.isFinite(parsed) ? parsed : 0;
+    const parsed = parsePtBrNumber(raw);
+    return parsed !== null && parsed >= 0 ? parsed : 0;
   };
+
+  // Sincroniza o rascunho textual quando o valor externo muda (importação/reset)
+  useEffect(() => {
+    setAreaDraft(typeof area === "number" && area > 0 ? formatArea(area) : "");
+  }, [area]);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 hover:shadow-sm transition-colors transition-shadow duration-150">
@@ -83,11 +93,18 @@ export default function AreaFactorCard({
           Área de Projeto (m²)
         </label>
         <input
-          type="number"
-          min="0"
-          step="0.01"
-          value={area || ""}
-          onChange={(e) => handleAreaInput(parseAreaValue(e.target.value))}
+          type="text"
+          inputMode="decimal"
+          value={areaDraft}
+          onChange={(e) => {
+            const nextDraft = sanitizeNumberDraft(e.target.value);
+            setAreaDraft(nextDraft);
+            handleAreaInput(parseAreaValue(nextDraft));
+          }}
+          onBlur={() => {
+            const parsed = parseAreaValue(areaDraft);
+            setAreaDraft(parsed > 0 ? formatArea(parsed) : "");
+          }}
           className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
           placeholder="Digite a área em m²"
         />

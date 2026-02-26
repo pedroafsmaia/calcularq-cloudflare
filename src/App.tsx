@@ -10,10 +10,12 @@ import BudgetsHistory from './pages/BudgetsHistory'
 import ResetPassword from './pages/ResetPassword'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
+import { ToastProvider } from './components/ui/ToastProvider'
 
 function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <Router>
         <Routes>
           <Route element={
@@ -53,6 +55,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      </ToastProvider>
     </AuthProvider>
   )
 }

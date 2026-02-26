@@ -1,9 +1,10 @@
-import { DollarSign } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+﻿import { DollarSign } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import SaveBudgetButton from "./SaveBudgetButton";
 import Tooltip from "@/components/ui/Tooltip";
 import SectionHeader from "./SectionHeader";
+import { formatHoursPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 
 interface FinalCalculationProps {
   budgetId?: string;
@@ -64,6 +65,10 @@ export default function FinalCalculation({
   mobileResultsContent,
   onBudgetSaved,
 }: FinalCalculationProps) {
+  const [estimatedHoursDraft, setEstimatedHoursDraft] = useState("");
+  const [discountDraft, setDiscountDraft] = useState("0");
+  const discountPresets = useMemo(() => [0, 5, 10, 15, 20], []);
+
   const handleAddExpense = (expense: Expense) => {
     onVariableExpensesChange([...variableExpenses, expense]);
   };
@@ -86,6 +91,14 @@ export default function FinalCalculation({
   }, []);
 
   const discountAmount = projectPrice * (commercialDiscount / 100);
+
+  useEffect(() => {
+    setEstimatedHoursDraft(estimatedHours > 0 ? formatHoursPtBr(estimatedHours) : "");
+  }, [estimatedHours]);
+
+  useEffect(() => {
+    setDiscountDraft(String(commercialDiscount));
+  }, [commercialDiscount]);
 
   const saveActions = (
     <div className="space-y-4">
@@ -152,11 +165,19 @@ export default function FinalCalculation({
               <Tooltip text="Quantidade total de horas que você estima gastar para executar este projeto. Considere a etapa, o tamanho e a complexidade do projeto ao estimar esse tempo. O sistema multiplicará esse valor pela sua Hora Técnica Ajustada." />
             </label>
             <input
-              type="number"
-              min="0"
-              step="0.5"
-              value={estimatedHours || ""}
-              onChange={(e) => onEstimatedHoursChange(Number(e.target.value))}
+              type="text"
+              inputMode="decimal"
+              value={estimatedHoursDraft}
+              onChange={(e) => {
+                const nextDraft = sanitizeNumberDraft(e.target.value);
+                setEstimatedHoursDraft(nextDraft);
+                const parsed = parsePtBrNumber(nextDraft);
+                onEstimatedHoursChange(parsed !== null && parsed >= 0 ? parsed : 0);
+              }}
+              onBlur={() => {
+                const parsed = parsePtBrNumber(estimatedHoursDraft);
+                setEstimatedHoursDraft(parsed !== null && parsed > 0 ? formatHoursPtBr(parsed) : "");
+              }}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg text-lg font-semibold text-calcularq-blue focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
               placeholder="0"
             />
@@ -177,6 +198,51 @@ export default function FinalCalculation({
               Desconto comercial: {commercialDiscount}%
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              {discountPresets.map((preset) => {
+                const active = commercialDiscount === preset;
+                return (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => onCommercialDiscountChange(preset)}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      active
+                        ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {preset}%
+                  </button>
+                );
+              })}
+              <div className="ml-auto flex items-center gap-2">
+                <span className="text-xs font-medium text-slate-500">Valor</span>
+                <div className="relative w-24">
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={discountDraft}
+                    onChange={(e) => {
+                      const nextDraft = sanitizeNumberDraft(e.target.value);
+                      setDiscountDraft(nextDraft);
+                      const parsed = parsePtBrNumber(nextDraft);
+                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                      onCommercialDiscountChange(next);
+                    }}
+                    onBlur={() => {
+                      const parsed = parsePtBrNumber(discountDraft);
+                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                      setDiscountDraft(String(next));
+                      onCommercialDiscountChange(next);
+                    }}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 pr-8 text-sm text-slate-700 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
+                    aria-label="Desconto comercial em porcentagem"
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">%</span>
+                </div>
+              </div>
+            </div>
             <input
               type="range"
               min="0"

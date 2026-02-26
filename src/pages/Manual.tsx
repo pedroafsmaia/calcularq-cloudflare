@@ -86,16 +86,42 @@ export default function Manual() {
 
   useEffect(() => {
     const updateActiveStep = () => {
-      let current: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
-      // Troca a etapa um pouco antes do topo da próxima seção para evitar sensação de atraso
-      // quando há elementos sticky (navbar + stepper/sumário) cobrindo parte do conteúdo.
-      const triggerLine = window.innerWidth < 768 ? 132 : 240;
+      const isMobile = window.innerWidth < 768;
+      const stickyTop = isMobile ? 132 : 240;
+      const viewportHeight = window.innerHeight;
+      const viewportBottom = viewportHeight - (isMobile ? 20 : 32);
+
+      let bestStep: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
+      let bestVisible = 0;
+
+      for (const step of manualSteps) {
+        const anchor = document.getElementById(step.id);
+        if (!anchor) continue;
+        const container = (anchor.closest("section") as HTMLElement | null) ?? anchor;
+        const rect = container.getBoundingClientRect();
+        const visibleTop = Math.max(rect.top, stickyTop);
+        const visibleBottom = Math.min(rect.bottom, viewportBottom);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+        if (visibleHeight > bestVisible) {
+          bestVisible = visibleHeight;
+          bestStep = step.id;
+        }
+      }
+
+      if (bestVisible > 0) {
+        setActiveStepId(bestStep);
+        return;
+      }
+
+      // Fallback: quando nenhuma seção está visível o suficiente, usa a mais próxima do topo útil.
+      let fallback: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
       for (const step of manualSteps) {
         const el = document.getElementById(step.id);
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= triggerLine) current = step.id;
+        if (el.getBoundingClientRect().top <= stickyTop) fallback = step.id;
       }
-      setActiveStepId(current);
+      setActiveStepId(fallback);
     };
 
     updateActiveStep();
@@ -444,7 +470,7 @@ export default function Manual() {
                           "Preço de Venda Final",
                           "% do valor da obra (indicador comparativo, referência CAU)",
                           "Preço/m² (indicador comparativo, referência IAB/CAU)",
-                          "Lucro Estimado",
+                          "Lucro estimado (margem bruta entre hora ajustada e hora mínima)",
                         ].map((item) => (
                           <li key={item} className="flex items-start gap-2.5">
                             <span className="mt-2 h-1.5 w-1.5 rounded-full bg-calcularq-blue/40 shrink-0" />
@@ -455,11 +481,11 @@ export default function Manual() {
                     </div>
 
                     <NoteBox>
-                      <strong>% do valor da obra (referência CAU/BR):</strong> Indicador comparativo (faixa sugerida: 2% a 11%). A faixa de referência pode variar dependendo da complexidade, da etapa do projeto, do tipo de projeto, da sofisticação e da região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>% do valor da obra (referência CAU/BR):</strong> Indicador comparativo (faixa sugerida: 2% a 11%). A faixa de referência do CAU/BR para % do valor da obra varia conforme a complexidade, a etapa do projeto, o tipo de projeto, a sofisticação e a região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
 
                     <NoteBox>
-                      <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa de referência pode variar dependendo da complexidade, da etapa do projeto, da sofisticação, da área e da região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa de referência do IAB/CAU para valor por m² varia conforme a complexidade, a etapa do projeto, a sofisticação, a área e a região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
                   </div>
                 </div>

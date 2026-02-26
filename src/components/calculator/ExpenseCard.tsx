@@ -1,6 +1,8 @@
+import { useEffect, useMemo, useState } from "react";
 import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Tooltip from "@/components/ui/Tooltip";
+import { formatCurrencyPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 
 export interface Expense {
   id: string;
@@ -28,6 +30,30 @@ export default function ExpenseCard({
   tooltip,
 }: ExpenseCardProps) {
   const total = expenses.reduce((sum, exp) => sum + exp.value, 0);
+  const [valueDrafts, setValueDrafts] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setValueDrafts((prev) => {
+      const next: Record<string, string> = {};
+      for (const expense of expenses) {
+        const existing = prev[expense.id];
+        if (existing !== undefined) {
+          const parsedExisting = parsePtBrNumber(existing);
+          next[expense.id] =
+            parsedExisting !== null && Math.abs(parsedExisting - expense.value) < 0.005
+              ? existing
+              : expense.value > 0
+                ? formatCurrencyPtBr(expense.value)
+                : "";
+          continue;
+        }
+        next[expense.id] = expense.value > 0 ? formatCurrencyPtBr(expense.value) : "";
+      }
+      return next;
+    });
+  }, [expenses]);
+
+  const canShowTotal = useMemo(() => expenses.length > 0, [expenses.length]);
 
   const handleAdd = () => {
     const newExpense: Expense = {
@@ -40,21 +66,11 @@ export default function ExpenseCard({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
         <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
           {label}
           {tooltip && <Tooltip text={tooltip} />}
         </label>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleAdd}
-          className="flex items-center gap-2 h-9 px-3"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar
-        </Button>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-2.5 sm:p-3">
@@ -73,11 +89,25 @@ export default function ExpenseCard({
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
                   <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={expense.value || ""}
-                    onChange={(e) => onUpdate(expense.id, { value: Number(e.target.value) })}
+                    type="text"
+                    inputMode="decimal"
+                    value={valueDrafts[expense.id] ?? ""}
+                    onChange={(e) => {
+                      const nextDraft = sanitizeNumberDraft(e.target.value);
+                      setValueDrafts((prev) => ({ ...prev, [expense.id]: nextDraft }));
+                      const parsed = parsePtBrNumber(nextDraft);
+                      onUpdate(expense.id, { value: parsed !== null && parsed >= 0 ? parsed : 0 });
+                    }}
+                    onBlur={() => {
+                      setValueDrafts((prev) => {
+                        const current = prev[expense.id] ?? "";
+                        const parsed = parsePtBrNumber(current);
+                        return {
+                          ...prev,
+                          [expense.id]: parsed !== null && parsed > 0 ? formatCurrencyPtBr(parsed) : "",
+                        };
+                      });
+                    }}
                     className="w-28 sm:w-32 pl-8 pr-3 py-2 border border-slate-300 rounded-lg min-w-0 bg-white focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                     placeholder="0,00"
                   />
@@ -97,13 +127,26 @@ export default function ExpenseCard({
             </div>
           ))}
         </div>
+
+        <div className="mt-3 border-t border-slate-200/80 pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAdd}
+            className="flex h-9 w-full items-center justify-center gap-2 border-dashed"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar despesa
+          </Button>
+        </div>
       </div>
 
-      {expenses.length > 0 && (
+      {canShowTotal && (
         <div className="flex items-center justify-between p-3 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
           <span className="font-semibold text-calcularq-blue">Total:</span>
           <span className="font-bold text-calcularq-blue">
-            R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            R$ {formatCurrencyPtBr(total)}
           </span>
         </div>
       )}

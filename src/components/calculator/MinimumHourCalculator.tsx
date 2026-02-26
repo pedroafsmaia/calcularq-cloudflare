@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+﻿import { useState, useMemo, useEffect, useRef } from "react";
 import { Calculator } from "lucide-react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import Tooltip from "@/components/ui/Tooltip";
 import SectionHeader from "./SectionHeader";
+import { formatCurrencyPtBr, formatHoursPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 
 interface MinimumHourCalculatorProps {
   initialFixedExpenses?: Expense[];
@@ -44,6 +45,8 @@ export default function MinimumHourCalculator({
   const [productiveHours, setProductiveHours] = useState(initialProductiveHours || 0);
   const [manualMinHourRate, setManualMinHourRate] = useState<number | undefined>(initialMinHourRate);
   const [useManual, setUseManual] = useState(initialUseManual);
+  const [manualMinHourDraft, setManualMinHourDraft] = useState("");
+  const [productiveHoursDraft, setProductiveHoursDraft] = useState("");
 
   const proLabore = useMemo(
     () => personalExpenses.reduce((sum, exp) => sum + exp.value, 0),
@@ -107,6 +110,16 @@ export default function MinimumHourCalculator({
   useEffect(() => {
     setUseManual(initialUseManual);
   }, [initialUseManual]);
+
+  useEffect(() => {
+    setManualMinHourDraft(
+      typeof manualMinHourRate === "number" && manualMinHourRate > 0 ? formatCurrencyPtBr(manualMinHourRate) : ""
+    );
+  }, [manualMinHourRate]);
+
+  useEffect(() => {
+    setProductiveHoursDraft(productiveHours > 0 ? formatHoursPtBr(productiveHours) : "");
+  }, [productiveHours]);
 
   useEffect(() => {
     onManualModeChange?.(useManual);
@@ -197,7 +210,7 @@ export default function MinimumHourCalculator({
             onClick={onClearCalculation}
             className="self-start w-full sm:w-auto rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
-            Limpar cálculo
+            Reiniciar cálculo
           </button>
         )}
       </div>
@@ -214,7 +227,7 @@ export default function MinimumHourCalculator({
           />
           <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
             Já sei a minha hora técnica mínima.
-            <Tooltip text="Marque esta opção se você já calculou sua hora técnica mínima anteriormente e quer inserir o valor diretamente, sem precisar preencher despesas operacionais fixas e despesas pessoais essenciais novamente." />
+            <Tooltip text="Use esta opção se você já conhece sua hora técnica mínima. Atenção: se o valor estiver abaixo do necessário, sua margem/lucro pode ficar comprometida." />
           </label>
         </div>
 
@@ -227,11 +240,20 @@ export default function MinimumHourCalculator({
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
               <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={manualMinHourRate || ""}
-                onChange={(e) => setManualMinHourRate(Number(e.target.value))}
+                type="text"
+                inputMode="decimal"
+                value={manualMinHourDraft}
+                onChange={(e) => {
+                  const nextDraft = sanitizeNumberDraft(e.target.value);
+                  setManualMinHourDraft(nextDraft);
+                  const parsed = parsePtBrNumber(nextDraft);
+                  setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
+                }}
+                onBlur={() => {
+                  const parsed = parsePtBrNumber(manualMinHourDraft);
+                  setManualMinHourDraft(parsed !== null && parsed > 0 ? formatCurrencyPtBr(parsed) : "");
+                  setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
+                }}
                 className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 placeholder="0,00"
               />
@@ -267,12 +289,21 @@ export default function MinimumHourCalculator({
                 <Tooltip text="Total de horas dedicadas efetivamente à produção de projetos por mês. Considere apenas o tempo focado em projeto — cerca de 70% a 80% do tempo total, descontando reuniões, pausas e tarefas administrativas. Ex: de 160h mensais, use ~120h." />
               </label>
               <input
-                type="number"
-                min="0"
-                step="0.5"
-                value={productiveHours || ""}
+                type="text"
+                inputMode="decimal"
+                value={productiveHoursDraft}
                 onChange={(e) => {
-                  const hours = Number(e.target.value);
+                  const nextDraft = sanitizeNumberDraft(e.target.value);
+                  setProductiveHoursDraft(nextDraft);
+                  const parsed = parsePtBrNumber(nextDraft);
+                  const hours = parsed !== null && parsed >= 0 ? parsed : 0;
+                  setProductiveHours(hours);
+                  onProductiveHoursChange?.(hours);
+                }}
+                onBlur={() => {
+                  const parsed = parsePtBrNumber(productiveHoursDraft);
+                  const hours = parsed !== null && parsed >= 0 ? parsed : 0;
+                  setProductiveHoursDraft(hours > 0 ? formatHoursPtBr(hours) : "");
                   setProductiveHours(hours);
                   onProductiveHoursChange?.(hours);
                 }}

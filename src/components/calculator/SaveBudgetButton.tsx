@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Save, Check } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AppDialog from "@/components/ui/AppDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
-import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface SaveBudgetButtonProps {
   budgetId?: string;
@@ -29,6 +30,7 @@ export default function SaveBudgetButton({
   onSaved,
 }: SaveBudgetButtonProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -92,8 +94,18 @@ export default function SaveBudgetButton({
       setIsDialogOpen(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+      toast({
+        tone: "success",
+        title: budgetId ? "Cálculo atualizado" : "Cálculo salvo",
+        description: "Os dados foram salvos com sucesso.",
+      });
     } catch (error) {
       setErrorMessage("Erro ao salvar cálculo.");
+      toast({
+        tone: "error",
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar o cálculo agora.",
+      });
       console.error(error);
     } finally {
       setIsSaving(false);
