@@ -195,12 +195,6 @@ export default function BudgetDetailsDialog({
                     </span>
                   </div>
                 ) : null}
-                {detailPreview && detailPreview.cubPercentage !== null ? (
-                  <div className="flex items-center justify-between gap-3 text-sm border-t border-slate-100 pt-2">
-                    <span className="text-slate-500">% do valor da obra</span>
-                    <span className="font-semibold text-slate-800">{detailPreview.cubPercentage.toFixed(1)}%</span>
-                  </div>
-                ) : null}
                 {detailPreview && detailPreview.pricePerSqm !== null ? (
                   <div className="flex items-center justify-between gap-3 text-sm">
                     <span className="text-slate-500">Preço/m²</span>

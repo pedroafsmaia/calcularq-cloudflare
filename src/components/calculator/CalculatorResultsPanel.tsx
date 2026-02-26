@@ -35,7 +35,6 @@ export default function CalculatorResultsPanel({
   totalFactors,
   estimatedHours,
   commercialDiscount,
-  cubPercentage,
   pricePerSqm,
   displayValues,
 }: Props) {
@@ -139,38 +138,6 @@ export default function CalculatorResultsPanel({
 
           {displayValues.finalSalePrice > 0 && (
             <>
-              <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
-                <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
-                  % do valor da obra
-                  <Tooltip text="Estimativa baseada no CUB médio nacional (R$ 2.800/m²). A faixa de referência do CAU/BR para % do valor da obra varia conforme a complexidade, a etapa do projeto, o tipo de projeto, a sofisticação e a região." />
-                </span>
-                <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                  <span className={`text-sm font-bold ${
-                    cubPercentage !== null
-                      ? cubPercentage < 2
-                        ? "text-blue-700"
-                        : cubPercentage > 11
-                          ? "text-blue-700"
-                          : "text-slate-700"
-                      : "text-calcularq-blue"
-                  }`}>
-                    {cubPercentage !== null ? `${cubPercentage.toFixed(1)}%` : "—"}
-                  </span>
-                  {cubPercentage !== null && (cubPercentage < 2 || cubPercentage > 11) && (
-                    <Tooltip
-                      title="Atenção"
-                      tone="warning"
-                      iconClassName="text-blue-700 hover:text-blue-800"
-                      text={
-                        cubPercentage < 2
-                          ? "% abaixo da faixa sugerida pelo CAU (2% a 11%). Isso pode indicar necessidade de revisão de horas/escopo, mas também pode refletir custos operacionais mais baixos, maior eficiência ou um projeto em etapa/nível de sofisticação diferente da referência."
-                          : "% acima da faixa sugerida pelo CAU (2% a 11%). Isso pode ser adequado em projetos com maior complexidade, maior sofisticação ou etapas de desenvolvimento mais avançadas."
-                      }
-                    />
-                  )}
-                </span>
-              </div>
-
               <div className="flex justify-between items-center gap-3 px-1 pt-1 border-t border-slate-100">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   Preço/m²
