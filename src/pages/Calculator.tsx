@@ -479,6 +479,14 @@ export default function Calculator() {
     useManualMinHourlyRate,
   ]);
 
+  const currentStepPendingDesktopSummary = useMemo(() => {
+    const entry = stepPending[currentStep as 1 | 2 | 3 | 4];
+    if (entry.count <= 0) return "";
+    if (entry.missing.length <= 2) return entry.missing.join(", ");
+    const extra = entry.missing.length - 2;
+    return `${entry.missing.slice(0, 2).join(", ")} e mais ${extra}`;
+  }, [currentStep, stepPending]);
+
   // ── Stepper ───────────────────────────────────────────────────
   const { stepComplete, canAdvance } = useCalculatorProgress({
     currentStep,
@@ -649,7 +657,7 @@ export default function Calculator() {
           variants={fadeUp(prefersReducedMotion, 10)}
           initial="hidden"
           animate="show"
-          className="mb-5 sm:mb-6 text-center"
+          className="mb-4 sm:mb-5 text-center"
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
             Calculadora de Precificação
@@ -660,7 +668,7 @@ export default function Calculator() {
         </motion.div>
 
         {/* Stepper horizontal unificado (desktop/tablet) */}
-        <div className="hidden sm:block mb-5 sm:mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
+        <div className="hidden sm:block mb-4 sm:mb-5 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
           <div className="flex min-w-full justify-center">
             <div className="flex w-max items-start gap-0">
             {STEPS.map((step, i) => {
@@ -727,7 +735,7 @@ export default function Calculator() {
               variants={fadeUp(prefersReducedMotion, 8)}
               initial="hidden"
               animate="show"
-              className="mb-4"
+              className="mb-3"
             >
               <div className="sm:flex sm:items-start sm:justify-between sm:gap-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
@@ -735,7 +743,7 @@ export default function Calculator() {
                     type="button"
                     onClick={handleOpenImportStepDialog}
                     disabled={!canImportCurrentStep}
-                    className="hidden sm:inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-calcularq-blue disabled:cursor-not-allowed disabled:opacity-50"
+                    className="hidden sm:inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
@@ -784,6 +792,11 @@ export default function Calculator() {
                         <RotateCcw className="h-4 w-4" />
                         Reiniciar cálculo
                       </button>
+                      <div className="hidden sm:block mt-1 border-t border-slate-100 px-3 pt-2 pb-1">
+                        <p className="text-[11px] leading-relaxed text-slate-400">
+                          Atalhos: Alt+← / Alt+→ / Alt+1-4
+                        </p>
+                      </div>
                     </div>
                   </details>
                 </div>
@@ -807,19 +820,13 @@ export default function Calculator() {
                           ? "Alterações não salvas"
                           : "Rascunho salvo automaticamente"}
                   </span>
-                  <span
-                    className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-400"
-                    title="Atalhos: Alt+← / Alt+→ / Alt+1-4"
-                  >
-                    Atalhos
-                  </span>
                 </div>
               </div>
               <div className="mt-2 min-h-5">
                 {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
                   <p className="hidden sm:block text-sm text-blue-700">
                     <span className="font-medium">Faltam:</span>{" "}
-                    {stepPending[currentStep as 1 | 2 | 3 | 4].missing.join(", ")}
+                    {currentStepPendingDesktopSummary}
                   </p>
                 ) : currentStep === 3 ? (
                   <p className="hidden sm:block text-sm text-slate-500">
