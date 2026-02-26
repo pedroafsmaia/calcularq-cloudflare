@@ -659,8 +659,8 @@ export default function Calculator() {
           </p>
         </motion.div>
 
-        {/* Stepper horizontal unificado */}
-        <div className="mb-7 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
+        {/* Stepper horizontal unificado (desktop/tablet) */}
+        <div className="hidden sm:block mb-7 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
           <div className="flex min-w-full justify-center">
             <div className="flex w-max items-start gap-0">
             {STEPS.map((step, i) => {
@@ -798,7 +798,7 @@ export default function Calculator() {
                         : "Rascunho salvo automaticamente"}
                 </span>
                 <span
-                  className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-400"
+                  className="hidden sm:inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-400"
                   title="Atalhos: Alt+← / Alt+→ / Alt+1-4"
                 >
                   Atalhos
