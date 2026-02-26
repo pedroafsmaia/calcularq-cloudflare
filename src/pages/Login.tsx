@@ -10,6 +10,7 @@ import { fadeUp } from "@/lib/motion";
 import AppDialog from "@/components/ui/AppDialog";
 
 export default function Login() {
+  const MIN_PASSWORD_LENGTH = 8;
   const prefersReducedMotion = !!useReducedMotion();
   const REMEMBER_ME_KEY = "calcularq_remember_me";
   const REMEMBER_ME_EMAIL_KEY = "calcularq_remember_me_email";
@@ -27,6 +28,7 @@ export default function Login() {
 
   const { login, register, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const hasMinPasswordLength = password.length >= MIN_PASSWORD_LENGTH;
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -163,7 +165,7 @@ export default function Login() {
                   className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                   placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
-                  minLength={8}
+                  minLength={MIN_PASSWORD_LENGTH}
                 />
                 <button
                   type="button"
@@ -173,6 +175,11 @@ export default function Login() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              {!isLogin && (
+                <p className={`mt-2 text-xs ${hasMinPasswordLength ? "text-emerald-700" : "text-slate-500"}`}>
+                  Requisito: mínimo de {MIN_PASSWORD_LENGTH} caracteres.
+                </p>
+              )}
             </div>
 
             {isLogin && (
