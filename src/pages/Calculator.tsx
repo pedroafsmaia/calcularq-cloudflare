@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, PieChart, Download, RotateCcw, Trash2 } from "lucide-react";
-import { useSearchParams, useBlocker } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
 import type { ExpenseItem } from "@/types/budget";
@@ -507,7 +507,17 @@ export default function Calculator() {
     if (currentStep > 1) setCurrentStep(s => s - 1);
   };
 
-  const navigationBlocker = useBlocker(hasUnsavedChanges);
+  // `useBlocker` requires a Data Router. This app uses BrowserRouter, so using
+  // it here can crash the calculator route at runtime (blank screen).
+  // Keep the `beforeunload` warning and disable SPA route blocking for now.
+  const navigationBlocker = useMemo(
+    () => ({
+      state: "unblocked" as "blocked" | "unblocked",
+      reset: () => {},
+      proceed: () => {},
+    }),
+    []
+  );
 
   useEffect(() => {
     if (navigationBlocker.state !== "blocked") return;
