@@ -649,7 +649,7 @@ export default function Calculator() {
           variants={fadeUp(prefersReducedMotion, 10)}
           initial="hidden"
           animate="show"
-          className="mb-7 sm:mb-8 text-center"
+          className="mb-5 sm:mb-6 text-center"
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
             Calculadora de Precificação
@@ -660,7 +660,7 @@ export default function Calculator() {
         </motion.div>
 
         {/* Stepper horizontal unificado (desktop/tablet) */}
-        <div className="hidden sm:block mb-7 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
+        <div className="hidden sm:block mb-5 sm:mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
           <div className="flex min-w-full justify-center">
             <div className="flex w-max items-start gap-0">
             {STEPS.map((step, i) => {
@@ -707,11 +707,7 @@ export default function Calculator() {
                     >
                       {step.label}
                     </span>
-                    {active && stepPending[step.n as 1 | 2 | 3 | 4].count > 0 ? (
-                      <span className="mt-1 text-[11px] sm:text-xs font-medium text-blue-700 text-center leading-tight max-w-[12ch]">
-                        Faltam {stepPending[step.n as 1 | 2 | 3 | 4].count}
-                      </span>
-                    ) : stepPending[step.n as 1 | 2 | 3 | 4].optional ? (
+                    {stepPending[step.n as 1 | 2 | 3 | 4].optional ? (
                       <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
                     ) : null}
                   </div>
@@ -731,14 +727,15 @@ export default function Calculator() {
               variants={fadeUp(prefersReducedMotion, 8)}
               initial="hidden"
               animate="show"
-              className="mb-5"
+              className="mb-4"
             >
-              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="sm:flex sm:items-start sm:justify-between sm:gap-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                   <button
                     type="button"
                     onClick={handleOpenImportStepDialog}
                     disabled={!canImportCurrentStep}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-calcularq-blue disabled:cursor-not-allowed disabled:opacity-50"
+                    className="hidden sm:inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-calcularq-blue disabled:cursor-not-allowed disabled:opacity-50"
                     title={`Importar dados para ${currentStepLabel} a partir de um cálculo salvo (sem alterar outras etapas)`}
                   >
                     <Download className="h-4 w-4" />
@@ -747,9 +744,22 @@ export default function Calculator() {
                   <details className="relative w-full sm:w-auto group">
                     <summary className="list-none inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800">
                       <MoreHorizontal className="h-4 w-4" />
-                      Mais ações
+                      <span className="sm:hidden">Ações da etapa</span>
+                      <span className="hidden sm:inline">Mais ações</span>
                     </summary>
                     <div className="mt-2 w-full sm:absolute sm:left-0 sm:top-full sm:mt-2 sm:min-w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-sm z-20">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          handleOpenImportStepDialog();
+                          (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
+                        }}
+                        disabled={!canImportCurrentStep}
+                        className="sm:hidden inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Download className="h-4 w-4" />
+                        Importar dados da etapa
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -776,33 +786,46 @@ export default function Calculator() {
                       </button>
                     </div>
                   </details>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                <span
-                  className={`inline-flex items-center rounded-full border px-2.5 py-1 font-medium ${
-                    draftStatus === "saving"
-                      ? "border-blue-200 bg-blue-50 text-blue-700"
+                </div>
+                <div className="hidden sm:flex flex-wrap items-center justify-end gap-2 text-xs sm:max-w-[46%]">
+                  <span
+                    className={`inline-flex items-center rounded-full border px-2.5 py-1 font-medium ${
+                      draftStatus === "saving"
+                        ? "border-blue-200 bg-blue-50 text-blue-700"
+                        : draftStatus === "saved"
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : hasUnsavedChanges
+                            ? "border-blue-200 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-500"
+                    }`}
+                  >
+                    {draftStatus === "saving"
+                      ? "Salvando rascunho local..."
                       : draftStatus === "saved"
-                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        ? `Rascunho salvo${lastDraftSavedAt ? ` às ${new Date(lastDraftSavedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""}`
                         : hasUnsavedChanges
-                          ? "border-blue-200 bg-blue-50 text-blue-700"
-                          : "border-slate-200 bg-white text-slate-500"
-                  }`}
-                >
-                  {draftStatus === "saving"
-                    ? "Salvando rascunho local..."
-                    : draftStatus === "saved"
-                      ? `Rascunho salvo${lastDraftSavedAt ? ` às ${new Date(lastDraftSavedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""}`
-                      : hasUnsavedChanges
-                        ? "Alterações não salvas"
-                        : "Rascunho salvo automaticamente"}
-                </span>
-                <span
-                  className="hidden sm:inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-400"
-                  title="Atalhos: Alt+← / Alt+→ / Alt+1-4"
-                >
-                  Atalhos
-                </span>
+                          ? "Alterações não salvas"
+                          : "Rascunho salvo automaticamente"}
+                  </span>
+                  <span
+                    className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-400"
+                    title="Atalhos: Alt+← / Alt+→ / Alt+1-4"
+                  >
+                    Atalhos
+                  </span>
+                </div>
+              </div>
+              <div className="mt-2 min-h-5">
+                {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
+                  <p className="hidden sm:block text-sm text-blue-700">
+                    <span className="font-medium">Faltam:</span>{" "}
+                    {stepPending[currentStep as 1 | 2 | 3 | 4].missing.join(", ")}
+                  </p>
+                ) : currentStep === 3 ? (
+                  <p className="hidden sm:block text-sm text-slate-500">
+                    Etapa opcional. Você pode ajustar os pesos ou manter o padrão.
+                  </p>
+                ) : null}
               </div>
             </motion.div>
 
@@ -821,6 +844,22 @@ export default function Calculator() {
                 <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
                   Opcional
                 </span>
+              ) : null}
+            </div>
+            <div className="mt-1.5 flex items-center justify-between gap-3">
+              <p className="min-w-0 truncate text-xs text-slate-500">
+                {draftStatus === "saving"
+                  ? "Salvando rascunho..."
+                  : draftStatus === "saved"
+                    ? "Rascunho salvo"
+                    : hasUnsavedChanges
+                      ? "Alterações não salvas"
+                      : "Rascunho automático ativo"}
+              </p>
+              {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
+                <p className="text-xs font-medium text-blue-700">
+                  {stepPending[currentStep as 1 | 2 | 3 | 4].missing.slice(0, 2).join(", ")}
+                </p>
               ) : null}
             </div>
           </div>
@@ -994,19 +1033,26 @@ export default function Calculator() {
 
           <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
 
-          {currentStep < 4 ? (
-            <button
-              onClick={handleNext}
-              disabled={!canAdvance}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors
-                ${canAdvance ? "bg-calcularq-blue text-white hover:bg-calcularq-blue/90 shadow-sm" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}
-            >
-              Próxima etapa
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <div className="w-32" />
-          )}
+          <div className="flex flex-col items-end gap-1">
+            {currentStep < 4 ? (
+              <>
+                {!canAdvance ? (
+                  <p className="hidden sm:block text-xs text-slate-500">Complete os campos obrigatórios para avançar.</p>
+                ) : null}
+                <button
+                  onClick={handleNext}
+                  disabled={!canAdvance}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors
+                    ${canAdvance ? "bg-calcularq-blue text-white hover:bg-calcularq-blue/90 shadow-sm" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}
+                >
+                  Próxima etapa
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <div className="w-32" />
+            )}
+          </div>
         </div>
 
       </div>
