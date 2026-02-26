@@ -549,30 +549,41 @@ export default function Calculator() {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isTypingTarget(event.target)) return;
+      const isShortcutCombo = event.altKey && !event.ctrlKey && !event.metaKey;
+      if (!isShortcutCombo && isTypingTarget(event.target)) return;
       if (confirmClearAllOpen || confirmClearStepOpen || importStepDialogOpen || confirmLeaveOpen) return;
 
-      if (event.altKey && event.key === "ArrowRight") {
+      if (!isShortcutCombo) return;
+
+      if (event.key === "ArrowRight") {
         event.preventDefault();
         if (currentStep < 4 && canAdvance) setCurrentStep((s) => s + 1);
         return;
       }
-      if (event.altKey && event.key === "ArrowLeft") {
+      if (event.key === "ArrowLeft") {
         event.preventDefault();
         if (currentStep > 1) setCurrentStep((s) => s - 1);
         return;
       }
-      if (event.altKey && /^[1-4]$/.test(event.key)) {
+
+      const digitFromCode = (() => {
+        if (/^Digit[1-4]$/.test(event.code)) return Number(event.code.replace("Digit", ""));
+        if (/^Numpad[1-4]$/.test(event.code)) return Number(event.code.replace("Numpad", ""));
+        if (/^[1-4]$/.test(event.key)) return Number(event.key);
+        return null;
+      })();
+
+      if (digitFromCode !== null) {
         event.preventDefault();
-        const targetStep = Number(event.key);
+        const targetStep = digitFromCode;
         const canGoToReached = targetStep <= maxStepReached;
         const canGoToNext = targetStep === maxStepReached + 1 && stepComplete(targetStep - 1);
         if (canGoToReached || canGoToNext) setCurrentStep(targetStep);
       }
     };
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown, { capture: true });
+    return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
   }, [
     canAdvance,
     confirmClearAllOpen,
