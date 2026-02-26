@@ -222,10 +222,16 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-xl bg-calcularq-blue/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-calcularq-blue" />
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold text-calcularq-blue mb-2">
+                <h3
+                  className="text-base sm:text-lg font-semibold text-calcularq-blue mb-2 leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1"
+                  style={{ textWrap: "balance" }}
+                >
                   {feature.title}
                 </h3>
-                <p className="text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed">
+                <p
+                  className="text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed max-w-[28ch] sm:max-w-[31ch] mx-auto px-1 break-words"
+                  style={{ textWrap: "pretty" }}
+                >
                   {feature.description}
                 </p>
               </motion.div>
@@ -268,7 +274,12 @@ export default function Home() {
                     className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-3"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    <span className="text-white text-sm sm:text-[0.95rem]">{factor}</span>
+                    <span
+                      className="min-w-0 text-white text-sm sm:text-[0.95rem] leading-snug break-words"
+                      style={{ textWrap: "balance" }}
+                    >
+                      {factor}
+                    </span>
                   </div>
                 ))}
               </div>

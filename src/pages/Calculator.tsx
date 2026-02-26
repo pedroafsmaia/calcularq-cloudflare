@@ -695,7 +695,7 @@ export default function Calculator() {
                         {done ? "✓" : step.n}
                       </span>
                     {stepPending[step.n as 1 | 2 | 3 | 4].count > 0 && !done ? (
-                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-1 text-[10px] font-semibold leading-none text-blue-700">
+                        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-1 text-[11px] font-semibold leading-none text-blue-700">
                           {stepPending[step.n as 1 | 2 | 3 | 4].count}
                         </span>
                       ) : null}
@@ -708,11 +708,11 @@ export default function Calculator() {
                       {step.label}
                     </span>
                     {active && stepPending[step.n as 1 | 2 | 3 | 4].count > 0 ? (
-                      <span className="mt-1 text-[10px] sm:text-xs font-medium text-blue-700 text-center leading-tight max-w-[12ch]">
+                      <span className="mt-1 text-[11px] sm:text-xs font-medium text-blue-700 text-center leading-tight max-w-[12ch]">
                         Faltam {stepPending[step.n as 1 | 2 | 3 | 4].count}
                       </span>
                     ) : stepPending[step.n as 1 | 2 | 3 | 4].optional ? (
-                      <span className="mt-1 text-[10px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
+                      <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
                     ) : null}
                   </div>
                   {i < STEPS.length - 1 && (
@@ -814,11 +814,11 @@ export default function Calculator() {
                 <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
               </div>
               {stepPending[currentStep as 1 | 2 | 3 | 4].count > 0 ? (
-                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
+                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">
                   Faltam {stepPending[currentStep as 1 | 2 | 3 | 4].count}
                 </span>
               ) : stepPending[currentStep as 1 | 2 | 3 | 4].optional ? (
-                <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
                   Opcional
                 </span>
               ) : null}

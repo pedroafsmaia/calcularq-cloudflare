@@ -82,11 +82,11 @@ export default function BudgetCard({
 
       <div className="grid grid-cols-2 gap-2.5 mb-4">
         <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-          <div className="text-[11px] uppercase tracking-wide text-slate-500">Complexidade</div>
+          <div className="text-xs uppercase tracking-wide text-slate-500">Complexidade</div>
           <div className="mt-0.5 font-semibold text-slate-800">{budget.data.results.globalComplexity}</div>
         </div>
         <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-          <div className="text-[11px] uppercase tracking-wide text-slate-500">Horas</div>
+          <div className="text-xs uppercase tracking-wide text-slate-500">Horas</div>
           <div className="mt-0.5 font-semibold text-slate-800">{budget.data.estimatedHours}h</div>
         </div>
       </div>

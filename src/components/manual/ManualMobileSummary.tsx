@@ -59,7 +59,7 @@ export default function ManualMobileSummary({
               <span className="flex items-center gap-2.5">
                 <span
                   className={[
-                    "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                    "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
                     isCompleted
                       ? "border-calcularq-blue bg-calcularq-blue text-white"
                       : isActive
