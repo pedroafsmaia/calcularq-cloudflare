@@ -19,6 +19,7 @@ Este guia reduz regressao em um projeto que evoluiu rapido (muitas melhorias de 
    - `npm run build`
    - backup pre-commit dos arquivos alterados
    - commit + push
+5. Mensagens de commit devem seguir `type(scope): resumo` (ver `docs/COMMIT_STRATEGY.md`)
 
 ---
 
@@ -128,3 +129,12 @@ Adicionar `eslint` + script `npm run lint` para evitar regressao de:
    - manual (stepper/sumario)
 3. Conferir mobile real (Android/iPhone) para dialogs e tooltips
 4. Deploy Cloudflare e revisar log final (`Success: Your site was deployed!`)
+
+---
+
+## 7. Organizacao de commits (a partir de agora)
+
+- Nao reescrever historico antigo de `main`.
+- Organizar commits por tema em novas entregas.
+- Separar `fix` de `style` quando o risco for diferente.
+- Usar scopes previsiveis (`calculator`, `manual`, `home`, `auth`, `history`, `results`, `api`).

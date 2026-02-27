@@ -187,6 +187,7 @@ Checklist de revisao:
 
 - `docs/ARCHITECTURE.md` -> arquitetura, fluxos e responsabilidades por camada
 - `docs/MAINTENANCE_GUIDE.md` -> convencoes, hotspots e roadmap de refatoracao
+- `docs/COMMIT_STRATEGY.md` -> padrao de commits, scopes e fluxo sem reescrever historico antigo
 - `docs/QA_SECURITY_CHECKLIST.md` -> check/fix de bugs, UX e seguranca
 - `docs/VISUAL_IDENTITY_CHECKLIST.md` -> checklist de consistencia visual (cores, componentes, tipografia e spacing)
 
