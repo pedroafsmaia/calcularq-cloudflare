@@ -124,9 +124,9 @@ export default function CalculatorResultsPanel({
           )}
 
           {displayValues.finalSalePrice > 0 ? (
-            <div className="bg-calcularq-blue rounded-xl p-4 text-center shadow-sm">
-              <p className="text-xs font-semibold text-blue-200 mb-1">Preço de Venda Final</p>
-              <p className="text-2xl font-bold text-white">
+            <div className="bg-calcularq-blue/10 border border-calcularq-blue/15 rounded-xl p-4 text-center shadow-sm">
+              <p className="text-xs font-semibold text-calcularq-blue mb-1">Preço de Venda Final</p>
+              <p className="text-2xl font-bold text-calcularq-blue">
                 R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
