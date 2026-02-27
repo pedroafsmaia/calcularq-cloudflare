@@ -206,7 +206,7 @@ export default function FinalCalculation({
                 </p>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_110px] sm:items-center">
                 <div className="space-y-2">
                   <input
                     type="range"
@@ -219,7 +219,7 @@ export default function FinalCalculation({
                       onCommercialDiscountChange(next);
                       setDiscountDraft(String(next));
                     }}
-                    className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer
+                    className="w-full h-3 bg-slate-200 rounded-full appearance-none cursor-pointer
                       [&::-webkit-slider-thumb]:appearance-none
                       [&::-webkit-slider-thumb]:w-5
                       [&::-webkit-slider-thumb]:h-5
@@ -243,34 +243,31 @@ export default function FinalCalculation({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-3">
-                  <span className="text-sm text-slate-600">Percentual:</span>
-                  <div className="relative w-[100px] max-w-[120px]">
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={discountDraft}
-                      onFocus={() => setIsEditingDiscount(true)}
-                      onChange={(e) => {
-                        const nextDraft = sanitizeNumberDraft(e.target.value);
-                        setDiscountDraft(nextDraft);
-                        const parsed = parsePtBrNumber(nextDraft);
-                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                        onCommercialDiscountChange(next);
-                      }}
-                      onBlur={() => {
-                        const parsed = parsePtBrNumber(discountDraft);
-                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                        setDiscountDraft(String(next));
-                        onCommercialDiscountChange(next);
-                        setIsEditingDiscount(false);
-                      }}
-                      className="w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2.5 pr-10 text-center text-base font-bold text-calcularq-blue transition-all
-                        focus:outline-none focus:border-calcularq-blue focus:ring-4 focus:ring-calcularq-blue/10"
-                      aria-label="Desconto comercial em porcentagem"
-                    />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base font-bold text-calcularq-blue">%</span>
-                  </div>
+                <div className="relative w-full sm:w-[110px]">
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={discountDraft}
+                    onFocus={() => setIsEditingDiscount(true)}
+                    onChange={(e) => {
+                      const nextDraft = sanitizeNumberDraft(e.target.value);
+                      setDiscountDraft(nextDraft);
+                      const parsed = parsePtBrNumber(nextDraft);
+                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                      onCommercialDiscountChange(next);
+                    }}
+                    onBlur={() => {
+                      const parsed = parsePtBrNumber(discountDraft);
+                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                      setDiscountDraft(String(next));
+                      onCommercialDiscountChange(next);
+                      setIsEditingDiscount(false);
+                    }}
+                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2.5 pr-10 text-center text-base font-bold text-calcularq-blue transition-all
+                      focus:outline-none focus:border-calcularq-blue focus:ring-4 focus:ring-calcularq-blue/10"
+                    aria-label="Desconto comercial em porcentagem"
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base font-bold text-calcularq-blue">%</span>
                 </div>
               </div>
             </div>
