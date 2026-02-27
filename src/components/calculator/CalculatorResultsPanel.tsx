@@ -1,9 +1,5 @@
 import Tooltip from "@/components/ui/Tooltip";
-import {
-  getExpectedPricePerSqmBand,
-  getPricePerSqmBand,
-  getPricePerSqmBandLabel,
-} from "@/lib/pricePerSqmBands";
+import { describePricePerSqm } from "@/lib/pricePerSqmBands";
 
 type CalculatorDisplayValues = {
   totalVariableExpenses: number;
@@ -27,7 +23,6 @@ type Props = {
   commercialDiscount: number;
   cubPercentage: number | null;
   pricePerSqm: number | null;
-  stageLevel: number | null;
   displayValues: CalculatorDisplayValues;
 };
 
@@ -42,16 +37,11 @@ export default function CalculatorResultsPanel({
   estimatedHours,
   commercialDiscount,
   pricePerSqm,
-  stageLevel,
   displayValues,
 }: Props) {
-  const actualPriceBand = pricePerSqm !== null ? getPricePerSqmBand(pricePerSqm) : null;
-  const expectedPriceBand = getExpectedPricePerSqmBand({ stageLevel, globalComplexity });
-  const shouldShowPricePerSqmWarning =
-    actualPriceBand !== null &&
-    (actualPriceBand === "below" || actualPriceBand === "above" || actualPriceBand !== expectedPriceBand);
-  const actualPriceBandLabel = actualPriceBand ? getPricePerSqmBandLabel(actualPriceBand) : null;
-  const expectedPriceBandLabel = getPricePerSqmBandLabel(expectedPriceBand);
+  const pricePerSqmDescription = pricePerSqm !== null ? describePricePerSqm(pricePerSqm) : null;
+  const isExtremePricePerSqm = pricePerSqmDescription?.kind === "extreme";
+  const isTransitionPricePerSqm = pricePerSqmDescription?.kind === "transition";
 
   return (
     <>
@@ -68,7 +58,7 @@ export default function CalculatorResultsPanel({
           </div>
         </div>
       ) : (
-        <div className="bg-transparent p-4 sm:p-5 space-y-4">
+        <div className="bg-transparent p-4 space-y-4 sm:p-5">
           <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
             <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do Cálculo</p>
             <div className="space-y-2 text-sm text-slate-600">
@@ -107,7 +97,7 @@ export default function CalculatorResultsPanel({
           {displayValues.projectPrice > 0 && (
             <div className="space-y-2 px-1 py-1 text-sm">
               <div className="flex items-start justify-between gap-2">
-                <span className="flex-1 text-slate-600 leading-snug">
+                <span className="flex-1 leading-snug text-slate-600">
                   Preço do Projeto
                   {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 && (
                     <span className="block text-xs text-slate-400">
@@ -121,7 +111,7 @@ export default function CalculatorResultsPanel({
               </div>
               {displayValues.totalVariableExpenses > 0 && (
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="min-w-0 text-slate-600 leading-snug">(+) Despesas Variáveis</span>
+                  <span className="min-w-0 leading-snug text-slate-600">(+) Despesas Variáveis</span>
                   <span className="whitespace-nowrap font-semibold text-slate-800">
                     R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -129,7 +119,7 @@ export default function CalculatorResultsPanel({
               )}
               {displayValues.discountAmount > 0 && (
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="min-w-0 text-slate-600 leading-snug">(-) Desconto ({commercialDiscount}%)</span>
+                  <span className="min-w-0 leading-snug text-slate-600">(-) Desconto ({commercialDiscount}%)</span>
                   <span className="whitespace-nowrap font-semibold text-red-500">
                     - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -156,24 +146,55 @@ export default function CalculatorResultsPanel({
               <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-1 pt-1">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
                   Preço/m²
-                  <Tooltip text="Indicador comparativo para checar coerência entre escopo e valor. Usa faixas internas de referência; não é tabela oficial nem preço obrigatório." />
+                  <Tooltip text="Indicador comparativo. O aviso mostra a faixa interna (ou transição) em que o valor se encaixa." />
                 </span>
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                  <span className={`text-sm font-bold ${pricePerSqm !== null ? (shouldShowPricePerSqmWarning ? "text-amber-700" : "text-slate-700") : "text-calcularq-blue"}`}>
+                  <span
+                    className={`text-sm font-bold ${
+                      pricePerSqm !== null
+                        ? isExtremePricePerSqm
+                          ? "text-amber-700"
+                          : isTransitionPricePerSqm
+                            ? "text-blue-700"
+                            : "text-slate-700"
+                        : "text-calcularq-blue"
+                    }`}
+                  >
                     {pricePerSqm !== null
                       ? `R$ ${pricePerSqm.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </span>
-                  {pricePerSqm !== null && shouldShowPricePerSqmWarning && actualPriceBandLabel && (
+                  {pricePerSqmDescription && (
                     <Tooltip
-                      title="Atenção"
-                      tone="warning"
-                      iconClassName="text-amber-700 hover:text-amber-800"
-                      text={`Seu Preço/m² caiu em: ${actualPriceBandLabel.name} (${actualPriceBandLabel.intervalLabel}).\nPela etapa selecionada, o esperado seria: ${expectedPriceBandLabel.name} (${expectedPriceBandLabel.intervalLabel}).\nRevise o escopo configurado (entregáveis, detalhamento, revisões, compatibilização, visitas).\nFaixas internas de referência (heurística de coerência).`}
+                      title={isExtremePricePerSqm ? "Atenção" : "Referência interna"}
+                      tone={isExtremePricePerSqm ? "warning" : "info"}
+                      iconClassName={
+                        isExtremePricePerSqm
+                          ? "text-amber-700 hover:text-amber-800"
+                          : isTransitionPricePerSqm
+                            ? "text-blue-700 hover:text-blue-800"
+                            : "text-slate-600 hover:text-slate-700"
+                      }
+                      text={[pricePerSqmDescription.line1, pricePerSqmDescription.line2, "Faixas internas de referência."].filter(Boolean).join("\n")}
                     />
                   )}
                 </span>
               </div>
+
+              {pricePerSqmDescription && (
+                <div
+                  className={`rounded-lg border px-3 py-2 text-xs leading-relaxed ${
+                    isExtremePricePerSqm
+                      ? "border-amber-200 bg-amber-50 text-amber-800"
+                      : isTransitionPricePerSqm
+                        ? "border-blue-200 bg-blue-50 text-blue-800"
+                        : "border-slate-200 bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  <p className="font-medium">{pricePerSqmDescription.line1}</p>
+                  {pricePerSqmDescription.line2 ? <p className="mt-0.5">{pricePerSqmDescription.line2}</p> : null}
+                </div>
+              )}
 
               {displayValues.profit !== null && (
                 <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-1 pt-1">

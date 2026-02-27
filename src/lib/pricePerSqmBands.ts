@@ -1,49 +1,83 @@
 export type PricePerSqmBandId = "below" | "low" | "mid" | "high" | "above";
+export type PricePerSqmKind = "extreme" | "unique" | "transition";
 
-type PricePerSqmBand = {
-  id: PricePerSqmBandId;
-  min: number | null;
-  max: number | null;
-  name: string;
-  intervalLabel: string;
-};
+export const TRANSITION_EPSILON = 5; // R$/m²
 
-export const PRICE_PER_SQM_BANDS: PricePerSqmBand[] = [
-  { id: "below", min: null, max: 20, name: "Abaixo da referência", intervalLabel: "< R$ 20/m²" },
-  { id: "low", min: 20, max: 80, name: "Baixa complexidade", intervalLabel: "R$ 20 a R$ 80/m²" },
-  { id: "mid", min: 80, max: 120, name: "Média complexidade", intervalLabel: "R$ 80 a R$ 120/m²" },
-  { id: "high", min: 120, max: 150, name: "Alta complexidade", intervalLabel: "R$ 120 a R$ 150/m²" },
-  { id: "above", min: 150, max: null, name: "Acima da referência", intervalLabel: "> R$ 150/m²" },
-];
-
-export function getPricePerSqmBand(pricePerSqm: number): PricePerSqmBandId {
-  if (pricePerSqm < 20) return "below";
-  if (pricePerSqm < 80) return "low";
-  if (pricePerSqm < 120) return "mid";
-  if (pricePerSqm <= 150) return "high";
-  return "above";
-}
-
-export function getPricePerSqmBandLabel(bandId: PricePerSqmBandId): Pick<PricePerSqmBand, "name" | "intervalLabel"> {
-  const band = PRICE_PER_SQM_BANDS.find((item) => item.id === bandId);
-  if (!band) return { name: "Referência interna", intervalLabel: "Faixa não definida" };
-  return { name: band.name, intervalLabel: band.intervalLabel };
-}
-
-type ExpectedBandInput = {
-  stageLevel: number | null | undefined;
-  globalComplexity: number;
-};
-
-export function getExpectedPricePerSqmBand({ stageLevel, globalComplexity }: ExpectedBandInput): PricePerSqmBandId {
-  if (typeof stageLevel === "number" && Number.isFinite(stageLevel) && stageLevel > 0) {
-    if (stageLevel <= 2) return "low";
-    if (stageLevel <= 4) return "mid";
-    return "high";
+export function describePricePerSqm(pricePerSqm: number): {
+  kind: PricePerSqmKind;
+  line1: string;
+  line2?: string;
+  bandIds: PricePerSqmBandId[];
+  intervalLabel?: string;
+} {
+  if (pricePerSqm < 20) {
+    return {
+      kind: "extreme",
+      line1: "Este Preço/m² está abaixo das faixas internas de referência.",
+      line2: "Abaixo de R$ 20/m².",
+      bandIds: ["below"],
+      intervalLabel: "< R$ 20/m²",
+    };
   }
 
-  if (globalComplexity < 2.2) return "low";
-  if (globalComplexity <= 3.3) return "mid";
-  return "high";
+  if (pricePerSqm > 150) {
+    return {
+      kind: "extreme",
+      line1: "Este Preço/m² está acima das faixas internas de referência.",
+      line2: "Acima de R$ 150/m².",
+      bandIds: ["above"],
+      intervalLabel: "> R$ 150/m²",
+    };
+  }
+
+  if (pricePerSqm >= 60 && pricePerSqm <= 80) {
+    return {
+      kind: "transition",
+      line1: "Este Preço/m² fica na transição entre baixa e média complexidade.",
+      line2: "Zona de transição: R$ 60–80/m².",
+      bandIds: ["low", "mid"],
+      intervalLabel: "R$ 60–80/m²",
+    };
+  }
+
+  const transitionMin = 120 - TRANSITION_EPSILON;
+  const transitionMax = 120 + TRANSITION_EPSILON;
+  if (pricePerSqm >= transitionMin && pricePerSqm <= transitionMax) {
+    return {
+      kind: "transition",
+      line1: "Este Preço/m² fica na transição entre média e alta complexidade.",
+      line2: `Zona de transição: ~R$ 120 ± ${TRANSITION_EPSILON}/m².`,
+      bandIds: ["mid", "high"],
+      intervalLabel: `~R$ 120 ± ${TRANSITION_EPSILON}/m²`,
+    };
+  }
+
+  if (pricePerSqm >= 20 && pricePerSqm < 60) {
+    return {
+      kind: "unique",
+      line1: "Este Preço/m² é comum em projetos de baixa complexidade.",
+      line2: "Faixa interna: R$ 20 a R$ 80/m².",
+      bandIds: ["low"],
+      intervalLabel: "R$ 20 a R$ 80/m²",
+    };
+  }
+
+  if (pricePerSqm > 80 && pricePerSqm < transitionMin) {
+    return {
+      kind: "unique",
+      line1: "Este Preço/m² é comum em projetos de média complexidade.",
+      line2: "Faixa interna: R$ 60 a R$ 120/m².",
+      bandIds: ["mid"],
+      intervalLabel: "R$ 60 a R$ 120/m²",
+    };
+  }
+
+  return {
+    kind: "unique",
+    line1: "Este Preço/m² é comum em projetos de alta complexidade.",
+    line2: "Faixa interna: R$ 120 a R$ 150/m².",
+    bandIds: ["high"],
+    intervalLabel: "R$ 120 a R$ 150/m²",
+  };
 }
 

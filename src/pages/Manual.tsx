@@ -495,7 +495,7 @@ export default function Manual() {
                       </ul>
                     </div>
                     <NoteBox>
-                      <strong>Preço por m² (indicador comparativo):</strong> A Calcularq usa faixas internas de referência (heurística de coerência) para sinalizar possíveis incompatibilidades entre escopo e valor. Essas faixas variam conforme complexidade, etapa de projeto, sofisticação e região. Não é tabela oficial e não substitui orçamento/contrato.
+                      <strong>Preço por m² (indicador comparativo):</strong> A Calcularq usa faixas internas de referência (heurística) para descrever em qual faixa o valor se encaixa. Faixas: abaixo (&lt; R$ 20/m²), baixa (R$ 20–80/m²), média (R$ 60–120/m²), alta (R$ 120–150/m²) e acima (&gt; R$ 150/m²). Zonas de transição: R$ 60–80/m² e ~R$ 120 ± 5/m².
                     </NoteBox>
                   </div>
                 </div>
