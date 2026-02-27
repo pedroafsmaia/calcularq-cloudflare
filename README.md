@@ -15,6 +15,7 @@ A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e compo
 - Recuperacao de senha por e-mail (Brevo)
 - Pagamento unico via Stripe (Checkout + Webhook)
 - Calculadora em 4 etapas (fatores antes da calibragem de pesos)
+- Fluxo com importacao por etapa, reinicio de etapa/calculo e rascunho local (autosave)
 - Historico de calculos por usuario
 - Manual integrado com navegacao por etapas
 
@@ -34,8 +35,10 @@ A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e compo
 src/
   components/        Componentes reutilizaveis de UI e calculadora
   contexts/          AuthContext / sessao do usuario
+  hooks/             Hooks da calculadora (progresso, reset, importacao por etapa)
   lib/               API client, motion presets e helpers
   pages/             Home, Calculadora, Manual, Auth, Payment, etc.
+  test/              Testes e setup de testes
   types/             Tipos compartilhados (budget/draft)
   utils/             Helpers gerais
 
@@ -79,6 +82,13 @@ npm run dev
 npm run build
 ```
 
+### Rodar frontend + Functions (Cloudflare local)
+
+```bash
+npm run build
+npm run cf:dev
+```
+
 ### Qualidade (recomendado antes de commit/push)
 
 ```bash
@@ -112,10 +122,12 @@ npx wrangler pages deploy dist --project-name calcularq-cloudflare
 ```toml
 [vars]
 FRONTEND_URL = "https://calcularq-cloudflare.pages.dev"
-STRIPE_SUCCESS_PATH = "/payment/close"
-STRIPE_CANCEL_PATH = "/payment"
 DEBUG_EMAIL_TOKENS = "0"
 ```
+
+Variaveis opcionais (podem ser definidas em `wrangler.toml` ou Pages):
+- `STRIPE_SUCCESS_PATH` (padrao: `/payment/close`)
+- `STRIPE_CANCEL_PATH` (padrao: `/payment`)
 
 ### Secrets (Cloudflare Pages)
 Secrets sensiveis nao ficam versionados. Configure via dashboard ou Wrangler:
@@ -186,6 +198,8 @@ Checklist de revisao:
 ## Documentacao do projeto
 
 - `docs/ARCHITECTURE.md` -> arquitetura, fluxos e responsabilidades por camada
+- `docs/CLOUDFLARE_DEPLOY_GUIDE.md` -> referencia de deploy/ambiente Cloudflare
+- `docs/README_CLOUDFLARE.md` -> operacao rapida de ambiente Cloudflare
 - `docs/MAINTENANCE_GUIDE.md` -> convencoes, hotspots e roadmap de refatoracao
 - `docs/COMMIT_STRATEGY.md` -> padrao de commits, scopes e fluxo sem reescrever historico antigo
 - `docs/QA_SECURITY_CHECKLIST.md` -> check/fix de bugs, UX e seguranca
