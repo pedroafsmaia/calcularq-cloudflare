@@ -54,7 +54,7 @@ export default function CalculatorResultsPanel({
         </div>
       ) : (
         <div className="bg-white p-4 sm:p-5 space-y-4">
-          <div className="bg-slate-50/80 border border-slate-200 rounded-xl p-4 sm:p-5">
+          <div className="bg-calcularq-blue/10 border border-calcularq-blue/15 rounded-xl p-4 sm:p-5">
             <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
             <div className="space-y-2 text-sm text-slate-600">
               <div className="flex items-start justify-between gap-3">
