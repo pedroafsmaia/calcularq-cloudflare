@@ -1,5 +1,5 @@
 ﻿import { DollarSign } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import SaveBudgetButton from "./SaveBudgetButton";
 import Tooltip from "@/components/ui/Tooltip";
@@ -68,7 +68,6 @@ export default function FinalCalculation({
   const [estimatedHoursDraft, setEstimatedHoursDraft] = useState("");
   const [discountDraft, setDiscountDraft] = useState("0");
   const [isEditingDiscount, setIsEditingDiscount] = useState(false);
-  const discountPresets = useMemo(() => [0, 5, 10, 15, 20], []);
 
   const handleAddExpense = (expense: Expense) => {
     onVariableExpensesChange([...variableExpenses, expense]);
@@ -205,7 +204,7 @@ export default function FinalCalculation({
             <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
               <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs sm:text-sm text-slate-500">
-                  Use os presets para aplicar rápido ou digite manualmente.
+                  Ajuste no slider ou digite manualmente.
                 </p>
                 <span
                   className={`inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${
@@ -217,25 +216,27 @@ export default function FinalCalculation({
                   {discountStateLabel}
                 </span>
               </div>
+
               <div className="grid gap-3 sm:grid-cols-[1fr_11rem] sm:items-end">
-                <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
-                  {discountPresets.map((preset) => {
-                    const active = commercialDiscount === preset;
-                    return (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => onCommercialDiscountChange(preset)}
-                        className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                          active
-                            ? "border-calcularq-blue bg-calcularq-blue text-white"
-                            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        {preset}%
-                      </button>
-                    );
-                  })}
+                <div className="space-y-2">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={commercialDiscount}
+                    onChange={(e) => {
+                      const next = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                      onCommercialDiscountChange(next);
+                      setDiscountDraft(String(next));
+                    }}
+                    className="w-full accent-calcularq-blue"
+                    aria-label="Ajustar desconto comercial pelo slider"
+                  />
+                  <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
+                    <span>0%</span>
+                    <span>100%</span>
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <span className="block text-xs font-medium text-slate-500">Valor manual</span>
