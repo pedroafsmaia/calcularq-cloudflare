@@ -41,7 +41,7 @@ export default function CalculatorResultsPanel({
   return (
     <>
       {(!minHourlyRate || minHourlyRate <= 0) ? (
-        <div className="bg-white p-5 space-y-3">
+        <div className="bg-transparent p-5 space-y-3">
           <div className="rounded-xl border-2 border-dashed border-slate-200 p-6 text-center">
             <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
               <span className="text-slate-400 text-lg font-bold">1</span>
@@ -53,7 +53,7 @@ export default function CalculatorResultsPanel({
           </div>
         </div>
       ) : (
-        <div className="bg-white p-4 sm:p-5 space-y-4">
+        <div className="bg-transparent p-4 sm:p-5 space-y-4">
           <div className="bg-calcularq-blue/10 border border-calcularq-blue/15 rounded-xl p-4 sm:p-5">
             <p className="text-sm font-semibold text-calcularq-blue text-center mb-3">Base do Cálculo</p>
             <div className="space-y-2 text-sm text-slate-600">
