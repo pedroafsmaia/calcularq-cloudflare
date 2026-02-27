@@ -13,8 +13,6 @@ import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ToastProvider } from './components/ui/ToastProvider'
 
-const DEMO_ALLOWED_EMAILS = ["pedroafsmaia@gmail.com"];
-
 function App() {
   return (
     <AuthProvider>
@@ -38,7 +36,7 @@ function App() {
           <Route
             path="/calculator-demo"
             element={
-              <ProtectedRoute requirePayment={true} allowedEmails={DEMO_ALLOWED_EMAILS}>
+              <ProtectedRoute requirePayment={true}>
                 <CalculatorDemo />
               </ProtectedRoute>
             }
