@@ -206,55 +206,55 @@ export default function FinalCalculation({
                 </p>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-[1fr_11.5rem] sm:items-center">
-                <div className="space-y-2">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_11.5rem]">
+                <span className="text-xs font-medium text-slate-500">Slider</span>
+                <span className="text-xs font-medium text-slate-500 sm:text-right">Valor manual</span>
+
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={commercialDiscount}
+                  onChange={(e) => {
+                    const next = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                    onCommercialDiscountChange(next);
+                    setDiscountDraft(String(next));
+                  }}
+                  className="w-full self-center accent-calcularq-blue"
+                  aria-label="Ajustar desconto comercial pelo slider"
+                />
+                <div className="relative self-center">
                   <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={commercialDiscount}
+                    type="text"
+                    inputMode="decimal"
+                    value={discountDraft}
+                    onFocus={() => setIsEditingDiscount(true)}
                     onChange={(e) => {
-                      const next = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                      const nextDraft = sanitizeNumberDraft(e.target.value);
+                      setDiscountDraft(nextDraft);
+                      const parsed = parsePtBrNumber(nextDraft);
+                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
                       onCommercialDiscountChange(next);
-                      setDiscountDraft(String(next));
                     }}
-                    className="w-full accent-calcularq-blue"
-                    aria-label="Ajustar desconto comercial pelo slider"
+                    onBlur={() => {
+                      const parsed = parsePtBrNumber(discountDraft);
+                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                      setDiscountDraft(String(next));
+                      onCommercialDiscountChange(next);
+                      setIsEditingDiscount(false);
+                    }}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-8 text-right text-sm font-semibold text-calcularq-blue focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
+                    aria-label="Desconto comercial em porcentagem"
                   />
-                  <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
-                    <span>0%</span>
-                    <span>100%</span>
-                  </div>
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">%</span>
                 </div>
-                <div className="space-y-1 sm:self-center">
-                  <span className="block text-xs font-medium text-slate-500 sm:text-right">Valor manual</span>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={discountDraft}
-                      onFocus={() => setIsEditingDiscount(true)}
-                      onChange={(e) => {
-                        const nextDraft = sanitizeNumberDraft(e.target.value);
-                        setDiscountDraft(nextDraft);
-                        const parsed = parsePtBrNumber(nextDraft);
-                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                        onCommercialDiscountChange(next);
-                      }}
-                      onBlur={() => {
-                        const parsed = parsePtBrNumber(discountDraft);
-                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                        setDiscountDraft(String(next));
-                        onCommercialDiscountChange(next);
-                        setIsEditingDiscount(false);
-                      }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-8 text-right text-sm font-semibold text-calcularq-blue focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
-                      aria-label="Desconto comercial em porcentagem"
-                    />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">%</span>
-                  </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
+                  <span>0%</span>
+                  <span>100%</span>
                 </div>
+                <div className="hidden sm:block" />
               </div>
             </div>
 
