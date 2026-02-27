@@ -307,7 +307,7 @@ export default function Home() {
               <FormulaStep 
                 number="1" 
                 title={"Hora técnica mínima"}
-                description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora tÃ©cnica mÃ­nima."}
+                description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica mínima."}
               />
               <FormulaStep 
                 number="2" 
@@ -322,7 +322,7 @@ export default function Home() {
               <FormulaStep 
                 number="4" 
                 title={"Composição final"}
-                description={"Estime as horas de projeto, adicione despesas variÃ¡veis e desconto. O preço de venda aparece na hora."}
+                description={"Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."}
               />
             </div>
           </motion.div>
@@ -338,8 +338,10 @@ function FormulaStep({ number, title, description }: { number: string; title: st
       <div className="w-12 h-12 rounded-full bg-calcularq-blue text-white text-lg font-bold flex items-center justify-center mx-auto mb-4">
         {number}
       </div>
-      <h3 className="min-h-[3.2rem] font-semibold text-calcularq-blue mb-2 text-base sm:text-lg leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1 flex items-center justify-center" style={{ textWrap: "balance" }}>{title}</h3>
-      <p className="min-h-[5.75rem] text-slate-600 text-sm sm:text-[0.95rem] leading-relaxed max-w-[26ch] sm:max-w-[30ch] lg:max-w-[29ch] mx-auto px-1 break-words" style={{ textWrap: "pretty" }}>
+      <h3 className="min-h-[3.2rem] text-base sm:text-lg font-semibold text-calcularq-blue mb-2 leading-snug max-w-[15ch] sm:max-w-[18ch] mx-auto px-1 flex items-center justify-center" style={{ textWrap: "balance" }}>
+        {title}
+      </h3>
+      <p className="min-h-[5.75rem] text-sm sm:text-[0.95rem] text-slate-600 leading-relaxed max-w-[28ch] sm:max-w-[31ch] mx-auto px-1 break-words" style={{ textWrap: "pretty" }}>
         {description}
       </p>
     </div>

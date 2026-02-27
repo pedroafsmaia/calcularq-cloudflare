@@ -47,6 +47,8 @@ export default function MinimumHourCalculator({
   const [useManual, setUseManual] = useState(initialUseManual);
   const [manualMinHourDraft, setManualMinHourDraft] = useState("");
   const [productiveHoursDraft, setProductiveHoursDraft] = useState("");
+  const [isEditingManualMinHour, setIsEditingManualMinHour] = useState(false);
+  const [isEditingProductiveHours, setIsEditingProductiveHours] = useState(false);
 
   const proLabore = useMemo(
     () => personalExpenses.reduce((sum, exp) => sum + exp.value, 0),
@@ -54,8 +56,8 @@ export default function MinimumHourCalculator({
   );
 
   const calculatedMinHourRate = useMemo(() => {
-    if (useManual && manualMinHourRate !== undefined) {
-      return manualMinHourRate;
+    if (useManual) {
+      return manualMinHourRate ?? 0;
     }
     const totalExpenses = fixedExpenses.reduce((sum, exp) => sum + exp.value, 0);
     if (productiveHours === 0) return 0;
@@ -112,14 +114,16 @@ export default function MinimumHourCalculator({
   }, [initialUseManual]);
 
   useEffect(() => {
+    if (isEditingManualMinHour) return;
     setManualMinHourDraft(
       typeof manualMinHourRate === "number" && manualMinHourRate > 0 ? formatCurrencyPtBr(manualMinHourRate) : ""
     );
-  }, [manualMinHourRate]);
+  }, [manualMinHourRate, isEditingManualMinHour]);
 
   useEffect(() => {
+    if (isEditingProductiveHours) return;
     setProductiveHoursDraft(productiveHours > 0 ? formatHoursPtBr(productiveHours) : "");
-  }, [productiveHours]);
+  }, [productiveHours, isEditingProductiveHours]);
 
   useEffect(() => {
     onManualModeChange?.(useManual);
@@ -243,6 +247,7 @@ export default function MinimumHourCalculator({
                 type="text"
                 inputMode="decimal"
                 value={manualMinHourDraft}
+                onFocus={() => setIsEditingManualMinHour(true)}
                 onChange={(e) => {
                   const nextDraft = sanitizeNumberDraft(e.target.value);
                   setManualMinHourDraft(nextDraft);
@@ -253,6 +258,7 @@ export default function MinimumHourCalculator({
                   const parsed = parsePtBrNumber(manualMinHourDraft);
                   setManualMinHourDraft(parsed !== null && parsed > 0 ? formatCurrencyPtBr(parsed) : "");
                   setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
+                  setIsEditingManualMinHour(false);
                 }}
                 className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 placeholder="0,00"
@@ -292,6 +298,7 @@ export default function MinimumHourCalculator({
                 type="text"
                 inputMode="decimal"
                 value={productiveHoursDraft}
+                onFocus={() => setIsEditingProductiveHours(true)}
                 onChange={(e) => {
                   const nextDraft = sanitizeNumberDraft(e.target.value);
                   setProductiveHoursDraft(nextDraft);
@@ -306,6 +313,7 @@ export default function MinimumHourCalculator({
                   setProductiveHoursDraft(hours > 0 ? formatHoursPtBr(hours) : "");
                   setProductiveHours(hours);
                   onProductiveHoursChange?.(hours);
+                  setIsEditingProductiveHours(false);
                 }}
                 className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
                 placeholder="0"
