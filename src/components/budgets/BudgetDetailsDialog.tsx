@@ -4,11 +4,18 @@ import AppDialog from "@/components/ui/AppDialog";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
 
+type ResultMode = "standard" | "demo";
+
 type DetailPreview = {
+  mode: ResultMode;
+  modeLabel: "Calculadora" | "Demo";
+  globalComplexity: number;
+  adjustedHourlyRate: number;
+  projectPrice: number;
+  finalSalePrice: number;
   totalVariableExpenses: number;
   discountPercent: number;
   discountAmount: number;
-  cubPercentage: number | null;
   pricePerSqm: number | null;
   profit: number | null;
 };
@@ -22,6 +29,8 @@ type Props = {
   detailDirty: boolean;
   isSavingDetails: boolean;
   detailPreview: DetailPreview | null;
+  resultMode: ResultMode;
+  onResultModeChange: (mode: ResultMode) => void;
   onOpenChange: (open: boolean) => void;
   onDetailNameChange: (value: string) => void;
   onDetailClientNameChange: (value: string) => void;
@@ -40,6 +49,8 @@ export default function BudgetDetailsDialog({
   detailDirty,
   isSavingDetails,
   detailPreview,
+  resultMode,
+  onResultModeChange,
   onOpenChange,
   onDetailNameChange,
   onDetailClientNameChange,
@@ -139,75 +150,134 @@ export default function BudgetDetailsDialog({
               className="mb-0"
               icon={<History className="h-5 w-5 text-calcularq-blue" />}
               title="Resumo dos resultados"
-              description="Visualização rápida do cálculo salvo."
+              description={detailPreview ? `Visualização rápida (${detailPreview.modeLabel}).` : "Visualização rápida do cálculo salvo."}
               titleClassName="text-lg"
               descriptionClassName="text-sm"
             />
 
             <div className="mt-4 space-y-4">
+              <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50/70 p-1">
+                <button
+                  type="button"
+                  onClick={() => onResultModeChange("standard")}
+                  className={[
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                    resultMode === "standard"
+                      ? "bg-calcularq-blue text-white shadow-sm"
+                      : "text-slate-600 hover:bg-white hover:text-slate-800",
+                  ].join(" ")}
+                >
+                  Calculadora
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onResultModeChange("demo")}
+                  className={[
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                    resultMode === "demo"
+                      ? "bg-calcularq-blue text-white shadow-sm"
+                      : "text-slate-600 hover:bg-white hover:text-slate-800",
+                  ].join(" ")}
+                >
+                  Demo
+                </button>
+              </div>
+
               <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-3">
-                <p className="text-xs font-semibold text-calcularq-blue/80 mb-1">Preço de Venda Final</p>
+                <p className="mb-1 text-xs font-semibold text-calcularq-blue/80">Preço de venda final</p>
                 <p className="text-2xl font-bold text-calcularq-blue">
-                  R$ {selectedBudget.data.results.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  R$ {(detailPreview?.finalSalePrice ?? selectedBudget.data.results.finalSalePrice).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-100 bg-slate-50/30 p-4 space-y-2">
+              <div className="space-y-2 rounded-xl border border-slate-100 bg-slate-50/30 p-4">
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-500">Hora técnica mínima</span>
                   <span className="font-semibold text-slate-800">
                     R$ {selectedBudget.data.minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
                   </span>
                 </div>
+
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-500">Complexidade global</span>
-                  <span className="font-semibold text-slate-800">{selectedBudget.data.results.globalComplexity}x</span>
+                  <span className="font-semibold text-slate-800">
+                    {(detailPreview?.globalComplexity ?? selectedBudget.data.results.globalComplexity).toFixed(2)}x
+                  </span>
                 </div>
+
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-500">Hora ajustada</span>
                   <span className="font-semibold text-slate-800">
-                    R$ {selectedBudget.data.results.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                    R$ {(detailPreview?.adjustedHourlyRate ?? selectedBudget.data.results.adjustedHourlyRate).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    /h
                   </span>
                 </div>
+
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-500">Preço do projeto</span>
                   <span className="font-semibold text-slate-800">
-                    R$ {selectedBudget.data.results.projectPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    R$ {(detailPreview?.projectPrice ?? selectedBudget.data.results.projectPrice).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
+
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-500">Horas estimadas</span>
                   <span className="font-semibold text-slate-800">{selectedBudget.data.estimatedHours}h</span>
                 </div>
+
                 {detailPreview && detailPreview.totalVariableExpenses > 0 ? (
                   <div className="flex items-center justify-between gap-3 text-sm">
                     <span className="text-slate-500">Despesas variáveis</span>
                     <span className="font-semibold text-slate-800">
-                      R$ {detailPreview.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      R$ {detailPreview.totalVariableExpenses.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
                 ) : null}
+
                 {detailPreview && detailPreview.discountAmount > 0 ? (
                   <div className="flex items-center justify-between gap-3 text-sm">
                     <span className="text-slate-500">Desconto ({detailPreview.discountPercent}%)</span>
                     <span className="font-semibold text-red-500">
-                      - R$ {detailPreview.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      - R$ {detailPreview.discountAmount.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
                 ) : null}
+
                 {detailPreview && detailPreview.pricePerSqm !== null ? (
                   <div className="flex items-center justify-between gap-3 text-sm">
                     <span className="text-slate-500">Preço/m²</span>
                     <span className="font-semibold text-slate-800">
-                      R$ {detailPreview.pricePerSqm.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      R$ {detailPreview.pricePerSqm.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
                 ) : null}
+
                 {detailPreview && detailPreview.profit !== null ? (
                   <div className="flex items-center justify-between gap-3 text-sm">
                     <span className="text-slate-500">Lucro estimado</span>
                     <span className={`font-semibold ${detailPreview.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
-                      R$ {detailPreview.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      R$ {detailPreview.profit.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
                 ) : null}

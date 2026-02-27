@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Budget, api } from "@/lib/api";
+import type { BudgetData } from "@/types/budget";
 import { History, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
@@ -13,8 +14,127 @@ import BudgetsToolbar from "@/components/budgets/BudgetsToolbar";
 import BudgetCard from "@/components/budgets/BudgetCard";
 import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
 import { useToast } from "@/components/ui/ToastProvider";
+import { calculateGlobalComplexity, type Factor as PricingFactor } from "@/components/pricing/PricingEngine";
+import { calculateDemoProjectValue, DEMO_PROFIT_PROFILES } from "@/components/pricing/PricingEngineDemo";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
+type ResultMode = "standard" | "demo";
+type DetailPreview = {
+  mode: ResultMode;
+  modeLabel: "Calculadora" | "Demo";
+  globalComplexity: number;
+  adjustedHourlyRate: number;
+  projectPrice: number;
+  finalSalePrice: number;
+  totalVariableExpenses: number;
+  discountPercent: number;
+  discountAmount: number;
+  pricePerSqm: number | null;
+  profit: number | null;
+};
+
+const DEMO_PROFILE_FOR_COMPARISON = DEMO_PROFIT_PROFILES.estabelecido;
+
+const toSafeNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  return value;
+};
+
+const resolveSelections = (data: BudgetData): Record<string, number> => {
+  if (data.selections && Object.keys(data.selections).length > 0) return data.selections;
+
+  return (data.factors ?? []).reduce<Record<string, number>>((acc, factor) => {
+    const level = toSafeNumber(factor.level, 0);
+    if (level > 0) acc[factor.id] = level;
+    return acc;
+  }, {});
+};
+
+const resolveEffectiveArea = (data: BudgetData, selections: Record<string, number>): number | null => {
+  if (typeof data.area === "number" && Number.isFinite(data.area) && data.area > 0) return data.area;
+
+  const selectedAreaLevel = Number(selections.area);
+  if (!Number.isFinite(selectedAreaLevel) || selectedAreaLevel <= 0) return null;
+
+  const interval = data.areaIntervals?.find((item) => item.level === selectedAreaLevel);
+  if (!interval) return null;
+
+  if (typeof interval.max === "number" && interval.max > interval.min) return (interval.min + interval.max) / 2;
+  return interval.min > 0 ? interval.min : null;
+};
+
+const calculatePreviewForMode = (data: BudgetData, mode: ResultMode): DetailPreview => {
+  const minHourlyRate = toSafeNumber(data.minHourlyRate, 0);
+  const estimatedHours = toSafeNumber(data.estimatedHours, 0);
+  const discountPercent = toSafeNumber(data.commercialDiscount, 0);
+  const selections = resolveSelections(data);
+  const totalVariableExpenses = Array.isArray(data.variableExpenses)
+    ? data.variableExpenses.reduce((sum, expense) => sum + toSafeNumber(expense?.value, 0), 0)
+    : 0;
+
+  let globalComplexity = toSafeNumber(data.results?.globalComplexity, 0);
+  let adjustedHourlyRate = toSafeNumber(data.results?.adjustedHourlyRate, 0);
+  let projectPrice = toSafeNumber(data.results?.projectPrice, 0);
+
+  if (minHourlyRate > 0 && estimatedHours >= 0) {
+    if (mode === "demo") {
+      const l3 = Number(selections.detail ?? 1) || 1;
+      const l4 = Number(selections.technical ?? 1) || 1;
+      const l5 = Number(selections.bureaucratic ?? 1) || 1;
+      const demo = calculateDemoProjectValue(
+        minHourlyRate,
+        DEMO_PROFILE_FOR_COMPARISON.m0,
+        l3,
+        l4,
+        l5,
+        estimatedHours,
+        totalVariableExpenses,
+        discountPercent
+      );
+
+      globalComplexity = demo.cExp;
+      adjustedHourlyRate = demo.htAj;
+      projectPrice = demo.projectPrice;
+    } else {
+      const factorsForComplexity: PricingFactor[] = (data.factors ?? []).map((factor) => ({
+        id: factor.id,
+        name: factor.name || factor.id,
+        description: "",
+        options: [],
+        weight: toSafeNumber(factor.weight, 1),
+      }));
+      const computedComplexity = calculateGlobalComplexity(factorsForComplexity, selections);
+      if (computedComplexity > 0) globalComplexity = computedComplexity;
+      adjustedHourlyRate = minHourlyRate * globalComplexity;
+      projectPrice = adjustedHourlyRate * estimatedHours;
+    }
+  }
+
+  const discountAmount = projectPrice * (discountPercent / 100);
+  const projectPriceWithDiscount = projectPrice - discountAmount;
+  const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
+  const profit =
+    minHourlyRate > 0 && adjustedHourlyRate > 0 && estimatedHours > 0
+      ? (adjustedHourlyRate - minHourlyRate) * estimatedHours
+      : null;
+
+  const effectiveArea = resolveEffectiveArea(data, selections);
+  const pricePerSqm = effectiveArea && effectiveArea > 0 && finalSalePrice > 0 ? finalSalePrice / effectiveArea : null;
+
+  return {
+    mode,
+    modeLabel: mode === "demo" ? "Demo" : "Calculadora",
+    globalComplexity,
+    adjustedHourlyRate,
+    projectPrice,
+    finalSalePrice,
+    totalVariableExpenses,
+    discountPercent,
+    discountAmount,
+    pricePerSqm,
+    profit,
+  };
+};
 
 export default function BudgetsHistory() {
   const prefersReducedMotion = !!useReducedMotion();
@@ -28,6 +148,7 @@ export default function BudgetsHistory() {
   const [detailName, setDetailName] = useState("");
   const [detailClientName, setDetailClientName] = useState("");
   const [detailDescription, setDetailDescription] = useState("");
+  const [detailResultMode, setDetailResultMode] = useState<ResultMode>("standard");
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [confirmDeleteBudgetId, setConfirmDeleteBudgetId] = useState<string | null>(null);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
@@ -130,6 +251,7 @@ export default function BudgetsHistory() {
     setDetailName(budget.name ?? "");
     setDetailClientName(budget.clientName ?? "");
     setDetailDescription(typeof budget.data?.description === "string" ? budget.data.description : "");
+    setDetailResultMode("standard");
   };
 
   const closeBudgetDetails = (force = false) => {
@@ -180,32 +302,8 @@ export default function BudgetsHistory() {
 
   const detailPreview = useMemo(() => {
     if (!selectedBudget) return null;
-    const data = selectedBudget.data;
-    const totalVariableExpenses = Array.isArray(data.variableExpenses)
-      ? data.variableExpenses.reduce((sum, exp) => sum + (exp.value || 0), 0)
-      : 0;
-    const discountPercent = typeof data.commercialDiscount === "number" ? data.commercialDiscount : 0;
-    const discountAmount = (data.results?.projectPrice || 0) * (discountPercent / 100);
-    const area = typeof data.area === "number" && data.area > 0 ? data.area : null;
-    const cubPercentage =
-      area && data.results?.finalSalePrice > 0 ? (data.results.finalSalePrice / (2800 * area)) * 100 : null;
-    const pricePerSqm = area && data.results?.finalSalePrice > 0 ? data.results.finalSalePrice / area : null;
-    const profit =
-      typeof data.results?.adjustedHourlyRate === "number" &&
-      typeof data.minHourlyRate === "number" &&
-      data.estimatedHours > 0
-        ? (data.results.adjustedHourlyRate - data.minHourlyRate) * data.estimatedHours
-        : null;
-
-    return {
-      totalVariableExpenses,
-      discountPercent,
-      discountAmount,
-      cubPercentage,
-      pricePerSqm,
-      profit,
-    };
-  }, [selectedBudget]);
+    return calculatePreviewForMode(selectedBudget.data, detailResultMode);
+  }, [selectedBudget, detailResultMode]);
 
   if (!user) {
     return (
@@ -320,6 +418,8 @@ export default function BudgetsHistory() {
         detailDirty={detailDirty}
         isSavingDetails={isSavingDetails}
         detailPreview={detailPreview}
+        resultMode={detailResultMode}
+        onResultModeChange={setDetailResultMode}
         onOpenChange={(open) => {
           if (!open) closeBudgetDetails();
         }}
