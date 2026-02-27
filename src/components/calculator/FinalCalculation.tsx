@@ -67,6 +67,7 @@ export default function FinalCalculation({
 }: FinalCalculationProps) {
   const [estimatedHoursDraft, setEstimatedHoursDraft] = useState("");
   const [discountDraft, setDiscountDraft] = useState("0");
+  const [isEditingDiscount, setIsEditingDiscount] = useState(false);
   const discountPresets = useMemo(() => [0, 5, 10, 15, 20], []);
 
   const handleAddExpense = (expense: Expense) => {
@@ -97,8 +98,11 @@ export default function FinalCalculation({
   }, [estimatedHours]);
 
   useEffect(() => {
+    if (isEditingDiscount) return;
     setDiscountDraft(String(commercialDiscount));
-  }, [commercialDiscount]);
+  }, [commercialDiscount, isEditingDiscount]);
+
+  const discountStateLabel = commercialDiscount === 0 ? "Sem desconto" : `${commercialDiscount}% aplicado`;
 
   const saveActions = (
     <div className="space-y-4">
@@ -193,60 +197,79 @@ export default function FinalCalculation({
             tooltip="Custos específicos deste contrato que serão repassados integralmente ao cliente."
           />
 
-          <div>
+          <div className="space-y-3">
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
               Desconto comercial: {commercialDiscount}%
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
-            <div className="mb-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div className="flex flex-wrap items-center gap-2">
-              {discountPresets.map((preset) => {
-                const active = commercialDiscount === preset;
-                return (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => onCommercialDiscountChange(preset)}
-                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                      active
-                        ? "border-calcularq-blue bg-calcularq-blue/10 text-calcularq-blue"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {preset}%
-                  </button>
-                );
-              })}
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs sm:text-sm text-slate-500">
+                  Use os presets para aplicar rápido ou digite manualmente.
+                </p>
+                <span
+                  className={`inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                    commercialDiscount > 0
+                      ? "border-blue-200 bg-blue-50 text-blue-700"
+                      : "border-slate-200 bg-white text-slate-600"
+                  }`}
+                >
+                  {discountStateLabel}
+                </span>
               </div>
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-xs font-medium text-slate-500">Valor</span>
-                <div className="relative w-24">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={discountDraft}
-                    onChange={(e) => {
-                      const nextDraft = sanitizeNumberDraft(e.target.value);
-                      setDiscountDraft(nextDraft);
-                      const parsed = parsePtBrNumber(nextDraft);
-                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                      onCommercialDiscountChange(next);
-                    }}
-                    onBlur={() => {
-                      const parsed = parsePtBrNumber(discountDraft);
-                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                      setDiscountDraft(String(next));
-                      onCommercialDiscountChange(next);
-                    }}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 pr-8 text-sm text-slate-700 focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
-                    aria-label="Desconto comercial em porcentagem"
-                  />
-                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">%</span>
+              <div className="grid gap-3 sm:grid-cols-[1fr_11rem] sm:items-end">
+                <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
+                  {discountPresets.map((preset) => {
+                    const active = commercialDiscount === preset;
+                    return (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => onCommercialDiscountChange(preset)}
+                        className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                          active
+                            ? "border-calcularq-blue bg-calcularq-blue text-white"
+                            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        {preset}%
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="space-y-1">
+                  <span className="block text-xs font-medium text-slate-500">Valor manual</span>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={discountDraft}
+                      onFocus={() => setIsEditingDiscount(true)}
+                      onChange={(e) => {
+                        const nextDraft = sanitizeNumberDraft(e.target.value);
+                        setDiscountDraft(nextDraft);
+                        const parsed = parsePtBrNumber(nextDraft);
+                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                        onCommercialDiscountChange(next);
+                      }}
+                      onBlur={() => {
+                        const parsed = parsePtBrNumber(discountDraft);
+                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                        setDiscountDraft(String(next));
+                        onCommercialDiscountChange(next);
+                        setIsEditingDiscount(false);
+                      }}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-8 text-right text-sm font-semibold text-calcularq-blue focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
+                      aria-label="Desconto comercial em porcentagem"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">%</span>
+                  </div>
                 </div>
               </div>
             </div>
+
             {commercialDiscount > 0 && (
-              <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/80 px-3.5 py-3">
+              <div className="rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-3">
                 <p className="text-sm leading-relaxed text-blue-800">
                   <span className="font-medium">Impacto do desconto:</span> sua remuneração será reduzida em R${" "}
                   {discountAmount.toLocaleString("pt-BR", {
@@ -254,6 +277,20 @@ export default function FinalCalculation({
                     maximumFractionDigits: 2,
                   })}
                   .
+                </p>
+                <p className="mt-1 text-xs text-blue-700/90">
+                  Preço de venda final com desconto: R${" "}
+                  {finalSalePrice.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
+            )}
+            {commercialDiscount === 0 && (
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium text-slate-700">Sem desconto aplicado:</span> sua remuneração-base permanece integral.
                 </p>
               </div>
             )}
