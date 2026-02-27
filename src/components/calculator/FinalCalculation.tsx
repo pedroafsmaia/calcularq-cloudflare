@@ -202,29 +202,33 @@ export default function FinalCalculation({
             <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
               <div className="mb-3">
                 <p className="text-xs sm:text-sm text-slate-500">
-                  Ajuste no slider ou digite manualmente.
+                  Arraste para ajustar ou digite o percentual.
                 </p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_11.5rem]">
-                <span className="text-xs font-medium text-slate-500">Slider</span>
-                <span className="text-xs font-medium text-slate-500 sm:text-right">Valor manual</span>
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem] sm:items-center">
+                <div className="space-y-2">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={commercialDiscount}
+                    onChange={(e) => {
+                      const next = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                      onCommercialDiscountChange(next);
+                      setDiscountDraft(String(next));
+                    }}
+                    className="w-full accent-calcularq-blue"
+                    aria-label="Ajustar desconto comercial pelo slider"
+                  />
+                  <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
+                    <span>0%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
 
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={commercialDiscount}
-                  onChange={(e) => {
-                    const next = Math.max(0, Math.min(100, Number(e.target.value) || 0));
-                    onCommercialDiscountChange(next);
-                    setDiscountDraft(String(next));
-                  }}
-                  className="w-full self-center accent-calcularq-blue"
-                  aria-label="Ajustar desconto comercial pelo slider"
-                />
-                <div className="relative self-center">
+                <div className="relative">
                   <input
                     type="text"
                     inputMode="decimal"
@@ -249,18 +253,12 @@ export default function FinalCalculation({
                   />
                   <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">%</span>
                 </div>
-
-                <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
-                  <span>0%</span>
-                  <span>100%</span>
-                </div>
-                <div className="hidden sm:block" />
               </div>
             </div>
 
             {commercialDiscount > 0 && (
-              <div className="rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-3">
-                <p className="text-sm leading-relaxed text-blue-800">
+              <div className="rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-2.5">
+                <p className="text-sm text-blue-800">
                   <span className="font-medium">Impacto do desconto:</span> sua remuneração será reduzida em R${" "}
                   {discountAmount.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
