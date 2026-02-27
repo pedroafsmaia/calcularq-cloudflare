@@ -962,7 +962,7 @@ export default function Calculator() {
                           description="Resumo do cálculo atual"
                           icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
                         />
-                        <div className="rounded-2xl border border-slate-100 bg-slate-50/80 overflow-hidden">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
                           <ResultsPanel />
                         </div>
                       </motion.div>
@@ -993,7 +993,7 @@ export default function Calculator() {
                 titleClassName="text-xl sm:text-xl"
                 descriptionClassName="text-sm"
               />
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/80 overflow-hidden">
+              <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
                 <ResultsPanel />
               </div>
             </div>
