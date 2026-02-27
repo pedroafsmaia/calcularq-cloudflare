@@ -154,9 +154,7 @@ export default function CalculatorResultsPanel({
                       pricePerSqm !== null
                         ? isExtremePricePerSqm
                           ? "text-amber-700"
-                          : isTransitionPricePerSqm
-                            ? "text-blue-700"
-                            : "text-slate-700"
+                          : "text-slate-700"
                         : "text-calcularq-blue"
                     }`}
                   >
@@ -171,9 +169,7 @@ export default function CalculatorResultsPanel({
                       iconClassName={
                         isExtremePricePerSqm
                           ? "text-amber-700 hover:text-amber-800"
-                          : isTransitionPricePerSqm
-                            ? "text-blue-700 hover:text-blue-800"
-                            : "text-slate-600 hover:text-slate-700"
+                          : "text-slate-600 hover:text-slate-700"
                       }
                       text={[pricePerSqmDescription.line1, pricePerSqmDescription.line2].filter(Boolean).join("\n")}
                     />
