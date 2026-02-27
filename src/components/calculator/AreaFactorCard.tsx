@@ -70,7 +70,7 @@ export default function AreaFactorCard({
   }, [area]);
 
   return (
-    <div className="bg-calcularq-blue/5 rounded-2xl border border-calcularq-blue/15 p-5 sm:p-6 shadow-sm hover:border-calcularq-blue/30 hover:shadow-sm transition-colors transition-shadow duration-150">
+    <div className="bg-slate-50/80 rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 hover:shadow-sm transition-colors transition-shadow duration-150">
       <div className="mb-4">
         <div className="flex items-start justify-between gap-3 mb-2">
           {/* Título com tooltip — igual aos outros FactorCards */}
