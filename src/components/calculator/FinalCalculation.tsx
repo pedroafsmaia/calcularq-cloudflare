@@ -199,7 +199,7 @@ export default function FinalCalculation({
               Desconto comercial: {commercialDiscount}%
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <div className="bg-calcularq-blue/5 rounded-xl border border-calcularq-blue/15 shadow-sm p-5">
               <div className="mb-4">
                 <p className="text-xs sm:text-sm text-slate-500">
                   Arraste para ajustar ou digite o percentual.
