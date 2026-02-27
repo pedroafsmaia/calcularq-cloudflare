@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
 import type { ExpenseItem } from "@/types/budget";
@@ -457,6 +457,7 @@ export default function Calculator() {
     () => savedBudgets.find((budget) => budget.id === selectedImportBudgetId) ?? null,
     [savedBudgets, selectedImportBudgetId]
   );
+  const canAccessDemo = (user?.email ?? "").toLowerCase().trim() === "pedroafsmaia@gmail.com";
 
   const handleNext = () => {
     if (currentStep < 4 && canAdvance) {
@@ -740,6 +741,14 @@ export default function Calculator() {
                       </div>
                     </div>
                   </details>
+                  {canAccessDemo ? (
+                    <Link
+                      to={createPageUrl("CalculatorDemo")}
+                      className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
+                    >
+                      Abrir demo
+                    </Link>
+                  ) : null}
                 </div>
                 <div className="hidden sm:flex flex-wrap items-center justify-end gap-2 text-xs sm:max-w-[46%]">
                   <span

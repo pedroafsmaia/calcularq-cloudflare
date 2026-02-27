@@ -41,7 +41,6 @@ export default function CalculatorResultsPanel({
 }: Props) {
   const pricePerSqmDescription = pricePerSqm !== null ? describePricePerSqm(pricePerSqm) : null;
   const isExtremePricePerSqm = pricePerSqmDescription?.kind === "extreme";
-  const isTransitionPricePerSqm = pricePerSqmDescription?.kind === "transition";
 
   return (
     <>
@@ -166,31 +165,12 @@ export default function CalculatorResultsPanel({
                     <Tooltip
                       title={isExtremePricePerSqm ? "Atenção" : "Referência interna"}
                       tone={isExtremePricePerSqm ? "warning" : "info"}
-                      iconClassName={
-                        isExtremePricePerSqm
-                          ? "text-amber-700 hover:text-amber-800"
-                          : "text-slate-600 hover:text-slate-700"
-                      }
+                      iconClassName={isExtremePricePerSqm ? "text-amber-700 hover:text-amber-800" : undefined}
                       text={[pricePerSqmDescription.line1, pricePerSqmDescription.line2].filter(Boolean).join("\n")}
                     />
                   )}
                 </span>
               </div>
-
-              {pricePerSqmDescription && (
-                <div
-                  className={`rounded-lg border px-3 py-2 text-xs leading-relaxed ${
-                    isExtremePricePerSqm
-                      ? "border-amber-200 bg-amber-50 text-amber-800"
-                      : isTransitionPricePerSqm
-                        ? "border-blue-200 bg-blue-50 text-blue-800"
-                        : "border-slate-200 bg-slate-50 text-slate-600"
-                  }`}
-                >
-                  <p className="font-medium">{pricePerSqmDescription.line1}</p>
-                  {pricePerSqmDescription.line2 ? <p className="mt-0.5">{pricePerSqmDescription.line2}</p> : null}
-                </div>
-              )}
 
               {displayValues.profit !== null && (
                 <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-1 pt-1">
