@@ -484,7 +484,7 @@ export default function Manual() {
                           "Despesas Variáveis",
                           "Valor do Desconto (se houver)",
                           "Preço de Venda Final",
-                          "Preço/m² (indicador comparativo, referência IAB/CAU)",
+                          "Preço/m² (indicador comparativo por faixa interna)",
                           "Lucro estimado (margem bruta entre hora ajustada e hora mínima)",
                         ].map((item) => (
                           <li key={item} className="flex items-start gap-2.5">
@@ -495,7 +495,7 @@ export default function Manual() {
                       </ul>
                     </div>
                     <NoteBox>
-                      <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa de referência do IAB/CAU para valor por m² varia conforme a complexidade, a etapa do projeto, a sofisticação, a área e a região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
+                      <strong>Preço por m² (indicador comparativo):</strong> A Calcularq usa faixas internas de referência (heurística de coerência) para sinalizar possíveis incompatibilidades entre escopo e valor. Essas faixas variam conforme complexidade, etapa de projeto, sofisticação e região. Não é tabela oficial e não substitui orçamento/contrato.
                     </NoteBox>
                   </div>
                 </div>

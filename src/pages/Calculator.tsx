@@ -612,6 +612,7 @@ export default function Calculator() {
       commercialDiscount={commercialDiscount}
       cubPercentage={cubPercentage}
       pricePerSqm={pricePerSqm}
+      stageLevel={typeof selections.stage === "number" ? selections.stage : null}
       displayValues={displayValues}
     />
   );

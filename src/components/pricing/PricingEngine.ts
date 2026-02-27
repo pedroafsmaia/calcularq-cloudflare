@@ -17,8 +17,8 @@ export interface AreaInterval {
   level: number;
 }
 
-// Expoente de compressão — calibrado por simulação contra
-// Tabela IAB, CAU/BR e hora técnica de mercado (30 cenários)
+// Expoente de compressão — calibrado por simulações internas
+// para manter estabilidade entre cenários de baixa e alta complexidade.
 export const COMPLEXITY_EXPONENT = 0.9;
 
 export const DEFAULT_AREA_INTERVALS: AreaInterval[] = [
