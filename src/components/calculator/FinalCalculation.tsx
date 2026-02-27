@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, DollarSign } from "lucide-react";
+import { AlertCircle, DollarSign } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import SaveBudgetButton from "./SaveBudgetButton";
@@ -263,7 +263,7 @@ export default function FinalCalculation({
                       onCommercialDiscountChange(next);
                       setIsEditingDiscount(false);
                     }}
-                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2.5 pr-10 text-center text-base font-bold text-calcularq-blue transition-all
+                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2.5 pr-8 text-right text-base font-bold text-calcularq-blue transition-all
                       focus:outline-none focus:border-calcularq-blue focus:ring-4 focus:ring-calcularq-blue/10"
                     aria-label="Desconto comercial em porcentagem"
                   />
@@ -287,15 +287,6 @@ export default function FinalCalculation({
                     </span>
                     .
                   </p>
-                </div>
-              </div>
-            )}
-            {commercialDiscount === 0 && (
-              <div className="flex items-start gap-3 rounded-xl border-l-4 border-green-500 bg-green-50 px-4 py-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-green-900 mb-0.5">Sem desconto aplicado</p>
-                  <p className="text-sm text-green-700">Sua remuneração-base permanece integral.</p>
                 </div>
               </div>
             )}
