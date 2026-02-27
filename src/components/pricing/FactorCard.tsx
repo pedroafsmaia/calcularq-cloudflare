@@ -38,10 +38,10 @@ export default function FactorCard({ factor, value, onChange }: FactorCardProps)
           <label
             key={option.value}
             className={`
-              flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors
+              flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors bg-white
               ${
                 value === option.value
-                  ? "border-calcularq-blue bg-calcularq-blue/10"
+                  ? "border-calcularq-blue shadow-sm"
                   : "border-slate-200 hover:border-calcularq-blue/40"
               }
             `}

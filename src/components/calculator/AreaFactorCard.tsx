@@ -144,7 +144,7 @@ export default function AreaFactorCard({
 
         <div className="space-y-2">
           {(isEditingIntervals ? editingIntervals : intervals).map((interval, index) => (
-            <div key={index} className="flex flex-wrap sm:flex-nowrap items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
+            <div key={index} className="flex flex-wrap sm:flex-nowrap items-center gap-2 p-2 bg-white border border-slate-200 rounded-lg">
               <span className="text-xs font-medium text-slate-600 w-16">Nível {interval.level}:</span>
               {isEditingIntervals ? (
                 <>
