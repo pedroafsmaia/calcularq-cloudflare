@@ -1,4 +1,4 @@
-﻿import { DollarSign } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import SaveBudgetButton from "./SaveBudgetButton";
@@ -194,19 +194,19 @@ export default function FinalCalculation({
             tooltip="Custos específicos deste contrato que serão repassados integralmente ao cliente."
           />
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
               Desconto comercial: {commercialDiscount}%
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
-              <div className="mb-3">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+              <div className="mb-4">
                 <p className="text-xs sm:text-sm text-slate-500">
                   Arraste para ajustar ou digite o percentual.
                 </p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem] sm:items-center">
+              <div className="flex flex-col gap-4">
                 <div className="space-y-2">
                   <input
                     type="range"
@@ -219,7 +219,22 @@ export default function FinalCalculation({
                       onCommercialDiscountChange(next);
                       setDiscountDraft(String(next));
                     }}
-                    className="w-full accent-calcularq-blue"
+                    className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer
+                      [&::-webkit-slider-thumb]:appearance-none
+                      [&::-webkit-slider-thumb]:w-5
+                      [&::-webkit-slider-thumb]:h-5
+                      [&::-webkit-slider-thumb]:rounded-full
+                      [&::-webkit-slider-thumb]:bg-calcularq-blue
+                      [&::-webkit-slider-thumb]:cursor-pointer
+                      [&::-webkit-slider-thumb]:shadow-md
+                      [&::-webkit-slider-thumb]:transition-transform
+                      [&::-webkit-slider-thumb]:hover:scale-110
+                      [&::-moz-range-thumb]:w-5
+                      [&::-moz-range-thumb]:h-5
+                      [&::-moz-range-thumb]:rounded-full
+                      [&::-moz-range-thumb]:bg-calcularq-blue
+                      [&::-moz-range-thumb]:border-0
+                      [&::-moz-range-thumb]:cursor-pointer"
                     aria-label="Ajustar desconto comercial pelo slider"
                   />
                   <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
@@ -228,51 +243,63 @@ export default function FinalCalculation({
                   </div>
                 </div>
 
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={discountDraft}
-                    onFocus={() => setIsEditingDiscount(true)}
-                    onChange={(e) => {
-                      const nextDraft = sanitizeNumberDraft(e.target.value);
-                      setDiscountDraft(nextDraft);
-                      const parsed = parsePtBrNumber(nextDraft);
-                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                      onCommercialDiscountChange(next);
-                    }}
-                    onBlur={() => {
-                      const parsed = parsePtBrNumber(discountDraft);
-                      const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
-                      setDiscountDraft(String(next));
-                      onCommercialDiscountChange(next);
-                      setIsEditingDiscount(false);
-                    }}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-8 text-right text-sm font-semibold text-calcularq-blue focus:outline-none focus:border-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20"
-                    aria-label="Desconto comercial em porcentagem"
-                  />
-                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">%</span>
+                <div className="flex items-center justify-end gap-3">
+                  <span className="text-sm text-slate-600">Percentual:</span>
+                  <div className="relative w-[100px] max-w-[120px]">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={discountDraft}
+                      onFocus={() => setIsEditingDiscount(true)}
+                      onChange={(e) => {
+                        const nextDraft = sanitizeNumberDraft(e.target.value);
+                        setDiscountDraft(nextDraft);
+                        const parsed = parsePtBrNumber(nextDraft);
+                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                        onCommercialDiscountChange(next);
+                      }}
+                      onBlur={() => {
+                        const parsed = parsePtBrNumber(discountDraft);
+                        const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                        setDiscountDraft(String(next));
+                        onCommercialDiscountChange(next);
+                        setIsEditingDiscount(false);
+                      }}
+                      className="w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2.5 pr-10 text-center text-base font-bold text-calcularq-blue transition-all
+                        focus:outline-none focus:border-calcularq-blue focus:ring-4 focus:ring-calcularq-blue/10"
+                      aria-label="Desconto comercial em porcentagem"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base font-bold text-calcularq-blue">%</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {commercialDiscount > 0 && (
-              <div className="rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-2.5">
-                <p className="text-sm text-blue-800">
-                  <span className="font-medium">Impacto do desconto:</span> sua remuneração será reduzida em R${" "}
-                  {discountAmount.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  .
-                </p>
+              <div className="flex items-start gap-3 rounded-xl border-l-4 border-blue-500 bg-blue-50 px-4 py-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900 mb-0.5">Impacto do desconto</p>
+                  <p className="text-sm text-blue-700">
+                    Sua remuneração será reduzida em{" "}
+                    <span className="font-bold">
+                      R$ {discountAmount.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    .
+                  </p>
+                </div>
               </div>
             )}
             {commercialDiscount === 0 && (
-              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                <p className="text-sm text-slate-600">
-                  <span className="font-medium text-slate-700">Sem desconto aplicado:</span> sua remuneração-base permanece integral.
-                </p>
+              <div className="flex items-start gap-3 rounded-xl border-l-4 border-green-500 bg-green-50 px-4 py-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-green-900 mb-0.5">Sem desconto aplicado</p>
+                  <p className="text-sm text-green-700">Sua remuneração-base permanece integral.</p>
+                </div>
               </div>
             )}
           </div>
