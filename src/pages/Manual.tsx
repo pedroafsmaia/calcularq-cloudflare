@@ -484,7 +484,6 @@ export default function Manual() {
                           "Despesas Variáveis",
                           "Valor do Desconto (se houver)",
                           "Preço de Venda Final",
-                          "% do valor da obra (indicador comparativo, referência CAU)",
                           "Preço/m² (indicador comparativo, referência IAB/CAU)",
                           "Lucro estimado (margem bruta entre hora ajustada e hora mínima)",
                         ].map((item) => (
@@ -495,11 +494,6 @@ export default function Manual() {
                         ))}
                       </ul>
                     </div>
-
-                    <NoteBox>
-                      <strong>% do valor da obra (referência CAU/BR):</strong> Indicador comparativo (faixa sugerida: 2% a 11%). A faixa de referência do CAU/BR para % do valor da obra varia conforme a complexidade, a etapa do projeto, o tipo de projeto, a sofisticação e a região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
-                    </NoteBox>
-
                     <NoteBox>
                       <strong>Preço por m² (referência IAB/CAU):</strong> Indicador comparativo (faixa sugerida: R$ 60 a R$ 200/m² para projetos residenciais). A faixa de referência do IAB/CAU para valor por m² varia conforme a complexidade, a etapa do projeto, a sofisticação, a área e a região. Ele ajuda a contextualizar o resultado, mas não define o cálculo.
                     </NoteBox>
