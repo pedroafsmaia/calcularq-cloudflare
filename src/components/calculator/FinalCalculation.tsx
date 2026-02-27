@@ -101,8 +101,6 @@ export default function FinalCalculation({
     setDiscountDraft(String(commercialDiscount));
   }, [commercialDiscount, isEditingDiscount]);
 
-  const discountStateLabel = commercialDiscount === 0 ? "Sem desconto" : `${commercialDiscount}% aplicado`;
-
   const saveActions = (
     <div className="space-y-4">
       <SaveBudgetButton
@@ -202,22 +200,13 @@ export default function FinalCalculation({
               <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
             </label>
             <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
-              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-3">
                 <p className="text-xs sm:text-sm text-slate-500">
                   Ajuste no slider ou digite manualmente.
                 </p>
-                <span
-                  className={`inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                    commercialDiscount > 0
-                      ? "border-blue-200 bg-blue-50 text-blue-700"
-                      : "border-slate-200 bg-white text-slate-600"
-                  }`}
-                >
-                  {discountStateLabel}
-                </span>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[1fr_11rem] sm:items-end">
+              <div className="grid gap-4 sm:grid-cols-[1fr_11.5rem] sm:items-center">
                 <div className="space-y-2">
                   <input
                     type="range"
@@ -238,8 +227,8 @@ export default function FinalCalculation({
                     <span>100%</span>
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <span className="block text-xs font-medium text-slate-500">Valor manual</span>
+                <div className="space-y-1 sm:self-center">
+                  <span className="block text-xs font-medium text-slate-500 sm:text-right">Valor manual</span>
                   <div className="relative">
                     <input
                       type="text"
@@ -278,13 +267,6 @@ export default function FinalCalculation({
                     maximumFractionDigits: 2,
                   })}
                   .
-                </p>
-                <p className="mt-1 text-xs text-blue-700/90">
-                  Preço de venda final com desconto: R${" "}
-                  {finalSalePrice.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
                 </p>
               </div>
             )}
