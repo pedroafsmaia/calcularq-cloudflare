@@ -175,7 +175,7 @@ export default function CalculatorResultsPanel({
                             ? "text-blue-700 hover:text-blue-800"
                             : "text-slate-600 hover:text-slate-700"
                       }
-                      text={[pricePerSqmDescription.line1, pricePerSqmDescription.line2, "Faixas internas de referência."].filter(Boolean).join("\n")}
+                      text={[pricePerSqmDescription.line1, pricePerSqmDescription.line2].filter(Boolean).join("\n")}
                     />
                   )}
                 </span>
@@ -214,4 +214,3 @@ export default function CalculatorResultsPanel({
     </>
   );
 }
-
