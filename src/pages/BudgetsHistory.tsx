@@ -13,9 +13,12 @@ import { fadeUp } from "@/lib/motion";
 import BudgetsToolbar from "@/components/budgets/BudgetsToolbar";
 import BudgetCard from "@/components/budgets/BudgetCard";
 import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
+import BudgetCloseDialog from "@/components/budgets/BudgetCloseDialog";
 import { useToast } from "@/components/ui/ToastProvider";
 import { calculateGlobalComplexity, type Factor as PricingFactor } from "@/components/pricing/PricingEngine";
 import { calculateDemoProjectValue, DEMO_PROFIT_PROFILES } from "@/components/pricing/PricingEngineDemo";
+import { isDemoMethodVersion, syncDemoCalibrationFromBudgets } from "@/lib/demoCalibration";
+import type { BudgetActualHoursByPhase, BudgetScopeChange } from "@/types/budget";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
 type ResultMode = "standard" | "demo";
@@ -152,13 +155,19 @@ export default function BudgetsHistory() {
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [confirmDeleteBudgetId, setConfirmDeleteBudgetId] = useState<string | null>(null);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
+  const [closeDialogBudgetId, setCloseDialogBudgetId] = useState<string | null>(null);
+  const [isSavingCloseFeedback, setIsSavingCloseFeedback] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       if (!user) return;
       try {
         const resp = await api.listBudgets();
-        setBudgets(resp.budgets);
+        const loadedBudgets = Array.isArray(resp.budgets) ? resp.budgets : [];
+        setBudgets(loadedBudgets);
+        if (user?.id) {
+          syncDemoCalibrationFromBudgets(user.id, loadedBudgets);
+        }
       } catch (e) {
         toast({
           tone: "error",
@@ -210,7 +219,11 @@ export default function BudgetsHistory() {
   const handleDelete = async (budgetId: string) => {
     try {
       await api.deleteBudget(budgetId);
-      setBudgets((prev) => prev.filter((b) => b.id !== budgetId));
+      setBudgets((prev) => {
+        const nextBudgets = prev.filter((b) => b.id !== budgetId);
+        if (user?.id) syncDemoCalibrationFromBudgets(user.id, nextBudgets);
+        return nextBudgets;
+      });
       toast({
         tone: "success",
         title: "Cálculo excluído",
@@ -226,8 +239,11 @@ export default function BudgetsHistory() {
     }
   };
 
-  const openBudget = (budgetId: string) => {
-    navigate(`${createPageUrl("Calculator")}?budget=${budgetId}`);
+  const isDemoBudget = (budget: Budget) => isDemoMethodVersion(budget.data?.methodVersion);
+
+  const openBudget = (budget: Budget) => {
+    const targetPage = isDemoBudget(budget) ? "CalculatorDemo" : "Calculator";
+    navigate(`${createPageUrl(targetPage)}?budget=${budget.id}`);
   };
 
   const selectedBudget = useMemo(
@@ -281,7 +297,11 @@ export default function BudgetsHistory() {
         },
       });
 
-      setBudgets((prev) => prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget)));
+      setBudgets((prev) => {
+        const nextBudgets = prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget));
+        if (user?.id) syncDemoCalibrationFromBudgets(user.id, nextBudgets);
+        return nextBudgets;
+      });
       setSelectedBudgetId(resp.budget.id);
       toast({
         tone: "success",
@@ -300,6 +320,43 @@ export default function BudgetsHistory() {
     }
   };
 
+  const selectedCloseBudget = useMemo(
+    () => budgets.find((budget) => budget.id === closeDialogBudgetId) ?? null,
+    [budgets, closeDialogBudgetId]
+  );
+
+  const handleCloseBudget = async (payload: {
+    actualHoursTotal: number;
+    actualHoursByPhase?: BudgetActualHoursByPhase;
+    scopeChange: BudgetScopeChange;
+  }) => {
+    if (!selectedCloseBudget || !user) return;
+
+    setIsSavingCloseFeedback(true);
+    try {
+      const resp = await api.closeBudget(selectedCloseBudget.id, payload);
+      setBudgets((prev) => {
+        const nextBudgets = prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget));
+        syncDemoCalibrationFromBudgets(user.id, nextBudgets);
+        return nextBudgets;
+      });
+      setCloseDialogBudgetId(null);
+      toast({
+        tone: "success",
+        title: "Projeto finalizado",
+        description: "Horas reais registradas e calibração DEMO atualizada.",
+      });
+    } catch (e) {
+      toast({
+        tone: "error",
+        title: "Erro ao registrar horas reais",
+        description: "Não foi possível salvar o fechamento do projeto.",
+      });
+      console.error(e);
+    } finally {
+      setIsSavingCloseFeedback(false);
+    }
+  };
   const detailPreview = useMemo(() => {
     if (!selectedBudget) return null;
     return calculatePreviewForMode(selectedBudget.data, detailResultMode);
@@ -401,7 +458,10 @@ export default function BudgetsHistory() {
                 budget={budget}
                 index={index}
                 prefersReducedMotion={prefersReducedMotion}
+                showCloseProjectAction={isDemoBudget(budget)}
+                isProjectClosed={Boolean(budget.data?.closedAt)}
                 onOpenDetails={openBudgetDetails}
+                onOpenCloseProject={(selected) => setCloseDialogBudgetId(selected.id)}
                 onRequestDelete={setConfirmDeleteBudgetId}
               />
             ))}
@@ -426,9 +486,19 @@ export default function BudgetsHistory() {
         onDetailNameChange={setDetailName}
         onDetailClientNameChange={setDetailClientName}
         onDetailDescriptionChange={setDetailDescription}
-        onOpenCalculator={() => (selectedBudget ? openBudget(selectedBudget.id) : null)}
+        onOpenCalculator={() => (selectedBudget ? openBudget(selectedBudget) : null)}
         onCancel={() => closeBudgetDetails()}
         onSave={handleSaveBudgetDetails}
+      />
+
+      <BudgetCloseDialog
+        open={!!selectedCloseBudget}
+        budget={selectedCloseBudget}
+        isSaving={isSavingCloseFeedback}
+        onOpenChange={(open) => {
+          if (!open) setCloseDialogBudgetId(null);
+        }}
+        onSubmit={handleCloseBudget}
       />
 
       <ConfirmDialog

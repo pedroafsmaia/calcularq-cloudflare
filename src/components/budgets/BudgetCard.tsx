@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Calendar, Eye, Trash2 } from "lucide-react";
+import { Calendar, CheckCircle2, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Budget } from "@/lib/api";
 
@@ -7,7 +7,10 @@ type Props = {
   budget: Budget;
   index: number;
   prefersReducedMotion: boolean;
+  showCloseProjectAction: boolean;
+  isProjectClosed: boolean;
   onOpenDetails: (budget: Budget) => void;
+  onOpenCloseProject: (budget: Budget) => void;
   onRequestDelete: (id: string) => void;
 };
 
@@ -15,7 +18,10 @@ export default function BudgetCard({
   budget,
   index,
   prefersReducedMotion,
+  showCloseProjectAction,
+  isProjectClosed,
   onOpenDetails,
+  onOpenCloseProject,
   onRequestDelete,
 }: Props) {
   return (
@@ -102,6 +108,30 @@ export default function BudgetCard({
           })}
         </span>
       </div>
+
+      {showCloseProjectAction ? (
+        <div className="mb-4">
+          {isProjectClosed ? (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Finalizado em{" "}
+              {budget.data.closedAt ? new Date(budget.data.closedAt).toLocaleDateString("pt-BR") : "data indisponível"}
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenCloseProject(budget);
+              }}
+            >
+              Finalizar projeto / Registrar horas reais
+            </Button>
+          )}
+        </div>
+      ) : null}
 
       <div className="mt-auto">
         <Button

@@ -1,4 +1,4 @@
-export type ExpenseItem = {
+﻿export type ExpenseItem = {
   id: string;
   name: string;
   value: number;
@@ -24,6 +24,17 @@ export type BudgetResultsData = {
   finalSalePrice: number;
 };
 
+export type BudgetScopeChange = "as_planned" | "moderate" | "major";
+
+export type BudgetActualHoursByPhase = {
+  briefing?: number;
+  ep?: number;
+  ap?: number;
+  ex?: number;
+  compat?: number;
+  obra?: number;
+};
+
 export type BudgetData = {
   description?: string;
   minHourlyRate: number;
@@ -40,6 +51,14 @@ export type BudgetData = {
   commercialDiscount?: number;
   variableExpenses: ExpenseItem[];
   results: BudgetResultsData;
+  methodVersion?: string;
+  suggestedH50?: number;
+  suggestedH80?: number;
+  actualHoursTotal?: number;
+  actualHoursByPhase?: BudgetActualHoursByPhase;
+  scopeChange?: BudgetScopeChange;
+  closedAt?: string;
+  hasPhaseMismatch?: boolean;
 };
 
 export type CalculatorDraft = {

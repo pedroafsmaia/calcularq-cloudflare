@@ -163,6 +163,27 @@ class ApiClient {
     return this.request(`/api/budgets/${id}`, { method: "DELETE" });
   }
 
+  async closeBudget(
+    id: string,
+    payload: {
+      actualHoursTotal: number;
+      actualHoursByPhase?: {
+        briefing?: number;
+        ep?: number;
+        ap?: number;
+        ex?: number;
+        compat?: number;
+        obra?: number;
+      };
+      scopeChange: "as_planned" | "moderate" | "major";
+    }
+  ): Promise<{ success: boolean; budget: Budget }> {
+    return this.request(`/api/budgets/${id}/close`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  }
+
   async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
     return this.request("/api/auth/reset-password", {
       method: "POST",
@@ -172,3 +193,5 @@ class ApiClient {
 }
 
 export const api = new ApiClient(API_BASE_URL);
+
+
