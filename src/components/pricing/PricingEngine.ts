@@ -1,4 +1,4 @@
-export interface Factor {
+﻿export interface Factor {
   id: string;
   name: string;
   description: string;
@@ -54,7 +54,7 @@ export const DEFAULT_FACTORS: Factor[] = [
       { value: 2, label: "Estudo Preliminar", description: "Nível 2" },
       { value: 3, label: "Anteprojeto", description: "Nível 3" },
       { value: 4, label: "Projeto Executivo", description: "Nível 4" },
-      { value: 5, label: "Coordenação de Complementares", description: "Nível 5" },
+      { value: 5, label: "Compatibilização de Complementares", description: "Nível 5" },
     ],
   },
   {
@@ -193,3 +193,4 @@ export function validateInputs(
 
   return errors;
 }
+

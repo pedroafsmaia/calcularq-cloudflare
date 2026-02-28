@@ -1,8 +1,8 @@
-import { Factor } from "./PricingEngine";
+﻿import { Factor } from "./PricingEngine";
 import Tooltip from "@/components/ui/Tooltip";
 
 const FACTOR_TOOLTIPS: Record<string, string> = {
-  stage: "Define até qual fase do ciclo de desenvolvimento você irá trabalhar — de uma consultoria simples até a coordenação completa de todos os projetos complementares (estrutural, elétrico, hidráulico, etc.).",
+  stage: "Define até qual fase do ciclo de desenvolvimento você irá trabalhar — de uma consultoria simples até a compatibilização completa de todos os projetos complementares (estrutural, elétrico, hidráulico, etc.).",
   detail: "Mede a quantidade de desenhos e o esforço criativo exigido. Soluções autorais e inéditas demandam muito mais trabalho do que projetos com itens de catálogo e marcenaria convencional.",
   technical: "Define a rigidez das normas técnicas e o volume de estudo necessário. Hospitais, patrimônios históricos e escolas exigem domínio de legislações muito mais complexas que um projeto residencial simples.",
   bureaucratic: "Mede a carga de aprovações em órgãos públicos. Inclui prefeitura, corpo de bombeiros, vigilância sanitária, licenciamento ambiental e outros processos administrativos envolvidos.",
@@ -70,3 +70,4 @@ export default function FactorCard({ factor, value, onChange }: FactorCardProps)
     </div>
   );
 }
+

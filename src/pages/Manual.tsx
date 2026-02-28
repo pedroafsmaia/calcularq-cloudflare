@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -380,7 +380,7 @@ export default function Manual() {
                           <><strong>2. Estudo preliminar:</strong> concepção visual, layout e validação funcional (ainda não é material para execução).</>,
                           <><strong>3. Anteprojeto:</strong> define tecnicamente o partido e permite aprovações/orçamentos preliminares.</>,
                           <><strong>4. Projeto executivo:</strong> caderno técnico final para execução da arquitetura.</>,
-                          <><strong>5. Coordenação de complementares:</strong> inclui compatibilização com estrutura, instalações e demais disciplinas.</>,
+                          <><strong>5. Compatibilização de complementares:</strong> inclui compatibilização com estrutura, instalações e demais disciplinas.</>,
                         ]}
                       />
 
@@ -539,3 +539,4 @@ export default function Manual() {
       </div>
   );
 }
+
