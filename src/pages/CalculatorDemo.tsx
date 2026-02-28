@@ -27,10 +27,8 @@ import {
 import {
   DEMO_PROFIT_PROFILES,
   DemoProfitProfileKey,
-  calculateCexp,
-  normalizeCexp,
   calculateHTaj,
-  calculateHourSuggestion,
+  calculateHourSuggestionV31,
   calculateDemoProjectValue,
 } from "../components/pricing/PricingEngineDemo";
 import { createPageUrl } from "@/utils";
@@ -91,6 +89,7 @@ export default function CalculatorDemo() {
 
   // Seção 4
   const [estimatedHours, setEstimatedHours] = useState(0);
+  const [estimatedHoursTouched, setEstimatedHoursTouched] = useState(false);
   const [commercialDiscount, setCommercialDiscount] = useState(0);
   const [variableExpenses, setVariableExpenses] = useState<ExpenseItem[]>([]);
 
@@ -160,10 +159,12 @@ export default function CalculatorDemo() {
         return saved ? { ...df, weight: saved.weight } : df;
       }));
     }
-    if (draft.areaIntervals) setAreaIntervals(draft.areaIntervals);
     if (draft.area) setArea(draft.area);
     if (draft.selections) setSelections(draft.selections);
-    if (draft.estimatedHours) setEstimatedHours(draft.estimatedHours);
+    if (draft.estimatedHours) {
+      setEstimatedHours(draft.estimatedHours);
+      setEstimatedHoursTouched(true);
+    }
     if (draft.commercialDiscount !== undefined) setCommercialDiscount(draft.commercialDiscount);
     if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
     if (draft.currentStep) setCurrentStep(draft.currentStep);
@@ -209,10 +210,9 @@ export default function CalculatorDemo() {
           const defaultFactor = DEFAULT_FACTORS.find(df => df.id === f.id);
           return { ...defaultFactor!, weight: f.weight };
         }));
-
-        setAreaIntervals(budget.data.areaIntervals);
         setSelections(budget.data.selections);
         setEstimatedHours(budget.data.estimatedHours);
+        setEstimatedHoursTouched(true);
         setVariableExpenses(budget.data.variableExpenses || []);
         if (budget.data.commercialDiscount !== undefined) setCommercialDiscount(budget.data.commercialDiscount);
         if (budget.data.fixedExpenses) setFixedExpenses(budget.data.fixedExpenses);
@@ -225,7 +225,7 @@ export default function CalculatorDemo() {
         } else {
           const areaFactor = budget.data.factors.find((f) => f.id === "area");
           if (areaFactor) {
-            const interval = budget.data.areaIntervals.find((i) => i.level === areaFactor.level);
+            const interval = DEFAULT_AREA_INTERVALS.find((i) => i.level === areaFactor.level);
             if (interval) {
               const max = interval.max ?? interval.min;
               setArea((interval.min + max) / 2);
@@ -263,7 +263,10 @@ export default function CalculatorDemo() {
     setPersonalExpenses,
     setProLabore,
     setProductiveHours,
-    setAreaIntervals,
+    setAreaIntervals: (_next) => {
+      // Demo usa régua interna fixa; não importa intervalos salvos.
+      return;
+    },
     setSelections,
     setArea,
     setFactors,
@@ -274,9 +277,7 @@ export default function CalculatorDemo() {
 
   const {
     handleConfirmClearCurrentStep,
-    handleClearCurrentStep,
     handleConfirmResetCalculation,
-    handleResetCalculation,
   } = useCalculatorReset({
     currentStep,
     defaultFactors: DEFAULT_FACTORS,
@@ -308,51 +309,64 @@ export default function CalculatorDemo() {
     setArea(newArea);
     if (newArea > 0) {
       const level = calculateAreaLevel(newArea, areaIntervals);
-      setSelections(prev => ({ ...prev, area: level }));
+      setSelections((prev) => ({ ...prev, area: level }));
+      return;
     }
+
+    setSelections((prev) => {
+      if (typeof prev.area === "undefined") return prev;
+      const next = { ...prev };
+      delete next.area;
+      return next;
+    });
   }, [areaIntervals]);
 
-  const handleAreaLevelChange = useCallback((level: number) => {
-    setSelections(prev => ({ ...prev, area: level }));
-  }, []);
+  useEffect(() => {
+    if (typeof area !== "number" || area <= 0) return;
+    const computedLevel = calculateAreaLevel(area, areaIntervals);
+    setSelections((prev) => (prev.area === computedLevel ? prev : { ...prev, area: computedLevel }));
+  }, [area, areaIntervals]);
 
   const handleSelectionChange = useCallback((factorId: string, value: number) => {
     setSelections(prev => ({ ...prev, [factorId]: value }));
   }, []);
 
   // ── Cálculos (Demo) ───────────────────────────────────────────
-  const demoCexp = useMemo(() => {
-    const l3 = selections.detail ?? 1;
-    const l4 = selections.technical ?? 1;
-    const l5 = selections.bureaucratic ?? 1;
-    return calculateCexp(l3, l4, l5);
-  }, [selections]);
-
-  const demoCexpNorm = useMemo(() => normalizeCexp(demoCexp), [demoCexp]);
   const demom0 = DEMO_PROFIT_PROFILES[profitProfile].m0;
+  const technicalLevel = Number(selections.technical ?? 1) || 1;
 
   const demoHTaj = useMemo(() => {
     if (!minHourlyRate || minHourlyRate <= 0) return 0;
-    return calculateHTaj(minHourlyRate, demom0, demoCexpNorm);
-  }, [minHourlyRate, demom0, demoCexpNorm]);
+    return calculateHTaj(minHourlyRate, demom0, technicalLevel);
+  }, [minHourlyRate, demom0, technicalLevel]);
 
   const demoHourSuggestion = useMemo(() => {
-    const areaLevel = selections.area ?? 0;
-    const stageLevel = selections.stage ?? 0;
-    const f6Level = selections.monitoring ?? 2;
-    const f3Level = selections.detail ?? 2;
-    if (!areaLevel || !stageLevel) return null;
-    return calculateHourSuggestion(areaLevel, stageLevel, f6Level, f3Level);
-  }, [selections]);
+    const stageLevel = Number(selections.stage ?? 0);
+    if (!area || area <= 0 || !stageLevel) return null;
 
-  // Mantido para compatibilidade visual com painéis já existentes.
-  const globalComplexity = demoCexp;
+    return calculateHourSuggestionV31({
+      areaM2: area,
+      areaLevel: selections.area,
+      areaIntervals,
+      stageLevel,
+      f3Level: Number(selections.detail ?? 3),
+      f4Level: technicalLevel,
+      f5Level: Number(selections.bureaucratic ?? 3),
+      f6Level: Number(selections.monitoring ?? 2),
+    });
+  }, [area, areaIntervals, selections, technicalLevel]);
+
+  useEffect(() => {
+    if (!demoHourSuggestion) return;
+    if (estimatedHoursTouched && estimatedHours > 0) return;
+    setEstimatedHours(demoHourSuggestion.h50);
+  }, [demoHourSuggestion, estimatedHours, estimatedHoursTouched]);
 
   const results = useMemo(() => {
     if (!minHourlyRate || minHourlyRate <= 0) return null;
     const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
     const l3 = selections.detail ?? 1;
-    const l4 = selections.technical ?? 1;
+    const l4 = technicalLevel;
     const l5 = selections.bureaucratic ?? 1;
     const calc = calculateDemoProjectValue(
       minHourlyRate,
@@ -371,7 +385,9 @@ export default function CalculatorDemo() {
       finalSalePrice: calc.finalSalePrice,
       complexityMultiplier: calc.cExp,
     };
-  }, [minHourlyRate, demom0, selections, estimatedHours, variableExpenses, commercialDiscount]);
+  }, [minHourlyRate, demom0, selections.detail, selections.bureaucratic, technicalLevel, estimatedHours, variableExpenses, commercialDiscount]);
+
+  const globalComplexity = results?.globalComplexity ?? 0;
 
   const displayValues = useMemo(() => {
     const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
@@ -570,24 +586,27 @@ export default function CalculatorDemo() {
 
   const handleImportCurrentStepWithFeedback = useCallback(() => {
     handleImportCurrentStepFromSelectedBudget();
+    if (currentStep === 4) setEstimatedHoursTouched(true);
     toast({
       tone: "success",
       title: "Etapa importada",
       description: "Somente os dados da etapa atual foram importados.",
     });
-  }, [handleImportCurrentStepFromSelectedBudget, toast]);
+  }, [currentStep, handleImportCurrentStepFromSelectedBudget, toast]);
 
   const handleConfirmClearCurrentStepWithFeedback = useCallback(() => {
     handleConfirmClearCurrentStep();
+    if (currentStep === 4) setEstimatedHoursTouched(false);
     toast({
       tone: "info",
       title: "Etapa reiniciada",
       description: `Os dados de ${currentStepLabel} foram reiniciados.`,
     });
-  }, [currentStepLabel, handleConfirmClearCurrentStep, toast]);
+  }, [currentStep, currentStepLabel, handleConfirmClearCurrentStep, toast]);
 
   const handleConfirmResetCalculationWithFeedback = useCallback(() => {
     handleConfirmResetCalculation();
+    setEstimatedHoursTouched(false);
     setLastCommittedHash(null);
     setHydrationComplete(true);
     setShouldClearDraftOnExit(false);
@@ -779,7 +798,7 @@ export default function CalculatorDemo() {
                       <button
                         type="button"
                         onClick={(e) => {
-                          handleClearCurrentStep();
+                          handleConfirmClearCurrentStepWithFeedback();
                           (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
                         }}
                         className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50"
@@ -791,7 +810,7 @@ export default function CalculatorDemo() {
                       <button
                         type="button"
                         onClick={(e) => {
-                          handleResetCalculation();
+                          handleConfirmResetCalculationWithFeedback();
                           (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
                         }}
                         className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50"
@@ -971,9 +990,12 @@ export default function CalculatorDemo() {
                         <AreaFactorCard
                           area={area}
                           onAreaChange={handleAreaChange}
-                          onLevelChange={handleAreaLevelChange}
+                          onLevelChange={(level) => setSelections((prev) => ({ ...prev, area: level }))}
                           intervals={areaIntervals}
                           onIntervalsChange={setAreaIntervals}
+                          allowEditIntervals={false}
+                          showIntervals={true}
+                          showAutoLevelBadge={true}
                         />
                       )}
                       {otherFactors.map((factor) => (
@@ -1013,10 +1035,10 @@ export default function CalculatorDemo() {
                     {demoHourSuggestion && (
                       <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-4">
                         <p className="text-sm text-blue-800">
-                          <strong>Sugestão de horas para este projeto:</strong> {demoHourSuggestion[0]}h a{" "}
-                          {demoHourSuggestion[1]}h
+                          <strong>Estimativa central (H50):</strong> {demoHourSuggestion.h50}h ·{" "}
+                          <strong>Conservador típico (H80):</strong> {demoHourSuggestion.h80}h
                           <span className="ml-2 text-xs text-blue-600">
-                            (baseado em Área × Etapa × Dedicação × Detalhamento)
+                            (área real, etapa contratada, detalhamento, técnica, burocracia e módulo de obra)
                           </span>
                         </p>
                       </div>
@@ -1033,7 +1055,10 @@ export default function CalculatorDemo() {
                       globalComplexity={results.globalComplexity}
                       adjustedHourlyRate={results.adjustedHourlyRate}
                       estimatedHours={estimatedHours}
-                      onEstimatedHoursChange={setEstimatedHours}
+                      onEstimatedHoursChange={(hours) => {
+                        setEstimatedHoursTouched(true);
+                        setEstimatedHours(hours);
+                      }}
                       commercialDiscount={commercialDiscount}
                       onCommercialDiscountChange={setCommercialDiscount}
                       variableExpenses={variableExpenses}
@@ -1238,3 +1263,4 @@ export default function CalculatorDemo() {
     </div>
   );
 }
+
