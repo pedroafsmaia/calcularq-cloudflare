@@ -5,6 +5,7 @@ import SaveBudgetButton from "./SaveBudgetButton";
 import Tooltip from "@/components/ui/Tooltip";
 import SectionHeader from "./SectionHeader";
 import { formatHoursPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
+import type { BudgetData } from "@/types/budget";
 
 interface FinalCalculationProps {
   budgetId?: string;
@@ -34,6 +35,7 @@ interface FinalCalculationProps {
   useManualMinHourlyRate?: boolean;
   mobileResultsContent?: ReactNode;
   onBudgetSaved?: () => void;
+  extraBudgetData?: Partial<BudgetData>;
 }
 
 export default function FinalCalculation({
@@ -64,6 +66,7 @@ export default function FinalCalculation({
   useManualMinHourlyRate = false,
   mobileResultsContent,
   onBudgetSaved,
+  extraBudgetData,
 }: FinalCalculationProps) {
   const [estimatedHoursDraft, setEstimatedHoursDraft] = useState("");
   const [discountDraft, setDiscountDraft] = useState("0");
@@ -136,6 +139,7 @@ export default function FinalCalculation({
             projectPrice,
             finalSalePrice,
           },
+          ...(extraBudgetData ?? {}),
         }}
       />
 
@@ -302,3 +306,5 @@ export default function FinalCalculation({
     </div>
   );
 }
+
+

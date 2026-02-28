@@ -66,6 +66,7 @@ export type DemoHourSuggestionInput = {
   f4Level: number;
   f5Level: number;
   f6Level: number;
+  kUser?: number;
 };
 
 export type DemoHourSuggestionBreakdown = {
@@ -80,6 +81,7 @@ export type DemoHourSuggestionBreakdown = {
   h50AteEx: number;
   h50Etapa: number;
   uncertainty: number;
+  appliedKUser: number;
 };
 
 export type DemoHourSuggestionResult = {
@@ -165,8 +167,12 @@ export function calculateHourSuggestionV31(input: DemoHourSuggestionInput): Demo
   const h50Etapa = hEtapaBase + obra;
 
   const uncertainty = calculateUncertainty(f4Level, f5Level);
-  const h50 = Math.max(0, Math.round(h50Etapa));
-  const h80 = Math.max(h50, Math.round(h50Etapa * (1 + uncertainty)));
+  const kUser = Number.isFinite(input.kUser) && Number(input.kUser) > 0 ? Number(input.kUser) : 1;
+  const calibratedH50 = h50Etapa * kUser;
+  const calibratedH80 = h50Etapa * (1 + uncertainty) * kUser;
+
+  const h50 = Math.max(0, Math.round(calibratedH50));
+  const h80 = Math.max(h50, Math.round(calibratedH80));
 
   return {
     h50,
@@ -183,6 +189,7 @@ export function calculateHourSuggestionV31(input: DemoHourSuggestionInput): Demo
       h50AteEx: Number(h50AteEx.toFixed(2)),
       h50Etapa: Number(h50Etapa.toFixed(2)),
       uncertainty: Number(uncertainty.toFixed(4)),
+      appliedKUser: Number(kUser.toFixed(3)),
     },
   };
 }
@@ -308,3 +315,5 @@ export function runDemoV31SanityChecks(): { monotonicArea: boolean; smoothBounda
 
   return { monotonicArea, smoothBoundary };
 }
+
+

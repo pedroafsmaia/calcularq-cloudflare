@@ -4,7 +4,7 @@ import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, 
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
-import type { ExpenseItem } from "@/types/budget";
+import type { BudgetData, ExpenseItem } from "@/types/budget";
 
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
 import ComplexityConfig from "../components/calculator/ComplexityConfig";
@@ -37,6 +37,11 @@ import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "
 import { useCalculatorProgress } from "@/hooks/calculator/useCalculatorProgress";
 import { useCalculatorReset } from "@/hooks/calculator/useCalculatorReset";
 import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImport";
+import {
+  DEMO_METHOD_VERSION,
+  loadStoredDemoCalibration,
+  syncDemoCalibrationFromBudgets,
+} from "@/lib/demoCalibration";
 
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
@@ -66,6 +71,11 @@ export default function CalculatorDemo() {
   const [hydrationComplete, setHydrationComplete] = useState(false);
   const [lastCommittedHash, setLastCommittedHash] = useState<string | null>(null);
   const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
+  const [demoKUser, setDemoKUser] = useState(1);
+  const [demoKUserSampleCount, setDemoKUserSampleCount] = useState(0);
+  const [persistedFeedbackMeta, setPersistedFeedbackMeta] = useState<Pick<BudgetData, "actualHoursTotal" | "actualHoursByPhase" | "scopeChange" | "closedAt" | "hasPhaseMismatch" | "suggestedH50" | "suggestedH80" | "methodVersion">>({
+    methodVersion: DEMO_METHOD_VERSION,
+  });
 
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
@@ -99,6 +109,28 @@ export default function CalculatorDemo() {
   const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftStatusResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mobileStepperRef = useRef<HTMLDetailsElement | null>(null);
+  useEffect(() => {
+    if (budgetId) return;
+    setPersistedFeedbackMeta({ methodVersion: DEMO_METHOD_VERSION });
+  }, [budgetId]);
+
+  useEffect(() => {
+    if (!user) {
+      setDemoKUser(1);
+      setDemoKUserSampleCount(0);
+      return;
+    }
+
+    const stored = loadStoredDemoCalibration(user.id);
+    if (!stored) {
+      setDemoKUser(1);
+      setDemoKUserSampleCount(0);
+      return;
+    }
+
+    setDemoKUser(stored.kUser);
+    setDemoKUserSampleCount(stored.sampleCount);
+  }, [user]);
 
   useEffect(() => {
     if (!user || budgetId) return;
@@ -174,22 +206,34 @@ export default function CalculatorDemo() {
     setHydrationComplete(true);
   }, [user, budgetId]);
 
-  // ── Buscar último budget para banner de restauração ───────────
+  // ── Buscar budgets salvos (importação + calibração pessoal) ─────
   useEffect(() => {
-    const fetchLastBudget = async () => {
-      if (!user || budgetId) return;
+    const fetchBudgets = async () => {
+      if (!user) return;
       try {
         const resp = await api.listBudgets();
         const budgets = Array.isArray(resp.budgets) ? resp.budgets : [];
         setSavedBudgets(budgets);
+
         if (budgets.length > 0) {
-          const last = budgets[0];          setSelectedImportBudgetId((prev) => prev || last.id);
-        } else {          setSelectedImportBudgetId("");
+          const last = budgets[0];
+          setSelectedImportBudgetId((prev) => prev || last.id);
+        } else {
+          setSelectedImportBudgetId("");
         }
-      } catch { /* silencioso */ }
+
+        const synced = syncDemoCalibrationFromBudgets(user.id, budgets);
+        if (synced) {
+          setDemoKUser(synced.kUser);
+          setDemoKUserSampleCount(synced.sampleCount);
+        }
+      } catch {
+        // silencioso
+      }
     };
-    fetchLastBudget();
-  }, [user, budgetId]);
+
+    fetchBudgets();
+  }, [user]);
 
   // ── Carregar orçamento salvo via URL ──────────────────────────
   useEffect(() => {
@@ -203,6 +247,16 @@ export default function CalculatorDemo() {
         setLoadedClientName(budget.clientName || null);
         setLoadedProjectName(budget.projectName || null);
         setLoadedBudgetDescription(typeof budget.data?.description === "string" ? budget.data.description : null);
+        setPersistedFeedbackMeta({
+          methodVersion: budget.data.methodVersion || DEMO_METHOD_VERSION,
+          suggestedH50: budget.data.suggestedH50,
+          suggestedH80: budget.data.suggestedH80,
+          actualHoursTotal: budget.data.actualHoursTotal,
+          actualHoursByPhase: budget.data.actualHoursByPhase,
+          scopeChange: budget.data.scopeChange,
+          closedAt: budget.data.closedAt,
+          hasPhaseMismatch: budget.data.hasPhaseMismatch,
+        });
         setMinHourlyRate(budget.data.minHourlyRate);
         setUseManualMinHourlyRate(Boolean(budget.data.useManualMinHourlyRate));
 
@@ -353,8 +407,9 @@ export default function CalculatorDemo() {
       f4Level: technicalLevel,
       f5Level: Number(selections.bureaucratic ?? 3),
       f6Level: Number(selections.monitoring ?? 2),
+      kUser: demoKUser,
     });
-  }, [area, areaIntervals, selections, technicalLevel]);
+  }, [area, areaIntervals, demoKUser, selections, technicalLevel]);
 
   useEffect(() => {
     if (!demoHourSuggestion) return;
@@ -410,6 +465,13 @@ export default function CalculatorDemo() {
       profit,
     };
   }, [demoHTaj, minHourlyRate, estimatedHours, commercialDiscount, variableExpenses]);
+
+  const demoBudgetMetadata = useMemo<Partial<BudgetData>>(() => ({
+    ...persistedFeedbackMeta,
+    methodVersion: DEMO_METHOD_VERSION,
+    suggestedH50: demoHourSuggestion?.h50 ?? persistedFeedbackMeta.suggestedH50,
+    suggestedH80: demoHourSuggestion?.h80 ?? persistedFeedbackMeta.suggestedH80,
+  }), [demoHourSuggestion, persistedFeedbackMeta]);
 
   const CUB_MEDIO = 2800;
   const effectiveAreaForCub = useMemo(() => {
@@ -1040,6 +1102,11 @@ export default function CalculatorDemo() {
                           <span className="ml-2 text-xs text-blue-600">
                             (área real, etapa contratada, detalhamento, técnica, burocracia e módulo de obra)
                           </span>
+                          {demoKUserSampleCount > 0 ? (
+                            <span className="ml-2 text-xs text-blue-700">
+                              calibração pessoal ativa: ×{demoKUser.toFixed(2)} ({demoKUserSampleCount} projeto{demoKUserSampleCount > 1 ? "s" : ""})
+                            </span>
+                          ) : null}
                         </p>
                       </div>
                     )}
@@ -1073,6 +1140,7 @@ export default function CalculatorDemo() {
                       personalExpenses={personalExpenses}
                       productiveHours={productiveHours}
                       useManualMinHourlyRate={useManualMinHourlyRate}
+                      extraBudgetData={demoBudgetMetadata}
                       onBudgetSaved={handleBudgetSaved}
                       mobileResultsContent={
                         <motion.div
@@ -1263,4 +1331,18 @@ export default function CalculatorDemo() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
