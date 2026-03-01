@@ -18,6 +18,7 @@ type Params = {
   setPersonalExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setProLabore: Dispatch<SetStateAction<number>>;
   setProductiveHours: Dispatch<SetStateAction<number>>;
+  setProfitProfile?: Dispatch<SetStateAction<"portfolio" | "estabelecido" | "referencia">>;
   setFactors: Dispatch<SetStateAction<Factor[]>>;
   setAreaIntervals: Dispatch<SetStateAction<AreaInterval[]>>;
   setArea: Dispatch<SetStateAction<number | null>>;
@@ -43,6 +44,7 @@ export function useCalculatorReset({
   setPersonalExpenses,
   setProLabore,
   setProductiveHours,
+  setProfitProfile,
   setFactors,
   setAreaIntervals,
   setArea,
@@ -61,6 +63,7 @@ export function useCalculatorReset({
       setPersonalExpenses([]);
       setProLabore(0);
       setProductiveHours(0);
+      if (setProfitProfile) setProfitProfile("estabelecido");
       return;
     }
 
@@ -97,6 +100,7 @@ export function useCalculatorReset({
     setPersonalExpenses,
     setProLabore,
     setProductiveHours,
+    setProfitProfile,
     setSelections,
     setUseManualMinHourlyRate,
     setVariableExpenses,
@@ -113,6 +117,7 @@ export function useCalculatorReset({
     setPersonalExpenses([]);
     setProLabore(0);
     setProductiveHours(0);
+    if (setProfitProfile) setProfitProfile("estabelecido");
 
     setFactors(defaultFactors);
     setAreaIntervals(defaultAreaIntervals);
@@ -142,6 +147,7 @@ export function useCalculatorReset({
     setPersonalExpenses,
     setProLabore,
     setProductiveHours,
+    setProfitProfile,
     setSelections,
     setUseManualMinHourlyRate,
     setVariableExpenses,

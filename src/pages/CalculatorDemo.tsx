@@ -7,7 +7,6 @@ import { api, Budget } from "@/lib/api";
 import type { BudgetData, ExpenseItem } from "@/types/budget";
 
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
-import ComplexityConfig from "../components/calculator/ComplexityConfig";
 import AreaFactorCard from "../components/calculator/AreaFactorCard";
 import FactorCard from "../components/pricing/FactorCard";
 import FinalCalculation from "../components/calculator/FinalCalculation";
@@ -44,11 +43,11 @@ import {
 } from "@/lib/demoCalibration";
 
 const STEPS = [
-  { n: 1, label: "Hora técnica mínima" },
+  { n: 1, label: "Configuração do escritório" },
   { n: 2, label: "Fatores de complexidade" },
-  { n: 3, label: "Calibragem dos pesos" },
-  { n: 4, label: "Composição final" },
+  { n: 3, label: "Composição final" },
 ];
+const FINAL_STEP = STEPS.length;
 
 export default function CalculatorDemo() {
   const prefersReducedMotion = !!useReducedMotion();
@@ -142,6 +141,7 @@ export default function CalculatorDemo() {
         factors: factors.map(f => ({ id: f.id, weight: f.weight })),
         areaIntervals, area, selections,
         estimatedHours, commercialDiscount, variableExpenses,
+        profitProfile,
         currentStep, maxStepReached,
         savedAt: Date.now(),
       });
@@ -155,6 +155,7 @@ export default function CalculatorDemo() {
     minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
     factors, areaIntervals, area, selections,
     estimatedHours, commercialDiscount, variableExpenses,
+    profitProfile,
     currentStep, maxStepReached,
     user,
   ]);
@@ -199,8 +200,9 @@ export default function CalculatorDemo() {
     }
     if (draft.commercialDiscount !== undefined) setCommercialDiscount(draft.commercialDiscount);
     if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
-    if (draft.currentStep) setCurrentStep(draft.currentStep);
-    if (draft.maxStepReached) setMaxStepReached(draft.maxStepReached);
+    if (draft.profitProfile) setProfitProfile(draft.profitProfile);
+    if (draft.currentStep) setCurrentStep(Math.min(draft.currentStep, FINAL_STEP));
+    if (draft.maxStepReached) setMaxStepReached(Math.min(draft.maxStepReached, FINAL_STEP));
     setLastDraftSavedAt(draft.savedAt ?? null);
     setDraftStatus("saved");
     setHydrationComplete(true);
@@ -273,6 +275,7 @@ export default function CalculatorDemo() {
         if (budget.data.personalExpenses) setPersonalExpenses(budget.data.personalExpenses);
         if (budget.data.proLabore !== undefined) setProLabore(budget.data.proLabore);
         if (budget.data.productiveHours !== undefined) setProductiveHours(budget.data.productiveHours);
+        if (budget.data.profitProfile) setProfitProfile(budget.data.profitProfile);
 
         if (typeof budget.data.area === "number" && Number.isFinite(budget.data.area)) {
           setArea(budget.data.area);
@@ -286,8 +289,8 @@ export default function CalculatorDemo() {
             }
           }
         }
-        setCurrentStep(4);
-        setMaxStepReached(4);
+        setCurrentStep(FINAL_STEP);
+        setMaxStepReached(FINAL_STEP);
       } catch (e) {
         console.error("Erro ao carregar cálculo:", e);
       } finally {
@@ -317,6 +320,7 @@ export default function CalculatorDemo() {
     setPersonalExpenses,
     setProLabore,
     setProductiveHours,
+    setProfitProfile,
     setAreaIntervals: (_next) => {
       // Demo usa régua interna fixa; não importa intervalos salvos.
       return;
@@ -327,6 +331,8 @@ export default function CalculatorDemo() {
     setEstimatedHours,
     setCommercialDiscount,
     setVariableExpenses,
+    hasWeightStep: false,
+    finalStepNumber: FINAL_STEP,
   });
 
   const {
@@ -353,11 +359,10 @@ export default function CalculatorDemo() {
     setEstimatedHours,
     setCommercialDiscount,
     setVariableExpenses,
+    setProfitProfile,
+    hasWeightStep: false,
+    finalStepNumber: FINAL_STEP,
   });
-
-  const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
-    setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
-  }, []);
 
   const handleAreaChange = useCallback((newArea: number) => {
     setArea(newArea);
@@ -471,7 +476,8 @@ export default function CalculatorDemo() {
     methodVersion: DEMO_METHOD_VERSION,
     suggestedH50: demoHourSuggestion?.h50 ?? persistedFeedbackMeta.suggestedH50,
     suggestedH80: demoHourSuggestion?.h80 ?? persistedFeedbackMeta.suggestedH80,
-  }), [demoHourSuggestion, persistedFeedbackMeta]);
+    profitProfile,
+  }), [demoHourSuggestion, persistedFeedbackMeta, profitProfile]);
 
   const CUB_MEDIO = 2800;
   const effectiveAreaForCub = useMemo(() => {
@@ -584,6 +590,7 @@ export default function CalculatorDemo() {
     minHourlyRate,
     hasComplexitySelections,
     finalSalePrice: displayValues.finalSalePrice,
+    includeWeightStep: false,
   });
 
   const stepVisualDone = (n: number) => maxStepReached > n;
@@ -595,7 +602,7 @@ export default function CalculatorDemo() {
   );
 
   const handleNext = () => {
-    if (currentStep < 4 && canAdvance) {
+    if (currentStep < FINAL_STEP && canAdvance) {
       setCurrentStep(s => s + 1);
     }
   };
@@ -648,7 +655,7 @@ export default function CalculatorDemo() {
 
   const handleImportCurrentStepWithFeedback = useCallback(() => {
     handleImportCurrentStepFromSelectedBudget();
-    if (currentStep === 4) setEstimatedHoursTouched(true);
+    if (currentStep === FINAL_STEP) setEstimatedHoursTouched(true);
     toast({
       tone: "success",
       title: "Etapa importada",
@@ -658,7 +665,7 @@ export default function CalculatorDemo() {
 
   const handleConfirmClearCurrentStepWithFeedback = useCallback(() => {
     handleConfirmClearCurrentStep();
-    if (currentStep === 4) setEstimatedHoursTouched(false);
+    if (currentStep === FINAL_STEP) setEstimatedHoursTouched(false);
     toast({
       tone: "info",
       title: "Etapa reiniciada",
@@ -696,7 +703,7 @@ export default function CalculatorDemo() {
 
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        if (currentStep < 4 && canAdvance) setCurrentStep((s) => s + 1);
+        if (currentStep < FINAL_STEP && canAdvance) setCurrentStep((s) => s + 1);
         return;
       }
       if (event.key === "ArrowLeft") {
@@ -706,13 +713,13 @@ export default function CalculatorDemo() {
       }
 
       const digitFromCode = (() => {
-        if (/^Digit[1-4]$/.test(event.code)) return Number(event.code.replace("Digit", ""));
-        if (/^Numpad[1-4]$/.test(event.code)) return Number(event.code.replace("Numpad", ""));
-        if (/^[1-4]$/.test(event.key)) return Number(event.key);
+        if (/^Digit[1-9]$/.test(event.code)) return Number(event.code.replace("Digit", ""));
+        if (/^Numpad[1-9]$/.test(event.code)) return Number(event.code.replace("Numpad", ""));
+        if (/^[1-9]$/.test(event.key)) return Number(event.key);
         return null;
       })();
 
-      if (digitFromCode !== null) {
+      if (digitFromCode !== null && digitFromCode <= FINAL_STEP) {
         event.preventDefault();
         const targetStep = digitFromCode;
         const canGoToReached = targetStep <= maxStepReached;
@@ -770,7 +777,7 @@ export default function CalculatorDemo() {
             Calculadora Demo - Calcularq Demo
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Versão demo com o novo Calcularq Demo. Experimente a precificação por expertise separada do escopo.
+            Versão demo com o novo método V3.1.1. Configure sua hora técnica, classifique os fatores do projeto e finalize a composição do preço.
           </p>
         </motion.div>
 
@@ -796,9 +803,7 @@ export default function CalculatorDemo() {
                     <button
                       type="button"
                       onClick={() => goToStep(step.n)}
-                      title={
-                        step.n === 3 ? "Etapa opcional" : step.label
-                      }
+                      title={step.label}
                       className="relative"
                     >
                       <span
@@ -817,9 +822,6 @@ export default function CalculatorDemo() {
                     >
                       {step.label}
                     </span>
-                    {step.n === 3 ? (
-                       <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
-                     ) : null}
                   </div>
                   {i < STEPS.length - 1 && (
                     <div
@@ -883,7 +885,7 @@ export default function CalculatorDemo() {
                       </button>
                       <div className="hidden sm:block mt-1 border-t border-slate-100 px-3 pt-2 pb-1">
                         <p className="text-[11px] leading-relaxed text-slate-400">
-                          Atalhos: Alt+← / Alt+→ / Alt+1-4
+                          Atalhos: Alt+← / Alt+→ / Alt+1-3
                         </p>
                       </div>
                     </div>
@@ -911,13 +913,7 @@ export default function CalculatorDemo() {
                   </span>
                 </div>
               </div>
-              <div className="mt-2 min-h-5">
-                {currentStep === 3 ? (
-                  <p className="hidden sm:block text-sm text-slate-500">
-                    Etapa opcional. Você pode ajustar os pesos ou manter o padrão.
-                  </p>
-                ) : null}
-              </div>
+              <div className="mt-2 min-h-5" />
             </motion.div>
 
         <div className="lg:hidden sticky top-20 z-10 mb-4">
@@ -925,15 +921,10 @@ export default function CalculatorDemo() {
             <summary className="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
               <div className="flex items-center justify-between gap-3 rounded-lg px-1 py-1.5 hover:bg-slate-50 transition-colors duration-150">
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de 4</p>
+                  <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de {FINAL_STEP}</p>
                   <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {currentStep === 3 ? (
-                    <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
-                      Opcional
-                    </span>
-                  ) : null}
                   <ChevronDown className="h-4 w-4 text-slate-500" />
                 </div>
               </div>
@@ -1007,27 +998,48 @@ export default function CalculatorDemo() {
                 transition={{ duration: prefersReducedMotion ? 0.12 : 0.2 }}
               >
                 {currentStep === 1 && (
-                  <MinimumHourCalculator
-                    onCalculate={handleMinHourRateCalculate}
-                    initialMinHourRate={minHourlyRate || undefined}
-                    initialUseManual={useManualMinHourlyRate}
-                    onManualModeChange={setUseManualMinHourlyRate}
-                    onFixedExpensesChange={setFixedExpenses}
-                    onProductiveHoursChange={setProductiveHours}
-                    onProLaboreChange={setProLabore}
-                    onPersonalExpensesChange={setPersonalExpenses}
-                    initialFixedExpenses={fixedExpenses}
-                    initialPersonalExpenses={personalExpenses}
-                    initialProductiveHours={productiveHours}
-                    initialProLabore={proLabore}
-                  />
-                )}
-
-                {currentStep === 3 && (
-                  <ComplexityConfig
-                    factors={factors}
-                    onFactorWeightChange={handleFactorWeightChange}
-                  />
+                  <div className="space-y-4">
+                    <MinimumHourCalculator
+                      onCalculate={handleMinHourRateCalculate}
+                      initialMinHourRate={minHourlyRate || undefined}
+                      initialUseManual={useManualMinHourlyRate}
+                      onManualModeChange={setUseManualMinHourlyRate}
+                      onFixedExpensesChange={setFixedExpenses}
+                      onProductiveHoursChange={setProductiveHours}
+                      onProLaboreChange={setProLabore}
+                      onPersonalExpensesChange={setPersonalExpenses}
+                      initialFixedExpenses={fixedExpenses}
+                      initialPersonalExpenses={personalExpenses}
+                      initialProductiveHours={productiveHours}
+                      initialProLabore={proLabore}
+                      titleLabel="Hora técnica"
+                      manualToggleLabel="Já sei a minha hora técnica."
+                      manualFieldLabel="Hora técnica (R$/hora)"
+                      resultLabel="Hora técnica (R$/hora):"
+                    />
+                    <div className="rounded-xl border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold text-slate-800">Posicionamento do escritório</p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Define sua margem de referência (m0). Não representa a complexidade do projeto.
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2.5">
+                        {(Object.entries(DEMO_PROFIT_PROFILES) as [DemoProfitProfileKey, (typeof DEMO_PROFIT_PROFILES)[DemoProfitProfileKey]][]).map(([key, profile]) => (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setProfitProfile(key)}
+                            className={`rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
+                              profitProfile === key
+                                ? "border-calcularq-blue bg-calcularq-blue text-white"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-calcularq-blue hover:text-calcularq-blue"
+                            }`}
+                          >
+                            {profile.label} (+{(profile.m0 * 100).toFixed(0)}%)
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {currentStep === 2 && (
@@ -1072,25 +1084,23 @@ export default function CalculatorDemo() {
                   </div>
                 )}
 
-                {currentStep === 4 && minHourlyRate && minHourlyRate > 0 && results && (
+                {currentStep === FINAL_STEP && minHourlyRate && minHourlyRate > 0 && results && (
                   <div className="space-y-4">
                     <div className="rounded-xl border border-slate-200 bg-white p-4">
-                      <p className="mb-3 text-sm font-medium text-slate-700">Perfil de lucro</p>
-                      <div className="flex flex-wrap gap-3">
-                        {(Object.entries(DEMO_PROFIT_PROFILES) as [DemoProfitProfileKey, (typeof DEMO_PROFIT_PROFILES)[DemoProfitProfileKey]][]).map(([key, profile]) => (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => setProfitProfile(key)}
-                            className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-                              profitProfile === key
-                                ? "border-calcularq-blue bg-calcularq-blue text-white"
-                                : "border-slate-200 bg-white text-slate-600 hover:border-calcularq-blue"
-                            }`}
-                          >
-                            {profile.label} (+{(profile.m0 * 100).toFixed(0)}%)
-                          </button>
-                        ))}
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm text-slate-500">Posicionamento do escritório</p>
+                          <p className="text-sm font-semibold text-slate-800">
+                            {DEMO_PROFIT_PROFILES[profitProfile].label} (+{(DEMO_PROFIT_PROFILES[profitProfile].m0 * 100).toFixed(0)}%)
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep(1)}
+                          className="text-sm font-semibold text-calcularq-blue underline"
+                        >
+                          Editar
+                        </button>
                       </div>
                     </div>
 
@@ -1163,7 +1173,7 @@ export default function CalculatorDemo() {
                     />
                   </div>
                 )}
-                {currentStep === 4 && (!minHourlyRate || !results) && (
+                {currentStep === FINAL_STEP && (!minHourlyRate || !results) && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center shadow-sm">
                     <p className="text-slate-500">Complete as etapas anteriores para chegar ao cálculo final.</p>
                     <button type="button" onClick={() => setCurrentStep(1)} className="mt-4 text-sm font-semibold text-calcularq-blue underline">
@@ -1209,7 +1219,7 @@ export default function CalculatorDemo() {
           <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
 
           <div className="flex flex-col items-end gap-1">
-            {currentStep < 4 ? (
+            {currentStep < FINAL_STEP ? (
               <>
                 {!canAdvance ? (
                   <p className="hidden sm:block text-xs text-slate-500">Complete os campos obrigatórios para avançar.</p>
