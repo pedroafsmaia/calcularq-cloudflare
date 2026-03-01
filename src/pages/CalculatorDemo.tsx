@@ -999,6 +999,29 @@ export default function CalculatorDemo() {
               >
                 {currentStep === 1 && (
                   <div className="space-y-4">
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
+                      <SectionHeader
+                        title="Posicionamento do escritório"
+                        description="Defina sua margem de referência (m0) antes de calcular a hora técnica. Isso representa seu posicionamento comercial, não a complexidade do projeto."
+                        icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                      />
+                      <div className="mt-5 flex flex-wrap gap-2.5">
+                        {(Object.entries(DEMO_PROFIT_PROFILES) as [DemoProfitProfileKey, (typeof DEMO_PROFIT_PROFILES)[DemoProfitProfileKey]][]).map(([key, profile]) => (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setProfitProfile(key)}
+                            className={`rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
+                              profitProfile === key
+                                ? "border-calcularq-blue bg-calcularq-blue text-white"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-calcularq-blue hover:text-calcularq-blue"
+                            }`}
+                          >
+                            {profile.label} (+{(profile.m0 * 100).toFixed(0)}%)
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <MinimumHourCalculator
                       onCalculate={handleMinHourRateCalculate}
                       initialMinHourRate={minHourlyRate || undefined}
@@ -1017,28 +1040,6 @@ export default function CalculatorDemo() {
                       manualFieldLabel="Hora técnica (R$/hora)"
                       resultLabel="Hora técnica (R$/hora):"
                     />
-                    <div className="rounded-xl border border-slate-200 bg-white p-4">
-                      <p className="text-sm font-semibold text-slate-800">Posicionamento do escritório</p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        Define sua margem de referência (m0). Não representa a complexidade do projeto.
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2.5">
-                        {(Object.entries(DEMO_PROFIT_PROFILES) as [DemoProfitProfileKey, (typeof DEMO_PROFIT_PROFILES)[DemoProfitProfileKey]][]).map(([key, profile]) => (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => setProfitProfile(key)}
-                            className={`rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
-                              profitProfile === key
-                                ? "border-calcularq-blue bg-calcularq-blue text-white"
-                                : "border-slate-200 bg-white text-slate-700 hover:border-calcularq-blue hover:text-calcularq-blue"
-                            }`}
-                          >
-                            {profile.label} (+{(profile.m0 * 100).toFixed(0)}%)
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 )}
 
