@@ -25,6 +25,8 @@ type Params = {
   setEstimatedHours: Dispatch<SetStateAction<number>>;
   setCommercialDiscount: Dispatch<SetStateAction<number>>;
   setVariableExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
+  hasWeightStep?: boolean;
+  finalStepNumber?: number;
 };
 
 export function useCalculatorReset({
@@ -48,6 +50,8 @@ export function useCalculatorReset({
   setEstimatedHours,
   setCommercialDiscount,
   setVariableExpenses,
+  hasWeightStep = true,
+  finalStepNumber = 4,
 }: Params) {
   const handleConfirmClearCurrentStep = useCallback(() => {
     if (currentStep === 1) {
@@ -67,12 +71,12 @@ export function useCalculatorReset({
       return;
     }
 
-    if (currentStep === 3) {
+    if (hasWeightStep && currentStep === 3) {
       setFactors(defaultFactors);
       return;
     }
 
-    if (currentStep === 4) {
+    if (currentStep === finalStepNumber) {
       setEstimatedHours(0);
       setCommercialDiscount(0);
       setVariableExpenses([]);
@@ -81,6 +85,8 @@ export function useCalculatorReset({
     currentStep,
     defaultAreaIntervals,
     defaultFactors,
+    finalStepNumber,
+    hasWeightStep,
     setArea,
     setAreaIntervals,
     setCommercialDiscount,

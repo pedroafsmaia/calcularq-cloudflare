@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";

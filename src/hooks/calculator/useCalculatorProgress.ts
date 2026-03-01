@@ -8,15 +8,19 @@ type UseCalculatorProgressParams = {
   minHourlyRate: number | null;
   hasComplexitySelections: boolean;
   finalSalePrice: number;
+  includeWeightStep?: boolean;
 };
 
 export function getMaxStepReachedFromState(params: {
   minHourlyRate: number | null;
   hasComplexitySelections: boolean;
+  includeWeightStep?: boolean;
 }) {
+  const includeWeightStep = params.includeWeightStep ?? true;
   const hasMinHour = !!(params.minHourlyRate && params.minHourlyRate > 0);
   if (!hasMinHour) return 1;
-  return params.hasComplexitySelections ? 4 : 2;
+  if (!params.hasComplexitySelections) return 2;
+  return includeWeightStep ? 4 : 3;
 }
 
 export function useCalculatorProgress({
@@ -26,22 +30,23 @@ export function useCalculatorProgress({
   minHourlyRate,
   hasComplexitySelections,
   finalSalePrice,
+  includeWeightStep = true,
 }: UseCalculatorProgressParams) {
   const stepComplete = useMemo(
     () => (n: number) => {
       if (n === 1) return !!(minHourlyRate && minHourlyRate > 0);
       if (n === 2) return hasComplexitySelections;
-      if (n === 3) return true; // opcional
+      if (includeWeightStep && n === 3) return true;
       return finalSalePrice > 0;
     },
-    [finalSalePrice, hasComplexitySelections, minHourlyRate]
+    [finalSalePrice, hasComplexitySelections, includeWeightStep, minHourlyRate]
   );
 
   useEffect(() => {
-    // A etapa 3 é opcional; a etapa 4 pode ser acessada após concluir a etapa 2.
     const nextMaxStepReached = getMaxStepReachedFromState({
       minHourlyRate,
       hasComplexitySelections,
+      includeWeightStep,
     });
 
     setMaxStepReached((prev) => (prev === nextMaxStepReached ? prev : nextMaxStepReached));
@@ -52,10 +57,10 @@ export function useCalculatorProgress({
   }, [
     currentStep,
     hasComplexitySelections,
+    includeWeightStep,
     minHourlyRate,
     setCurrentStep,
     setMaxStepReached,
-    stepComplete,
   ]);
 
   const canAdvance = stepComplete(currentStep);

@@ -18,6 +18,7 @@ type Params = {
   setPersonalExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setProLabore: Dispatch<SetStateAction<number>>;
   setProductiveHours: Dispatch<SetStateAction<number>>;
+  setProfitProfile?: Dispatch<SetStateAction<"portfolio" | "estabelecido" | "referencia">>;
   setAreaIntervals: Dispatch<SetStateAction<AreaInterval[]>>;
   setSelections: Dispatch<SetStateAction<Record<string, number>>>;
   setArea: Dispatch<SetStateAction<number | null>>;
@@ -25,6 +26,8 @@ type Params = {
   setEstimatedHours: Dispatch<SetStateAction<number>>;
   setCommercialDiscount: Dispatch<SetStateAction<number>>;
   setVariableExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
+  hasWeightStep?: boolean;
+  finalStepNumber?: number;
 };
 
 export function useCalculatorStepImport({
@@ -41,6 +44,7 @@ export function useCalculatorStepImport({
   setPersonalExpenses,
   setProLabore,
   setProductiveHours,
+  setProfitProfile,
   setAreaIntervals,
   setSelections,
   setArea,
@@ -48,6 +52,8 @@ export function useCalculatorStepImport({
   setEstimatedHours,
   setCommercialDiscount,
   setVariableExpenses,
+  hasWeightStep = true,
+  finalStepNumber = 4,
 }: Params) {
   const applyCurrentStepFromBudgetData = useCallback(
     (sourceData: BudgetData) => {
@@ -60,6 +66,15 @@ export function useCalculatorStepImport({
         setPersonalExpenses(Array.isArray(sourceData.personalExpenses) ? sourceData.personalExpenses : []);
         setProLabore(typeof sourceData.proLabore === "number" ? sourceData.proLabore : 0);
         setProductiveHours(typeof sourceData.productiveHours === "number" ? sourceData.productiveHours : 0);
+
+        if (setProfitProfile) {
+          const profile = sourceData.profitProfile;
+          setProfitProfile(
+            profile === "portfolio" || profile === "estabelecido" || profile === "referencia"
+              ? profile
+              : "estabelecido"
+          );
+        }
         return;
       }
 
@@ -83,7 +98,7 @@ export function useCalculatorStepImport({
         return;
       }
 
-      if (currentStep === 3) {
+      if (hasWeightStep && currentStep === 3) {
         if (Array.isArray(sourceData.factors)) {
           setFactors(
             defaultFactors.map((df) => {
@@ -95,7 +110,7 @@ export function useCalculatorStepImport({
         return;
       }
 
-      if (currentStep === 4) {
+      if (currentStep === finalStepNumber) {
         setEstimatedHours(typeof sourceData.estimatedHours === "number" ? sourceData.estimatedHours : 0);
         setCommercialDiscount(typeof sourceData.commercialDiscount === "number" ? sourceData.commercialDiscount : 0);
         setVariableExpenses(Array.isArray(sourceData.variableExpenses) ? sourceData.variableExpenses : []);
@@ -105,6 +120,8 @@ export function useCalculatorStepImport({
       areaIntervals,
       currentStep,
       defaultFactors,
+      finalStepNumber,
+      hasWeightStep,
       setArea,
       setAreaIntervals,
       setCommercialDiscount,
@@ -115,6 +132,7 @@ export function useCalculatorStepImport({
       setPersonalExpenses,
       setProLabore,
       setProductiveHours,
+      setProfitProfile,
       setSelections,
       setUseManualMinHourlyRate,
       setVariableExpenses,

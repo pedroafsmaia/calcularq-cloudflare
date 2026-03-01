@@ -1,4 +1,4 @@
-﻿export type ExpenseItem = {
+export type ExpenseItem = {
   id: string;
   name: string;
   value: number;
@@ -59,6 +59,7 @@ export type BudgetData = {
   scopeChange?: BudgetScopeChange;
   closedAt?: string;
   hasPhaseMismatch?: boolean;
+  profitProfile?: "portfolio" | "estabelecido" | "referencia";
 };
 
 export type CalculatorDraft = {
@@ -78,4 +79,5 @@ export type CalculatorDraft = {
   currentStep?: number;
   maxStepReached?: number;
   savedAt?: number;
+  profitProfile?: "portfolio" | "estabelecido" | "referencia";
 };

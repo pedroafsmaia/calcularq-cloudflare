@@ -19,6 +19,10 @@ interface MinimumHourCalculatorProps {
   initialUseManual?: boolean;
   onManualModeChange?: (value: boolean) => void;
   onClearCalculation?: () => void;
+  titleLabel?: string;
+  manualToggleLabel?: string;
+  manualFieldLabel?: string;
+  resultLabel?: string;
 }
 
 export default function MinimumHourCalculator({ 
@@ -35,6 +39,10 @@ export default function MinimumHourCalculator({
   initialUseManual = false,
   onManualModeChange,
   onClearCalculation,
+  titleLabel = "Hora técnica mínima",
+  manualToggleLabel = "Já sei a minha hora técnica mínima.",
+  manualFieldLabel = "Hora técnica mínima (R$/hora)",
+  resultLabel = "Hora técnica mínima (R$/hora):",
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
   const [personalExpenses, setPersonalExpenses] = useState<Expense[]>(
@@ -204,7 +212,7 @@ export default function MinimumHourCalculator({
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <SectionHeader
           className="mb-0"
-          title="Hora técnica mínima"
+          title={titleLabel}
           description="Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima."
           icon={<Calculator className="w-5 h-5 text-calcularq-blue" />}
         />
@@ -230,7 +238,7 @@ export default function MinimumHourCalculator({
             className="mt-0.5 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-2 focus:ring-calcularq-blue/20 focus:ring-offset-0"
           />
           <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
-            Já sei a minha hora técnica mínima.
+            {manualToggleLabel}
             <Tooltip text="Use esta opção se você já conhece sua hora técnica mínima. Atenção: se o valor estiver abaixo do necessário, sua margem/lucro pode ficar comprometida." />
           </label>
         </div>
@@ -238,7 +246,7 @@ export default function MinimumHourCalculator({
         {useManual ? (
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-              Hora técnica mínima (R$/hora)
+              {manualFieldLabel}
               <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas operacionais fixas e despesas pessoais essenciais sem ter prejuízo. Este é o piso financeiro do seu escritório." />
             </label>
             <div className="relative">
@@ -325,7 +333,7 @@ export default function MinimumHourCalculator({
         {/* Resultado */}
         <div className="p-4 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <span className="font-semibold text-calcularq-blue">Hora técnica mínima (R$/hora):</span>
+            <span className="font-semibold text-calcularq-blue">{resultLabel}</span>
             <span className="text-xl sm:text-2xl font-bold text-calcularq-blue">
               R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
@@ -335,3 +343,5 @@ export default function MinimumHourCalculator({
     </div>
   );
 }
+
+
