@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
+import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal, Briefcase } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
@@ -1003,7 +1003,7 @@ export default function CalculatorDemo() {
                       <SectionHeader
                         title="Posicionamento do escritório"
                         description="Defina sua margem de referência (m0) antes de calcular a hora técnica. Isso representa seu posicionamento comercial, não a complexidade do projeto."
-                        icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                        icon={<Briefcase className="w-5 h-5 text-calcularq-blue" />}
                       />
                       <div className="mt-5 flex flex-wrap gap-2.5">
                         {(Object.entries(DEMO_PROFIT_PROFILES) as [DemoProfitProfileKey, (typeof DEMO_PROFIT_PROFILES)[DemoProfitProfileKey]][]).map(([key, profile]) => (
