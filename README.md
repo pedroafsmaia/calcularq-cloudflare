@@ -33,9 +33,15 @@ A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e compo
 
 ```text
 src/
-  components/        Componentes reutilizaveis de UI e calculadora
+  components/
+    budgets/         Cards, dialogs e toolbar de "Meus calculos"
+    calculator/      Blocos da calculadora (fatores, resultados, salvamento)
+    manual/          Componentes do manual (stepper, cards, resumo mobile)
+    pricing/         Motores de calculo (classico e demo)
+    ui/              Base de UI reutilizavel (dialog, tooltip, toast, etc.)
   contexts/          AuthContext / sessao do usuario
-  hooks/             Hooks da calculadora (progresso, reset, importacao por etapa)
+  hooks/
+    calculator/      Hooks de progresso, reset e importacao por etapa
   lib/               API client, motion presets e helpers
   pages/             Home, Calculadora, Manual, Auth, Payment, etc.
   test/              Testes e setup de testes
@@ -44,20 +50,26 @@ src/
 
 functions/
   api/
-    auth/            Login, registro, logout, recovery/reset
+    _utils.js        Sessao, validacoes, respostas, hardening
+    auth/            Login, registro, logout, recovery/reset/me
     budgets/         CRUD dos calculos salvos
     stripe/          Checkout + webhook
     user/            Status de pagamento
-    _utils.js        Sessao, validacoes, respostas, hardening
 
 migrations/
   0001_init.sql
   0002_security_hardening.sql
+  0003_budget_feedback_fields.sql
 
 docs/
-  QA_SECURITY_CHECKLIST.md
   ARCHITECTURE.md
+  CLOUDFLARE_DEPLOY_GUIDE.md
+  COMMIT_STRATEGY.md
   MAINTENANCE_GUIDE.md
+  METODO_V3_1_1_IMPLEMENTACAO.md
+  QA_SECURITY_CHECKLIST.md
+  README_CLOUDFLARE.md
+  VISUAL_IDENTITY_CHECKLIST.md
 ```
 
 ---
@@ -176,6 +188,7 @@ echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-
 ```bash
 npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0002_security_hardening.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0003_budget_feedback_fields.sql
 ```
 
 ---
