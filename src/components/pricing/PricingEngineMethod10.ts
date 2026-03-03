@@ -3,6 +3,14 @@ export const METHOD_10_VERSION = "1.0.0";
 export const M_DET = [0.85, 1.0, 1.12, 1.25, 1.4] as const;
 export const V_VOLUMETRIA = [1.0, 1.08, 1.15, 1.22, 1.3] as const;
 
+export const ETAPA_MULTIPLIERS = {
+  1: 0.05,   // Consultoria/Briefing
+  2: 0.15,   // Estudo Preliminar
+  3: 0.40,   // Anteprojeto
+  4: 0.85,   // Projeto Executivo
+  5: 1.00,   // Compatibilização
+} as const;
+
 export const T_TIPOLOGIA = {
   residencial: 1.0,
   comercial: 1.0,
@@ -51,6 +59,7 @@ export interface Method10Output {
     m_det: number;
     t_tipologia: number;
     v_volumetria: number;
+    e_etapa: number;
     u_base: number;
     u_f4: number;
     u_f5: number;
@@ -168,8 +177,9 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   const m_det = M_DET[f3 - 1];
   const t_tipologia = T_TIPOLOGIA[input.tipologia] ?? 1;
   const v_volumetria = V_VOLUMETRIA[volumetria - 1];
+  const e_etapa = ETAPA_MULTIPLIERS[clampLevel(input.etapa) as 1 | 2 | 3 | 4 | 5] ?? 1.0;
 
-  const h50 = area * r_area * m_det * t_tipologia * v_volumetria;
+  const h50 = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
 
   const u_base = 0.2;
   const u_f4 = 0.05 * normalizeLevel(f4);
@@ -226,6 +236,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
       m_det,
       t_tipologia,
       v_volumetria,
+      e_etapa,
       u_base,
       u_f4: Number(u_f4.toFixed(4)),
       u_f5: Number(u_f5.toFixed(4)),
