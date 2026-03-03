@@ -1,292 +1,231 @@
-export const METHOD_10_VERSION = "1.0.0";
-
-export const M_DET = [0.85, 1.0, 1.12, 1.25, 1.4] as const;
-export const V_VOLUMETRIA = [1.0, 1.08, 1.15, 1.22, 1.3] as const;
-
-export const ETAPA_MULTIPLIERS = {
-  1: 0.05,   // Consultoria/Briefing
-  2: 0.15,   // Estudo Preliminar
-  3: 0.40,   // Anteprojeto
-  4: 0.85,   // Projeto Executivo
-  5: 1.00,   // Compatibilização
-} as const;
-
-export const F6_OBRA_MULTIPLIERS = {
-  1: 0.00,   // Levantamento
-  2: 0.05,   // Pontual
-  3: 0.10,   // Por Etapa
-  4: 0.20,   // Acompanhamento
-  5: 0.35,   // Gestão
-} as const;
-
-export const T_TIPOLOGIA = {
-  residencial: 1.0,
-  comercial: 1.0,
-  institucional: 1.0,
-  industrial: 1.0,
-  saude: 1.25,
-} as const;
-
-export type TipologiaMethod10 = keyof typeof T_TIPOLOGIA;
-export type CenarioMethod10 = "conservador" | "otimista";
-
-export interface Method10Input {
-  ht_min: number;
-  margem_lucro: number;
-  area: number;
-  etapa: number;
-  tipologia: TipologiaMethod10;
-  volumetria: number;
-  reforma: boolean;
-  f3_detalhamento: number;
-  f4_tecnica: number;
-  f5_burocracia: number;
-  f6_obra?: number;
-  cenario: CenarioMethod10;
-  h_usuario_manual?: number;
-  A?: number;
+﻿export interface Factor {
+  id: string;
+  name: string;
+  description: string;
+  options: {
+    value: number;
+    label: string;
+    description?: string;
+  }[];
+  weight: number;
+  isArea?: boolean; // Para identificar o fator de área que usa régua de intervalos
 }
 
-export interface Method10Output {
-  h50: number;
-  h_cons: number;
-  h_final: number;
-  ht_aj: number;
-  preco_h50: number;
-  preco_conservador: number;
-  preco_final: number;
-  preco_m2: number;
-  score_complexidade: number;
-  classificacao_complexidade: string;
-  u_total: number;
-  method_version: string;
-  cenario_usado: CenarioMethod10;
-  usuario_editou_horas: boolean;
-  breakdown: {
-    r_area: number;
-    m_det: number;
-    t_tipologia: number;
-    v_volumetria: number;
-    e_etapa: number;
-    h_projeto: number;
-    h_obra: number;
-    u_base: number;
-    u_f4: number;
-    u_f5: number;
-    u_tipologia: number;
-    u_reforma: number;
-    c_tech: number;
-    margem_lucro_aplicada: number;
-    premio_tecnico: number;
-  };
+export interface AreaInterval {
+  min: number;
+  max: number | null; // null significa "acima de"
+  level: number;
 }
 
-const clampLevel = (value: number) => Math.max(1, Math.min(5, Math.round(value)));
+// Expoente de compressão — calibrado por simulações internas
+// para manter estabilidade entre cenários de baixa e alta complexidade.
+export const COMPLEXITY_EXPONENT = 0.9;
 
-const normalizeLevel = (value: number) => (clampLevel(value) - 1) / 4;
+export const DEFAULT_AREA_INTERVALS: AreaInterval[] = [
+  { min: 0, max: 49, level: 1 },
+  { min: 50, max: 149, level: 2 },
+  { min: 150, max: 499, level: 3 },
+  { min: 500, max: 999, level: 4 },
+  { min: 1000, max: null, level: 5 },
+];
 
-export function tipologiaFromLevel(level: number): TipologiaMethod10 {
-  const safe = clampLevel(level);
-  if (safe === 1) return "residencial";
-  if (safe === 2) return "comercial";
-  if (safe === 3) return "institucional";
-  if (safe === 4) return "industrial";
-  return "saude";
-}
+export const DEFAULT_FACTORS: Factor[] = [
+  {
+    id: "area",
+    name: "Área de projeto",
+    description: "Estimativa da metragem total de intervenção.",
+    weight: 1.0,
+    isArea: true,
+    options: [
+      { value: 1, label: "Até 49m²", description: "Nível 1" },
+      { value: 2, label: "50 a 149m²", description: "Nível 2" },
+      { value: 3, label: "150 a 499m²", description: "Nível 3" },
+      { value: 4, label: "500 a 999m²", description: "Nível 4" },
+      { value: 5, label: "Acima de 1000m²", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "tipology",
+    name: "Tipologia",
+    description: "Natureza principal do projeto arquitetônico.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Residencial", description: "Nível 1" },
+      { value: 2, label: "Comercial / Serviços", description: "Nível 2" },
+      { value: 3, label: "Institucional", description: "Nível 3" },
+      { value: 4, label: "Industrial", description: "Nível 4" },
+      { value: 5, label: "Saúde", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "volumetry",
+    name: "Níveis do projeto",
+    description: "Quantidade de pavimentos envolvidos.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "1 nível (térreo)", description: "Nível 1" },
+      { value: 2, label: "2-3 níveis", description: "Nível 2" },
+      { value: 3, label: "4-6 níveis", description: "Nível 3" },
+      { value: 4, label: "7-15 níveis", description: "Nível 4" },
+      { value: 5, label: "16+ níveis", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "reform",
+    name: "Reforma / Ampliação",
+    description: "Intervenção em edificação existente.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Não", description: "Sem reforma" },
+      { value: 2, label: "Sim", description: "Com reforma/ampliação" },
+    ],
+  },
+  {
+    id: "stage",
+    name: "Etapa final",
+    description: "Define até qual fase do ciclo de desenvolvimento o arquiteto desenvolverá o projeto.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Consultoria / Briefing", description: "Nível 1" },
+      { value: 2, label: "Estudo Preliminar", description: "Nível 2" },
+      { value: 3, label: "Anteprojeto", description: "Nível 3" },
+      { value: 4, label: "Projeto Executivo", description: "Nível 4" },
+      { value: 5, label: "Compatibilização de Complementares", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "detail",
+    name: "Nível de detalhamento",
+    description: "Mede a quantidade de desenhos e o esforço criativo exigido.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Mínimo", description: "Nível 1" },
+      { value: 2, label: "Básico", description: "Nível 2" },
+      { value: 3, label: "Médio", description: "Nível 3" },
+      { value: 4, label: "Alto", description: "Nível 4" },
+      { value: 5, label: "Máximo", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "technical",
+    name: "Exigência técnica",
+    description: "Define a rigidez das normas, leis e o volume de estudo técnico necessário.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Mínima", description: "Nível 1" },
+      { value: 2, label: "Baixa", description: "Nível 2" },
+      { value: 3, label: "Média", description: "Nível 3" },
+      { value: 4, label: "Alta", description: "Nível 4" },
+      { value: 5, label: "Máxima", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "bureaucratic",
+    name: "Exigência burocrática",
+    description: "Mede a carga administrativa e a gestão de aprovações em órgãos públicos.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Mínima", description: "Nível 1" },
+      { value: 2, label: "Baixa", description: "Nível 2" },
+      { value: 3, label: "Média", description: "Nível 3" },
+      { value: 4, label: "Alta", description: "Nível 4" },
+      { value: 5, label: "Máxima", description: "Nível 5" },
+    ],
+  },
+  {
+    id: "monitoring",
+    name: "Dedicação à obra",
+    description: "Frequência de visitas e nível de responsabilidade no canteiro.",
+    weight: 1.0,
+    options: [
+      { value: 1, label: "Levantamento", description: "Nível 1" },
+      { value: 2, label: "Pontual", description: "Nível 2" },
+      { value: 3, label: "Por Etapas", description: "Nível 3" },
+      { value: 4, label: "Acompanhamento", description: "Nível 4" },
+      { value: 5, label: "Gestão", description: "Nível 5" },
+    ],
+  },
+];
 
-export function reformFromLevel(level: number): boolean {
-  return clampLevel(level) > 1;
-}
-
-export function calcularProdutividade(area: number): number {
-  const r_min = 0.9;
-  const r_max = 1.85;
-  const k = 350;
-  const p = 1.2;
-  return r_min + (r_max - r_min) / (1 + Math.pow(area / k, p));
-}
-
-export function calcularScoreComplexidade(input: {
-  area: number;
-  f3: number;
-  f4: number;
-  f5: number;
-  volumetria: number;
-  tipologia: TipologiaMethod10;
-  reforma: boolean;
-  etapa: number;
-}): number {
-  const normalizar = (nivel: number) => ((clampLevel(nivel) - 1) / 4) * 100;
-
-  let scoreArea = 20;
-  if (input.area > 49) scoreArea = 35;
-  if (input.area > 149) scoreArea = 50;
-  if (input.area > 499) scoreArea = 70;
-  if (input.area > 999) scoreArea = 85;
-
-  const scoreTipologia: Record<TipologiaMethod10, number> = {
-    residencial: 20,
-    comercial: 40,
-    institucional: 60,
-    industrial: 70,
-    saude: 100,
-  };
-
-  const scores = {
-    area: scoreArea,
-    detalhamento: normalizar(input.f3),
-    tecnica: normalizar(input.f4),
-    burocracia: normalizar(input.f5),
-    volumetria: normalizar(input.volumetria),
-    tipologia: scoreTipologia[input.tipologia] ?? 50,
-    etapa: normalizar(input.etapa),
-    reforma: input.reforma ? 100 : 0,
-  };
-
-  const pesos = {
-    area: 0.15,
-    detalhamento: 0.20,
-    tecnica: 0.20,
-    burocracia: 0.12,
-    volumetria: 0.12,
-    tipologia: 0.08,
-    etapa: 0.08,
-    reforma: 0.05,
-  };
-
-  const score =
-    scores.area * pesos.area +
-    scores.detalhamento * pesos.detalhamento +
-    scores.tecnica * pesos.tecnica +
-    scores.burocracia * pesos.burocracia +
-    scores.volumetria * pesos.volumetria +
-    scores.tipologia * pesos.tipologia +
-    scores.etapa * pesos.etapa +
-    scores.reforma * pesos.reforma;
-
-  return Math.round(score);
-}
-
-export function classificarComplexidade(score: number): string {
-  if (score <= 20) return "Muito Baixa";
-  if (score <= 40) return "Baixa a Média";
-  if (score <= 60) return "Média";
-  if (score <= 80) return "Média a Alta";
-  return "Muito Alta";
-}
-
-export function calcularMethod10(input: Method10Input): Method10Output {
-  // Validações básicas
-  if (!Number.isFinite(input.area) || input.area <= 0) throw new Error("Area invalida");
-  if (!Number.isFinite(input.ht_min) || input.ht_min <= 0) throw new Error("HT_min invalida");
-  if (!Number.isFinite(input.margem_lucro) || input.margem_lucro < 0) throw new Error("Margem invalida");
-  if (![1, 2, 3, 4, 5].includes(input.etapa)) throw new Error("Etapa invalida");
-
-  const area = input.area;
-  const etapa = clampLevel(input.etapa);
-  const f3 = clampLevel(input.f3_detalhamento);
-  const f4 = clampLevel(input.f4_tecnica);
-  const f5 = clampLevel(input.f5_burocracia);
-  const volumetria = clampLevel(input.volumetria);
-  
-  // Parâmetro A para teste A/B/C (0.25, 0.35, 0.45)
-  const A = Number.isFinite(input.A) ? Number(input.A) : 0.35;
-
-  const r_area = calcularProdutividade(area);
-  const m_det = M_DET[f3 - 1];
-  const t_tipologia = T_TIPOLOGIA[input.tipologia] ?? 1;
-  const v_volumetria = V_VOLUMETRIA[volumetria - 1];
-  const e_etapa = ETAPA_MULTIPLIERS[clampLevel(input.etapa) as 1 | 2 | 3 | 4 | 5] ?? 1.0;
-
-  const h50 = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
-
-  // Calcular horas de obra (F6) se aplicável
-  let h_obra = 0;
-  if (input.f6_obra && input.f6_obra > 1) {
-    const f6 = clampLevel(input.f6_obra);
-    const t_f6 = F6_OBRA_MULTIPLIERS[f6 as 1 | 2 | 3 | 4 | 5] ?? 0;
-    
-    // H_obra = t(F6) × H_Executivo
-    // H_Executivo = H50 quando etapa=4, ou proporcional
-    const h_executivo = area * r_area * m_det * t_tipologia * v_volumetria * 0.85;
-    h_obra = t_f6 * h_executivo;
+export function calculateAreaLevel(
+  area: number,
+  intervals: AreaInterval[]
+): number {
+  for (const interval of intervals) {
+    if (interval.max === null) {
+      if (area >= interval.min) return interval.level;
+    } else {
+      if (area >= interval.min && area <= interval.max) {
+        return interval.level;
+      }
+    }
   }
+  return 1; // Default
+}
 
-  const h50_total = h50 + h_obra;
+export function calculateGlobalComplexity(
+  factors: Factor[],
+  selections: Record<string, number>
+): number {
+  let weightedSum = 0;
+  let totalWeight = 0;
 
-  const u_base = 0.2;
-  const u_f4 = 0.05 * normalizeLevel(f4);
-  const u_f5 = 0.25 * normalizeLevel(f5);
-  const u_tipologia =
-    input.tipologia === "comercial" || input.tipologia === "institucional" || input.tipologia === "industrial" ? 0.03 : 0;
-  const u_reforma = input.reforma ? (f4 + f5 < 7 ? 0.15 : 0.25) : 0;
-  const u_total = u_base + u_f4 + u_f5 + u_tipologia + u_reforma;
-  const h_cons = h50_total * (1 + u_total);
-
-  let usuario_editou_horas = false;
-  let h_final = input.cenario === "conservador" ? h_cons : h50_total;
-  if (Number.isFinite(input.h_usuario_manual) && Number(input.h_usuario_manual) > 0) {
-    usuario_editou_horas = true;
-    const manual = Number(input.h_usuario_manual);
-    h_final = input.cenario === "conservador" ? manual * (1 + u_total) : manual;
-  }
-
-  // Arredondar horas ANTES de calcular preços
-  const h50_rounded = Math.round(h50_total);
-  const h_cons_rounded = Math.round(h_cons);
-  const h_final_rounded = Math.round(h_final);
-
-  const c_tech = normalizeLevel(f4);
-  const premio_tecnico = A * c_tech;
-  const ht_aj = input.ht_min * (1 + input.margem_lucro + premio_tecnico);
-
-  // Calcular preços com horas arredondadas
-  const preco_h50 = h50_rounded * ht_aj;
-  const preco_conservador = h_cons_rounded * ht_aj;
-  const preco_final = h_final_rounded * ht_aj;
-
-  const score_complexidade = calcularScoreComplexidade({
-    area,
-    f3,
-    f4,
-    f5,
-    volumetria,
-    tipologia: input.tipologia,
-    reforma: input.reforma,
-    etapa,
+  factors.forEach((factor) => {
+    const selection = selections[factor.id];
+    if (selection !== undefined) {
+      weightedSum += selection * factor.weight;
+      totalWeight += factor.weight;
+    }
   });
 
+  if (totalWeight === 0) return 0;
+
+  const linearComplexity = weightedSum / totalWeight;
+
+  // Compressão sub-linear: amortece crescimento em complexidades altas
+  // C=1 → 1.00 | C=2 → 1.87 | C=3 → 2.69 | C=4 → 3.48 | C=5 → 4.26
+  return Math.pow(linearComplexity, COMPLEXITY_EXPONENT);
+}
+
+export function calculateProjectValue(
+  minHourlyRate: number,
+  estimatedHours: number,
+  globalComplexity: number,
+  variableExpenses: number = 0
+): {
+  globalComplexity: number;
+  adjustedHourlyRate: number;
+  projectPrice: number;
+  finalSalePrice: number;
+  complexityMultiplier: number;
+} {
+  const complexityMultiplier = globalComplexity;
+  const adjustedHourlyRate = minHourlyRate * complexityMultiplier;
+  const projectPrice = adjustedHourlyRate * estimatedHours;
+  const finalSalePrice = projectPrice + variableExpenses;
+
   return {
-    h50: h50_rounded,
-    h_cons: h_cons_rounded,
-    h_final: h_final_rounded,
-    ht_aj: Number(ht_aj.toFixed(2)),
-    preco_h50: Number(preco_h50.toFixed(2)),
-    preco_conservador: Number(preco_conservador.toFixed(2)),
-    preco_final: Number(preco_final.toFixed(2)),
-    preco_m2: Number((preco_final / area).toFixed(2)),
-    score_complexidade,
-    classificacao_complexidade: classificarComplexidade(score_complexidade),
-    u_total: Number(u_total.toFixed(4)),
-    method_version: METHOD_10_VERSION,
-    cenario_usado: input.cenario,
-    usuario_editou_horas,
-    breakdown: {
-      r_area: Number(r_area.toFixed(4)),
-      m_det,
-      t_tipologia,
-      v_volumetria,
-      e_etapa,
-      h_projeto: Math.round(h50),
-      h_obra: Math.round(h_obra),
-      u_base,
-      u_f4: Number(u_f4.toFixed(4)),
-      u_f5: Number(u_f5.toFixed(4)),
-      u_tipologia,
-      u_reforma,
-      c_tech: Number(c_tech.toFixed(4)),
-      margem_lucro_aplicada: input.margem_lucro,
-      premio_tecnico: Number(premio_tecnico.toFixed(4)),
-    },
+    globalComplexity: Number(globalComplexity.toFixed(2)),
+    adjustedHourlyRate: Number(adjustedHourlyRate.toFixed(2)),
+    projectPrice: Number(projectPrice.toFixed(2)),
+    finalSalePrice: Number(finalSalePrice.toFixed(2)),
+    complexityMultiplier: Number(complexityMultiplier.toFixed(2)),
   };
+}
+
+export function validateInputs(
+  minHourlyRate: number,
+  estimatedHours: number
+): string[] {
+  const errors: string[] = [];
+
+  if (minHourlyRate <= 0) {
+    errors.push("A hora técnica mínima deve ser maior que zero");
+  }
+
+  if (estimatedHours <= 0) {
+    errors.push("As horas estimadas devem ser maiores que zero");
+  }
+
+  return errors;
 }
