@@ -251,9 +251,9 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   });
 
   return {
-    h50: Number(h50_total.toFixed(2)),
-    h_cons: Number(h_cons.toFixed(2)),
-    h_final: Number(h_final.toFixed(2)),
+    h50: Math.round(h50_total),
+    h_cons: Math.round(h_cons),
+    h_final: Math.round(h_final),
     ht_aj: Number(ht_aj.toFixed(2)),
     preco_h50: Number(preco_h50.toFixed(2)),
     preco_conservador: Number(preco_conservador.toFixed(2)),
@@ -271,8 +271,8 @@ export function calcularMethod10(input: Method10Input): Method10Output {
       t_tipologia,
       v_volumetria,
       e_etapa,
-      h_projeto: Number(h50.toFixed(2)),
-      h_obra: Number(h_obra.toFixed(2)),
+      h_projeto: Math.round(h50),
+      h_obra: Math.round(h_obra),
       u_base,
       u_f4: Number(u_f4.toFixed(4)),
       u_f5: Number(u_f5.toFixed(4)),
