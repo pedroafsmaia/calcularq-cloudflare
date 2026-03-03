@@ -231,13 +231,19 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     h_final = input.cenario === "conservador" ? manual * (1 + u_total) : manual;
   }
 
+  // Arredondar horas ANTES de calcular preços
+  const h50_rounded = Math.round(h50_total);
+  const h_cons_rounded = Math.round(h_cons);
+  const h_final_rounded = Math.round(h_final);
+
   const c_tech = normalizeLevel(f4);
   const premio_tecnico = A * c_tech;
   const ht_aj = input.ht_min * (1 + input.margem_lucro + premio_tecnico);
 
-  const preco_h50 = h50_total * ht_aj;
-  const preco_conservador = h_cons * ht_aj;
-  const preco_final = h_final * ht_aj;
+  // Calcular preços com horas arredondadas
+  const preco_h50 = h50_rounded * ht_aj;
+  const preco_conservador = h_cons_rounded * ht_aj;
+  const preco_final = h_final_rounded * ht_aj;
 
   const score_complexidade = calcularScoreComplexidade({
     area,
@@ -251,9 +257,9 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   });
 
   return {
-    h50: Math.round(h50_total),
-    h_cons: Math.round(h_cons),
-    h_final: Math.round(h_final),
+    h50: h50_rounded,
+    h_cons: h_cons_rounded,
+    h_final: h_final_rounded,
     ht_aj: Number(ht_aj.toFixed(2)),
     preco_h50: Number(preco_h50.toFixed(2)),
     preco_conservador: Number(preco_conservador.toFixed(2)),
