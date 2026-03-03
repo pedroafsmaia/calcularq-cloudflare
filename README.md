@@ -109,6 +109,25 @@ npm run test:run
 npm run build
 ```
 
+### Automacao de Repomix (apos push)
+
+Instalar hooks do repositório (uma vez):
+
+```bash
+npm run hooks:install
+```
+
+Gerar manualmente quando quiser:
+
+```bash
+npm run repomix:full
+```
+
+Regra configurada:
+- A cada `git push`, o hook `post-push` gera `repomix-calcularq-full.md`
+- O arquivo anterior de repomix e substituido automaticamente
+- `dist/`, `backups/` e `node_modules/` ficam fora do pacote
+
 ### Preview local
 
 ```bash

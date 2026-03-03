@@ -11,7 +11,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "preview": "vite preview",
-    "cf:dev": "wrangler pages dev ./dist --compatibility-date=2026-02-20"
+    "cf:dev": "wrangler pages dev ./dist --compatibility-date=2026-02-20",
+    "repomix:full": "node scripts/generate-repomix.mjs",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "clsx": "^2.0.0",
