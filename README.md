@@ -1,4 +1,4 @@
-﻿# Calcularq
+# Calcularq
 
 Calculadora de precificacao por complexidade para projetos de arquitetura.
 
@@ -111,7 +111,7 @@ npm run build
 
 ### Automacao de Repomix (apos push)
 
-Instalar hooks do repositório (uma vez):
+Instalar hooks do reposit�rio (uma vez):
 
 ```bash
 npm run hooks:install
@@ -124,7 +124,7 @@ npm run repomix:full
 ```
 
 Regra configurada:
-- A cada `git push`, o hook `post-push` gera `repomix-calcularq-full.md`
+- A cada `git push`, o hook `pre-push` gera `repomix-calcularq-full.md`
 - O arquivo anterior de repomix e substituido automaticamente
 - `dist/`, `backups/` e `node_modules/` ficam fora do pacote
 

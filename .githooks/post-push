@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-set -eu
-
-echo "[post-push] Gerando repomix atualizado..."
-npm run -s repomix:full
-echo "[post-push] Repomix atualizado."
