@@ -53,23 +53,23 @@ export default function Home() {
   const features = [
     {
       icon: Calculator,
-      title: "Cálculo da complexidade",
-      description: "Garante uma precificação justa ao considerar fatores de complexidade do projeto."
+      title: "Preço ajustado à complexidade",
+      description: "Projetos simples e complexos passam a ter precificação proporcional ao esforço real."
     },
     {
       icon: Globe,
-      title: "Acesso em qualquer lugar",
-      description: "Uma ferramenta prática e 100% online, pronta para usar em qualquer dispositivo."
+      title: "Transparência total",
+      description: "Você entende de onde vem cada número e ganha segurança para defender sua proposta."
     },
     {
       icon: DollarSign,
-      title: "Preço acessível",
-      description: "Acesso completo por um valor único e justo, sem mensalidades ou custos surpresa."
+      title: "Método que melhora com uso",
+      description: "Ao registrar horas reais, você cria uma base melhor para decisões futuras."
     },
     {
       icon: Zap,
-      title: "Agilidade na entrega",
-      description: "Reduza o tempo de elaboração de propostas e envie cálculos precisos com rapidez."
+      title: "Projetos ilimitados",
+      description: "Use quantas vezes precisar dentro do período de acesso."
     }
   ];
 
@@ -134,11 +134,11 @@ export default function Home() {
                   {/* Logo removido do banner conforme feedback */}
 
                   <h1 className="text-[2.05rem] sm:text-4xl lg:text-[2.5rem] xl:text-[2.65rem] font-bold text-calcularq-blue mb-4 sm:mb-5 leading-[1.12] tracking-tight text-center">
-                    SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
+                    Precifique considerando a complexidade real do projeto
                   </h1>
 
                   <p className="text-[0.98rem] sm:text-lg text-slate-700 mb-6 sm:mb-7 leading-relaxed text-center">
-                    Precifique seus projetos de arquitetura. A Calcularq é uma ferramenta precisa para alinhar seus cálculos à dedicação que cada projeto exige.
+                    Não é só R$/m². É esforço x complexidade.
                   </p>
 
                   {!user?.hasPaid ? (
@@ -168,8 +168,8 @@ export default function Home() {
                         "Acessar a Calcularq"
                       ) : (
                         <>
-                          <span className="hidden sm:inline">Acesse agora por apenas R$19,90</span>
-                          <span className="sm:hidden">Acessar por R$19,90</span>
+                          <span className="hidden sm:inline">Garantir Acesso - R$ 19,90</span>
+                          <span className="sm:hidden">Garantir Acesso - R$ 19,90</span>
                         </>
                       )}
                     </Button>
@@ -193,9 +193,7 @@ export default function Home() {
                     </a>
                   ) : null}
 
-                  <p className="text-center text-sm text-slate-600">
-                    Pagamento único. Sem mensalidades.
-                  </p>
+                  <p className="text-center text-sm text-slate-600">Pagamento único.</p>
                 </motion.div>
               </div>
             </div>
@@ -300,29 +298,24 @@ export default function Home() {
               Como funciona
             </h2>
             <p className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[34ch] sm:max-w-[42ch] md:max-w-[50ch] lg:max-w-[54ch] mx-auto leading-relaxed" style={{ textWrap: "balance" }}>
-              {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 4 etapas simples."}
+              {"Cada projeto tem uma complexidade diferente. O método transforma isso em um preço defendável em 3 etapas."}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
               <FormulaStep 
                 number="1" 
-                title={"Hora técnica mínima"}
-                description={"Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica mínima."}
+                title={"Configure seu escritório"}
+                description={"Defina seus custos e margem de lucro para criar uma base financeira realista."}
               />
               <FormulaStep 
                 number="2" 
-                title="Fatores de complexidade"
-                description={"Informe a área e as características do projeto. O Calcularq mede o esforço real envolvido."}
+                title="Informe a complexidade do projeto"
+                description={"Área, tipologia, níveis, reforma e exigências técnicas/burocráticas."}
               />
               <FormulaStep 
                 number="3" 
-                title="Calibragem dos pesos"
-                description={"Personalize o quanto cada fator influencia o cálculo. Ou pule e use os valores padrão."}
-              />
-              <FormulaStep 
-                number="4" 
-                title={"Composição final"}
-                description={"Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."}
+                title={"Receba preço fundamentado"}
+                description={"Horas estimadas x taxa ajustada, com cenário otimista ou conservador."}
               />
             </div>
           </motion.div>

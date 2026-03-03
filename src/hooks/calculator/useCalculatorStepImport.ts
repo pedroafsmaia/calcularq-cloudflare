@@ -14,6 +14,7 @@ type Params = {
   defaultFactors: Factor[];
   setMinHourlyRate: Dispatch<SetStateAction<number | null>>;
   setUseManualMinHourlyRate: Dispatch<SetStateAction<boolean>>;
+  setProfitMargin?: Dispatch<SetStateAction<number>>;
   setFixedExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setPersonalExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setProLabore: Dispatch<SetStateAction<number>>;
@@ -24,6 +25,8 @@ type Params = {
   setArea: Dispatch<SetStateAction<number | null>>;
   setFactors: Dispatch<SetStateAction<Factor[]>>;
   setEstimatedHours: Dispatch<SetStateAction<number>>;
+  setCenarioEscolhido?: Dispatch<SetStateAction<"conservador" | "otimista">>;
+  setHorasManuais?: Dispatch<SetStateAction<number | null>>;
   setCommercialDiscount: Dispatch<SetStateAction<number>>;
   setVariableExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   hasWeightStep?: boolean;
@@ -40,6 +43,7 @@ export function useCalculatorStepImport({
   defaultFactors,
   setMinHourlyRate,
   setUseManualMinHourlyRate,
+  setProfitMargin,
   setFixedExpenses,
   setPersonalExpenses,
   setProLabore,
@@ -50,6 +54,8 @@ export function useCalculatorStepImport({
   setArea,
   setFactors,
   setEstimatedHours,
+  setCenarioEscolhido,
+  setHorasManuais,
   setCommercialDiscount,
   setVariableExpenses,
   hasWeightStep = true,
@@ -62,6 +68,9 @@ export function useCalculatorStepImport({
       if (currentStep === 1) {
         setMinHourlyRate(sourceData.minHourlyRate ?? null);
         setUseManualMinHourlyRate(Boolean(sourceData.useManualMinHourlyRate));
+        if (setProfitMargin && typeof sourceData.margemLucro === "number" && Number.isFinite(sourceData.margemLucro)) {
+          setProfitMargin(sourceData.margemLucro);
+        }
         setFixedExpenses(Array.isArray(sourceData.fixedExpenses) ? sourceData.fixedExpenses : []);
         setPersonalExpenses(Array.isArray(sourceData.personalExpenses) ? sourceData.personalExpenses : []);
         setProLabore(typeof sourceData.proLabore === "number" ? sourceData.proLabore : 0);
@@ -70,9 +79,7 @@ export function useCalculatorStepImport({
         if (setProfitProfile) {
           const profile = sourceData.profitProfile;
           setProfitProfile(
-            profile === "portfolio" || profile === "estabelecido" || profile === "referencia"
-              ? profile
-              : "estabelecido"
+            profile === "portfolio" || profile === "estabelecido" || profile === "referencia" ? profile : "estabelecido"
           );
         }
         return;
@@ -111,7 +118,15 @@ export function useCalculatorStepImport({
       }
 
       if (currentStep === finalStepNumber) {
-        setEstimatedHours(typeof sourceData.estimatedHours === "number" ? sourceData.estimatedHours : 0);
+        const fallbackHours = typeof sourceData.estimatedHours === "number" ? sourceData.estimatedHours : 0;
+        const methodHours = typeof sourceData.hFinal === "number" ? sourceData.hFinal : fallbackHours;
+        setEstimatedHours(methodHours);
+        if (setCenarioEscolhido) {
+          setCenarioEscolhido(sourceData.cenarioEscolhido === "otimista" ? "otimista" : "conservador");
+        }
+        if (setHorasManuais) {
+          setHorasManuais(typeof sourceData.hUsuarioManual === "number" ? sourceData.hUsuarioManual : null);
+        }
         setCommercialDiscount(typeof sourceData.commercialDiscount === "number" ? sourceData.commercialDiscount : 0);
         setVariableExpenses(Array.isArray(sourceData.variableExpenses) ? sourceData.variableExpenses : []);
       }
@@ -124,14 +139,17 @@ export function useCalculatorStepImport({
       hasWeightStep,
       setArea,
       setAreaIntervals,
+      setCenarioEscolhido,
       setCommercialDiscount,
       setEstimatedHours,
       setFactors,
       setFixedExpenses,
+      setHorasManuais,
       setMinHourlyRate,
       setPersonalExpenses,
       setProLabore,
       setProductiveHours,
+      setProfitMargin,
       setProfitProfile,
       setSelections,
       setUseManualMinHourlyRate,

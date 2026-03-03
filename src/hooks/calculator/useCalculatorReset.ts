@@ -14,6 +14,7 @@ type Params = {
   setMaxStepReached: Dispatch<SetStateAction<number>>;
   setMinHourlyRate: Dispatch<SetStateAction<number | null>>;
   setUseManualMinHourlyRate: Dispatch<SetStateAction<boolean>>;
+  setProfitMargin?: Dispatch<SetStateAction<number>>;
   setFixedExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setPersonalExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setProLabore: Dispatch<SetStateAction<number>>;
@@ -24,6 +25,8 @@ type Params = {
   setArea: Dispatch<SetStateAction<number | null>>;
   setSelections: Dispatch<SetStateAction<Record<string, number>>>;
   setEstimatedHours: Dispatch<SetStateAction<number>>;
+  setCenarioEscolhido?: Dispatch<SetStateAction<"conservador" | "otimista">>;
+  setHorasManuais?: Dispatch<SetStateAction<number | null>>;
   setCommercialDiscount: Dispatch<SetStateAction<number>>;
   setVariableExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   hasWeightStep?: boolean;
@@ -40,6 +43,7 @@ export function useCalculatorReset({
   setMaxStepReached,
   setMinHourlyRate,
   setUseManualMinHourlyRate,
+  setProfitMargin,
   setFixedExpenses,
   setPersonalExpenses,
   setProLabore,
@@ -50,6 +54,8 @@ export function useCalculatorReset({
   setArea,
   setSelections,
   setEstimatedHours,
+  setCenarioEscolhido,
+  setHorasManuais,
   setCommercialDiscount,
   setVariableExpenses,
   hasWeightStep = true,
@@ -59,6 +65,7 @@ export function useCalculatorReset({
     if (currentStep === 1) {
       setMinHourlyRate(null);
       setUseManualMinHourlyRate(false);
+      if (setProfitMargin) setProfitMargin(0.15);
       setFixedExpenses([]);
       setPersonalExpenses([]);
       setProLabore(0);
@@ -81,6 +88,8 @@ export function useCalculatorReset({
 
     if (currentStep === finalStepNumber) {
       setEstimatedHours(0);
+      if (setCenarioEscolhido) setCenarioEscolhido("conservador");
+      if (setHorasManuais) setHorasManuais(null);
       setCommercialDiscount(0);
       setVariableExpenses([]);
     }
@@ -92,14 +101,17 @@ export function useCalculatorReset({
     hasWeightStep,
     setArea,
     setAreaIntervals,
+    setCenarioEscolhido,
     setCommercialDiscount,
     setEstimatedHours,
     setFactors,
     setFixedExpenses,
+    setHorasManuais,
     setMinHourlyRate,
     setPersonalExpenses,
     setProLabore,
     setProductiveHours,
+    setProfitMargin,
     setProfitProfile,
     setSelections,
     setUseManualMinHourlyRate,
@@ -113,6 +125,7 @@ export function useCalculatorReset({
   const handleConfirmResetCalculation = useCallback(() => {
     setMinHourlyRate(null);
     setUseManualMinHourlyRate(false);
+    if (setProfitMargin) setProfitMargin(0.15);
     setFixedExpenses([]);
     setPersonalExpenses([]);
     setProLabore(0);
@@ -125,6 +138,8 @@ export function useCalculatorReset({
     setSelections({});
 
     setEstimatedHours(0);
+    if (setCenarioEscolhido) setCenarioEscolhido("conservador");
+    if (setHorasManuais) setHorasManuais(null);
     setCommercialDiscount(0);
     setVariableExpenses([]);
 
@@ -137,16 +152,19 @@ export function useCalculatorReset({
     defaultFactors,
     setArea,
     setAreaIntervals,
+    setCenarioEscolhido,
     setCommercialDiscount,
     setCurrentStep,
     setEstimatedHours,
     setFactors,
     setFixedExpenses,
+    setHorasManuais,
     setMaxStepReached,
     setMinHourlyRate,
     setPersonalExpenses,
     setProLabore,
     setProductiveHours,
+    setProfitMargin,
     setProfitProfile,
     setSelections,
     setUseManualMinHourlyRate,

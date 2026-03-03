@@ -24,6 +24,20 @@ export default function BudgetCard({
   onOpenCloseProject,
   onRequestDelete,
 }: Props) {
+  const finalPrice =
+    typeof budget.data?.hFinal === "number" && Number.isFinite(budget.data.hFinal) && typeof budget.data?.results?.adjustedHourlyRate === "number"
+      ? budget.data.hFinal * budget.data.results.adjustedHourlyRate
+      : budget.data.results.finalSalePrice;
+  const complexityScore =
+    typeof budget.data?.scoreComplexidade === "number" && Number.isFinite(budget.data.scoreComplexidade)
+      ? Math.round(budget.data.scoreComplexidade)
+      : Math.round((budget.data.results.globalComplexity || 0) * 20);
+  const hoursLabel =
+    typeof budget.data?.hFinal === "number" && Number.isFinite(budget.data.hFinal)
+      ? `${budget.data.hFinal}h`
+      : `${budget.data.estimatedHours}h`;
+  const cenarioLabel = budget.data?.cenarioEscolhido ? ` (${budget.data.cenarioEscolhido})` : "";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -78,7 +92,7 @@ export default function BudgetCard({
           <span className="text-sm text-slate-600">Preço final</span>
           <span className="font-bold text-calcularq-blue text-lg whitespace-nowrap">
             R${" "}
-            {budget.data.results.finalSalePrice.toLocaleString("pt-BR", {
+            {finalPrice.toLocaleString("pt-BR", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -86,16 +100,16 @@ export default function BudgetCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5 mb-4">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-          <div className="text-xs uppercase tracking-wide text-slate-500">Complexidade</div>
-          <div className="mt-0.5 font-semibold text-slate-800">{budget.data.results.globalComplexity}</div>
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="text-xs uppercase tracking-wide text-slate-500">Complexidade</div>
+            <div className="mt-0.5 font-semibold text-slate-800">{complexityScore}/100</div>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="text-xs uppercase tracking-wide text-slate-500">Horas</div>
+            <div className="mt-0.5 font-semibold text-slate-800">{hoursLabel}{cenarioLabel}</div>
+          </div>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-          <div className="text-xs uppercase tracking-wide text-slate-500">Horas</div>
-          <div className="mt-0.5 font-semibold text-slate-800">{budget.data.estimatedHours}h</div>
-        </div>
-      </div>
 
       <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
         <Calendar className="w-3.5 h-3.5" />

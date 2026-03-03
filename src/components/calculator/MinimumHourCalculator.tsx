@@ -19,6 +19,8 @@ interface MinimumHourCalculatorProps {
   initialUseManual?: boolean;
   onManualModeChange?: (value: boolean) => void;
   onClearCalculation?: () => void;
+  initialMargin?: number;
+  onMarginChange?: (value: number) => void;
   titleLabel?: string;
   manualToggleLabel?: string;
   manualFieldLabel?: string;
@@ -39,6 +41,8 @@ export default function MinimumHourCalculator({
   initialUseManual = false,
   onManualModeChange,
   onClearCalculation,
+  initialMargin = 0.15,
+  onMarginChange,
   titleLabel = "Hora técnica mínima",
   manualToggleLabel = "Já sei a minha hora técnica mínima.",
   manualFieldLabel = "Hora técnica mínima (R$/hora)",
@@ -57,6 +61,7 @@ export default function MinimumHourCalculator({
   const [productiveHoursDraft, setProductiveHoursDraft] = useState("");
   const [isEditingManualMinHour, setIsEditingManualMinHour] = useState(false);
   const [isEditingProductiveHours, setIsEditingProductiveHours] = useState(false);
+  const [margin, setMargin] = useState(initialMargin);
 
   const proLabore = useMemo(
     () => personalExpenses.reduce((sum, exp) => sum + exp.value, 0),
@@ -136,6 +141,14 @@ export default function MinimumHourCalculator({
   useEffect(() => {
     onManualModeChange?.(useManual);
   }, [useManual, onManualModeChange]);
+
+  useEffect(() => {
+    setMargin(initialMargin);
+  }, [initialMargin]);
+
+  useEffect(() => {
+    onMarginChange?.(margin);
+  }, [margin, onMarginChange]);
 
   const handleAddExpense = (expense: Expense) => {
     const updated = [...fixedExpenses, expense];
@@ -337,6 +350,37 @@ export default function MinimumHourCalculator({
             <span className="text-xl sm:text-2xl font-bold text-calcularq-blue">
               R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+          <h3 className="text-sm font-semibold text-slate-800 mb-1">Margem de lucro</h3>
+          <p className="text-xs text-slate-500 mb-3">Qual margem deseja aplicar?</p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {[
+              { value: 0.1, label: "Competitivo (+10%)" },
+              { value: 0.15, label: "Padrão (+15%)" },
+              { value: 0.2, label: "Premium (+20%)" },
+            ].map((option) => (
+              <label
+                key={option.value}
+                className={[
+                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+                  margin === option.value
+                    ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                ].join(" ")}
+              >
+                <input
+                  type="radio"
+                  name="margin"
+                  value={option.value}
+                  checked={margin === option.value}
+                  onChange={() => setMargin(option.value)}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
           </div>
         </div>
       </div>

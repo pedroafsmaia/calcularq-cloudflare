@@ -1,4 +1,4 @@
-import type { BudgetData } from "@/types/budget";
+import type { BudgetData, BudgetScopeChange } from "@/types/budget";
 
 // API client para comunicação com o backend
 
@@ -175,7 +175,7 @@ class ApiClient {
         compat?: number;
         obra?: number;
       };
-      scopeChange: "as_planned" | "moderate" | "major";
+      scopeChange: BudgetScopeChange;
     }
   ): Promise<{ success: boolean; budget: Budget }> {
     return this.request(`/api/budgets/${id}/close`, {

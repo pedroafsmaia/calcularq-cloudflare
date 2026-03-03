@@ -169,7 +169,7 @@ export default function AreaFactorCard({
           <div className="mb-3 rounded border border-blue-200 bg-blue-50 p-2 text-xs text-blue-700">
             {allowEditIntervals
               ? "Os intervalos abaixo são a sugestão padrão do sistema. Você pode ajustá-los para adequar à realidade do seu escritório."
-              : "Os intervalos abaixo seguem a regra interna da calculadora demo e são usados para classificar a área automaticamente."}
+              : "Os intervalos abaixo seguem a regra interna da calculadora e são usados para classificar a área automaticamente."}
           </div>
 
           <div className="space-y-2">

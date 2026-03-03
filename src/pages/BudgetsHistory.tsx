@@ -16,15 +16,11 @@ import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
 import BudgetCloseDialog from "@/components/budgets/BudgetCloseDialog";
 import { useToast } from "@/components/ui/ToastProvider";
 import { calculateGlobalComplexity, type Factor as PricingFactor } from "@/components/pricing/PricingEngine";
-import { calculateDemoProjectValue, DEMO_PROFIT_PROFILES } from "@/components/pricing/PricingEngineDemo";
-import { isDemoMethodVersion, syncDemoCalibrationFromBudgets } from "@/lib/demoCalibration";
 import type { BudgetActualHoursByPhase, BudgetScopeChange } from "@/types/budget";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
-type ResultMode = "standard" | "demo";
+
 type DetailPreview = {
-  mode: ResultMode;
-  modeLabel: "Calculadora" | "Demo";
   globalComplexity: number;
   adjustedHourlyRate: number;
   projectPrice: number;
@@ -36,8 +32,6 @@ type DetailPreview = {
   profit: number | null;
 };
 
-const DEMO_PROFILE_FOR_COMPARISON = DEMO_PROFIT_PROFILES.estabelecido;
-
 const toSafeNumber = (value: unknown, fallback = 0): number => {
   if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
   return value;
@@ -45,7 +39,6 @@ const toSafeNumber = (value: unknown, fallback = 0): number => {
 
 const resolveSelections = (data: BudgetData): Record<string, number> => {
   if (data.selections && Object.keys(data.selections).length > 0) return data.selections;
-
   return (data.factors ?? []).reduce<Record<string, number>>((acc, factor) => {
     const level = toSafeNumber(factor.level, 0);
     if (level > 0) acc[factor.id] = level;
@@ -61,15 +54,15 @@ const resolveEffectiveArea = (data: BudgetData, selections: Record<string, numbe
 
   const interval = data.areaIntervals?.find((item) => item.level === selectedAreaLevel);
   if (!interval) return null;
-
   if (typeof interval.max === "number" && interval.max > interval.min) return (interval.min + interval.max) / 2;
   return interval.min > 0 ? interval.min : null;
 };
 
-const calculatePreviewForMode = (data: BudgetData, mode: ResultMode): DetailPreview => {
+const calculatePreview = (data: BudgetData): DetailPreview => {
   const minHourlyRate = toSafeNumber(data.minHourlyRate, 0);
   const estimatedHours = toSafeNumber(data.estimatedHours, 0);
   const discountPercent = toSafeNumber(data.commercialDiscount, 0);
+  const isMethod10 = String(data.methodVersion || "").startsWith("1.0");
   const selections = resolveSelections(data);
   const totalVariableExpenses = Array.isArray(data.variableExpenses)
     ? data.variableExpenses.reduce((sum, expense) => sum + toSafeNumber(expense?.value, 0), 0)
@@ -79,38 +72,23 @@ const calculatePreviewForMode = (data: BudgetData, mode: ResultMode): DetailPrev
   let adjustedHourlyRate = toSafeNumber(data.results?.adjustedHourlyRate, 0);
   let projectPrice = toSafeNumber(data.results?.projectPrice, 0);
 
-  if (minHourlyRate > 0 && estimatedHours >= 0) {
-    if (mode === "demo") {
-      const l3 = Number(selections.detail ?? 1) || 1;
-      const l4 = Number(selections.technical ?? 1) || 1;
-      const l5 = Number(selections.bureaucratic ?? 1) || 1;
-      const demo = calculateDemoProjectValue(
-        minHourlyRate,
-        DEMO_PROFILE_FOR_COMPARISON.m0,
-        l3,
-        l4,
-        l5,
-        estimatedHours,
-        totalVariableExpenses,
-        discountPercent
-      );
-
-      globalComplexity = demo.cExp;
-      adjustedHourlyRate = demo.htAj;
-      projectPrice = demo.projectPrice;
-    } else {
-      const factorsForComplexity: PricingFactor[] = (data.factors ?? []).map((factor) => ({
-        id: factor.id,
-        name: factor.name || factor.id,
-        description: "",
-        options: [],
-        weight: toSafeNumber(factor.weight, 1),
-      }));
-      const computedComplexity = calculateGlobalComplexity(factorsForComplexity, selections);
-      if (computedComplexity > 0) globalComplexity = computedComplexity;
-      adjustedHourlyRate = minHourlyRate * globalComplexity;
-      projectPrice = adjustedHourlyRate * estimatedHours;
-    }
+  if (isMethod10) {
+    globalComplexity =
+      typeof data.scoreComplexidade === "number" && Number.isFinite(data.scoreComplexidade)
+        ? Number((data.scoreComplexidade / 100).toFixed(2))
+        : globalComplexity;
+  } else if (minHourlyRate > 0 && estimatedHours >= 0) {
+    const factorsForComplexity: PricingFactor[] = (data.factors ?? []).map((factor) => ({
+      id: factor.id,
+      name: factor.name || factor.id,
+      description: "",
+      options: [],
+      weight: toSafeNumber(factor.weight, 1),
+    }));
+    const computedComplexity = calculateGlobalComplexity(factorsForComplexity, selections);
+    if (computedComplexity > 0) globalComplexity = computedComplexity;
+    adjustedHourlyRate = minHourlyRate * globalComplexity;
+    projectPrice = adjustedHourlyRate * estimatedHours;
   }
 
   const discountAmount = projectPrice * (discountPercent / 100);
@@ -125,8 +103,6 @@ const calculatePreviewForMode = (data: BudgetData, mode: ResultMode): DetailPrev
   const pricePerSqm = effectiveArea && effectiveArea > 0 && finalSalePrice > 0 ? finalSalePrice / effectiveArea : null;
 
   return {
-    mode,
-    modeLabel: mode === "demo" ? "Demo" : "Calculadora",
     globalComplexity,
     adjustedHourlyRate,
     projectPrice,
@@ -151,7 +127,6 @@ export default function BudgetsHistory() {
   const [detailName, setDetailName] = useState("");
   const [detailClientName, setDetailClientName] = useState("");
   const [detailDescription, setDetailDescription] = useState("");
-  const [detailResultMode, setDetailResultMode] = useState<ResultMode>("standard");
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [confirmDeleteBudgetId, setConfirmDeleteBudgetId] = useState<string | null>(null);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
@@ -163,11 +138,7 @@ export default function BudgetsHistory() {
       if (!user) return;
       try {
         const resp = await api.listBudgets();
-        const loadedBudgets = Array.isArray(resp.budgets) ? resp.budgets : [];
-        setBudgets(loadedBudgets);
-        if (user?.id) {
-          syncDemoCalibrationFromBudgets(user.id, loadedBudgets);
-        }
+        setBudgets(Array.isArray(resp.budgets) ? resp.budgets : []);
       } catch (e) {
         toast({
           tone: "error",
@@ -177,13 +148,11 @@ export default function BudgetsHistory() {
         console.error("Erro ao carregar cálculos:", e);
       }
     };
-
     load();
   }, [user, toast]);
 
   const visibleBudgets = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
-
     const filtered = budgets.filter((budget) => {
       if (!q) return true;
       const haystack = [budget.name ?? "", budget.clientName ?? "", budget.projectName ?? "", budget.data?.description ?? ""]
@@ -194,15 +163,9 @@ export default function BudgetsHistory() {
 
     const sorted = [...filtered];
     sorted.sort((a, b) => {
-      if (sortBy === "recent") {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-      }
-      if (sortBy === "price_desc") {
-        return b.data.results.finalSalePrice - a.data.results.finalSalePrice;
-      }
-      if (sortBy === "price_asc") {
-        return a.data.results.finalSalePrice - b.data.results.finalSalePrice;
-      }
+      if (sortBy === "recent") return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      if (sortBy === "price_desc") return b.data.results.finalSalePrice - a.data.results.finalSalePrice;
+      if (sortBy === "price_asc") return a.data.results.finalSalePrice - b.data.results.finalSalePrice;
       return (a.name || "").localeCompare(b.name || "", "pt-BR", { sensitivity: "base" });
     });
 
@@ -219,11 +182,7 @@ export default function BudgetsHistory() {
   const handleDelete = async (budgetId: string) => {
     try {
       await api.deleteBudget(budgetId);
-      setBudgets((prev) => {
-        const nextBudgets = prev.filter((b) => b.id !== budgetId);
-        if (user?.id) syncDemoCalibrationFromBudgets(user.id, nextBudgets);
-        return nextBudgets;
-      });
+      setBudgets((prev) => prev.filter((b) => b.id !== budgetId));
       toast({
         tone: "success",
         title: "Cálculo excluído",
@@ -239,11 +198,8 @@ export default function BudgetsHistory() {
     }
   };
 
-  const isDemoBudget = (budget: Budget) => isDemoMethodVersion(budget.data?.methodVersion);
-
   const openBudget = (budget: Budget) => {
-    const targetPage = isDemoBudget(budget) ? "CalculatorDemo" : "Calculator";
-    navigate(`${createPageUrl(targetPage)}?budget=${budget.id}`);
+    navigate(`${createPageUrl("Calculator")}?budget=${budget.id}`);
   };
 
   const selectedBudget = useMemo(
@@ -253,8 +209,7 @@ export default function BudgetsHistory() {
 
   const detailDirty = useMemo(() => {
     if (!selectedBudget) return false;
-    const originalDescription =
-      typeof selectedBudget.data?.description === "string" ? selectedBudget.data.description : "";
+    const originalDescription = typeof selectedBudget.data?.description === "string" ? selectedBudget.data.description : "";
     return (
       detailName.trim() !== (selectedBudget.name ?? "").trim() ||
       detailClientName.trim() !== (selectedBudget.clientName ?? "").trim() ||
@@ -267,7 +222,6 @@ export default function BudgetsHistory() {
     setDetailName(budget.name ?? "");
     setDetailClientName(budget.clientName ?? "");
     setDetailDescription(typeof budget.data?.description === "string" ? budget.data.description : "");
-    setDetailResultMode("standard");
   };
 
   const closeBudgetDetails = (force = false) => {
@@ -296,12 +250,7 @@ export default function BudgetsHistory() {
           description: detailDescription.trim() || undefined,
         },
       });
-
-      setBudgets((prev) => {
-        const nextBudgets = prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget));
-        if (user?.id) syncDemoCalibrationFromBudgets(user.id, nextBudgets);
-        return nextBudgets;
-      });
+      setBudgets((prev) => prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget)));
       setSelectedBudgetId(resp.budget.id);
       toast({
         tone: "success",
@@ -330,21 +279,16 @@ export default function BudgetsHistory() {
     actualHoursByPhase?: BudgetActualHoursByPhase;
     scopeChange: BudgetScopeChange;
   }) => {
-    if (!selectedCloseBudget || !user) return;
-
+    if (!selectedCloseBudget) return;
     setIsSavingCloseFeedback(true);
     try {
       const resp = await api.closeBudget(selectedCloseBudget.id, payload);
-      setBudgets((prev) => {
-        const nextBudgets = prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget));
-        syncDemoCalibrationFromBudgets(user.id, nextBudgets);
-        return nextBudgets;
-      });
+      setBudgets((prev) => prev.map((budget) => (budget.id === resp.budget.id ? resp.budget : budget)));
       setCloseDialogBudgetId(null);
       toast({
         tone: "success",
         title: "Projeto finalizado",
-        description: "Horas reais registradas e calibração DEMO atualizada.",
+        description: "Horas reais registradas com sucesso.",
       });
     } catch (e) {
       toast({
@@ -357,10 +301,11 @@ export default function BudgetsHistory() {
       setIsSavingCloseFeedback(false);
     }
   };
+
   const detailPreview = useMemo(() => {
     if (!selectedBudget) return null;
-    return calculatePreviewForMode(selectedBudget.data, detailResultMode);
-  }, [selectedBudget, detailResultMode]);
+    return calculatePreview(selectedBudget.data);
+  }, [selectedBudget]);
 
   if (!user) {
     return (
@@ -458,7 +403,7 @@ export default function BudgetsHistory() {
                 budget={budget}
                 index={index}
                 prefersReducedMotion={prefersReducedMotion}
-                showCloseProjectAction={isDemoBudget(budget)}
+                showCloseProjectAction
                 isProjectClosed={Boolean(budget.data?.closedAt)}
                 onOpenDetails={openBudgetDetails}
                 onOpenCloseProject={(selected) => setCloseDialogBudgetId(selected.id)}
@@ -478,8 +423,6 @@ export default function BudgetsHistory() {
         detailDirty={detailDirty}
         isSavingDetails={isSavingDetails}
         detailPreview={detailPreview}
-        resultMode={detailResultMode}
-        onResultModeChange={setDetailResultMode}
         onOpenChange={(open) => {
           if (!open) closeBudgetDetails();
         }}

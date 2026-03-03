@@ -4,11 +4,7 @@ import AppDialog from "@/components/ui/AppDialog";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
 
-type ResultMode = "standard" | "demo";
-
 type DetailPreview = {
-  mode: ResultMode;
-  modeLabel: "Calculadora" | "Demo";
   globalComplexity: number;
   adjustedHourlyRate: number;
   projectPrice: number;
@@ -29,8 +25,6 @@ type Props = {
   detailDirty: boolean;
   isSavingDetails: boolean;
   detailPreview: DetailPreview | null;
-  resultMode: ResultMode;
-  onResultModeChange: (mode: ResultMode) => void;
   onOpenChange: (open: boolean) => void;
   onDetailNameChange: (value: string) => void;
   onDetailClientNameChange: (value: string) => void;
@@ -49,8 +43,6 @@ export default function BudgetDetailsDialog({
   detailDirty,
   isSavingDetails,
   detailPreview,
-  resultMode,
-  onResultModeChange,
   onOpenChange,
   onDetailNameChange,
   onDetailClientNameChange,
@@ -150,39 +142,12 @@ export default function BudgetDetailsDialog({
               className="mb-0"
               icon={<History className="h-5 w-5 text-calcularq-blue" />}
               title="Resumo dos resultados"
-              description={detailPreview ? `Visualização rápida (${detailPreview.modeLabel}).` : "Visualização rápida do cálculo salvo."}
+              description="Visualização rápida do cálculo salvo."
               titleClassName="text-lg"
               descriptionClassName="text-sm"
             />
 
             <div className="mt-4 space-y-4">
-              <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50/70 p-1">
-                <button
-                  type="button"
-                  onClick={() => onResultModeChange("standard")}
-                  className={[
-                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                    resultMode === "standard"
-                      ? "bg-calcularq-blue text-white shadow-sm"
-                      : "text-slate-600 hover:bg-white hover:text-slate-800",
-                  ].join(" ")}
-                >
-                  Calculadora
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onResultModeChange("demo")}
-                  className={[
-                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                    resultMode === "demo"
-                      ? "bg-calcularq-blue text-white shadow-sm"
-                      : "text-slate-600 hover:bg-white hover:text-slate-800",
-                  ].join(" ")}
-                >
-                  Demo
-                </button>
-              </div>
-
               <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-3">
                 <p className="mb-1 text-xs font-semibold text-calcularq-blue/80">Preço de venda final</p>
                 <p className="text-2xl font-bold text-calcularq-blue">

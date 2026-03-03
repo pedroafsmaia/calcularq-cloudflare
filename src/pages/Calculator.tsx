@@ -1,16 +1,16 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
 import type { ExpenseItem } from "@/types/budget";
+import type { CenarioMethod10 } from "@/components/pricing/PricingEngineMethod10";
 
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
-import ComplexityConfig from "../components/calculator/ComplexityConfig";
 import AreaFactorCard from "../components/calculator/AreaFactorCard";
 import FactorCard from "../components/pricing/FactorCard";
-import FinalCalculation from "../components/calculator/FinalCalculation";
+import Method10Composition from "../components/calculator/Method10Composition";
 import SectionHeader from "../components/calculator/SectionHeader";
 import CalculatorResultsPanel from "../components/calculator/CalculatorResultsPanel";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -21,11 +21,11 @@ import {
   DEFAULT_FACTORS,
   DEFAULT_AREA_INTERVALS,
   calculateGlobalComplexity,
-  calculateProjectValue,
   calculateAreaLevel,
   Factor,
   AreaInterval,
 } from "../components/pricing/PricingEngine";
+import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod10";
 import { createPageUrl } from "@/utils";
 import { fadeUp } from "@/lib/motion";
 import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "@/lib/calculatorDraft";
@@ -35,9 +35,8 @@ import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImp
 
 const STEPS = [
   { n: 1, label: "Hora técnica mínima" },
-  { n: 2, label: "Fatores de complexidade" },
-  { n: 3, label: "Calibragem dos pesos" },
-  { n: 4, label: "Composição final" },
+  { n: 2, label: "Informações do projeto" },
+  { n: 3, label: "Composição final" },
 ];
 
 export default function Calculator() {
@@ -68,6 +67,7 @@ export default function Calculator() {
   // Seção 1
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [useManualMinHourlyRate, setUseManualMinHourlyRate] = useState(false);
+  const [profitMargin, setProfitMargin] = useState(0.15);
   const [fixedExpenses, setFixedExpenses] = useState<ExpenseItem[]>([]);
   const [personalExpenses, setPersonalExpenses] = useState<ExpenseItem[]>([]);
   const [proLabore, setProLabore] = useState(0);
@@ -83,6 +83,8 @@ export default function Calculator() {
 
   // Seção 4
   const [estimatedHours, setEstimatedHours] = useState(0);
+  const [cenarioEscolhido, setCenarioEscolhido] = useState<CenarioMethod10>("conservador");
+  const [horasManuais, setHorasManuais] = useState<number | null>(null);
   const [commercialDiscount, setCommercialDiscount] = useState(0);
   const [variableExpenses, setVariableExpenses] = useState<ExpenseItem[]>([]);
 
@@ -99,10 +101,10 @@ export default function Calculator() {
     setDraftStatus("saving");
     draftSaveRef.current = setTimeout(() => {
       saveCalculatorDraft({
-        minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
+        minHourlyRate, useManualMinHourlyRate, profitMargin, fixedExpenses, personalExpenses, proLabore, productiveHours,
         factors: factors.map(f => ({ id: f.id, weight: f.weight })),
         areaIntervals, area, selections,
-        estimatedHours, commercialDiscount, variableExpenses,
+        estimatedHours, cenarioEscolhido, hUsuarioManual: horasManuais, commercialDiscount, variableExpenses,
         currentStep, maxStepReached,
         savedAt: Date.now(),
       });
@@ -113,9 +115,9 @@ export default function Calculator() {
     }, 800);
   }, [
     budgetId,
-    minHourlyRate, useManualMinHourlyRate, fixedExpenses, personalExpenses, proLabore, productiveHours,
+    minHourlyRate, useManualMinHourlyRate, profitMargin, fixedExpenses, personalExpenses, proLabore, productiveHours,
     factors, areaIntervals, area, selections,
-    estimatedHours, commercialDiscount, variableExpenses,
+    estimatedHours, cenarioEscolhido, horasManuais, commercialDiscount, variableExpenses,
     currentStep, maxStepReached,
     user,
   ]);
@@ -141,6 +143,9 @@ export default function Calculator() {
 
     setMinHourlyRate(draft.minHourlyRate ?? null);
     setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
+    if (typeof draft.profitMargin === "number" && Number.isFinite(draft.profitMargin)) {
+      setProfitMargin(draft.profitMargin);
+    }
     if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
     if (draft.personalExpenses) setPersonalExpenses(draft.personalExpenses);
     if (draft.proLabore) setProLabore(draft.proLabore);
@@ -156,6 +161,12 @@ export default function Calculator() {
     if (draft.area) setArea(draft.area);
     if (draft.selections) setSelections(draft.selections);
     if (draft.estimatedHours) setEstimatedHours(draft.estimatedHours);
+    if (draft.cenarioEscolhido === "otimista" || draft.cenarioEscolhido === "conservador") {
+      setCenarioEscolhido(draft.cenarioEscolhido);
+    }
+    if (typeof draft.hUsuarioManual === "number" && Number.isFinite(draft.hUsuarioManual)) {
+      setHorasManuais(draft.hUsuarioManual);
+    }
     if (draft.commercialDiscount !== undefined) setCommercialDiscount(draft.commercialDiscount);
     if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
     if (draft.currentStep) setCurrentStep(draft.currentStep);
@@ -196,14 +207,43 @@ export default function Calculator() {
         setLoadedBudgetDescription(typeof budget.data?.description === "string" ? budget.data.description : null);
         setMinHourlyRate(budget.data.minHourlyRate);
         setUseManualMinHourlyRate(Boolean(budget.data.useManualMinHourlyRate));
+        if (typeof budget.data.margemLucro === "number" && Number.isFinite(budget.data.margemLucro)) {
+          setProfitMargin(budget.data.margemLucro);
+        } else if (budget.data.profitProfile === "portfolio") {
+          setProfitMargin(0.1);
+        } else if (budget.data.profitProfile === "referencia") {
+          setProfitMargin(0.2);
+        } else {
+          setProfitMargin(0.15);
+        }
+        if (budget.data.cenarioEscolhido === "otimista" || budget.data.cenarioEscolhido === "conservador") {
+          setCenarioEscolhido(budget.data.cenarioEscolhido);
+        } else {
+          setCenarioEscolhido("conservador");
+        }
+        if (typeof budget.data.hUsuarioManual === "number" && Number.isFinite(budget.data.hUsuarioManual)) {
+          setHorasManuais(budget.data.hUsuarioManual);
+        } else {
+          setHorasManuais(null);
+        }
 
-        setFactors(budget.data.factors.map((f) => {
-          const defaultFactor = DEFAULT_FACTORS.find(df => df.id === f.id);
-          return { ...defaultFactor!, weight: f.weight };
-        }));
+        setFactors(
+          DEFAULT_FACTORS.map((defaultFactor) => {
+            const saved = budget.data.factors.find((factor) => factor.id === defaultFactor.id);
+            return saved ? { ...defaultFactor, weight: saved.weight } : defaultFactor;
+          })
+        );
 
         setAreaIntervals(budget.data.areaIntervals);
-        setSelections(budget.data.selections);
+        const mergedSelections: Record<string, number> = {
+          ...budget.data.selections,
+        };
+        for (const id of ["area", "tipology", "volumetry", "reform", "stage", "monitoring", "detail", "technical", "bureaucratic"]) {
+          if (!Number.isFinite(mergedSelections[id]) || mergedSelections[id] <= 0) {
+            mergedSelections[id] = 1;
+          }
+        }
+        setSelections(mergedSelections);
         setEstimatedHours(budget.data.estimatedHours);
         setVariableExpenses(budget.data.variableExpenses || []);
         if (budget.data.commercialDiscount !== undefined) setCommercialDiscount(budget.data.commercialDiscount);
@@ -224,8 +264,8 @@ export default function Calculator() {
             }
           }
         }
-        setCurrentStep(4);
-        setMaxStepReached(4);
+        setCurrentStep(3);
+        setMaxStepReached(3);
       } catch (e) {
         console.error("Erro ao carregar cálculo:", e);
       } finally {
@@ -251,6 +291,7 @@ export default function Calculator() {
     defaultFactors: DEFAULT_FACTORS,
     setMinHourlyRate,
     setUseManualMinHourlyRate,
+    setProfitMargin,
     setFixedExpenses,
     setPersonalExpenses,
     setProLabore,
@@ -260,8 +301,12 @@ export default function Calculator() {
     setArea,
     setFactors,
     setEstimatedHours,
+    setCenarioEscolhido,
+    setHorasManuais,
     setCommercialDiscount,
     setVariableExpenses,
+    hasWeightStep: false,
+    finalStepNumber: 3,
   });
 
   const {
@@ -279,6 +324,7 @@ export default function Calculator() {
     setMaxStepReached,
     setMinHourlyRate,
     setUseManualMinHourlyRate,
+    setProfitMargin,
     setFixedExpenses,
     setPersonalExpenses,
     setProLabore,
@@ -288,13 +334,13 @@ export default function Calculator() {
     setArea,
     setSelections,
     setEstimatedHours,
+    setCenarioEscolhido,
+    setHorasManuais,
     setCommercialDiscount,
     setVariableExpenses,
+    hasWeightStep: false,
+    finalStepNumber: 3,
   });
-
-  const handleFactorWeightChange = useCallback((factorId: string, weight: number) => {
-    setFactors(prev => prev.map(f => f.id === factorId ? { ...f, weight } : f));
-  }, []);
 
   const handleAreaChange = useCallback((newArea: number) => {
     setArea(newArea);
@@ -312,32 +358,106 @@ export default function Calculator() {
     setSelections(prev => ({ ...prev, [factorId]: value }));
   }, []);
 
-  // ── Cálculos ──────────────────────────────────────────────────
-  const globalComplexity = useMemo(() => calculateGlobalComplexity(factors, selections), [factors, selections]);
+  const requiredSelectionIds = [
+    "area",
+    "tipology",
+    "volumetry",
+    "reform",
+    "stage",
+    "monitoring",
+    "detail",
+    "technical",
+    "bureaucratic",
+  ];
+  const hasComplexitySelections = requiredSelectionIds.every((id) => Number(selections[id]) > 0);
 
-  const results = useMemo(() => {
-    if (!minHourlyRate || minHourlyRate <= 0) return null;
-    const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
-    return calculateProjectValue(minHourlyRate, estimatedHours, globalComplexity, totalVariableExpenses);
-  }, [minHourlyRate, estimatedHours, globalComplexity, variableExpenses]);
+  // ── Cálculos ──────────────────────────────────────────────────
+  const methodOutputSuggested = useMemo(() => {
+    if (!minHourlyRate || minHourlyRate <= 0 || !area || area <= 0) return null;
+    if (!hasComplexitySelections) return null;
+
+    try {
+      return calcularMethod10({
+        ht_min: minHourlyRate,
+        margem_lucro: profitMargin,
+        area,
+        etapa: Number(selections.stage ?? 1),
+        tipologia: tipologiaFromLevel(Number(selections.tipology ?? 1)),
+        volumetria: Number(selections.volumetry ?? 1),
+        reforma: reformFromLevel(Number(selections.reform ?? 1)),
+        f3_detalhamento: Number(selections.detail ?? 1),
+        f4_tecnica: Number(selections.technical ?? 1),
+        f5_burocracia: Number(selections.bureaucratic ?? 1),
+        f6_obra: Number(selections.monitoring ?? 1),
+        cenario: cenarioEscolhido,
+      });
+    } catch {
+      return null;
+    }
+  }, [area, cenarioEscolhido, hasComplexitySelections, minHourlyRate, profitMargin, selections]);
+
+  const methodOutput = useMemo(() => {
+    if (!minHourlyRate || minHourlyRate <= 0 || !area || area <= 0) return null;
+    if (!hasComplexitySelections) return null;
+
+    try {
+      return calcularMethod10({
+        ht_min: minHourlyRate,
+        margem_lucro: profitMargin,
+        area,
+        etapa: Number(selections.stage ?? 1),
+        tipologia: tipologiaFromLevel(Number(selections.tipology ?? 1)),
+        volumetria: Number(selections.volumetry ?? 1),
+        reforma: reformFromLevel(Number(selections.reform ?? 1)),
+        f3_detalhamento: Number(selections.detail ?? 1),
+        f4_tecnica: Number(selections.technical ?? 1),
+        f5_burocracia: Number(selections.bureaucratic ?? 1),
+        f6_obra: Number(selections.monitoring ?? 1),
+        cenario: cenarioEscolhido,
+        h_usuario_manual: horasManuais ?? undefined,
+      });
+    } catch {
+      return null;
+    }
+  }, [area, cenarioEscolhido, hasComplexitySelections, horasManuais, minHourlyRate, profitMargin, selections]);
+
+  useEffect(() => {
+    if (!methodOutput) return;
+    setEstimatedHours(methodOutput.h_final);
+  }, [methodOutput]);
+
+  const globalComplexity = useMemo(() => {
+    if (methodOutput) return Number((methodOutput.score_complexidade / 100).toFixed(2));
+    return calculateGlobalComplexity(factors, selections);
+  }, [factors, methodOutput, selections]);
 
   const displayValues = useMemo(() => {
-    const totalVariableExpenses = variableExpenses.reduce((sum, exp) => sum + exp.value, 0);
-    const adjustedHourlyRate = minHourlyRate && minHourlyRate > 0 && globalComplexity > 0
-      ? minHourlyRate * globalComplexity : 0;
-    const projectPrice = adjustedHourlyRate > 0 && estimatedHours > 0
-      ? adjustedHourlyRate * estimatedHours : 0;
-    const projectPriceWithDiscount = projectPrice * (1 - commercialDiscount / 100);
-    const discountAmount = projectPrice * (commercialDiscount / 100);
-    const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
-    const profit = minHourlyRate && adjustedHourlyRate > 0 && estimatedHours > 0
-      ? (adjustedHourlyRate - minHourlyRate) * estimatedHours
-      : null;
+    if (!methodOutput || !minHourlyRate || minHourlyRate <= 0) {
+      return {
+        totalVariableExpenses: 0,
+        adjustedHourlyRate: 0,
+        projectPrice: 0,
+        projectPriceWithDiscount: 0,
+        discountAmount: 0,
+        finalSalePrice: 0,
+        profit: null as number | null,
+      };
+    }
+
+    const adjustedHourlyRate = methodOutput.ht_aj;
+    const projectPrice = methodOutput.preco_final;
+    const profit = (adjustedHourlyRate - minHourlyRate) * methodOutput.h_final;
+
     return {
-      totalVariableExpenses, adjustedHourlyRate, projectPrice,
-      projectPriceWithDiscount, discountAmount, finalSalePrice, profit,
+      totalVariableExpenses: 0,
+      adjustedHourlyRate,
+      projectPrice,
+      projectPriceWithDiscount: projectPrice,
+      discountAmount: 0,
+      finalSalePrice: projectPrice,
+      profit: Number(profit.toFixed(2)),
     };
-  }, [minHourlyRate, globalComplexity, estimatedHours, commercialDiscount, variableExpenses]);
+  }, [methodOutput, minHourlyRate]);
 
   const CUB_MEDIO = 2800;
   const effectiveAreaForCub = useMemo(() => {
@@ -371,6 +491,7 @@ export default function Calculator() {
       JSON.stringify({
         minHourlyRate,
         useManualMinHourlyRate,
+        profitMargin,
         fixedExpenses,
         personalExpenses,
         proLabore,
@@ -380,6 +501,8 @@ export default function Calculator() {
         area,
         selections,
         estimatedHours,
+        cenarioEscolhido,
+        horasManuais,
         commercialDiscount,
         variableExpenses,
         currentStep,
@@ -388,6 +511,7 @@ export default function Calculator() {
       area,
       areaIntervals,
       commercialDiscount,
+      cenarioEscolhido,
       currentStep,
       estimatedHours,
       factors,
@@ -396,9 +520,11 @@ export default function Calculator() {
       personalExpenses,
       proLabore,
       productiveHours,
+      profitMargin,
       selections,
       useManualMinHourlyRate,
       variableExpenses,
+      horasManuais,
     ]
   );
 
@@ -434,9 +560,8 @@ export default function Calculator() {
     };
   }, [hasUnsavedChanges, shouldClearDraftOnExit]);
 
-  const hasComplexitySelections = Object.keys(selections).length > 0;
-  const totalFactors = factors.length; // inclui área
-  const selectedFactorsCount = Object.keys(selections).length;
+  const totalFactors = factors.length;
+  const selectedFactorsCount = Object.values(selections).filter((value) => Number(value) > 0).length;
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area");
 
@@ -448,6 +573,7 @@ export default function Calculator() {
     minHourlyRate,
     hasComplexitySelections,
     finalSalePrice: displayValues.finalSalePrice,
+    includeWeightStep: false,
   });
 
   const stepVisualDone = (n: number) => maxStepReached > n;
@@ -459,7 +585,7 @@ export default function Calculator() {
   );
 
   const handleNext = () => {
-    if (currentStep < 4 && canAdvance) {
+    if (currentStep < STEPS.length && canAdvance) {
       setCurrentStep(s => s + 1);
     }
   };
@@ -557,7 +683,7 @@ export default function Calculator() {
 
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        if (currentStep < 4 && canAdvance) setCurrentStep((s) => s + 1);
+        if (currentStep < STEPS.length && canAdvance) setCurrentStep((s) => s + 1);
         return;
       }
       if (event.key === "ArrowLeft") {
@@ -567,9 +693,9 @@ export default function Calculator() {
       }
 
       const digitFromCode = (() => {
-        if (/^Digit[1-4]$/.test(event.code)) return Number(event.code.replace("Digit", ""));
-        if (/^Numpad[1-4]$/.test(event.code)) return Number(event.code.replace("Numpad", ""));
-        if (/^[1-4]$/.test(event.key)) return Number(event.key);
+        if (/^Digit[1-3]$/.test(event.code)) return Number(event.code.replace("Digit", ""));
+        if (/^Numpad[1-3]$/.test(event.code)) return Number(event.code.replace("Numpad", ""));
+        if (/^[1-3]$/.test(event.key)) return Number(event.key);
         return null;
       })();
 
@@ -631,7 +757,7 @@ export default function Calculator() {
             Calculadora de Precificação
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Descubra sua hora técnica mínima, classifique a complexidade do projeto, ajuste os pesos (opcional) e finalize a composição do preço.
+            Configure sua hora técnica, descreva o projeto e finalize o preço com base no Método Calcularq 1.0.
           </p>
         </motion.div>
 
@@ -648,9 +774,7 @@ export default function Calculator() {
                     <button
                       type="button"
                       onClick={() => goToStep(step.n)}
-                      title={
-                        step.n === 3 ? "Etapa opcional" : step.label
-                      }
+                      title={step.label}
                       className="relative"
                     >
                       <span
@@ -669,9 +793,6 @@ export default function Calculator() {
                     >
                       {step.label}
                     </span>
-                    {step.n === 3 ? (
-                       <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400 text-center">Opcional</span>
-                     ) : null}
                   </div>
                   {i < STEPS.length - 1 && (
                     <div
@@ -735,17 +856,11 @@ export default function Calculator() {
                       </button>
                       <div className="hidden sm:block mt-1 border-t border-slate-100 px-3 pt-2 pb-1">
                         <p className="text-[11px] leading-relaxed text-slate-400">
-                          Atalhos: Alt+← / Alt+→ / Alt+1-4
+                          Atalhos: Alt+← / Alt+→ / Alt+1-3
                         </p>
                       </div>
                     </div>
                   </details>
-                  <Link
-                    to={createPageUrl("CalculatorDemo")}
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200/90 bg-transparent px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-800"
-                  >
-                    Abrir demo
-                  </Link>
                 </div>
                 <div className="hidden sm:flex flex-wrap items-center justify-end gap-2 text-xs sm:max-w-[46%]">
                   <span
@@ -770,11 +885,9 @@ export default function Calculator() {
                 </div>
               </div>
               <div className="mt-2 min-h-5">
-                {currentStep === 3 ? (
-                  <p className="hidden sm:block text-sm text-slate-500">
-                    Etapa opcional. Você pode ajustar os pesos ou manter o padrão.
-                  </p>
-                ) : null}
+                <p className="hidden sm:block text-sm text-slate-500">
+                  Etapa {currentStep} de {STEPS.length}.
+                </p>
               </div>
             </motion.div>
 
@@ -783,15 +896,10 @@ export default function Calculator() {
             <summary className="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
               <div className="flex items-center justify-between gap-3 rounded-lg px-1 py-1.5 hover:bg-slate-50 transition-colors duration-150">
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de 4</p>
+                  <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de {STEPS.length}</p>
                   <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {currentStep === 3 ? (
-                    <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
-                      Opcional
-                    </span>
-                  ) : null}
                   <ChevronDown className="h-4 w-4 text-slate-500" />
                 </div>
               </div>
@@ -870,6 +978,8 @@ export default function Calculator() {
                     initialMinHourRate={minHourlyRate || undefined}
                     initialUseManual={useManualMinHourlyRate}
                     onManualModeChange={setUseManualMinHourlyRate}
+                    initialMargin={profitMargin}
+                    onMarginChange={setProfitMargin}
                     onFixedExpensesChange={setFixedExpenses}
                     onProductiveHoursChange={setProductiveHours}
                     onProLaboreChange={setProLabore}
@@ -881,18 +991,11 @@ export default function Calculator() {
                   />
                 )}
 
-                {currentStep === 3 && (
-                  <ComplexityConfig
-                    factors={factors}
-                    onFactorWeightChange={handleFactorWeightChange}
-                  />
-                )}
-
                 {currentStep === 2 && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
                     <SectionHeader
-                      title="Análise de complexidade"
-                      description="Selecione as características do projeto específico que está precificando"
+                      title="Informações do projeto"
+                      description="Preencha os campos da etapa para que o método calcule horas e preço com base na complexidade."
                       icon={<BarChart2 className="w-5 h-5 text-calcularq-blue" />}
                     />
 
@@ -927,55 +1030,38 @@ export default function Calculator() {
                   </div>
                 )}
 
-                {currentStep === 4 && minHourlyRate && minHourlyRate > 0 && results && (
-                  <FinalCalculation
+                {currentStep === 3 && minHourlyRate && minHourlyRate > 0 && area && area > 0 && methodOutput && methodOutputSuggested && (
+                  <Method10Composition
                     budgetId={budgetId || undefined}
                     initialBudgetName={loadedBudgetName || undefined}
                     initialClientName={loadedClientName || undefined}
                     initialProjectName={loadedProjectName || undefined}
                     initialDescription={loadedBudgetDescription || undefined}
-                    proLabore={proLabore}
                     minHourlyRate={minHourlyRate}
-                    globalComplexity={results.globalComplexity}
-                    adjustedHourlyRate={results.adjustedHourlyRate}
-                    estimatedHours={estimatedHours}
-                    onEstimatedHoursChange={setEstimatedHours}
-                    commercialDiscount={commercialDiscount}
-                    onCommercialDiscountChange={setCommercialDiscount}
-                    variableExpenses={variableExpenses}
-                    onVariableExpensesChange={setVariableExpenses}
-                    projectPrice={results.projectPrice}
-                    finalSalePrice={displayValues.finalSalePrice}
-                    factorLevels={selections}
+                    useManualMinHourlyRate={useManualMinHourlyRate}
+                    fixedExpenses={fixedExpenses}
+                    personalExpenses={personalExpenses}
+                    proLabore={proLabore}
+                    productiveHours={productiveHours}
                     area={area}
                     factors={factors}
                     areaIntervals={areaIntervals}
-                    fixedExpenses={fixedExpenses}
-                    personalExpenses={personalExpenses}
-                    productiveHours={productiveHours}
-                    useManualMinHourlyRate={useManualMinHourlyRate}
+                    selections={selections}
+                    margin={profitMargin}
+                    tipologia={tipologiaFromLevel(Number(selections.tipology ?? 1))}
+                    volumetria={Number(selections.volumetry ?? 1)}
+                    reforma={reformFromLevel(Number(selections.reform ?? 1))}
+                    cenario={cenarioEscolhido}
+                    onCenarioChange={setCenarioEscolhido}
+                    horasManual={horasManuais}
+                    onHorasManualChange={setHorasManuais}
+                    h50={methodOutputSuggested.h50}
+                    hCons={methodOutputSuggested.h_cons}
+                    output={methodOutput}
                     onBudgetSaved={handleBudgetSaved}
-                    mobileResultsContent={
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
-                        className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
-                      >
-                        <SectionHeader
-                          compact
-                          title="Resultados"
-                          description="Resumo do cálculo atual"
-                          icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
-                        />
-                        <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
-                          <ResultsPanel />
-                        </div>
-                      </motion.div>
-                    }
                   />
                 )}
-                {currentStep === 4 && (!minHourlyRate || !results) && (
+                {currentStep === 3 && (!minHourlyRate || !methodOutput) && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center shadow-sm">
                     <p className="text-slate-500">Complete as etapas anteriores para chegar ao cálculo final.</p>
                     <button type="button" onClick={() => setCurrentStep(1)} className="mt-4 text-sm font-semibold text-calcularq-blue underline">
@@ -1021,7 +1107,7 @@ export default function Calculator() {
           <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
 
           <div className="flex flex-col items-end gap-1">
-            {currentStep < 4 ? (
+            {currentStep < STEPS.length ? (
               <>
                 {!canAdvance ? (
                   <p className="hidden sm:block text-xs text-slate-500">Complete os campos obrigatórios para avançar.</p>

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom
 import { AuthProvider } from './contexts/AuthContext'
 import Home from './pages/Home'
 import Calculator from './pages/Calculator'
-import CalculatorDemo from './pages/CalculatorDemo'
 import Manual from './pages/Manual'
 import Login from './pages/Login'
 import Payment from './pages/Payment'
@@ -32,14 +31,6 @@ function App() {
                 <Calculator />
               </ProtectedRoute>
             } 
-          />
-          <Route
-            path="/calculator-demo"
-            element={
-              <ProtectedRoute requirePayment={true}>
-                <CalculatorDemo />
-              </ProtectedRoute>
-            }
           />
           <Route 
             path="/manual" 
