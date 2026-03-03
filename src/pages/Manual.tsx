@@ -1,196 +1,542 @@
-import { useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
-import { BookOpen, ChevronDown, ChevronUp, LifeBuoy, ArrowRight } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+  Calculator,
+  Settings2,
+  Layers,
+  DollarSign,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  BookOpen,
+  ArrowRight,
+} from "lucide-react";
+import SectionHeader from "@/components/calculator/SectionHeader";
+import { ManualCard, NoteBox } from "@/components/manual/ManualCard";
+import ManualStepper from "@/components/manual/ManualStepper";
+import ManualMobileSummary from "@/components/manual/ManualMobileSummary";
 import { createPageUrl } from "@/utils";
 import { fadeUp } from "@/lib/motion";
 
-type Section = {
-  id: string;
-  title: string;
-  content: string[];
-};
+type FactorId = "area" | "stage" | "detail" | "technical" | "bureaucratic" | "monitoring";
 
-const MANUAL_SECTIONS: Section[] = [
-  {
-    id: "primeiros-passos",
-    title: "1. Primeiros passos",
-    content: [
-      "Comece definindo sua hora técnica mínima e a margem de lucro desejada.",
-      "Use valores realistas do seu escritório para evitar distorções no preço final.",
-      "A etapa inicial cria a base financeira do cálculo.",
-    ],
-  },
-  {
-    id: "usando-calculadora",
-    title: "2. Usando a calculadora",
-    content: [
-      "Preencha os dados essenciais do projeto: área, tipologia, níveis, reforma e etapa final.",
-      "Em seguida, defina os níveis de complexidade técnica e burocrática.",
-      "O objetivo é traduzir esforço real de execução em horas estimadas.",
-    ],
-  },
-  {
-    id: "entendendo-resultado",
-    title: "3. Entendendo o resultado",
-    content: [
-      "Escolha entre cenário conservador ou otimista para gerar as horas finais.",
-      "Ajuste manualmente as horas apenas quando houver justificativa técnica/comercial.",
-      "Use os indicadores de preço por m² e valor/hora como referência de mercado, não como regra rígida.",
-    ],
-  },
-  {
-    id: "faq-suporte",
-    title: "4. FAQ & suporte",
-    content: [
-      "As respostas abaixo resumem os principais pontos de acesso, reembolso, dados e responsabilidades de uso.",
-      "Para suporte, utilize o e-mail oficial: atendimento@calcularq.com.br.",
-    ],
-  },
-];
+const manualSteps = [
+  { id: "introducao", label: "Visão geral", short: "Introdução" },
+  { id: "etapa-1", label: "Hora técnica mínima", short: "Hora técnica mínima" },
+  { id: "etapa-2", label: "Fatores de complexidade", short: "Fatores de complexidade" },
+  { id: "etapa-3", label: "Calibragem dos pesos", short: "Calibragem dos pesos" },
+  { id: "etapa-4", label: "Composição final do preço", short: "Composição final" },
+  { id: "encerramento", label: "Conclusão", short: "Conclusão" },
+] as const;
 
-const FAQ_ITEMS = [
-  {
-    q: "Quanto tempo tenho de acesso?",
-    a: "Garantia mínima de 6 meses. Após isso, o acesso continua enquanto o software estiver disponível (Life of the Software).",
-  },
-  {
-    q: "Posso usar em quantos projetos?",
-    a: "Ilimitado durante o período de acesso.",
-  },
-  {
-    q: "Posso pedir reembolso?",
-    a: "Sim. Você tem 7 dias corridos para solicitar reembolso integral pelo atendimento@calcularq.com.br.",
-  },
-  {
-    q: "E se o sistema sair do ar antes de 6 meses?",
-    a: "Você recebe reembolso integral, independente do tempo já utilizado.",
-  },
-  {
-    q: "O software pode sair do ar?",
-    a: "Sim. Após os 6 meses de garantia, pode ser descontinuado com aviso prévio de 30 dias para exportação dos dados.",
-  },
-  {
-    q: "Posso transferir minha conta?",
-    a: "Não. A licença é pessoal e intransferível.",
-  },
-  {
-    q: "O preço sugerido está sempre certo?",
-    a: "Não. O Calcularq é ferramenta de apoio. A validação final da proposta é sua responsabilidade.",
-  },
-  {
-    q: "Posso mudar minha HT_min depois?",
-    a: "Sim. Você pode recalcular sua base sempre que precisar.",
-  },
-  {
-    q: "Os cálculos salvos ficam guardados?",
-    a: "Sim, durante o período de acesso. Se houver descontinuação, exporte seus dados antes do prazo final.",
-  },
-  {
-    q: "Há garantia de que vou lucrar com os preços calculados?",
-    a: "Não. A ferramenta auxilia no cálculo, mas não garante aceitação comercial nem rentabilidade.",
-  },
-  {
-    q: "Vocês guardam meus dados de cartão?",
-    a: "Não. O pagamento é processado pela Stripe e os dados bancários não ficam armazenados no sistema.",
-  },
-  {
-    q: "Posso inserir dados dos meus clientes?",
-    a: "Sim, desde que você tenha as autorizações necessárias e cumpra LGPD no seu uso.",
-  },
-  {
-    q: "Os termos podem mudar?",
-    a: "Sim. Mudanças relevantes são comunicadas com antecedência de 15 dias.",
-  },
-];
+const MANUAL_SCROLL_OFFSET = {
+  mobile: 132,
+  desktop: 92,
+} as const;
+
+const MANUAL_SCROLL_SPY_TOP = {
+  mobile: 132,
+  desktop: 240,
+} as const;
 
 export default function Manual() {
   const prefersReducedMotion = !!useReducedMotion();
-  const [openSectionId, setOpenSectionId] = useState<string>(MANUAL_SECTIONS[0].id);
+  const [activeStepId, setActiveStepId] = useState<(typeof manualSteps)[number]["id"]>("introducao");
+  const mobileSummaryRef = useRef<HTMLDetailsElement | null>(null);
+  const [expandedFactors, setExpandedFactors] = useState<Record<FactorId, boolean>>({
+    area: true,
+    stage: false,
+    detail: false,
+    technical: false,
+    bureaucratic: false,
+    monitoring: false,
+  });
 
-  return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <motion.section variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-calcularq-blue mb-4">
-            <BookOpen className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-calcularq-blue">Manual de instruções</h1>
-          <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
-            Guia objetivo para usar a calculadora, interpretar o resultado e consultar dúvidas frequentes.
-          </p>
-        </motion.section>
+  const toggleFactor = (factorId: FactorId) => {
+    setExpandedFactors((prev) => ({
+      ...prev,
+      [factorId]: !prev[factorId],
+    }));
+  };
 
-        <div className="mt-6 space-y-4">
-          {MANUAL_SECTIONS.map((section) => {
-            const isOpen = openSectionId === section.id;
-            return (
-              <motion.section
-                key={section.id}
-                variants={fadeUp(prefersReducedMotion, 12)}
-                initial="hidden"
-                animate="show"
-                className="rounded-2xl border border-slate-200 bg-white shadow-sm"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenSectionId(isOpen ? "" : section.id)}
-                  className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-slate-50 rounded-2xl"
-                >
-                  <h2 className="text-base sm:text-lg font-semibold text-calcularq-blue">{section.title}</h2>
-                  {isOpen ? <ChevronUp className="w-4 h-4 text-calcularq-blue" /> : <ChevronDown className="w-4 h-4 text-calcularq-blue" />}
-                </button>
+  const activeStepIndex = useMemo(
+    () => Math.max(0, manualSteps.findIndex((step) => step.id === activeStepId)),
+    [activeStepId]
+  );
+  const activeManualStep = manualSteps[activeStepIndex] ?? manualSteps[0];
+  const mobileSummaryShowsCurrentStep = activeManualStep.id !== "introducao";
 
-                {isOpen ? (
-                  <div className="border-t border-slate-200 px-5 py-4">
-                    <ul className="space-y-3 text-sm sm:text-base text-slate-700 leading-relaxed">
-                      {section.content.map((line) => (
-                        <li key={line} className="flex items-start gap-2.5">
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-calcularq-blue/40 shrink-0" />
-                          <span>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
+  const scrollToSection = (id: (typeof manualSteps)[number]["id"]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const sectionAnchor = (el.closest("section") as HTMLElement | null) ?? el;
 
-                    {section.id === "faq-suporte" ? (
-                      <div className="mt-5 space-y-3">
-                        {FAQ_ITEMS.map((item) => (
-                          <div key={item.q} className="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
-                            <p className="text-sm sm:text-base font-semibold text-slate-800">{item.q}</p>
-                            <p className="mt-1 text-sm sm:text-base text-slate-700 leading-relaxed">{item.a}</p>
-                          </div>
-                        ))}
-                        <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm sm:text-base text-calcularq-blue">
-                          <div className="inline-flex items-center gap-2 font-semibold">
-                            <LifeBuoy className="w-4 h-4" />
-                            Suporte
-                          </div>
-                          <p className="mt-1">E-mail: atendimento@calcularq.com.br</p>
-                          <p className="text-sm mt-1">Resposta em até 24h úteis.</p>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-              </motion.section>
-            );
-          })}
-        </div>
+    const isMobile = window.innerWidth < 768;
+    const summaryWasOpen = isMobile && Boolean(mobileSummaryRef.current?.open);
 
-        <motion.section variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" className="mt-6 rounded-2xl bg-gradient-to-br from-calcularq-blue to-[#002366] p-6 text-white shadow-sm">
-          <h3 className="text-xl font-bold">Pronto para calcular?</h3>
-          <p className="mt-2 text-sm sm:text-base text-white/90">
-            Use o fluxo completo da calculadora e salve seus projetos para histórico e comparação.
-          </p>
-          <Link
-            to={createPageUrl("Calculator")}
-            className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-calcularq-blue hover:bg-slate-100"
+    if (summaryWasOpen && mobileSummaryRef.current) {
+      mobileSummaryRef.current.open = false;
+    }
+
+    const performScroll = () => {
+      const offset = isMobile ? MANUAL_SCROLL_OFFSET.mobile : MANUAL_SCROLL_OFFSET.desktop;
+      const top = sectionAnchor.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: "smooth" });
+    };
+
+    if (summaryWasOpen) {
+      requestAnimationFrame(() => requestAnimationFrame(performScroll));
+      return;
+    }
+
+    performScroll();
+  };
+
+  useEffect(() => {
+    const updateActiveStep = () => {
+      const isMobile = window.innerWidth < 768;
+      const stickyTop = isMobile ? MANUAL_SCROLL_SPY_TOP.mobile : MANUAL_SCROLL_SPY_TOP.desktop;
+      const viewportHeight = window.innerHeight;
+      const viewportBottom = viewportHeight - (isMobile ? 20 : 32);
+
+      let bestStep: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
+      let bestVisible = 0;
+
+      for (const step of manualSteps) {
+        const anchor = document.getElementById(step.id);
+        if (!anchor) continue;
+        const container = (anchor.closest("section") as HTMLElement | null) ?? anchor;
+        const rect = container.getBoundingClientRect();
+        const visibleTop = Math.max(rect.top, stickyTop);
+        const visibleBottom = Math.min(rect.bottom, viewportBottom);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+        if (visibleHeight > bestVisible) {
+          bestVisible = visibleHeight;
+          bestStep = step.id;
+        }
+      }
+
+      if (bestVisible > 0) {
+        setActiveStepId(bestStep);
+        return;
+      }
+
+      // Fallback: quando nenhuma seção está visível o suficiente, usa a mais próxima do topo útil.
+      let fallback: (typeof manualSteps)[number]["id"] = manualSteps[0].id;
+      for (const step of manualSteps) {
+        const el = document.getElementById(step.id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= stickyTop) fallback = step.id;
+      }
+      setActiveStepId(fallback);
+    };
+
+    updateActiveStep();
+    window.addEventListener("scroll", updateActiveStep, { passive: true });
+    window.addEventListener("resize", updateActiveStep);
+    return () => {
+      window.removeEventListener("scroll", updateActiveStep);
+      window.removeEventListener("resize", updateActiveStep);
+    };
+  }, []);
+
+  const FactorAccordion = ({
+    id,
+    title,
+    definition,
+    items,
+    footer,
+  }: {
+    id: FactorId;
+    title: string;
+    definition: React.ReactNode;
+    items: React.ReactNode[];
+    footer?: React.ReactNode;
+  }) => (
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <button
+        type="button"
+        onClick={() => toggleFactor(id)}
+        className="flex w-full items-center justify-between gap-3 bg-slate-50 px-4 py-3 text-left hover:bg-slate-100 transition-colors"
+        aria-expanded={expandedFactors[id]}
+        aria-controls={`${id}-panel`}
+        id={`${id}-trigger`}
+      >
+        <h3 className="text-sm sm:text-base font-semibold text-calcularq-blue">{title}</h3>
+        {expandedFactors[id] ? (
+          <ChevronUp className="w-4 h-4 text-calcularq-blue shrink-0" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-calcularq-blue shrink-0" />
+        )}
+      </button>
+      <AnimatePresence initial={false}>
+        {expandedFactors[id] ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+            className="overflow-hidden"
+            id={`${id}-panel`}
+            role="region"
+            aria-labelledby={`${id}-trigger`}
           >
-            Ir para a calculadora
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
-        </motion.section>
-      </div>
+            <div className="border-t border-slate-200 px-4 py-4">
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed mb-4">{definition}</p>
+              <ul className="space-y-2.5 text-sm sm:text-base text-slate-700 leading-relaxed">
+                {items.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-calcularq-blue shrink-0" />
+                    <div>{item}</div>
+                  </li>
+                ))}
+              </ul>
+              {footer ? <div className="mt-4">{footer}</div> : null}
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
+
+
+
+  return (
+    <div className="bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+        <motion.div variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" className="mb-6 sm:mb-8 max-w-4xl mx-auto">
+          <ManualCard className="p-6 sm:p-8 lg:p-10">
+            <div id="introducao" className="text-center scroll-mt-24">
+              <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-calcularq-blue mb-5">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue tracking-tight mb-4">
+                Manual de Instruções
+              </h1>
+              <p className="text-slate-600 leading-relaxed max-w-3xl mx-auto text-sm sm:text-base lg:text-lg">
+                A Calcularq precifica projetos de arquitetura pelo esforço real. Ela cruza o custo da sua hora de
+                trabalho com a complexidade do projeto para gerar um preço justo e defendável.
+              </p>
+              <p className="mt-4 text-slate-700 font-medium text-sm sm:text-base">
+                Navegue pelas etapas abaixo para estudar o manual na mesma lógica da calculadora.
+              </p>
+
+            </div>
+          </ManualCard>
+        </motion.div>
+
+        <div className="hidden md:block max-w-4xl mx-auto sticky top-20 z-20 mb-6 sm:mb-8">
+          <ManualStepper
+            steps={manualSteps}
+            activeStepId={activeStepId}
+            activeStepIndex={activeStepIndex}
+            onStepClick={(id) => scrollToSection(id as (typeof manualSteps)[number]["id"])}
+          />
+        </div>
+
+        <div className="md:hidden max-w-4xl mx-auto sticky top-20 z-20 mb-5">
+          <ManualMobileSummary
+            summaryRef={mobileSummaryRef}
+            steps={manualSteps}
+            activeStepId={activeStepId}
+            activeStepIndex={activeStepIndex}
+            activeStepShort={activeManualStep.short}
+            showsCurrentStep={mobileSummaryShowsCurrentStep}
+            onStepClick={(id) => scrollToSection(id as (typeof manualSteps)[number]["id"])}
+          />
+        </div>
+
+        <div className="max-w-4xl mx-auto flex flex-col gap-5 sm:gap-6">
+            <motion.div className="order-1" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.03 }}>
+              <ManualCard>
+                <div id="etapa-1" className="scroll-mt-24">
+                  <SectionHeader
+                    icon={<Calculator className="w-5 h-5 text-calcularq-blue" />}
+                    title="1. Hora técnica mínima"
+                    description="Quanto custa sua hora de trabalho? Aqui você descobre o mínimo para operar sem prejuízo."
+                    compact
+                  />
+
+                  <div className="grid gap-4">
+                    <NoteBox tone="slate">
+                      <strong>Resumo rápido:</strong> Informe despesas operacionais fixas, despesas pessoais essenciais e horas produtivas. O sistema retorna sua Hora Técnica Mínima.
+                    </NoteBox>
+
+                    <div className="space-y-4 text-slate-700 leading-relaxed">
+                      <div>
+                        <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
+                        <ul className="space-y-3">
+                          <li>
+                            <strong>Despesas operacionais fixas mensais:</strong> Adicione os custos recorrentes para manter o escritório funcionando.
+                            <p className="text-sm text-slate-500 mt-1">Ex.: aluguel, softwares, salários, contador, anuidades e serviços essenciais.</p>
+                          </li>
+                          <li>
+                            <strong>Despesas pessoais essenciais mensais:</strong> Valor líquido essencial para cobrir suas despesas pessoais.
+                            <p className="text-sm text-amber-700 mt-1">Atenção: o lucro tende a aparecer na etapa final, via complexidade, horas e composição do preço.</p>
+                          </li>
+                          <li>
+                          <strong>Horas produtivas mensais:</strong> Horas efetivas dedicadas à produção de projeto (não o expediente inteiro).
+                            <p className="text-sm text-calcularq-blue mt-1">Dica: muitas operações trabalham com algo entre 70% e 80% do tempo total como horas produtivas.</p>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <NoteBox>
+                        <strong>Resultado esperado:</strong> A calculadora define sua Hora Técnica Mínima. Esse valor será usado nas próximas etapas como base para o cálculo do preço.
+                      </NoteBox>
+                    </div>
+                  </div>
+                </div>
+              </ManualCard>
+            </motion.div>
+
+            <motion.div className="order-3" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.07 }}>
+              <ManualCard>
+                <div id="etapa-3" className="scroll-mt-24">
+                  <SectionHeader
+                    icon={<Settings2 className="w-5 h-5 text-calcularq-blue" />}
+                    title="3. Calibragem dos pesos"
+                    description="Etapa opcional. Ajuste a influência de cada fator de complexidade para refletir melhor a estratégia do seu escritório."
+                    compact
+                  />
+
+                  <div className="space-y-4 text-slate-700 leading-relaxed">
+                    <NoteBox tone="slate">
+                      <strong>Resumo rápido:</strong> Ajuste os pesos se quiser calibrar o cálculo ao perfil do seu escritório. Se preferir, mantenha o padrão e avance.
+                    </NoteBox>
+
+                    <p className="text-sm text-calcularq-blue font-medium">
+                      Primeira vez? Você pode pular esta etapa. Os pesos padrão funcionam bem para começar.
+                    </p>
+
+                    <div>
+                      <h3 className="text-base font-semibold text-calcularq-blue mb-2">Como os pesos funcionam (0 a 6)</h3>
+                      <p>
+                        Cada peso define o quanto um fator de complexidade impacta o cálculo final. Quanto maior o peso, maior a influência daquele critério na composição da complexidade global.
+                      </p>
+                      <p className="text-sm text-slate-500 mt-2">
+                        Peso 0 reduz a influência do fator; peso 6 dá influência máxima.
+                      </p>
+                    </div>
+
+                    <ul className="space-y-3">
+                      <li>
+                        <strong>Recomendação:</strong> Comece com todos em <strong>Peso 1 (padrão)</strong> para manter uma referência equilibrada.
+                      </li>
+                      <li>
+                        <strong>Quando alterar:</strong> Aumente o peso quando um fator for sistematicamente mais relevante para o tipo de projeto que seu escritório atende.
+                      </li>
+                      <li>
+                        <strong>Exemplo:</strong> Se seu escritório trabalha com interiores de alto detalhamento, você pode elevar o peso do fator <em>Nível de detalhamento</em>.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </ManualCard>
+            </motion.div>
+
+            <motion.div className="order-2" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.05 }}>
+              <ManualCard>
+                <div id="etapa-2" className="scroll-mt-24">
+                  <SectionHeader
+                    icon={<Layers className="w-5 h-5 text-calcularq-blue" />}
+                    title="2. Fatores de complexidade"
+                    description="Descreva o projeto: tamanho, etapa, detalhamento, exigências e dedicação à obra. A calculadora transforma isso em um índice de complexidade."
+                    compact
+                  />
+
+                  <div className="space-y-4">
+                    <NoteBox tone="slate">
+                      <strong>Resumo rápido:</strong> Aqui você descreve o projeto em 6 fatores. O sistema transforma essas escolhas em um índice de complexidade.
+                    </NoteBox>
+
+                    <div className="space-y-3">
+                      <FactorAccordion
+                        id="area"
+                        title="1. Área de projeto (m²)"
+                        definition={<><strong>Definição:</strong> estimativa da metragem total de intervenção. Mede a escala física do projeto e impacta diretamente o volume de trabalho.</>}
+                        items={[
+                          <><strong>1. Até 49 m²:</strong> intervenções pontuais e rápidas, como reformas de cômodos ou consultorias.</>,
+                          <><strong>2. 50 a 149 m²:</strong> faixa comum em apartamentos completos, casas compactas, lojas e pequenos escritórios.</>,
+                          <><strong>3. 150 a 499 m²:</strong> projetos de porte robusto, como casas maiores e espaços comerciais mais amplos.</>,
+                          <><strong>4. 500 a 999 m²:</strong> edificações de porte significativo e maior volume de compatibilização.</>,
+                          <><strong>5. Acima de 1000 m²:</strong> grandes volumes e programas complexos, incluindo usos institucionais.</>,
+                        ]}
+                        footer={
+                          <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm leading-relaxed text-calcularq-blue">
+                            Os intervalos são configuráveis. Você pode ajustá-los para a realidade do seu mercado.
+                          </div>
+                        }
+                      />
+
+                      <FactorAccordion
+                        id="stage"
+                        title="2. Etapa de projeto"
+                        definition={<><strong>Definição:</strong> define até qual fase do ciclo de desenvolvimento o escritório entregará o projeto.</>}
+                        items={[
+                          <><strong>1. Consultoria:</strong> aconselhamento técnico, diagnósticos e direcionamento pontual, sem desenvolvimento de projetos.</>,
+                          <><strong>2. Estudo preliminar:</strong> concepção visual, layout e validação funcional (ainda não é material para execução).</>,
+                          <><strong>3. Anteprojeto:</strong> define tecnicamente o partido e permite aprovações/orçamentos preliminares.</>,
+                          <><strong>4. Projeto executivo:</strong> caderno técnico final para execução da arquitetura.</>,
+                          <><strong>5. Compatibilização de complementares:</strong> inclui compatibilização com estrutura, instalações e demais disciplinas.</>,
+                        ]}
+                      />
+
+                      <FactorAccordion
+                        id="detail"
+                        title="3. Nível de detalhamento"
+                        definition={<><strong>Definição:</strong> mede a quantidade de desenhos e o esforço criativo/técnico exigido pela solução.</>}
+                        items={[
+                          <><strong>1. Mínimo:</strong> diretrizes gerais e baixa necessidade de detalhamento técnico.</>,
+                          <><strong>2. Básico:</strong> soluções padronizadas e predominância de itens de catálogo.</>,
+                          <><strong>3. Médio:</strong> combinação de itens convencionais com desenho sob medida moderado.</>,
+                          <><strong>4. Alto:</strong> personalização ampla, com maior volume de detalhamento e coordenação.</>,
+                          <><strong>5. Máximo:</strong> design autoral/atípico, com alto esforço criativo e detalhamento exaustivo.</>,
+                        ]}
+                      />
+
+                      <FactorAccordion
+                        id="technical"
+                        title="4. Exigência técnica"
+                        definition={<><strong>Definição:</strong> mede o rigor normativo e o volume de estudo técnico necessário para viabilizar o projeto.</>}
+                        items={[
+                          <><strong>1. Mínima:</strong> regras usuais do código local já dominadas pelo escritório.</>,
+                          <><strong>2. Baixa:</strong> consultas pontuais a regulamentos específicos (ex.: condomínio).</>,
+                          <><strong>3. Média:</strong> normas de segurança/acessibilidade e exigências recorrentes de aprovação.</>,
+                          <><strong>4. Alta:</strong> requisitos técnicos específicos da atividade (ex.: educação, bancos, varejo especializado).</>,
+                          <><strong>5. Máxima:</strong> ambientes altamente regulados, como saúde, patrimônio ou exigências ambientais complexas.</>,
+                        ]}
+                      />
+
+                      <FactorAccordion
+                        id="bureaucratic"
+                        title="5. Exigência burocrática"
+                        definition={<><strong>Definição:</strong> mede a carga administrativa e o esforço de tramitação/aprovação junto a órgãos e entidades.</>}
+                        items={[
+                          <><strong>1. Mínima:</strong> formalização profissional básica (RRT/ART).</>,
+                          <><strong>2. Baixa:</strong> trâmite principal em uma esfera (ex.: prefeitura).</>,
+                          <><strong>3. Média:</strong> prefeitura + instâncias complementares (condomínio, bombeiros etc.).</>,
+                          <><strong>4. Alta:</strong> múltiplos órgãos e processos paralelos (sanitária, concessionárias, trânsito etc.).</>,
+                          <><strong>5. Máxima:</strong> processos longos e rigorosos (ambiental, patrimônio, EIV, entre outros).</>,
+                        ]}
+                      />
+
+                      <FactorAccordion
+                        id="monitoring"
+                        title="6. Dedicação à obra"
+                        definition={<><strong>Definição:</strong> frequência de visitas e nível de responsabilidade assumido durante a execução.</>}
+                        items={[
+                          <><strong>1. Levantamento:</strong> visita inicial para medir e iniciar projeto, sem retornos na obra.</>,
+                          <><strong>2. Pontual:</strong> visitas estratégicas em marcos específicos.</>,
+                          <><strong>3. Por etapas:</strong> checagens ao fim de fases de execução.</>,
+                          <><strong>4. Acompanhamento:</strong> rotina periódica de fiscalização e alinhamento com obra.</>,
+                          <><strong>5. Gestão:</strong> atuação intensa na execução, com maior responsabilidade e coordenação.</>,
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </ManualCard>
+            </motion.div>
+
+            <motion.div className="order-4" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.09 }}>
+              <ManualCard>
+                <div id="etapa-4" className="scroll-mt-24">
+                  <SectionHeader
+                    icon={<DollarSign className="w-5 h-5 text-calcularq-blue" />}
+                    title="4. Composição final do preço"
+                    description="Informe as horas estimadas, despesas do contrato e desconto comercial para chegar ao preço de venda."
+                    compact
+                  />
+
+                  <div className="space-y-4 text-slate-700 leading-relaxed">
+                    <NoteBox tone="slate">
+                      <strong>Resumo rápido:</strong> Você informa horas, despesas variáveis e desconto comercial. A calculadora compõe o preço de venda final usando a complexidade do projeto com multiplicador comprimido ({`M = C^0,90`}).
+                    </NoteBox>
+
+                    <div>
+                      <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você precisa preencher</h3>
+                      <ul className="space-y-3">
+                        <li>
+                          <strong>Estimativa de horas de projeto:</strong> Total de horas previstas para executar este trabalho.
+                          <p className="text-sm text-slate-500 mt-1">Considere a etapa, o tamanho e a complexidade do projeto. Esse total é multiplicado pela Hora Técnica Ajustada para formar os honorários-base do projeto.</p>
+                        </li>
+                        <li>
+                          <strong>Despesas variáveis:</strong> Custos específicos deste contrato que serão repassados ao cliente.
+                          <p className="text-sm text-slate-500 mt-1">Ex.: RRT/ART, deslocamentos, plotagens, taxas e custos logísticos.</p>
+                        </li>
+                        <li>
+                          <strong>Desconto comercial:</strong> Ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente.</li>
+                      </ul>
+                    </div>
+
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
+                      <h3 className="font-semibold text-calcularq-blue mb-3">Resultado apresentado ao final</h3>
+                      <ul className="space-y-2 text-sm sm:text-base text-slate-700 leading-relaxed">
+                        {[
+                          "Hora Técnica Mínima",
+                          "Complexidade Global",
+                          "Hora Técnica Ajustada",
+                          "Estimativa de Horas de Projeto",
+                          "Preço do Projeto (honorários)",
+                          "Despesas Variáveis",
+                          "Valor do Desconto (se houver)",
+                          "Preço de Venda Final",
+                          "Preço/m² (indicador comparativo por faixa interna)",
+                          "Lucro estimado (margem bruta entre hora ajustada e hora mínima)",
+                        ].map((item) => (
+                          <li key={item} className="flex items-start gap-2.5">
+                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-calcularq-blue/40 shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <NoteBox>
+                      <strong>Preço por m² (indicador comparativo):</strong> A Calcularq usa faixas internas de referência para contextualizar o resultado.
+                      A leitura considera: abaixo (&lt; R$ 20/m²), baixa (R$ 20–80/m²), média (R$ 60–120/m²), alta (R$ 120–150/m²) e acima (&gt; R$ 150/m²), com zonas de transição em R$ 60–80/m² e ~R$ 120 ± 5/m².
+                      Esse valor pode variar conforme padrão construtivo, região e complexidade do projeto.
+                    </NoteBox>
+                  </div>
+                </div>
+              </ManualCard>
+            </motion.div>
+
+            <motion.div className="order-5" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.11 }}>
+              <section id="encerramento" className="scroll-mt-24 rounded-2xl bg-gradient-to-br from-calcularq-blue to-[#002366] p-6 sm:p-8 text-white shadow-sm">
+                <div className="flex items-start gap-3 mb-4">
+                  <Info className="w-6 h-6 mt-0.5 shrink-0" />
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold">Agora você está no controle</h2>
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-white/95 leading-relaxed text-sm sm:text-base">
+                  <p>
+                    O manual existe para reduzir incerteza e transformar a lógica da calculadora em um processo claro de decisão. O sistema entrega referência matemática; sua apresentação e estratégia comercial continuam sendo decisivas.
+                  </p>
+                  <p>
+                    Use o manual para entender a lógica das etapas e aplicar o fluxo na calculadora. Os resultados são referência técnica; a negociação e a estratégia comercial continuam sendo suas.
+                  </p>
+                </div>
+
+                <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                  <p className="font-semibold">Bom projeto!</p>
+                  <Link
+                    to={createPageUrl("Calculator")}
+                    className="inline-flex h-10 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-calcularq-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-calcularq-blue hover:bg-slate-100"
+                  >
+                    <span>Ir para a calculadora</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </div>
+              </section>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+  );
 }
+
