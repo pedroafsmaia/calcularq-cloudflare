@@ -11,6 +11,14 @@ export const ETAPA_MULTIPLIERS = {
   5: 1.00,   // Compatibilização
 } as const;
 
+export const F6_OBRA_MULTIPLIERS = {
+  1: 0.00,   // Levantamento
+  2: 0.05,   // Pontual
+  3: 0.10,   // Por Etapa
+  4: 0.20,   // Acompanhamento
+  5: 0.35,   // Gestão
+} as const;
+
 export const T_TIPOLOGIA = {
   residencial: 1.0,
   comercial: 1.0,
@@ -60,6 +68,8 @@ export interface Method10Output {
     t_tipologia: number;
     v_volumetria: number;
     e_etapa: number;
+    h_projeto: number;
+    h_obra: number;
     u_base: number;
     u_f4: number;
     u_f5: number;
@@ -104,6 +114,7 @@ export function calcularScoreComplexidade(input: {
   volumetria: number;
   tipologia: TipologiaMethod10;
   reforma: boolean;
+  etapa: number;
 }): number {
   const normalizar = (nivel: number) => ((clampLevel(nivel) - 1) / 4) * 100;
 
@@ -128,16 +139,18 @@ export function calcularScoreComplexidade(input: {
     burocracia: normalizar(input.f5),
     volumetria: normalizar(input.volumetria),
     tipologia: scoreTipologia[input.tipologia] ?? 50,
+    etapa: normalizar(input.etapa),
     reforma: input.reforma ? 100 : 0,
   };
 
   const pesos = {
     area: 0.15,
-    detalhamento: 0.2,
-    tecnica: 0.2,
-    burocracia: 0.15,
-    volumetria: 0.15,
-    tipologia: 0.1,
+    detalhamento: 0.20,
+    tecnica: 0.20,
+    burocracia: 0.12,
+    volumetria: 0.12,
+    tipologia: 0.08,
+    etapa: 0.08,
     reforma: 0.05,
   };
 
@@ -148,6 +161,7 @@ export function calcularScoreComplexidade(input: {
     scores.burocracia * pesos.burocracia +
     scores.volumetria * pesos.volumetria +
     scores.tipologia * pesos.tipologia +
+    scores.etapa * pesos.etapa +
     scores.reforma * pesos.reforma;
 
   return Math.round(score);
@@ -155,22 +169,27 @@ export function calcularScoreComplexidade(input: {
 
 export function classificarComplexidade(score: number): string {
   if (score <= 20) return "Muito Baixa";
-  if (score <= 40) return "Baixa a Media";
-  if (score <= 60) return "Media";
-  if (score <= 80) return "Media a Alta";
+  if (score <= 40) return "Baixa a Média";
+  if (score <= 60) return "Média";
+  if (score <= 80) return "Média a Alta";
   return "Muito Alta";
 }
 
 export function calcularMethod10(input: Method10Input): Method10Output {
+  // Validações básicas
   if (!Number.isFinite(input.area) || input.area <= 0) throw new Error("Area invalida");
   if (!Number.isFinite(input.ht_min) || input.ht_min <= 0) throw new Error("HT_min invalida");
   if (!Number.isFinite(input.margem_lucro) || input.margem_lucro < 0) throw new Error("Margem invalida");
+  if (![1, 2, 3, 4, 5].includes(input.etapa)) throw new Error("Etapa invalida");
 
   const area = input.area;
+  const etapa = clampLevel(input.etapa);
   const f3 = clampLevel(input.f3_detalhamento);
   const f4 = clampLevel(input.f4_tecnica);
   const f5 = clampLevel(input.f5_burocracia);
   const volumetria = clampLevel(input.volumetria);
+  
+  // Parâmetro A para teste A/B/C (0.25, 0.35, 0.45)
   const A = Number.isFinite(input.A) ? Number(input.A) : 0.35;
 
   const r_area = calcularProdutividade(area);
@@ -181,6 +200,20 @@ export function calcularMethod10(input: Method10Input): Method10Output {
 
   const h50 = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
 
+  // Calcular horas de obra (F6) se aplicável
+  let h_obra = 0;
+  if (input.f6_obra && input.f6_obra > 1) {
+    const f6 = clampLevel(input.f6_obra);
+    const t_f6 = F6_OBRA_MULTIPLIERS[f6 as 1 | 2 | 3 | 4 | 5] ?? 0;
+    
+    // H_obra = t(F6) × H_Executivo
+    // H_Executivo = H50 quando etapa=4, ou proporcional
+    const h_executivo = area * r_area * m_det * t_tipologia * v_volumetria * 0.85;
+    h_obra = t_f6 * h_executivo;
+  }
+
+  const h50_total = h50 + h_obra;
+
   const u_base = 0.2;
   const u_f4 = 0.05 * normalizeLevel(f4);
   const u_f5 = 0.25 * normalizeLevel(f5);
@@ -188,10 +221,10 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     input.tipologia === "comercial" || input.tipologia === "institucional" || input.tipologia === "industrial" ? 0.03 : 0;
   const u_reforma = input.reforma ? (f4 + f5 < 7 ? 0.15 : 0.25) : 0;
   const u_total = u_base + u_f4 + u_f5 + u_tipologia + u_reforma;
-  const h_cons = h50 * (1 + u_total);
+  const h_cons = h50_total * (1 + u_total);
 
   let usuario_editou_horas = false;
-  let h_final = input.cenario === "conservador" ? h_cons : h50;
+  let h_final = input.cenario === "conservador" ? h_cons : h50_total;
   if (Number.isFinite(input.h_usuario_manual) && Number(input.h_usuario_manual) > 0) {
     usuario_editou_horas = true;
     const manual = Number(input.h_usuario_manual);
@@ -202,7 +235,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   const premio_tecnico = A * c_tech;
   const ht_aj = input.ht_min * (1 + input.margem_lucro + premio_tecnico);
 
-  const preco_h50 = h50 * ht_aj;
+  const preco_h50 = h50_total * ht_aj;
   const preco_conservador = h_cons * ht_aj;
   const preco_final = h_final * ht_aj;
 
@@ -214,10 +247,11 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     volumetria,
     tipologia: input.tipologia,
     reforma: input.reforma,
+    etapa,
   });
 
   return {
-    h50: Number(h50.toFixed(2)),
+    h50: Number(h50_total.toFixed(2)),
     h_cons: Number(h_cons.toFixed(2)),
     h_final: Number(h_final.toFixed(2)),
     ht_aj: Number(ht_aj.toFixed(2)),
@@ -237,6 +271,8 @@ export function calcularMethod10(input: Method10Input): Method10Output {
       t_tipologia,
       v_volumetria,
       e_etapa,
+      h_projeto: Number(h50.toFixed(2)),
+      h_obra: Number(h_obra.toFixed(2)),
       u_base,
       u_f4: Number(u_f4.toFixed(4)),
       u_f5: Number(u_f5.toFixed(4)),
