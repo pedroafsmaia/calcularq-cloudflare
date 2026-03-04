@@ -50,7 +50,7 @@ export default function MinimumHourCalculator({
   onMarginChange,
   initialTechnicalPremium = 0.35,
   onTechnicalPremiumChange,
-  titleLabel = "Hora técnica",
+  titleLabel = "Hora técnica mínima",
   manualToggleLabel = "Já sei a minha hora técnica.",
   manualFieldLabel = "Hora técnica (R$/hora)",
   resultLabel = "Hora técnica (R$/hora):",
@@ -275,7 +275,7 @@ export default function MinimumHourCalculator({
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-transparent p-5 sm:p-6 lg:p-8 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <SectionHeader
           className="mb-0"
@@ -412,10 +412,15 @@ export default function MinimumHourCalculator({
           </div>
         </section>
 
-        <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+        <section className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 p-4 sm:p-5">
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-calcularq-blue" />
-            <h3 className="text-sm font-semibold text-slate-800">Ajustes de preço</h3>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-800">Ajustes de preço</h3>
+              <p className="mt-0.5 text-xs text-slate-600">
+                Defina a margem de lucro e o prêmio por complexidade para calibrar sua hora ajustada.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-5">
