@@ -404,56 +404,49 @@ export default function Calculator() {
   const hasComplexitySelections = requiredSelectionIds.every((id) => Number(selections[id]) > 0);
 
   // ── Cálculos ──────────────────────────────────────────────────
-  const methodOutputSuggested = useMemo(() => {
+  const methodInputs = useMemo(() => {
     if (!minHourlyRate || minHourlyRate <= 0 || !area || area <= 0) return null;
     if (!hasComplexitySelections) return null;
 
-    try {
-      return calcularMethod10({
-        ht_min: minHourlyRate,
-        margem_lucro: profitMargin,
-        area,
-        etapa: Number(selections.stage ?? 1),
-        tipologia: tipologiaFromLevel(Number(selections.tipology ?? 1)),
-        volumetria: Number(selections.volumetry ?? 1),
-        reforma: reformFromLevel(Number(selections.reform ?? 1)),
-        f3_detalhamento: Number(selections.detail ?? 1),
-        f4_tecnica: Number(selections.technical ?? 1),
-        f5_burocracia: Number(selections.bureaucratic ?? 1),
-        f6_obra: Number(selections.monitoring ?? 1),
-        cenario: cenarioEscolhido,
-        A: technicalPremium,
-      });
-    } catch {
-      return null;
-    }
+    return {
+      ht_min: minHourlyRate,
+      margem_lucro: profitMargin,
+      area,
+      etapa: Number(selections.stage ?? 1),
+      tipologia: tipologiaFromLevel(Number(selections.tipology ?? 1)),
+      volumetria: Number(selections.volumetry ?? 1),
+      reforma: reformFromLevel(Number(selections.reform ?? 1)),
+      f3_detalhamento: Number(selections.detail ?? 1),
+      f4_tecnica: Number(selections.technical ?? 1),
+      f5_burocracia: Number(selections.bureaucratic ?? 1),
+      f6_obra: Number(selections.monitoring ?? 1),
+      cenario: cenarioEscolhido,
+      A: technicalPremium,
+    } as const;
   }, [area, cenarioEscolhido, hasComplexitySelections, minHourlyRate, profitMargin, selections, technicalPremium]);
 
+  const methodOutputSuggested = useMemo(() => {
+    if (!methodInputs) return null;
+
+    try {
+      return calcularMethod10(methodInputs);
+    } catch {
+      return null;
+    }
+  }, [methodInputs]);
+
   const methodOutput = useMemo(() => {
-    if (!minHourlyRate || minHourlyRate <= 0 || !area || area <= 0) return null;
-    if (!hasComplexitySelections) return null;
+    if (!methodInputs) return null;
 
     try {
       return calcularMethod10({
-        ht_min: minHourlyRate,
-        margem_lucro: profitMargin,
-        area,
-        etapa: Number(selections.stage ?? 1),
-        tipologia: tipologiaFromLevel(Number(selections.tipology ?? 1)),
-        volumetria: Number(selections.volumetry ?? 1),
-        reforma: reformFromLevel(Number(selections.reform ?? 1)),
-        f3_detalhamento: Number(selections.detail ?? 1),
-        f4_tecnica: Number(selections.technical ?? 1),
-        f5_burocracia: Number(selections.bureaucratic ?? 1),
-        f6_obra: Number(selections.monitoring ?? 1),
-        cenario: cenarioEscolhido,
+        ...methodInputs,
         h_usuario_manual: horasManuais ?? undefined,
-        A: technicalPremium,
       });
     } catch {
       return null;
     }
-  }, [area, cenarioEscolhido, hasComplexitySelections, horasManuais, minHourlyRate, profitMargin, selections, technicalPremium]);
+  }, [horasManuais, methodInputs]);
 
   useEffect(() => {
     if (!methodOutput) return;
@@ -495,7 +488,6 @@ export default function Calculator() {
     };
   }, [methodOutput, minHourlyRate]);
 
-  const CUB_MEDIO = 2800;
   const effectiveAreaForCub = useMemo(() => {
     if (typeof area === "number" && Number.isFinite(area) && area > 0) return area;
 
@@ -511,11 +503,6 @@ export default function Calculator() {
 
     return interval.min > 0 ? interval.min : null;
   }, [area, selections.area, areaIntervals]);
-
-  const cubPercentage = useMemo(() => {
-    if (!effectiveAreaForCub || effectiveAreaForCub <= 0 || displayValues.finalSalePrice <= 0) return null;
-    return (displayValues.finalSalePrice / (CUB_MEDIO * effectiveAreaForCub)) * 100;
-  }, [effectiveAreaForCub, displayValues.finalSalePrice]);
 
   const pricePerSqm = useMemo(() => {
     if (!effectiveAreaForCub || effectiveAreaForCub <= 0 || displayValues.finalSalePrice <= 0) return null;
@@ -774,7 +761,6 @@ export default function Calculator() {
       totalFactors={totalFactors}
       estimatedHours={estimatedHours}
       commercialDiscount={commercialDiscount}
-      cubPercentage={cubPercentage}
       pricePerSqm={pricePerSqm}
       displayValues={displayValues}
     />

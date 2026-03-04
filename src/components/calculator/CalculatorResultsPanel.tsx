@@ -21,7 +21,6 @@ type Props = {
   totalFactors: number;
   estimatedHours: number;
   commercialDiscount: number;
-  cubPercentage: number | null;
   pricePerSqm: number | null;
   displayValues: CalculatorDisplayValues;
 };
