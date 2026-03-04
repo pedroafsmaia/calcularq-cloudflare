@@ -1009,6 +1009,7 @@ export default function Calculator() {
                     onMarginChange={setProfitMargin}
                     initialTechnicalPremium={technicalPremium}
                     onTechnicalPremiumChange={setTechnicalPremium}
+                    technicalLevel={Number(selections.technical ?? 1)}
                     onFixedExpensesChange={setFixedExpenses}
                     onProductiveHoursChange={setProductiveHours}
                     onProLaboreChange={setProLabore}

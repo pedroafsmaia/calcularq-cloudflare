@@ -23,6 +23,7 @@ interface MinimumHourCalculatorProps {
   onMarginChange?: (value: number) => void;
   initialTechnicalPremium?: number;
   onTechnicalPremiumChange?: (value: number) => void;
+  technicalLevel?: number;
   titleLabel?: string;
   manualToggleLabel?: string;
   manualFieldLabel?: string;
@@ -56,6 +57,7 @@ export default function MinimumHourCalculator({
   onMarginChange,
   initialTechnicalPremium = 0.35,
   onTechnicalPremiumChange,
+  technicalLevel = 3,
   titleLabel = "Hora técnica mínima",
   manualToggleLabel = "Já sei a minha hora técnica.",
   manualFieldLabel = "Hora técnica (R$/hora)",
@@ -198,19 +200,23 @@ export default function MinimumHourCalculator({
       ].join("\n");
     }
 
+    const safeTechnicalLevel = Math.max(1, Math.min(5, Math.round(technicalLevel)));
+    const cTech = (safeTechnicalLevel - 1) / 4;
+
     const currentOption = TECHNICAL_PREMIUM_OPTIONS.find((option) => option.value === technicalPremium);
 
     const optionLines = TECHNICAL_PREMIUM_OPTIONS.map((option) => {
-      const maxHourly = baseRate * (1 + margin + option.value);
+      const maxHourly = baseRate * (1 + margin + option.value * cTech);
       return `${option.label} (+${Math.round(option.value * 100)}%): ${formatCurrencyPtBr(maxHourly)}/h`;
     });
 
     return [
       "Simulação do valor máximo com sua hora técnica atual:",
+      `Exigência técnica atual (F4): nível ${safeTechnicalLevel}`,
       ...optionLines,
       `Opção selecionada: ${currentOption?.label ?? "Equilibrado"} (+${Math.round(technicalPremium * 100)}%)`,
     ].join("\n");
-  }, [calculatedMinHourRate, initialMinHourRate, margin, technicalPremium]);
+  }, [calculatedMinHourRate, initialMinHourRate, margin, technicalLevel, technicalPremium]);
 
   const applyCustomMarginDraft = (draft: string) => {
     const parsed = parsePtBrNumber(draft);
