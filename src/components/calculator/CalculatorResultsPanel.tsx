@@ -81,8 +81,18 @@ export default function CalculatorResultsPanel({
               {displayValues.adjustedHourlyRate > 0 ? (
                 <>
                   <div className="mt-1 flex items-start justify-between gap-3 border-t border-slate-200 pt-2">
-                    <span className="min-w-0 font-bold leading-snug text-calcularq-blue">Hora Ajustada</span>
-                    <span className="inline-flex items-center gap-1 whitespace-nowrap font-bold text-calcularq-blue">
+                    <span
+                      className={`min-w-0 font-bold leading-snug ${
+                        isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-calcularq-blue"
+                      }`}
+                    >
+                      Hora Técnica Ajustada
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
+                        isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-calcularq-blue"
+                      }`}
+                    >
                       R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
                       {adjustedHourlyRateDescription ? (
                         <Tooltip
