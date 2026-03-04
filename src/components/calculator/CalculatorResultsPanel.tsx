@@ -82,22 +82,9 @@ export default function CalculatorResultsPanel({
                 <>
                   <div className="mt-1 flex items-start justify-between gap-3 border-t border-slate-200 pt-2">
                     <span className="min-w-0 font-bold leading-snug text-calcularq-blue">Hora Ajustada</span>
-                    <span className="whitespace-nowrap font-bold text-calcularq-blue">
+                    <span className="inline-flex items-center gap-1 whitespace-nowrap font-bold text-calcularq-blue">
                       R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                    </span>
-                  </div>
-
-                  {adjustedHourlyRateDescription ? (
-                    <div className="mt-1 flex items-center justify-between gap-3 border-t border-slate-200 pt-2">
-                      <span className="min-w-0 text-sm text-slate-500">Faixa da hora</span>
-                      <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                        <span
-                          className={`text-sm font-semibold ${
-                            isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
-                          }`}
-                        >
-                          {adjustedHourlyRateDescription.label}
-                        </span>
+                      {adjustedHourlyRateDescription ? (
                         <Tooltip
                           title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
                           tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
@@ -110,9 +97,9 @@ export default function CalculatorResultsPanel({
                             .filter(Boolean)
                             .join("\n")}
                         />
-                      </span>
-                    </div>
-                  ) : null}
+                      ) : null}
+                    </span>
+                  </div>
                 </>
               ) : null}
             </div>
