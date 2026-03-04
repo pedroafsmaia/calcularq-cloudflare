@@ -1,4 +1,5 @@
-﻿import Tooltip from "@/components/ui/Tooltip";
+import Tooltip from "@/components/ui/Tooltip";
+import { describeHourlyRate } from "@/lib/hourlyRateBands";
 import { describePricePerSqm } from "@/lib/pricePerSqmBands";
 
 type CalculatorDisplayValues = {
@@ -40,18 +41,11 @@ export default function CalculatorResultsPanel({
 }: Props) {
   const pricePerSqmDescription = pricePerSqm !== null ? describePricePerSqm(pricePerSqm) : null;
   const isExtremePricePerSqm = pricePerSqmDescription?.kind === "extreme";
-
-  const adjustedHourlyRateMessage = (() => {
-    const rate = displayValues.adjustedHourlyRate;
-    if (!Number.isFinite(rate) || rate <= 0) return null;
-    if (rate < 45) return "Abaixo da faixa júnior (R$ 45-85/h)";
-    if (rate >= 45 && rate < 75) return "Dentro da faixa júnior (R$ 45-85/h)";
-    if (rate >= 75 && rate < 85) return "Faixa júnior-pleno (R$ 75-100/h)";
-    if (rate >= 85 && rate < 120) return "Dentro da faixa pleno (R$ 85-130/h)";
-    if (rate >= 120 && rate < 130) return "Faixa pleno-sênior (R$ 120-150/h)";
-    if (rate >= 130 && rate <= 200) return "Dentro da faixa sênior (R$ 130-200/h)";
-    return "Acima da faixa sênior (R$ 130-200/h)";
-  })();
+  const adjustedHourlyRateDescription =
+    Number.isFinite(displayValues.adjustedHourlyRate) && displayValues.adjustedHourlyRate > 0
+      ? describeHourlyRate(displayValues.adjustedHourlyRate)
+      : null;
+  const isExtremeAdjustedHourlyRate = adjustedHourlyRateDescription?.kind === "extreme";
 
   return (
     <>
@@ -93,13 +87,30 @@ export default function CalculatorResultsPanel({
                     </span>
                   </div>
 
-                  {adjustedHourlyRateMessage ? (
-                    <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                      <p className="inline-flex items-center gap-1.5">
-                        <Tooltip text={adjustedHourlyRateMessage} />
-                        {adjustedHourlyRateMessage}
-                      </p>
-                      <p className="mt-1 text-slate-500">Faixa estimada com base em CAGED 2025, Censo CAU 2020 e SINAPI.</p>
+                  {adjustedHourlyRateDescription ? (
+                    <div className="mt-1 flex items-center justify-between gap-3 border-t border-slate-200 pt-2">
+                      <span className="min-w-0 text-sm text-slate-500">Faixa da hora</span>
+                      <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                        <span
+                          className={`text-sm font-semibold ${
+                            isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
+                          }`}
+                        >
+                          {adjustedHourlyRateDescription.label}
+                        </span>
+                        <Tooltip
+                          title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
+                          tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
+                          iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
+                          text={[
+                            adjustedHourlyRateDescription.line1,
+                            adjustedHourlyRateDescription.line2,
+                            "Faixa estimada com base em CAGED 2025, Censo CAU 2020 e SINAPI.",
+                          ]
+                            .filter(Boolean)
+                            .join("\n")}
+                        />
+                      </span>
                     </div>
                   ) : null}
                 </>
