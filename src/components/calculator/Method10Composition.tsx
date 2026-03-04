@@ -251,7 +251,7 @@ export default function Method10Composition({
           ) : null}
         </section>
 
-        <section className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-4">
+        <section className="rounded-xl border border-slate-200 bg-white px-4 py-4">
           <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-700">
             Desconto comercial: {sanitizedCommercialDiscount}%
             <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
