@@ -215,6 +215,7 @@ export default function MinimumHourCalculator({
       `Exigência técnica atual (F4): nível ${safeTechnicalLevel}`,
       ...optionLines,
       `Opção selecionada: ${currentOption?.label ?? "Equilibrado"} (+${Math.round(technicalPremium * 100)}%)`,
+      "Baseado em simulações, ajustado com uso.",
     ].join("\n");
   }, [calculatedMinHourRate, initialMinHourRate, margin, technicalLevel, technicalPremium]);
 
