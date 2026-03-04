@@ -12,7 +12,7 @@ export function describeHourlyRate(hourlyRate: number): {
       kind: "extreme",
       label: "Abaixo da faixa júnior",
       line1: "A hora ajustada ficou abaixo das faixas internas de referência.",
-      line2: "Faixa observada: abaixo de R$ 45/h (júnior: R$ 45-85/h).",
+      line2: "Abaixo de R$ 45/h (júnior: R$ 45-85/h).",
       intervalLabel: "< R$ 45/h",
     };
   }
@@ -22,7 +22,7 @@ export function describeHourlyRate(hourlyRate: number): {
       kind: "extreme",
       label: "Acima da faixa sênior",
       line1: "A hora ajustada ficou acima das faixas internas de referência.",
-      line2: "Faixa observada: acima de R$ 200/h (sênior: R$ 130-200/h).",
+      line2: "Acima de R$ 200/h (sênior: R$ 130-200/h).",
       intervalLabel: "> R$ 200/h",
     };
   }
@@ -75,4 +75,3 @@ export function describeHourlyRate(hourlyRate: number): {
     intervalLabel: "R$ 130-200/h",
   };
 }
-
