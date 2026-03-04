@@ -21,14 +21,21 @@ interface MinimumHourCalculatorProps {
   onClearCalculation?: () => void;
   initialMargin?: number;
   onMarginChange?: (value: number) => void;
+  initialTechnicalPremium?: number;
+  onTechnicalPremiumChange?: (value: number) => void;
   titleLabel?: string;
   manualToggleLabel?: string;
   manualFieldLabel?: string;
   resultLabel?: string;
 }
 
-export default function MinimumHourCalculator({ 
-  onCalculate, 
+const MARGIN_PRESETS = [0.1, 0.15, 0.2] as const;
+const TECHNICAL_PREMIUM_PRESETS = [0.25, 0.35, 0.45] as const;
+const clampPercent = (value: number) => Math.min(100, Math.max(0, value));
+const isPresetMargin = (value: number) => MARGIN_PRESETS.includes(value as (typeof MARGIN_PRESETS)[number]);
+
+export default function MinimumHourCalculator({
+  onCalculate,
   initialMinHourRate,
   onFixedExpensesChange,
   onProductiveHoursChange,
@@ -43,16 +50,19 @@ export default function MinimumHourCalculator({
   onClearCalculation,
   initialMargin = 0.15,
   onMarginChange,
-  titleLabel = "Hora técnica mínima",
-  manualToggleLabel = "Já sei a minha hora técnica mínima.",
-  manualFieldLabel = "Hora técnica mínima (R$/hora)",
-  resultLabel = "Hora técnica mínima (R$/hora):",
+  initialTechnicalPremium = 0.35,
+  onTechnicalPremiumChange,
+  titleLabel = "Hora técnica",
+  manualToggleLabel = "Já sei a minha hora técnica.",
+  manualFieldLabel = "Hora técnica (R$/hora)",
+  resultLabel = "Hora técnica (R$/hora):",
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
   const [personalExpenses, setPersonalExpenses] = useState<Expense[]>(
-    initialPersonalExpenses || (typeof initialProLabore === "number" && initialProLabore > 0
-      ? [{ id: "personal-legacy", name: "Despesa pessoal", value: initialProLabore }]
-      : [])
+    initialPersonalExpenses ||
+      (typeof initialProLabore === "number" && initialProLabore > 0
+        ? [{ id: "personal-legacy", name: "Despesa pessoal", value: initialProLabore }]
+        : [])
   );
   const [productiveHours, setProductiveHours] = useState(initialProductiveHours || 0);
   const [manualMinHourRate, setManualMinHourRate] = useState<number | undefined>(initialMinHourRate);
@@ -61,12 +71,20 @@ export default function MinimumHourCalculator({
   const [productiveHoursDraft, setProductiveHoursDraft] = useState("");
   const [isEditingManualMinHour, setIsEditingManualMinHour] = useState(false);
   const [isEditingProductiveHours, setIsEditingProductiveHours] = useState(false);
-  const [margin, setMargin] = useState(initialMargin);
 
-  const proLabore = useMemo(
-    () => personalExpenses.reduce((sum, exp) => sum + exp.value, 0),
-    [personalExpenses]
+  const [margin, setMargin] = useState(initialMargin);
+  const [marginMode, setMarginMode] = useState<"preset" | "custom">(isPresetMargin(initialMargin) ? "preset" : "custom");
+  const [customMarginDraft, setCustomMarginDraft] = useState(() => {
+    const percent = clampPercent(initialMargin * 100);
+    return Number.isFinite(percent) ? percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) : "";
+  });
+  const [technicalPremium, setTechnicalPremium] = useState(
+    TECHNICAL_PREMIUM_PRESETS.includes(initialTechnicalPremium as (typeof TECHNICAL_PREMIUM_PRESETS)[number])
+      ? initialTechnicalPremium
+      : 0.35
   );
+
+  const proLabore = useMemo(() => personalExpenses.reduce((sum, exp) => sum + exp.value, 0), [personalExpenses]);
 
   const calculatedMinHourRate = useMemo(() => {
     if (useManual) {
@@ -86,11 +104,11 @@ export default function MinimumHourCalculator({
       setFixedExpenses(initialFixedExpenses);
       onFixedExpensesChange?.(initialFixedExpenses);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialFixedExpenses]);
 
   useEffect(() => {
-    if (typeof initialProLabore === 'number') {
+    if (typeof initialProLabore === "number") {
       if (!initialPersonalExpenses || initialPersonalExpenses.length === 0) {
         const legacyExpenses =
           initialProLabore > 0 ? [{ id: "personal-legacy", name: "Despesa pessoal", value: initialProLabore }] : [];
@@ -99,7 +117,7 @@ export default function MinimumHourCalculator({
       }
       onProLaboreChange?.(initialProLabore);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialProLabore]);
 
   const prevInitialPersonalExpensesRef = useRef<string>("");
@@ -111,15 +129,15 @@ export default function MinimumHourCalculator({
       setPersonalExpenses(initialPersonalExpenses);
       onPersonalExpensesChange?.(initialPersonalExpenses);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPersonalExpenses]);
 
   useEffect(() => {
-    if (typeof initialProductiveHours === 'number') {
+    if (typeof initialProductiveHours === "number") {
       setProductiveHours(initialProductiveHours);
       onProductiveHoursChange?.(initialProductiveHours);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialProductiveHours]);
 
   useEffect(() => {
@@ -144,11 +162,54 @@ export default function MinimumHourCalculator({
 
   useEffect(() => {
     setMargin(initialMargin);
+    const preset = isPresetMargin(initialMargin);
+    setMarginMode(preset ? "preset" : "custom");
+    if (!preset) {
+      const percent = clampPercent(initialMargin * 100);
+      setCustomMarginDraft(percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
+    }
   }, [initialMargin]);
 
   useEffect(() => {
     onMarginChange?.(margin);
   }, [margin, onMarginChange]);
+
+  useEffect(() => {
+    setTechnicalPremium(
+      TECHNICAL_PREMIUM_PRESETS.includes(initialTechnicalPremium as (typeof TECHNICAL_PREMIUM_PRESETS)[number])
+        ? initialTechnicalPremium
+        : 0.35
+    );
+  }, [initialTechnicalPremium]);
+
+  useEffect(() => {
+    onTechnicalPremiumChange?.(technicalPremium);
+  }, [onTechnicalPremiumChange, technicalPremium]);
+
+  const technicalPremiumTooltipText = useMemo(() => {
+    const baseHourly = calculatedMinHourRate * (1 + margin);
+    const mediumHourly = calculatedMinHourRate * (1 + margin + technicalPremium * 0.5);
+    const complexHourly = calculatedMinHourRate * (1 + margin + technicalPremium);
+    const mediumPct = Math.round(technicalPremium * 50);
+    const maxPct = Math.round(technicalPremium * 100);
+
+    return [
+      "Este é o MÁXIMO cobrado em projetos de altíssima complexidade técnica.",
+      `Projeto simples: ${formatCurrencyPtBr(baseHourly)}/h (+0%)`,
+      `Projeto médio: ${formatCurrencyPtBr(mediumHourly)}/h (+${mediumPct}%)`,
+      `Projeto complexo: ${formatCurrencyPtBr(complexHourly)}/h (+${maxPct}%)`,
+      "Baseado em simulações, ajustado com uso.",
+    ].join("\n");
+  }, [calculatedMinHourRate, margin, technicalPremium]);
+
+  const applyCustomMarginDraft = (draft: string) => {
+    const parsed = parsePtBrNumber(draft);
+    if (parsed === null) {
+      setMargin(0);
+      return;
+    }
+    setMargin(clampPercent(parsed) / 100);
+  };
 
   const handleAddExpense = (expense: Expense) => {
     const updated = [...fixedExpenses, expense];
@@ -199,7 +260,7 @@ export default function MinimumHourCalculator({
     } else if (useManual && manualMinHourRate !== undefined && manualMinHourRate > 0) {
       handleCalculate();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calculatedMinHourRate, useManual, manualMinHourRate]);
 
   useEffect(() => {
@@ -210,14 +271,14 @@ export default function MinimumHourCalculator({
     if (!useManual && fixedExpenses.length === 0) {
       handleAddExpense({ id: Date.now().toString(), name: "", value: 0 });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!useManual && personalExpenses.length === 0 && (initialProLabore ?? 0) === 0) {
       handleAddPersonalExpense({ id: `${Date.now()}-personal`, name: "", value: 0 });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -226,7 +287,7 @@ export default function MinimumHourCalculator({
         <SectionHeader
           className="mb-0"
           title={titleLabel}
-          description="Preencha os dados do seu escritório para descobrir o valor da sua hora técnica mínima."
+          description="Preencha os dados do seu escritório para descobrir o valor da sua hora técnica base."
           icon={<Calculator className="w-5 h-5 text-calcularq-blue" />}
         />
         {onClearCalculation && (
@@ -241,7 +302,6 @@ export default function MinimumHourCalculator({
       </div>
 
       <div className="space-y-6">
-        {/* Opção Manual */}
         <div className="flex items-start gap-3 p-3 sm:p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl">
           <input
             type="checkbox"
@@ -252,7 +312,7 @@ export default function MinimumHourCalculator({
           />
           <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
             {manualToggleLabel}
-            <Tooltip text="Use esta opção se você já conhece sua hora técnica mínima. Atenção: se o valor estiver abaixo do necessário, sua margem/lucro pode ficar comprometida." />
+            <Tooltip text="Use esta opção se você já conhece sua hora técnica. Atenção: se o valor estiver abaixo do necessário, sua margem/lucro pode ficar comprometida." />
           </label>
         </div>
 
@@ -288,7 +348,6 @@ export default function MinimumHourCalculator({
           </div>
         ) : (
           <>
-            {/* Despesas operacionais fixas */}
             <ExpenseCard
               expenses={fixedExpenses}
               onAdd={handleAddExpense}
@@ -309,7 +368,6 @@ export default function MinimumHourCalculator({
               tooltip="Despesas pessoais essenciais mensais. Inclua moradia, alimentação, saúde, transporte e outros custos de vida."
             />
 
-            {/* Horas Produtivas Mensais */}
             <div>
               <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
                 Horas produtivas mensais
@@ -343,7 +401,6 @@ export default function MinimumHourCalculator({
           </>
         )}
 
-        {/* Resultado */}
         <div className="p-4 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <span className="font-semibold text-calcularq-blue">{resultLabel}</span>
@@ -354,19 +411,19 @@ export default function MinimumHourCalculator({
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-          <h3 className="text-sm font-semibold text-slate-800 mb-1">Margem de lucro</h3>
+          <h3 className="text-sm font-semibold text-slate-800 mb-1">Margem de Lucro</h3>
           <p className="text-xs text-slate-500 mb-3">Qual margem deseja aplicar?</p>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="space-y-2">
             {[
-              { value: 0.1, label: "Competitivo (+10%)" },
-              { value: 0.15, label: "Padrão (+15%)" },
-              { value: 0.2, label: "Premium (+20%)" },
+              { value: 0.1, label: "Baixa (10%)" },
+              { value: 0.15, label: "Média (15%)" },
+              { value: 0.2, label: "Alta (20%)" },
             ].map((option) => (
               <label
                 key={option.value}
                 className={[
                   "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                  margin === option.value
+                  marginMode === "preset" && margin === option.value
                     ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
                     : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
                 ].join(" ")}
@@ -375,10 +432,96 @@ export default function MinimumHourCalculator({
                   type="radio"
                   name="margin"
                   value={option.value}
-                  checked={margin === option.value}
-                  onChange={() => setMargin(option.value)}
+                  checked={marginMode === "preset" && margin === option.value}
+                  onChange={() => {
+                    setMarginMode("preset");
+                    setMargin(option.value);
+                  }}
                 />
                 <span>{option.label}</span>
+              </label>
+            ))}
+
+            <label
+              className={[
+                "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+                marginMode === "custom"
+                  ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+              ].join(" ")}
+            >
+              <input
+                type="radio"
+                name="margin"
+                checked={marginMode === "custom"}
+                onChange={() => setMarginMode("custom")}
+              />
+              <span>Personalizada</span>
+            </label>
+
+            {marginMode === "custom" ? (
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={customMarginDraft}
+                  onChange={(event) => {
+                    const nextDraft = sanitizeNumberDraft(event.target.value);
+                    setMarginMode("custom");
+                    setCustomMarginDraft(nextDraft);
+                    applyCustomMarginDraft(nextDraft);
+                  }}
+                  onBlur={() => {
+                    const parsed = parsePtBrNumber(customMarginDraft);
+                    if (parsed === null) {
+                      setCustomMarginDraft("");
+                      setMargin(0);
+                      return;
+                    }
+                    const clamped = clampPercent(parsed);
+                    setCustomMarginDraft(clamped.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
+                    setMargin(clamped / 100);
+                  }}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+                  placeholder="0"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">%</span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+          <h3 className="text-sm font-semibold text-slate-800 mb-1">Prêmio por Complexidade Técnica</h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Projetos tecnicamente complexos valem mais. Quanto você cobra a mais? (máximo)
+          </p>
+          <div className="space-y-2">
+            {[
+              { value: 0.25, label: "Conservador (+25%)" },
+              { value: 0.35, label: "Equilibrado (+35%)", showInfo: true },
+              { value: 0.45, label: "Agressivo (+45%)" },
+            ].map((option) => (
+              <label
+                key={option.value}
+                className={[
+                  "flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition-colors",
+                  technicalPremium === option.value
+                    ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                ].join(" ")}
+              >
+                <span className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="technical-premium"
+                    value={option.value}
+                    checked={technicalPremium === option.value}
+                    onChange={() => setTechnicalPremium(option.value)}
+                  />
+                  <span>{option.label}</span>
+                </span>
+                {option.showInfo ? <Tooltip text={technicalPremiumTooltipText} /> : null}
               </label>
             ))}
           </div>
@@ -387,5 +530,3 @@ export default function MinimumHourCalculator({
     </div>
   );
 }
-
-

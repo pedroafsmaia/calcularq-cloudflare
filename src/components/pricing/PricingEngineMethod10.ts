@@ -119,10 +119,10 @@ export function calcularScoreComplexidade(input: {
   const normalizar = (nivel: number) => ((clampLevel(nivel) - 1) / 4) * 100;
 
   let scoreArea = 20;
-  if (input.area > 49) scoreArea = 35;
-  if (input.area > 149) scoreArea = 50;
-  if (input.area > 499) scoreArea = 70;
-  if (input.area > 999) scoreArea = 85;
+  if (input.area > 60) scoreArea = 35;
+  if (input.area > 140) scoreArea = 50;
+  if (input.area > 400) scoreArea = 70;
+  if (input.area > 1000) scoreArea = 85;
 
   const scoreTipologia: Record<TipologiaMethod10, number> = {
     residencial: 20,

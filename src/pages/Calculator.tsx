@@ -34,7 +34,7 @@ import { useCalculatorReset } from "@/hooks/calculator/useCalculatorReset";
 import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImport";
 
 const STEPS = [
-  { n: 1, label: "Hora técnica mínima" },
+  { n: 1, label: "Hora técnica" },
   { n: 2, label: "Informações do projeto" },
   { n: 3, label: "Composição final" },
 ];
@@ -68,6 +68,7 @@ export default function Calculator() {
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [useManualMinHourlyRate, setUseManualMinHourlyRate] = useState(false);
   const [profitMargin, setProfitMargin] = useState(0.15);
+  const [technicalPremium, setTechnicalPremium] = useState(0.35);
   const [fixedExpenses, setFixedExpenses] = useState<ExpenseItem[]>([]);
   const [personalExpenses, setPersonalExpenses] = useState<ExpenseItem[]>([]);
   const [proLabore, setProLabore] = useState(0);
@@ -101,7 +102,7 @@ export default function Calculator() {
     setDraftStatus("saving");
     draftSaveRef.current = setTimeout(() => {
       saveCalculatorDraft({
-        minHourlyRate, useManualMinHourlyRate, profitMargin, fixedExpenses, personalExpenses, proLabore, productiveHours,
+        minHourlyRate, useManualMinHourlyRate, profitMargin, technicalPremium, fixedExpenses, personalExpenses, proLabore, productiveHours,
         factors: factors.map(f => ({ id: f.id, weight: f.weight })),
         areaIntervals, area, selections,
         estimatedHours, cenarioEscolhido, hUsuarioManual: horasManuais, commercialDiscount, variableExpenses,
@@ -115,7 +116,7 @@ export default function Calculator() {
     }, 800);
   }, [
     budgetId,
-    minHourlyRate, useManualMinHourlyRate, profitMargin, fixedExpenses, personalExpenses, proLabore, productiveHours,
+    minHourlyRate, useManualMinHourlyRate, profitMargin, technicalPremium, fixedExpenses, personalExpenses, proLabore, productiveHours,
     factors, areaIntervals, area, selections,
     estimatedHours, cenarioEscolhido, horasManuais, commercialDiscount, variableExpenses,
     currentStep, maxStepReached,
@@ -145,6 +146,12 @@ export default function Calculator() {
     setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
     if (typeof draft.profitMargin === "number" && Number.isFinite(draft.profitMargin)) {
       setProfitMargin(draft.profitMargin);
+    }
+    if (typeof draft.technicalPremium === "number" && Number.isFinite(draft.technicalPremium)) {
+      const parsed = Number(draft.technicalPremium);
+      if (parsed === 0.25 || parsed === 0.35 || parsed === 0.45) {
+        setTechnicalPremium(parsed);
+      }
     }
     if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
     if (draft.personalExpenses) setPersonalExpenses(draft.personalExpenses);
@@ -215,6 +222,20 @@ export default function Calculator() {
           setProfitMargin(0.2);
         } else {
           setProfitMargin(0.15);
+        }
+        if (typeof budget.data.aValue === "number" && Number.isFinite(budget.data.aValue)) {
+          const parsed = Number(budget.data.aValue);
+          if (parsed === 0.25 || parsed === 0.35 || parsed === 0.45) {
+            setTechnicalPremium(parsed);
+          } else {
+            setTechnicalPremium(0.35);
+          }
+        } else if (budget.data.aTestGroup === "A") {
+          setTechnicalPremium(0.25);
+        } else if (budget.data.aTestGroup === "C") {
+          setTechnicalPremium(0.45);
+        } else {
+          setTechnicalPremium(0.35);
         }
         if (budget.data.cenarioEscolhido === "otimista" || budget.data.cenarioEscolhido === "conservador") {
           setCenarioEscolhido(budget.data.cenarioEscolhido);
@@ -292,6 +313,7 @@ export default function Calculator() {
     setMinHourlyRate,
     setUseManualMinHourlyRate,
     setProfitMargin,
+    setTechnicalPremium,
     setFixedExpenses,
     setPersonalExpenses,
     setProLabore,
@@ -325,6 +347,7 @@ export default function Calculator() {
     setMinHourlyRate,
     setUseManualMinHourlyRate,
     setProfitMargin,
+    setTechnicalPremium,
     setFixedExpenses,
     setPersonalExpenses,
     setProLabore,
@@ -355,14 +378,23 @@ export default function Calculator() {
   }, []);
 
   const handleSelectionChange = useCallback((factorId: string, value: number) => {
-    setSelections(prev => ({ ...prev, [factorId]: value }));
+    setSelections((prev) => {
+      const next = { ...prev, [factorId]: value };
+      if (factorId === "tipology" && (!Number.isFinite(Number(next.reform)) || Number(next.reform) <= 0)) {
+        next.reform = 1;
+      }
+      return next;
+    });
+  }, []);
+
+  const handleReformChange = useCallback((checked: boolean) => {
+    setSelections((prev) => ({ ...prev, reform: checked ? 2 : 1 }));
   }, []);
 
   const requiredSelectionIds = [
     "area",
     "tipology",
     "volumetry",
-    "reform",
     "stage",
     "monitoring",
     "detail",
@@ -390,11 +422,12 @@ export default function Calculator() {
         f5_burocracia: Number(selections.bureaucratic ?? 1),
         f6_obra: Number(selections.monitoring ?? 1),
         cenario: cenarioEscolhido,
+        A: technicalPremium,
       });
     } catch {
       return null;
     }
-  }, [area, cenarioEscolhido, hasComplexitySelections, minHourlyRate, profitMargin, selections]);
+  }, [area, cenarioEscolhido, hasComplexitySelections, minHourlyRate, profitMargin, selections, technicalPremium]);
 
   const methodOutput = useMemo(() => {
     if (!minHourlyRate || minHourlyRate <= 0 || !area || area <= 0) return null;
@@ -415,20 +448,23 @@ export default function Calculator() {
         f6_obra: Number(selections.monitoring ?? 1),
         cenario: cenarioEscolhido,
         h_usuario_manual: horasManuais ?? undefined,
+        A: technicalPremium,
       });
     } catch {
       return null;
     }
-  }, [area, cenarioEscolhido, hasComplexitySelections, horasManuais, minHourlyRate, profitMargin, selections]);
+  }, [area, cenarioEscolhido, hasComplexitySelections, horasManuais, minHourlyRate, profitMargin, selections, technicalPremium]);
 
   useEffect(() => {
     if (!methodOutput) return;
     setEstimatedHours(methodOutput.h_final);
   }, [methodOutput]);
 
-  const globalComplexity = useMemo(() => {
-    if (methodOutput) return Number((methodOutput.score_complexidade / 100).toFixed(2));
-    return calculateGlobalComplexity(factors, selections);
+  const complexityScore = useMemo(() => {
+    if (methodOutput) return methodOutput.score_complexidade;
+    const legacyComplexity = calculateGlobalComplexity(factors, selections);
+    if (!Number.isFinite(legacyComplexity) || legacyComplexity <= 0) return 0;
+    return Math.round((legacyComplexity / 5) * 100);
   }, [factors, methodOutput, selections]);
 
   const displayValues = useMemo(() => {
@@ -492,6 +528,7 @@ export default function Calculator() {
         minHourlyRate,
         useManualMinHourlyRate,
         profitMargin,
+        technicalPremium,
         fixedExpenses,
         personalExpenses,
         proLabore,
@@ -521,6 +558,7 @@ export default function Calculator() {
       proLabore,
       productiveHours,
       profitMargin,
+      technicalPremium,
       selections,
       useManualMinHourlyRate,
       variableExpenses,
@@ -560,10 +598,10 @@ export default function Calculator() {
     };
   }, [hasUnsavedChanges, shouldClearDraftOnExit]);
 
-  const totalFactors = factors.length;
-  const selectedFactorsCount = Object.values(selections).filter((value) => Number(value) > 0).length;
+  const totalFactors = requiredSelectionIds.length;
+  const selectedFactorsCount = requiredSelectionIds.filter((id) => Number(selections[id]) > 0).length;
   const areaFactor = factors.find(f => f.id === "area");
-  const otherFactors = factors.filter(f => f.id !== "area");
+  const otherFactors = factors.filter(f => f.id !== "area" && f.id !== "volumetry" && f.id !== "reform");
 
   // ── Stepper ───────────────────────────────────────────────────
   const { stepComplete, canAdvance } = useCalculatorProgress({
@@ -729,7 +767,7 @@ export default function Calculator() {
     <CalculatorResultsPanel
       minHourlyRate={minHourlyRate}
       hasComplexitySelections={hasComplexitySelections}
-      globalComplexity={globalComplexity}
+      complexityScore={complexityScore}
       currentStep={currentStep}
       currentStepLabel={currentStepLabel}
       selectedFactorsCount={selectedFactorsCount}
@@ -980,6 +1018,8 @@ export default function Calculator() {
                     onManualModeChange={setUseManualMinHourlyRate}
                     initialMargin={profitMargin}
                     onMarginChange={setProfitMargin}
+                    initialTechnicalPremium={technicalPremium}
+                    onTechnicalPremiumChange={setTechnicalPremium}
                     onFixedExpensesChange={setFixedExpenses}
                     onProductiveHoursChange={setProductiveHours}
                     onProLaboreChange={setProLabore}
@@ -1014,8 +1054,9 @@ export default function Calculator() {
                           area={area}
                           onAreaChange={handleAreaChange}
                           onLevelChange={handleAreaLevelChange}
+                          volumetryLevel={Number(selections.volumetry || 0)}
+                          onVolumetryChange={(level) => handleSelectionChange("volumetry", level)}
                           intervals={areaIntervals}
-                          onIntervalsChange={setAreaIntervals}
                         />
                       )}
                       {otherFactors.map((factor) => (
@@ -1024,6 +1065,8 @@ export default function Calculator() {
                           factor={factor}
                           value={selections[factor.id]}
                           onChange={handleSelectionChange}
+                          reformValue={factor.id === "tipology" ? Number(selections.reform ?? 1) > 1 : undefined}
+                          onReformChange={factor.id === "tipology" ? handleReformChange : undefined}
                         />
                       ))}
                     </div>
@@ -1053,6 +1096,7 @@ export default function Calculator() {
                     reforma={reformFromLevel(Number(selections.reform ?? 1))}
                     cenario={cenarioEscolhido}
                     onCenarioChange={setCenarioEscolhido}
+                    technicalPremium={technicalPremium}
                     horasManual={horasManuais}
                     onHorasManualChange={setHorasManuais}
                     h50={methodOutputSuggested.h50}

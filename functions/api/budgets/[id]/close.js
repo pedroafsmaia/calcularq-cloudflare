@@ -1,6 +1,13 @@
-import { assertAllowedOrigin, jsonResponse, readJson, requireAuth } from "../../_utils.js";
+﻿import { assertAllowedOrigin, jsonResponse, readJson, requireAuth } from "../../_utils.js";
 
 const VALID_SCOPE_CHANGES = new Set(["as_planned", "moderate", "major"]);
+const VALID_CLOSE_FEEDBACK = new Set([
+  "too_expensive",
+  "accepted_no_questions",
+  "accepted_after_negotiation",
+  "could_charge_more",
+  "did_not_close_other",
+]);
 const PHASE_KEYS = ["briefing", "ep", "ap", "ex", "compat", "obra"];
 
 function toPositiveNumber(value) {
@@ -69,6 +76,11 @@ export async function onRequest(context) {
     return jsonResponse({ success: false, message: "Status de escopo inválido" }, { status: 400 });
   }
 
+  const closeFeedback = String(body?.closeFeedback || "").trim();
+  if (!VALID_CLOSE_FEEDBACK.has(closeFeedback)) {
+    return jsonResponse({ success: false, message: "Feedback de fechamento inválido" }, { status: 400 });
+  }
+
   const normalizedByPhase = normalizeHoursByPhase(body?.actualHoursByPhase);
   if (normalizedByPhase.error) {
     return jsonResponse({ success: false, message: normalizedByPhase.error }, { status: 400 });
@@ -99,6 +111,7 @@ export async function onRequest(context) {
     delete data.actualHoursByPhase;
   }
   data.scopeChange = scopeChange;
+  data.closeFeedback = closeFeedback;
   data.closedAt = now;
   data.hasPhaseMismatch = hasPhaseMismatch;
 
@@ -110,10 +123,7 @@ export async function onRequest(context) {
       .bind(serialized, now, now, id, auth.userId)
       .run();
   } catch {
-    await db
-      .prepare("UPDATE budgets SET data = ?, updated_at = ? WHERE id = ? AND user_id = ?")
-      .bind(serialized, now, id, auth.userId)
-      .run();
+    await db.prepare("UPDATE budgets SET data = ?, updated_at = ? WHERE id = ? AND user_id = ?").bind(serialized, now, id, auth.userId).run();
   }
 
   const budget = await db
@@ -135,4 +145,3 @@ export async function onRequest(context) {
     },
   });
 }
-

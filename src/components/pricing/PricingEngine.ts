@@ -22,25 +22,25 @@ export interface AreaInterval {
 export const COMPLEXITY_EXPONENT = 0.9;
 
 export const DEFAULT_AREA_INTERVALS: AreaInterval[] = [
-  { min: 0, max: 49, level: 1 },
-  { min: 50, max: 149, level: 2 },
-  { min: 150, max: 499, level: 3 },
-  { min: 500, max: 999, level: 4 },
-  { min: 1000, max: null, level: 5 },
+  { min: 0, max: 60, level: 1 },
+  { min: 61, max: 140, level: 2 },
+  { min: 141, max: 400, level: 3 },
+  { min: 401, max: 1000, level: 4 },
+  { min: 1001, max: null, level: 5 },
 ];
 
 export const DEFAULT_FACTORS: Factor[] = [
   {
     id: "area",
-    name: "Área de projeto",
-    description: "Estimativa da metragem total de intervenção.",
+    name: "Volume do projeto (área)",
+    description: "Metragem total da intervenção.",
     weight: 1.0,
     isArea: true,
     options: [
-      { value: 1, label: "Até 49m²", description: "Nível 1" },
-      { value: 2, label: "50 a 149m²", description: "Nível 2" },
-      { value: 3, label: "150 a 499m²", description: "Nível 3" },
-      { value: 4, label: "500 a 999m²", description: "Nível 4" },
+      { value: 1, label: "Até 60m²", description: "Nível 1" },
+      { value: 2, label: "61 a 140m²", description: "Nível 2" },
+      { value: 3, label: "141 a 400m²", description: "Nível 3" },
+      { value: 4, label: "401 a 1000m²", description: "Nível 4" },
       { value: 5, label: "Acima de 1000m²", description: "Nível 5" },
     ],
   },
@@ -72,8 +72,8 @@ export const DEFAULT_FACTORS: Factor[] = [
   },
   {
     id: "reform",
-    name: "Reforma / Ampliação",
-    description: "Intervenção em edificação existente.",
+    name: "Reforma/Ampliação",
+    description: "Checkbox auxiliar dentro do card de Tipologia.",
     weight: 1.0,
     options: [
       { value: 1, label: "Não", description: "Sem reforma" },

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Home, Calculator, FileText, Shield } from "lucide-react";
 import { createPageUrl } from "@/utils";
@@ -45,7 +45,7 @@ export default function Footer() {
                 </Link>
               </nav>
               
-              {/* Termos e Política */}
+              {/* Termos e PolÃ­tica */}
               <nav className="space-y-2 mt-4">
                 <button
                   onClick={() => setShowTerms(true)}
@@ -59,7 +59,7 @@ export default function Footer() {
                   className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors w-full text-left"
                 >
                   <Shield className="w-4 h-4" />
-                  Política de Privacidade
+                  PolÃ­tica de Privacidade
                 </button>
               </nav>
               
@@ -81,7 +81,7 @@ export default function Footer() {
                 Sobre
               </h3>
               <p className="text-sm text-white/80 leading-relaxed">
-                A Calcularq é uma ferramenta precisa que precifica projetos de arquitetura e interiores com cálculos automáticos baseados em horas técnicas e fatores de complexidade.
+                A CalculArq Ã© uma ferramenta inteligente que precifica projetos de arquitetura e interiores com cÃ¡lculos automÃ¡ticos baseados em horas tÃ©cnicas e fatores de complexidade.
               </p>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function Footer() {
           <div className="mt-12 pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="text-sm text-white/60">
-                <p>© {new Date().getFullYear()} <span className="text-white font-semibold">calcularq.com.br</span>. Todos os direitos reservados.</p>
+                <p>Â© {new Date().getFullYear()} <span className="text-white font-semibold">calcularq.com.br</span>. Todos os direitos reservados.</p>
               </div>
             </div>
           </div>
@@ -101,14 +101,14 @@ export default function Footer() {
       <LegalModal
         isOpen={showTerms}
         onClose={() => setShowTerms(false)}
-        title="Termos e Condições Gerais de Uso"
+        title="Termos e CondiÃ§Ãµes Gerais de Uso"
         content={termsContent}
       />
       
       <LegalModal
         isOpen={showPrivacy}
         onClose={() => setShowPrivacy(false)}
-        title="Política de Privacidade e Proteção de Dados Pessoais"
+        title="PolÃ­tica de Privacidade e ProteÃ§Ã£o de Dados Pessoais"
         content={privacyContent}
       />
     </>

@@ -31,6 +31,13 @@ export type BudgetScopeChange =
   | "como_previsto"
   | "mudou_muito";
 
+export type BudgetCloseFeedback =
+  | "too_expensive"
+  | "accepted_no_questions"
+  | "accepted_after_negotiation"
+  | "could_charge_more"
+  | "did_not_close_other";
+
 export type BudgetTipologia = "residencial" | "comercial" | "institucional" | "industrial" | "saude";
 export type BudgetCenario = "conservador" | "otimista";
 
@@ -78,6 +85,7 @@ export type BudgetData = {
   actualHoursTotal?: number;
   actualHoursByPhase?: BudgetActualHoursByPhase;
   scopeChange?: BudgetScopeChange;
+  closeFeedback?: BudgetCloseFeedback;
   closedAt?: string;
   hasPhaseMismatch?: boolean;
   profitProfile?: "portfolio" | "estabelecido" | "referencia";
@@ -87,6 +95,7 @@ export type CalculatorDraft = {
   minHourlyRate?: number | null;
   useManualMinHourlyRate?: boolean;
   profitMargin?: number;
+  technicalPremium?: number;
   fixedExpenses?: ExpenseItem[];
   personalExpenses?: ExpenseItem[];
   proLabore?: number;

@@ -15,6 +15,7 @@ type Params = {
   setMinHourlyRate: Dispatch<SetStateAction<number | null>>;
   setUseManualMinHourlyRate: Dispatch<SetStateAction<boolean>>;
   setProfitMargin?: Dispatch<SetStateAction<number>>;
+  setTechnicalPremium?: Dispatch<SetStateAction<number>>;
   setFixedExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setPersonalExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setProLabore: Dispatch<SetStateAction<number>>;
@@ -44,6 +45,7 @@ export function useCalculatorReset({
   setMinHourlyRate,
   setUseManualMinHourlyRate,
   setProfitMargin,
+  setTechnicalPremium,
   setFixedExpenses,
   setPersonalExpenses,
   setProLabore,
@@ -66,6 +68,7 @@ export function useCalculatorReset({
       setMinHourlyRate(null);
       setUseManualMinHourlyRate(false);
       if (setProfitMargin) setProfitMargin(0.15);
+      if (setTechnicalPremium) setTechnicalPremium(0.35);
       setFixedExpenses([]);
       setPersonalExpenses([]);
       setProLabore(0);
@@ -112,6 +115,7 @@ export function useCalculatorReset({
     setProLabore,
     setProductiveHours,
     setProfitMargin,
+    setTechnicalPremium,
     setProfitProfile,
     setSelections,
     setUseManualMinHourlyRate,
@@ -126,6 +130,7 @@ export function useCalculatorReset({
     setMinHourlyRate(null);
     setUseManualMinHourlyRate(false);
     if (setProfitMargin) setProfitMargin(0.15);
+    if (setTechnicalPremium) setTechnicalPremium(0.35);
     setFixedExpenses([]);
     setPersonalExpenses([]);
     setProLabore(0);
@@ -165,6 +170,7 @@ export function useCalculatorReset({
     setProLabore,
     setProductiveHours,
     setProfitMargin,
+    setTechnicalPremium,
     setProfitProfile,
     setSelections,
     setUseManualMinHourlyRate,

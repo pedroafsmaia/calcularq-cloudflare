@@ -35,6 +35,7 @@ type Props = {
   areaIntervals: AreaIntervalSnapshot[];
   selections: Record<string, number>;
   margin: number;
+  technicalPremium: number;
   tipologia: TipologiaMethod10;
   volumetria: number;
   reforma: boolean;
@@ -79,6 +80,7 @@ export default function Method10Composition({
   areaIntervals,
   selections,
   margin,
+  technicalPremium,
   tipologia,
   volumetria,
   reforma,
@@ -117,6 +119,8 @@ export default function Method10Composition({
     hFinal: output.h_final,
     scoreComplexidade: output.score_complexidade,
     classificacaoComplexidade: output.classificacao_complexidade,
+    aValue: technicalPremium,
+    aTestGroup: technicalPremium <= 0.25 ? "A" : technicalPremium >= 0.45 ? "C" : "B",
     area,
     factors: factors.map((factor) => ({
       id: factor.id,
@@ -266,6 +270,9 @@ export default function Method10Composition({
               </p>
               <p>
                 <strong>Taxa ajustada:</strong> {formatCurrency(output.ht_aj)}/h
+              </p>
+              <p>
+                <strong>Prêmio técnico máximo:</strong> +{Math.round(technicalPremium * 100)}%
               </p>
               <p className="text-xs text-slate-500">
                 Versão: {output.method_version} | Cenário: {cenario}

@@ -15,6 +15,7 @@ type Params = {
   setMinHourlyRate: Dispatch<SetStateAction<number | null>>;
   setUseManualMinHourlyRate: Dispatch<SetStateAction<boolean>>;
   setProfitMargin?: Dispatch<SetStateAction<number>>;
+  setTechnicalPremium?: Dispatch<SetStateAction<number>>;
   setFixedExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setPersonalExpenses: Dispatch<SetStateAction<ExpenseItem[]>>;
   setProLabore: Dispatch<SetStateAction<number>>;
@@ -44,6 +45,7 @@ export function useCalculatorStepImport({
   setMinHourlyRate,
   setUseManualMinHourlyRate,
   setProfitMargin,
+  setTechnicalPremium,
   setFixedExpenses,
   setPersonalExpenses,
   setProLabore,
@@ -70,6 +72,20 @@ export function useCalculatorStepImport({
         setUseManualMinHourlyRate(Boolean(sourceData.useManualMinHourlyRate));
         if (setProfitMargin && typeof sourceData.margemLucro === "number" && Number.isFinite(sourceData.margemLucro)) {
           setProfitMargin(sourceData.margemLucro);
+        }
+        if (setTechnicalPremium) {
+          if (typeof sourceData.aValue === "number" && Number.isFinite(sourceData.aValue)) {
+            const parsed = Number(sourceData.aValue);
+            if (parsed === 0.25 || parsed === 0.35 || parsed === 0.45) {
+              setTechnicalPremium(parsed);
+            }
+          } else if (sourceData.aTestGroup === "A") {
+            setTechnicalPremium(0.25);
+          } else if (sourceData.aTestGroup === "C") {
+            setTechnicalPremium(0.45);
+          } else {
+            setTechnicalPremium(0.35);
+          }
         }
         setFixedExpenses(Array.isArray(sourceData.fixedExpenses) ? sourceData.fixedExpenses : []);
         setPersonalExpenses(Array.isArray(sourceData.personalExpenses) ? sourceData.personalExpenses : []);
@@ -150,6 +166,7 @@ export function useCalculatorStepImport({
       setProLabore,
       setProductiveHours,
       setProfitMargin,
+      setTechnicalPremium,
       setProfitProfile,
       setSelections,
       setUseManualMinHourlyRate,

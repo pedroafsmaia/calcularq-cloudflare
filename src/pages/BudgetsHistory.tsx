@@ -16,7 +16,7 @@ import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
 import BudgetCloseDialog from "@/components/budgets/BudgetCloseDialog";
 import { useToast } from "@/components/ui/ToastProvider";
 import { calculateGlobalComplexity, type Factor as PricingFactor } from "@/components/pricing/PricingEngine";
-import type { BudgetActualHoursByPhase, BudgetScopeChange } from "@/types/budget";
+import type { BudgetActualHoursByPhase, BudgetScopeChange, BudgetCloseFeedback } from "@/types/budget";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
 
@@ -278,6 +278,7 @@ export default function BudgetsHistory() {
     actualHoursTotal: number;
     actualHoursByPhase?: BudgetActualHoursByPhase;
     scopeChange: BudgetScopeChange;
+    closeFeedback?: BudgetCloseFeedback;
   }) => {
     if (!selectedCloseBudget) return;
     setIsSavingCloseFeedback(true);
