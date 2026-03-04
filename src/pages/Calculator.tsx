@@ -1108,6 +1108,27 @@ export default function Calculator() {
               </motion.div>
             </AnimatePresence>
 
+            {currentStep === 3 ? (
+              <div className="lg:hidden mt-4">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+                  className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
+                >
+                  <SectionHeader
+                    compact
+                    title="Resultados"
+                    description="Resumo do cálculo atual"
+                    icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                  />
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
+                    <ResultsPanel />
+                  </div>
+                </motion.div>
+              </div>
+            ) : null}
+
           </div>
 
           {/* Painel lateral — desktop */}

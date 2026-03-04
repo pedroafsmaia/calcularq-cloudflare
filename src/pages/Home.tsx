@@ -167,6 +167,23 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
+          <motion.div
+            variants={fadeUp(prefersReducedMotion, 14)}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="rounded-3xl border border-slate-200 bg-white px-6 py-10 sm:px-10 sm:py-12 text-center shadow-sm mb-10 sm:mb-12 lg:mb-14"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-calcularq-blue mb-4 tracking-tight">Uma calculadora que evolui com você</h2>
+            <p className="mx-auto max-w-3xl text-sm sm:text-base text-slate-600 leading-relaxed">
+              A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o sistema ajusta
+              automaticamente as estimativas futuras.
+            </p>
+            <p className="mx-auto mt-4 max-w-3xl text-sm sm:text-base text-slate-600 leading-relaxed">
+              Quanto mais você usa, mais precisa ela fica.
+            </p>
+          </motion.div>
+
           <motion.div variants={listStagger} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <motion.div
@@ -246,8 +263,8 @@ export default function Home() {
               />
               <FormulaStep
                 number="2"
-                title="Fatores de complexidade"
-                description="Informe a área e as características do projeto. O Calcularq mede o esforço real envolvido."
+                title="Informações do projeto"
+                description="Informe área e características do projeto para o método medir a complexidade e estimar o esforço real."
               />
               <FormulaStep
                 number="3"
@@ -258,24 +275,6 @@ export default function Home() {
           </motion.div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
-          <motion.div
-            variants={fadeUp(prefersReducedMotion, 14)}
-            initial="hidden"
-            whileInView="show"
-            viewport={viewportOnce}
-            className="rounded-3xl border border-slate-200 bg-white px-6 py-10 sm:px-10 sm:py-12 text-center shadow-sm"
-          >
-            <h2 className="text-2xl sm:text-3xl font-bold text-calcularq-blue mb-4 tracking-tight">Uma calculadora que evolui com você</h2>
-            <p className="mx-auto max-w-3xl text-sm sm:text-base text-slate-600 leading-relaxed">
-              A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o sistema ajusta
-              automaticamente as estimativas futuras.
-            </p>
-            <p className="mx-auto mt-4 max-w-3xl text-sm sm:text-base text-slate-600 leading-relaxed">
-              Quanto mais você usa, mais precisa ela fica.
-            </p>
-          </motion.div>
-        </div>
       </div>
     </div>
   );

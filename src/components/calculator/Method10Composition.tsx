@@ -171,7 +171,10 @@ export default function Method10Composition({
 
       <div className="space-y-6">
         <section className="space-y-3">
-          <h3 className="text-base font-semibold text-calcularq-blue">Horas estimadas</h3>
+          <h3 className="flex items-center gap-1.5 text-base font-semibold text-calcularq-blue">
+            Horas estimadas
+            <Tooltip text="Estimativa fundamentada em referências de mercado e simulações, com calibragem automática contínua." />
+          </h3>
 
           <div className="grid gap-2 sm:grid-cols-2">
             <label className="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-sm text-slate-700">

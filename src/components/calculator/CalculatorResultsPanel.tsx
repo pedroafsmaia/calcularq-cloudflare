@@ -63,8 +63,8 @@ export default function CalculatorResultsPanel({
         <div className="bg-transparent p-4 space-y-4 sm:p-5">
           <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
             <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do Cálculo</p>
-            <div className="space-y-2 text-sm text-slate-600">
-              <div className="flex items-start justify-between gap-3">
+            <div className="space-y-2.5 text-sm text-slate-600">
+              <div className="grid grid-cols-[1fr_auto] items-start gap-3">
                 <span className="min-w-0 leading-snug">Hora técnica</span>
                 <span className="whitespace-nowrap font-medium text-slate-800">
                   R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
@@ -72,7 +72,7 @@ export default function CalculatorResultsPanel({
               </div>
 
               {hasComplexitySelections ? (
-                <div className="flex items-start justify-between gap-3">
+                <div className="grid grid-cols-[1fr_auto] items-start gap-3">
                   <span className="min-w-0 leading-snug">Score de Complexidade</span>
                   <span className="whitespace-nowrap font-medium text-slate-800">{complexityScore}/100</span>
                 </div>
@@ -80,17 +80,13 @@ export default function CalculatorResultsPanel({
 
               {displayValues.adjustedHourlyRate > 0 ? (
                 <>
-                  <div className="mt-1 flex items-start justify-between gap-3 border-t border-slate-200 pt-2">
-                    <span
-                      className={`min-w-0 font-bold leading-snug ${
-                        isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-calcularq-blue"
-                      }`}
-                    >
+                  <div className="mt-1 grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5">
+                    <span className="min-w-0 font-semibold leading-snug text-slate-700">
                       Hora Técnica Ajustada
                     </span>
                     <span
                       className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
-                        isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-calcularq-blue"
+                        isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
                       }`}
                     >
                       R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
@@ -125,14 +121,16 @@ export default function CalculatorResultsPanel({
           ) : null}
 
           {displayValues.projectPrice > 0 ? (
-            <div className="space-y-2 px-1 py-1 text-sm">
-              <div className="flex items-start justify-between gap-2">
-                <span className="flex-1 leading-snug text-slate-600">
+            <div className="space-y-2.5 px-1 py-1 text-sm">
+              <div className="grid grid-cols-[1fr_auto] items-start gap-2">
+                <span className="min-w-0 leading-snug text-slate-600">
                   Preço do Projeto
                   {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 ? (
-                    <span className="mt-0.5 inline-flex items-center gap-1 text-xs text-slate-400">
+                    <span className="mt-0.5 block text-xs leading-snug text-slate-400">
                       {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      <Tooltip text="Estimativa fundamentada em referências de mercado e simulações, com calibragem automática contínua." />
+                      <span className="ml-1 inline-flex align-middle">
+                        <Tooltip text="Estimativa fundamentada em referências de mercado e simulações, com calibragem automática contínua." />
+                      </span>
                     </span>
                   ) : null}
                 </span>
@@ -142,7 +140,7 @@ export default function CalculatorResultsPanel({
               </div>
 
               {displayValues.totalVariableExpenses > 0 ? (
-                <div className="flex items-baseline justify-between gap-2">
+                <div className="grid grid-cols-[1fr_auto] items-baseline gap-2">
                   <span className="min-w-0 leading-snug text-slate-600">(+) Despesas Variáveis</span>
                   <span className="whitespace-nowrap font-semibold text-slate-800">
                     R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -151,7 +149,7 @@ export default function CalculatorResultsPanel({
               ) : null}
 
               {displayValues.discountAmount > 0 ? (
-                <div className="flex items-baseline justify-between gap-2">
+                <div className="grid grid-cols-[1fr_auto] items-baseline gap-2">
                   <span className="min-w-0 leading-snug text-slate-600">(-) Desconto ({commercialDiscount}%)</span>
                   <span className="whitespace-nowrap font-semibold text-red-500">
                     - R$ {displayValues.discountAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
