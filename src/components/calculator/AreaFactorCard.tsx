@@ -2,6 +2,7 @@
 import { AreaInterval, calculateAreaLevel } from "../pricing/PricingEngine";
 import Tooltip from "@/components/ui/Tooltip";
 import { formatNumberPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
+import { getManualFactorTooltip } from "@/lib/manualFactorGuides";
 
 interface AreaFactorCardProps {
   area: number | null;
@@ -30,6 +31,7 @@ export default function AreaFactorCard({
 }: AreaFactorCardProps) {
   const [areaDraft, setAreaDraft] = useState("");
   const currentLevel = area !== null ? calculateAreaLevel(area, intervals) : null;
+  const volumeTooltipText = getManualFactorTooltip("volume");
 
   const formatArea = (value: number) => {
     const hasFraction = Math.abs(value % 1) > 0.000001;
@@ -59,17 +61,7 @@ export default function AreaFactorCard({
         <div className="mb-2 flex items-start justify-between gap-3">
           <h3 className="flex items-center gap-1.5 font-semibold text-slate-900">
             Volume do Projeto
-            <Tooltip
-              text={[
-                "Volume do Projeto",
-                "• 1 nível: Projeto térreo ou unidade única",
-                "• 2-3 níveis: Sobrado ou pequeno edifício",
-                "• 4-6 níveis: Edifício médio com repetição",
-                "• 7-15 níveis: Edifício alto",
-                "• 16+ níveis: Edifício muito alto",
-                "Subsolo conta como nível adicional.",
-              ].join("\n")}
-            />
+            {volumeTooltipText ? <Tooltip text={volumeTooltipText} /> : null}
           </h3>
           {currentLevel ? (
             <span className="shrink-0 rounded-md border border-calcularq-blue/20 bg-calcularq-blue/10 px-2 py-1 text-xs text-calcularq-blue">
