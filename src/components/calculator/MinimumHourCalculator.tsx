@@ -442,7 +442,6 @@ export default function MinimumHourCalculator({
         <div className="space-y-5">
           <div>
             <h4 className="text-sm font-semibold text-slate-800 mb-1">Margem de lucro</h4>
-            <p className="text-xs text-slate-500 mb-3">Qual margem deseja aplicar?</p>
             <div className="space-y-2">
               {[
                 { value: 0.1, label: "Baixa (10%)" },
@@ -509,9 +508,6 @@ export default function MinimumHourCalculator({
               Prêmio por complexidade
               <Tooltip text={technicalPremiumTooltipText} />
             </h4>
-            <p className="text-xs text-slate-500 mb-3">
-              Projetos tecnicamente complexos valem mais. Quanto você cobra a mais? (máximo)
-            </p>
             <div className="space-y-2">
               {TECHNICAL_PREMIUM_OPTIONS.map((option) => (
                 <label
