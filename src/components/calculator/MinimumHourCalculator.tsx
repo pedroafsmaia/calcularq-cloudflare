@@ -187,7 +187,7 @@ export default function MinimumHourCalculator({
     const maxPct = Math.round(technicalPremium * 100);
 
     return [
-      "Este é o MÁXIMO cobrado em projetos de altíssima complexidade técnica.",
+      "Este é o máximo cobrado em projetos de altíssima complexidade técnica.",
       `Projeto simples: ${formatCurrencyPtBr(baseHourly)}/h (+0%)`,
       `Projeto médio: ${formatCurrencyPtBr(mediumHourly)}/h (+${mediumPct}%)`,
       `Projeto complexo: ${formatCurrencyPtBr(complexHourly)}/h (+${maxPct}%)`,
@@ -415,12 +415,12 @@ export default function MinimumHourCalculator({
         <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-calcularq-blue" />
-            <h3 className="text-sm font-semibold text-slate-800">Margem de lucro e prêmio por complexidade</h3>
+            <h3 className="text-sm font-semibold text-slate-800">Ajustes de preço</h3>
           </div>
 
           <div className="space-y-5">
             <div>
-              <h4 className="text-sm font-semibold text-slate-800 mb-1">Margem de Lucro</h4>
+              <h4 className="text-sm font-semibold text-slate-800 mb-1">Margem de lucro</h4>
               <p className="text-xs text-slate-500 mb-3">Qual margem deseja aplicar?</p>
               <div className="space-y-2">
                 {[
@@ -485,7 +485,7 @@ export default function MinimumHourCalculator({
 
             <div>
               <h4 className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
-                Prêmio por Complexidade
+                Prêmio por complexidade
                 <Tooltip text={technicalPremiumTooltipText} />
               </h4>
               <p className="text-xs text-slate-500 mb-3">
