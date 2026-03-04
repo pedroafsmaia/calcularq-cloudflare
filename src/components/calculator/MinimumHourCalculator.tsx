@@ -32,6 +32,12 @@ interface MinimumHourCalculatorProps {
 const TECHNICAL_PREMIUM_PRESETS = [0.25, 0.35, 0.45] as const;
 const clampPercent = (value: number) => Math.min(100, Math.max(0, value));
 
+const TECHNICAL_PREMIUM_OPTIONS = [
+  { value: 0.25, label: "Suave" },
+  { value: 0.35, label: "Equilibrado" },
+  { value: 0.45, label: "Agressivo" },
+] as const;
+
 export default function MinimumHourCalculator({
   onCalculate,
   initialMinHourRate,
@@ -180,20 +186,33 @@ export default function MinimumHourCalculator({
   }, [onTechnicalPremiumChange, technicalPremium]);
 
   const technicalPremiumTooltipText = useMemo(() => {
-    const baseHourly = calculatedMinHourRate * (1 + margin);
-    const mediumHourly = calculatedMinHourRate * (1 + margin + technicalPremium * 0.5);
-    const complexHourly = calculatedMinHourRate * (1 + margin + technicalPremium);
-    const mediumPct = Math.round(technicalPremium * 50);
-    const maxPct = Math.round(technicalPremium * 100);
+    const baseRate =
+      typeof initialMinHourRate === "number" && Number.isFinite(initialMinHourRate) && initialMinHourRate > 0
+        ? initialMinHourRate
+        : calculatedMinHourRate;
+
+    if (!Number.isFinite(baseRate) || baseRate <= 0) {
+      return [
+        "Preencha a hora técnica mínima para visualizar a simulação do prêmio por complexidade.",
+        "Os valores serão atualizados automaticamente no painel de resultados.",
+      ].join("\n");
+    }
+
+    const currentOption = TECHNICAL_PREMIUM_OPTIONS.find((option) => option.value === technicalPremium);
+
+    const optionLines = TECHNICAL_PREMIUM_OPTIONS.map((option) => {
+      const simpleHourly = baseRate * (1 + margin);
+      const mediumHourly = baseRate * (1 + margin + option.value * 0.5);
+      const complexHourly = baseRate * (1 + margin + option.value);
+      return `${option.label} (+${Math.round(option.value * 100)}%): simples ${formatCurrencyPtBr(simpleHourly)}/h | médio ${formatCurrencyPtBr(mediumHourly)}/h | complexo ${formatCurrencyPtBr(complexHourly)}/h`;
+    });
 
     return [
-      "Este é o máximo cobrado em projetos de altíssima complexidade técnica.",
-      `Projeto simples: ${formatCurrencyPtBr(baseHourly)}/h (+0%)`,
-      `Projeto médio: ${formatCurrencyPtBr(mediumHourly)}/h (+${mediumPct}%)`,
-      `Projeto complexo: ${formatCurrencyPtBr(complexHourly)}/h (+${maxPct}%)`,
-      "Baseado em simulações, ajustado com uso.",
+      "Simulação com sua hora técnica atual:",
+      ...optionLines,
+      `Opção selecionada: ${currentOption?.label ?? "Equilibrado"} (+${Math.round(technicalPremium * 100)}%)`,
     ].join("\n");
-  }, [calculatedMinHourRate, margin, technicalPremium]);
+  }, [calculatedMinHourRate, initialMinHourRate, margin, technicalPremium]);
 
   const applyCustomMarginDraft = (draft: string) => {
     const parsed = parsePtBrNumber(draft);
@@ -497,11 +516,7 @@ export default function MinimumHourCalculator({
                 Projetos tecnicamente complexos valem mais. Quanto você cobra a mais? (máximo)
               </p>
               <div className="space-y-2">
-                {[
-                  { value: 0.25, label: "Suave (+25%)" },
-                  { value: 0.35, label: "Equilibrado (+35%)" },
-                  { value: 0.45, label: "Agressivo (+45%)" },
-                ].map((option) => (
+                {TECHNICAL_PREMIUM_OPTIONS.map((option) => (
                   <label
                     key={option.value}
                     className={[
@@ -519,7 +534,7 @@ export default function MinimumHourCalculator({
                         checked={technicalPremium === option.value}
                         onChange={() => setTechnicalPremium(option.value)}
                       />
-                      <span>{option.label}</span>
+                      <span>{option.label} (+{Math.round(option.value * 100)}%)</span>
                     </span>
                   </label>
                 ))}
