@@ -1,5 +1,5 @@
 ﻿import { useState, useMemo, useEffect, useRef } from "react";
-import { Calculator } from "lucide-react";
+import { Calculator, TrendingUp } from "lucide-react";
 import ExpenseCard, { Expense } from "./ExpenseCard";
 import Tooltip from "@/components/ui/Tooltip";
 import SectionHeader from "./SectionHeader";
@@ -302,230 +302,250 @@ export default function MinimumHourCalculator({
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-start gap-3 p-3 sm:p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl">
-          <input
-            type="checkbox"
-            id="useManual"
-            checked={useManual}
-            onChange={(e) => setUseManual(e.target.checked)}
-            className="mt-0.5 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-2 focus:ring-calcularq-blue/20 focus:ring-offset-0"
-          />
-          <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
-            {manualToggleLabel}
-            <Tooltip text="Use esta opção se você já conhece sua hora técnica. Atenção: se o valor estiver abaixo do necessário, sua margem/lucro pode ficar comprometida." />
-          </label>
-        </div>
-
-        {useManual ? (
-          <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-              {manualFieldLabel}
-              <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas operacionais fixas e despesas pessoais essenciais sem ter prejuízo. Este é o piso financeiro do seu escritório." />
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={manualMinHourDraft}
-                onFocus={() => setIsEditingManualMinHour(true)}
-                onChange={(e) => {
-                  const nextDraft = sanitizeNumberDraft(e.target.value);
-                  setManualMinHourDraft(nextDraft);
-                  const parsed = parsePtBrNumber(nextDraft);
-                  setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
-                }}
-                onBlur={() => {
-                  const parsed = parsePtBrNumber(manualMinHourDraft);
-                  setManualMinHourDraft(parsed !== null && parsed > 0 ? formatCurrencyPtBr(parsed) : "");
-                  setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
-                  setIsEditingManualMinHour(false);
-                }}
-                className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
-                placeholder="0,00"
-              />
-            </div>
+        <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <Calculator className="h-4 w-4 text-calcularq-blue" />
+            <h3 className="text-sm font-semibold text-slate-800">Hora técnica mínima</h3>
           </div>
-        ) : (
-          <>
-            <ExpenseCard
-              expenses={fixedExpenses}
-              onAdd={handleAddExpense}
-              onRemove={handleRemoveExpense}
-              onUpdate={handleUpdateExpense}
-              placeholder="Ex: Aluguel, Contador..."
-              label="Despesas operacionais fixas (R$)"
-              tooltip="Suas despesas operacionais fixas mensais para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
-            />
 
-            <ExpenseCard
-              expenses={personalExpenses}
-              onAdd={handleAddPersonalExpense}
-              onRemove={handleRemovePersonalExpense}
-              onUpdate={handleUpdatePersonalExpense}
-              placeholder="Ex: Moradia, Alimentação..."
-              label="Despesas pessoais essenciais (R$)"
-              tooltip="Despesas pessoais essenciais mensais. Inclua moradia, alimentação, saúde, transporte e outros custos de vida."
-            />
-
-            <div>
-              <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-                Horas produtivas mensais
-                <Tooltip text="Total de horas dedicadas efetivamente à produção de projetos por mês. Considere apenas o tempo focado em projeto — cerca de 70% a 80% do tempo total, descontando reuniões, pausas e tarefas administrativas. Ex: de 160h mensais, use ~120h." />
-              </label>
+          <div className="space-y-5">
+            <div className="flex items-start gap-3 p-3 sm:p-3.5 bg-white border border-slate-200 rounded-xl">
               <input
-                type="text"
-                inputMode="decimal"
-                value={productiveHoursDraft}
-                onFocus={() => setIsEditingProductiveHours(true)}
-                onChange={(e) => {
-                  const nextDraft = sanitizeNumberDraft(e.target.value);
-                  setProductiveHoursDraft(nextDraft);
-                  const parsed = parsePtBrNumber(nextDraft);
-                  const hours = parsed !== null && parsed >= 0 ? parsed : 0;
-                  setProductiveHours(hours);
-                  onProductiveHoursChange?.(hours);
-                }}
-                onBlur={() => {
-                  const parsed = parsePtBrNumber(productiveHoursDraft);
-                  const hours = parsed !== null && parsed >= 0 ? parsed : 0;
-                  setProductiveHoursDraft(hours > 0 ? formatHoursPtBr(hours) : "");
-                  setProductiveHours(hours);
-                  onProductiveHoursChange?.(hours);
-                  setIsEditingProductiveHours(false);
-                }}
-                className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
-                placeholder="0"
+                type="checkbox"
+                id="useManual"
+                checked={useManual}
+                onChange={(e) => setUseManual(e.target.checked)}
+                className="mt-0.5 w-4 h-4 text-calcularq-blue border-slate-300 rounded focus:ring-2 focus:ring-calcularq-blue/20 focus:ring-offset-0"
               />
+              <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium text-slate-700 leading-snug">
+                {manualToggleLabel}
+                <Tooltip text="Use esta opção se você já conhece sua hora técnica. Atenção: se o valor estiver abaixo do necessário, sua margem/lucro pode ficar comprometida." />
+              </label>
             </div>
-          </>
-        )}
 
-        <div className="p-4 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <span className="font-semibold text-calcularq-blue">{resultLabel}</span>
-            <span className="text-xl sm:text-2xl font-bold text-calcularq-blue">
-              R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-          <h3 className="text-sm font-semibold text-slate-800 mb-1">Margem de Lucro</h3>
-          <p className="text-xs text-slate-500 mb-3">Qual margem deseja aplicar?</p>
-          <div className="space-y-2">
-            {[
-              { value: 0.1, label: "Baixa (10%)" },
-              { value: 0.15, label: "Média (15%)" },
-              { value: 0.2, label: "Alta (20%)" },
-            ].map((option) => (
-              <label
-                key={option.value}
-                className={[
-                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                  marginMode === "preset" && margin === option.value
-                    ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-                ].join(" ")}
-              >
-                <input
-                  type="radio"
-                  name="margin"
-                  value={option.value}
-                  checked={marginMode === "preset" && margin === option.value}
-                  onChange={() => {
-                    setMarginMode("preset");
-                    setMargin(option.value);
-                  }}
-                />
-                <span>{option.label}</span>
-              </label>
-            ))}
-
-            <label
-              className={[
-                "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                marginMode === "custom"
-                  ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
-                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-              ].join(" ")}
-            >
-              <input
-                type="radio"
-                name="margin"
-                checked={marginMode === "custom"}
-                onChange={() => setMarginMode("custom")}
-              />
-              <span>Personalizada</span>
-            </label>
-
-            {marginMode === "custom" ? (
-              <div className="relative">
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={customMarginDraft}
-                  onChange={(event) => {
-                    const nextDraft = sanitizeNumberDraft(event.target.value);
-                    setMarginMode("custom");
-                    setCustomMarginDraft(nextDraft);
-                    applyCustomMarginDraft(nextDraft);
-                  }}
-                  onBlur={() => {
-                    const parsed = parsePtBrNumber(customMarginDraft);
-                    if (parsed === null) {
-                      setCustomMarginDraft("");
-                      setMargin(0);
-                      return;
-                    }
-                    const clamped = clampPercent(parsed);
-                    setCustomMarginDraft(clamped.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
-                    setMargin(clamped / 100);
-                  }}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
-                  placeholder="0"
-                />
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">%</span>
+            {useManual ? (
+              <div>
+                <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
+                  {manualFieldLabel}
+                  <Tooltip text="O valor mínimo que você precisa cobrar por hora para cobrir todas as suas despesas operacionais fixas e despesas pessoais essenciais sem ter prejuízo. Este é o piso financeiro do seu escritório." />
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">R$</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={manualMinHourDraft}
+                    onFocus={() => setIsEditingManualMinHour(true)}
+                    onChange={(e) => {
+                      const nextDraft = sanitizeNumberDraft(e.target.value);
+                      setManualMinHourDraft(nextDraft);
+                      const parsed = parsePtBrNumber(nextDraft);
+                      setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
+                    }}
+                    onBlur={() => {
+                      const parsed = parsePtBrNumber(manualMinHourDraft);
+                      setManualMinHourDraft(parsed !== null && parsed > 0 ? formatCurrencyPtBr(parsed) : "");
+                      setManualMinHourRate(parsed !== null && parsed >= 0 ? parsed : undefined);
+                      setIsEditingManualMinHour(false);
+                    }}
+                    className="w-full pl-8 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+                    placeholder="0,00"
+                  />
+                </div>
               </div>
-            ) : null}
-          </div>
-        </div>
+            ) : (
+              <>
+                <ExpenseCard
+                  expenses={fixedExpenses}
+                  onAdd={handleAddExpense}
+                  onRemove={handleRemoveExpense}
+                  onUpdate={handleUpdateExpense}
+                  placeholder="Ex: Aluguel, Contador..."
+                  label="Despesas operacionais fixas (R$)"
+                  tooltip="Suas despesas operacionais fixas mensais para manter o escritório funcionando: aluguel, softwares, salários, contador, anuidades do CAU etc. Não inclua custos variáveis por projeto — esses serão adicionados na etapa final."
+                />
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-          <h3 className="text-sm font-semibold text-slate-800 mb-1">Prêmio por Complexidade Técnica</h3>
-          <p className="text-xs text-slate-500 mb-3">
-            Projetos tecnicamente complexos valem mais. Quanto você cobra a mais? (máximo)
-          </p>
-          <div className="space-y-2">
-            {[
-              { value: 0.25, label: "Conservador (+25%)" },
-              { value: 0.35, label: "Equilibrado (+35%)", showInfo: true },
-              { value: 0.45, label: "Agressivo (+45%)" },
-            ].map((option) => (
-              <label
-                key={option.value}
-                className={[
-                  "flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition-colors",
-                  technicalPremium === option.value
-                    ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-                ].join(" ")}
-              >
-                <span className="flex items-center gap-2">
+                <ExpenseCard
+                  expenses={personalExpenses}
+                  onAdd={handleAddPersonalExpense}
+                  onRemove={handleRemovePersonalExpense}
+                  onUpdate={handleUpdatePersonalExpense}
+                  placeholder="Ex: Moradia, Alimentação..."
+                  label="Despesas pessoais essenciais (R$)"
+                  tooltip="Despesas pessoais essenciais mensais. Inclua moradia, alimentação, saúde, transporte e outros custos de vida."
+                />
+
+                <div>
+                  <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
+                    Horas produtivas mensais
+                    <Tooltip text="Total de horas dedicadas efetivamente à produção de projetos por mês. Considere apenas o tempo focado em projeto — cerca de 70% a 80% do tempo total, descontando reuniões, pausas e tarefas administrativas. Ex: de 160h mensais, use ~120h." />
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={productiveHoursDraft}
+                    onFocus={() => setIsEditingProductiveHours(true)}
+                    onChange={(e) => {
+                      const nextDraft = sanitizeNumberDraft(e.target.value);
+                      setProductiveHoursDraft(nextDraft);
+                      const parsed = parsePtBrNumber(nextDraft);
+                      const hours = parsed !== null && parsed >= 0 ? parsed : 0;
+                      setProductiveHours(hours);
+                      onProductiveHoursChange?.(hours);
+                    }}
+                    onBlur={() => {
+                      const parsed = parsePtBrNumber(productiveHoursDraft);
+                      const hours = parsed !== null && parsed >= 0 ? parsed : 0;
+                      setProductiveHoursDraft(hours > 0 ? formatHoursPtBr(hours) : "");
+                      setProductiveHours(hours);
+                      onProductiveHoursChange?.(hours);
+                      setIsEditingProductiveHours(false);
+                    }}
+                    className="w-full px-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+                    placeholder="0"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="p-4 bg-calcularq-blue/10 rounded-xl border border-calcularq-blue/20">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <span className="font-semibold text-calcularq-blue">{resultLabel}</span>
+                <span className="text-xl sm:text-2xl font-bold text-calcularq-blue">
+                  R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-calcularq-blue" />
+            <h3 className="text-sm font-semibold text-slate-800">Margem de lucro e prêmio por complexidade</h3>
+          </div>
+
+          <div className="space-y-5">
+            <div>
+              <h4 className="text-sm font-semibold text-slate-800 mb-1">Margem de Lucro</h4>
+              <p className="text-xs text-slate-500 mb-3">Qual margem deseja aplicar?</p>
+              <div className="space-y-2">
+                {[
+                  { value: 0.1, label: "Baixa (10%)" },
+                  { value: 0.15, label: "Média (15%)" },
+                  { value: 0.2, label: "Alta (20%)" },
+                ].map((option) => (
+                  <label
+                    key={option.value}
+                    className={[
+                      "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+                      marginMode === "preset" && margin === option.value
+                        ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    <input
+                      type="radio"
+                      name="margin"
+                      value={option.value}
+                      checked={marginMode === "preset" && margin === option.value}
+                      onChange={() => {
+                        setMarginMode("preset");
+                        setMargin(option.value);
+                      }}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+
+                <label
+                  className={[
+                    "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+                    marginMode === "custom"
+                      ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
+                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                  ].join(" ")}
+                >
                   <input
                     type="radio"
-                    name="technical-premium"
-                    value={option.value}
-                    checked={technicalPremium === option.value}
-                    onChange={() => setTechnicalPremium(option.value)}
+                    name="margin"
+                    checked={marginMode === "custom"}
+                    onChange={() => setMarginMode("custom")}
                   />
-                  <span>{option.label}</span>
-                </span>
-                {option.showInfo ? <Tooltip text={technicalPremiumTooltipText} /> : null}
-              </label>
-            ))}
+                  <span>Personalizada</span>
+                </label>
+
+                {marginMode === "custom" ? (
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={customMarginDraft}
+                      onChange={(event) => {
+                        const nextDraft = sanitizeNumberDraft(event.target.value);
+                        setMarginMode("custom");
+                        setCustomMarginDraft(nextDraft);
+                        applyCustomMarginDraft(nextDraft);
+                      }}
+                      onBlur={() => {
+                        const parsed = parsePtBrNumber(customMarginDraft);
+                        if (parsed === null) {
+                          setCustomMarginDraft("");
+                          setMargin(0);
+                          return;
+                        }
+                        const clamped = clampPercent(parsed);
+                        setCustomMarginDraft(clamped.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
+                        setMargin(clamped / 100);
+                      }}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20 focus:border-calcularq-blue"
+                      placeholder="0"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">%</span>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+                Prêmio por Complexidade
+                <Tooltip text={technicalPremiumTooltipText} />
+              </h4>
+              <p className="text-xs text-slate-500 mb-3">
+                Projetos tecnicamente complexos valem mais. Quanto você cobra a mais? (máximo)
+              </p>
+              <div className="space-y-2">
+                {[
+                  { value: 0.25, label: "Suave (+25%)" },
+                  { value: 0.35, label: "Equilibrado (+35%)" },
+                  { value: 0.45, label: "Agressivo (+45%)" },
+                ].map((option) => (
+                  <label
+                    key={option.value}
+                    className={[
+                      "flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition-colors",
+                      technicalPremium === option.value
+                        ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    <span className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="technical-premium"
+                        value={option.value}
+                        checked={technicalPremium === option.value}
+                        onChange={() => setTechnicalPremium(option.value)}
+                      />
+                      <span>{option.label}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
