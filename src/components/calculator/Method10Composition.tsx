@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertCircle, AlertTriangle, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
+import { AlertCircle, AlertTriangle, DollarSign } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import SaveBudgetButton from "./SaveBudgetButton";
 import type { BudgetData } from "@/types/budget";
@@ -99,7 +99,6 @@ export default function Method10Composition({
   output,
   onBudgetSaved,
 }: Props) {
-  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [discountDraft, setDiscountDraft] = useState("0");
   const [isEditingDiscount, setIsEditingDiscount] = useState(false);
   const baseHoras = cenario === "conservador" ? hCons : h50;
@@ -342,55 +341,6 @@ export default function Method10Composition({
               </div>
             </div>
           ) : null}
-        </section>
-
-        <section className="space-y-3">
-          <button
-            type="button"
-            onClick={() => setShowTechnicalDetails((prev) => !prev)}
-            className="inline-flex items-center gap-2 text-sm font-medium text-calcularq-blue hover:text-calcularq-blue/80"
-          >
-            {showTechnicalDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            Ver detalhes técnicos
-          </button>
-
-          {showTechnicalDetails ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-4 space-y-3 text-sm text-slate-700">
-              <p>
-                <strong>Complexidade:</strong> {output.score_complexidade}/100 ({output.classificacao_complexidade})
-              </p>
-              <p>
-                <strong>Horas base (H50):</strong> {formatHours(output.h50)}h
-              </p>
-              <p>
-                <strong>Horas conservadoras:</strong> {formatHours(output.h_cons)}h (+{Math.round(output.u_total * 100)}%)
-              </p>
-              <p>
-                <strong>Hora técnica mínima:</strong> {formatCurrency(minHourlyRate)}/h
-              </p>
-              <p>
-                <strong>Taxa ajustada:</strong> {formatCurrency(output.ht_aj)}/h
-              </p>
-              <p>
-                <strong>Prêmio técnico máximo:</strong> +{Math.round(technicalPremium * 100)}%
-              </p>
-              <p className="text-xs text-slate-500">
-                Versão: {output.method_version} | Cenário: {cenario}
-              </p>
-            </div>
-          ) : null}
-        </section>
-
-        <section className="rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-4 text-sm">
-          <h4 className="font-semibold text-calcularq-blue mb-2">Indicadores de mercado</h4>
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-slate-600">Preço por m²</span>
-            <strong className="text-slate-800">{formatCurrency(output.preco_m2)}/m²</strong>
-          </div>
-          <div className="mt-2 flex items-center justify-between gap-3">
-            <span className="text-slate-600">Valor da hora</span>
-            <strong className="text-slate-800">{formatCurrency(output.ht_aj)}/h</strong>
-          </div>
         </section>
 
         <SaveBudgetButton
