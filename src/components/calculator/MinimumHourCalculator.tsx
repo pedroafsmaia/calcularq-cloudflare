@@ -314,10 +314,17 @@ export default function MinimumHourCalculator({
       </div>
 
       <div className="space-y-6">
-        <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Calculator className="h-4 w-4 text-calcularq-blue" />
-            <h3 className="text-sm font-semibold text-slate-800">Hora técnica mínima</h3>
+        <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+          <div className="mb-4 flex items-start gap-3">
+            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+              <Calculator className="h-4 w-4 text-calcularq-blue" />
+            </span>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-800">Hora técnica mínima</h3>
+              <p className="mt-0.5 text-xs text-slate-600">
+                Preencha os dados do seu escritório para descobrir o valor da sua hora técnica base.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-5">
@@ -431,9 +438,11 @@ export default function MinimumHourCalculator({
           </div>
         </section>
 
-        <section className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 p-4 sm:p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-calcularq-blue" />
+        <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+          <div className="mb-4 flex items-start gap-3">
+            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+              <TrendingUp className="h-4 w-4 text-calcularq-blue" />
+            </span>
             <div>
               <h3 className="text-sm font-semibold text-slate-800">Ajustes de preço</h3>
               <p className="mt-0.5 text-xs text-slate-600">
