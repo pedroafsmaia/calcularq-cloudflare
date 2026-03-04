@@ -41,6 +41,8 @@ type Props = {
   reforma: boolean;
   cenario: CenarioMethod10;
   onCenarioChange: (value: CenarioMethod10) => void;
+  commercialDiscount: number;
+  onCommercialDiscountChange: (value: number) => void;
   horasManual: number | null;
   onHorasManualChange: (value: number | null) => void;
   h50: number;
@@ -86,6 +88,8 @@ export default function Method10Composition({
   reforma,
   cenario,
   onCenarioChange,
+  commercialDiscount,
+  onCommercialDiscountChange,
   horasManual,
   onHorasManualChange,
   h50,
@@ -96,6 +100,9 @@ export default function Method10Composition({
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const baseHoras = cenario === "conservador" ? hCons : h50;
   const horasUsadas = output.h_final;
+  const sanitizedCommercialDiscount = Math.min(30, Math.max(0, Number(commercialDiscount) || 0));
+  const discountAmount = output.preco_final * (sanitizedCommercialDiscount / 100);
+  const finalSalePrice = output.preco_final - discountAmount;
 
   const percentualDiff = useMemo(() => {
     if (baseHoras <= 0) return 0;
@@ -135,13 +142,13 @@ export default function Method10Composition({
     personalExpenses: personalExpenses ?? [],
     proLabore,
     productiveHours,
-    commercialDiscount: 0,
+    commercialDiscount: sanitizedCommercialDiscount,
     variableExpenses: [],
     results: {
       globalComplexity: Number((output.score_complexidade / 100).toFixed(2)),
       adjustedHourlyRate: output.ht_aj,
       projectPrice: output.preco_final,
-      finalSalePrice: output.preco_final,
+      finalSalePrice,
     },
     methodVersion: output.method_version,
   };
@@ -237,8 +244,33 @@ export default function Method10Composition({
         </section>
 
         <section className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-4 text-center">
+          <div className="mb-3 rounded-lg border border-slate-200 bg-white/90 px-3 py-3 text-left">
+            <div className="mb-1 flex items-center justify-between gap-3">
+              <label className="text-sm font-medium text-slate-700">Desconto comercial</label>
+              <span className="text-sm font-semibold text-calcularq-blue">{sanitizedCommercialDiscount}%</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={30}
+              step={1}
+              value={sanitizedCommercialDiscount}
+              onChange={(event) => onCommercialDiscountChange(Number(event.target.value) || 0)}
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-calcularq-blue"
+            />
+            <div className="mt-1 flex justify-between text-xs text-slate-500">
+              <span>0%</span>
+              <span>30%</span>
+            </div>
+          </div>
+
           <p className="text-xs font-semibold text-calcularq-blue">PREÇO FINAL</p>
-          <p className="mt-1 text-3xl font-bold text-calcularq-blue">{formatCurrency(output.preco_final)}</p>
+          <p className="mt-1 text-3xl font-bold text-calcularq-blue">{formatCurrency(finalSalePrice)}</p>
+          {sanitizedCommercialDiscount > 0 ? (
+            <p className="mt-1 text-xs text-slate-500">
+              Base: {formatCurrency(output.preco_final)} | Desconto: -{formatCurrency(discountAmount)}
+            </p>
+          ) : null}
           <p className="mt-1 text-sm text-slate-600">
             ({formatHours(output.h_final)}h x {formatCurrency(output.ht_aj)}/h)
           </p>

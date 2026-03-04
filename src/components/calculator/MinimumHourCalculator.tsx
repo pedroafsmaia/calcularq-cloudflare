@@ -29,10 +29,8 @@ interface MinimumHourCalculatorProps {
   resultLabel?: string;
 }
 
-const MARGIN_PRESETS = [0.1, 0.15, 0.2] as const;
 const TECHNICAL_PREMIUM_PRESETS = [0.25, 0.35, 0.45] as const;
 const clampPercent = (value: number) => Math.min(100, Math.max(0, value));
-const isPresetMargin = (value: number) => MARGIN_PRESETS.includes(value as (typeof MARGIN_PRESETS)[number]);
 
 export default function MinimumHourCalculator({
   onCalculate,
@@ -73,7 +71,6 @@ export default function MinimumHourCalculator({
   const [isEditingProductiveHours, setIsEditingProductiveHours] = useState(false);
 
   const [margin, setMargin] = useState(initialMargin);
-  const [marginMode, setMarginMode] = useState<"preset" | "custom">(isPresetMargin(initialMargin) ? "preset" : "custom");
   const [customMarginDraft, setCustomMarginDraft] = useState(() => {
     const percent = clampPercent(initialMargin * 100);
     return Number.isFinite(percent) ? percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) : "";
@@ -162,12 +159,8 @@ export default function MinimumHourCalculator({
 
   useEffect(() => {
     setMargin(initialMargin);
-    const preset = isPresetMargin(initialMargin);
-    setMarginMode(preset ? "preset" : "custom");
-    if (!preset) {
-      const percent = clampPercent(initialMargin * 100);
-      setCustomMarginDraft(percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
-    }
+    const percent = clampPercent(initialMargin * 100);
+    setCustomMarginDraft(percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
   }, [initialMargin]);
 
   useEffect(() => {
@@ -439,7 +432,7 @@ export default function MinimumHourCalculator({
                     key={option.value}
                     className={[
                       "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                      marginMode === "preset" && margin === option.value
+                      margin === option.value
                         ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
                         : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
                     ].join(" ")}
@@ -448,34 +441,18 @@ export default function MinimumHourCalculator({
                       type="radio"
                       name="margin"
                       value={option.value}
-                      checked={marginMode === "preset" && margin === option.value}
+                      checked={margin === option.value}
                       onChange={() => {
-                        setMarginMode("preset");
                         setMargin(option.value);
+                        setCustomMarginDraft((option.value * 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
                       }}
                     />
                     <span>{option.label}</span>
                   </label>
                 ))}
 
-                <label
-                  className={[
-                    "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                    marginMode === "custom"
-                      ? "border-calcularq-blue bg-calcularq-blue/5 text-calcularq-blue"
-                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-                  ].join(" ")}
-                >
-                  <input
-                    type="radio"
-                    name="margin"
-                    checked={marginMode === "custom"}
-                    onChange={() => setMarginMode("custom")}
-                  />
-                  <span>Personalizada</span>
-                </label>
-
-                {marginMode === "custom" ? (
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-600">Margem personalizada (%)</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -483,7 +460,6 @@ export default function MinimumHourCalculator({
                       value={customMarginDraft}
                       onChange={(event) => {
                         const nextDraft = sanitizeNumberDraft(event.target.value);
-                        setMarginMode("custom");
                         setCustomMarginDraft(nextDraft);
                         applyCustomMarginDraft(nextDraft);
                       }}
@@ -503,7 +479,7 @@ export default function MinimumHourCalculator({
                     />
                     <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">%</span>
                   </div>
-                ) : null}
+                </div>
               </div>
             </div>
 

@@ -475,18 +475,21 @@ export default function Calculator() {
 
     const adjustedHourlyRate = methodOutput.ht_aj;
     const projectPrice = methodOutput.preco_final;
-    const profit = (adjustedHourlyRate - minHourlyRate) * methodOutput.h_final;
+    const sanitizedCommercialDiscount = Math.min(30, Math.max(0, Number(commercialDiscount) || 0));
+    const discountAmount = projectPrice * (sanitizedCommercialDiscount / 100);
+    const finalSalePrice = projectPrice - discountAmount;
+    const profit = ((adjustedHourlyRate - minHourlyRate) * methodOutput.h_final) - discountAmount;
 
     return {
       totalVariableExpenses: 0,
       adjustedHourlyRate,
       projectPrice,
-      projectPriceWithDiscount: projectPrice,
-      discountAmount: 0,
-      finalSalePrice: projectPrice,
+      projectPriceWithDiscount: finalSalePrice,
+      discountAmount,
+      finalSalePrice,
       profit: Number(profit.toFixed(2)),
     };
-  }, [methodOutput, minHourlyRate]);
+  }, [commercialDiscount, methodOutput, minHourlyRate]);
 
   const effectiveAreaForCub = useMemo(() => {
     if (typeof area === "number" && Number.isFinite(area) && area > 0) return area;
@@ -1082,6 +1085,8 @@ export default function Calculator() {
                     reforma={reformFromLevel(Number(selections.reform ?? 1))}
                     cenario={cenarioEscolhido}
                     onCenarioChange={setCenarioEscolhido}
+                    commercialDiscount={commercialDiscount}
+                    onCommercialDiscountChange={setCommercialDiscount}
                     technicalPremium={technicalPremium}
                     horasManual={horasManuais}
                     onHorasManualChange={setHorasManuais}
