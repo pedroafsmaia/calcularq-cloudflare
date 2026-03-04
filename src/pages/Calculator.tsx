@@ -475,7 +475,7 @@ export default function Calculator() {
 
     const adjustedHourlyRate = methodOutput.ht_aj;
     const projectPrice = methodOutput.preco_final;
-    const sanitizedCommercialDiscount = Math.min(30, Math.max(0, Number(commercialDiscount) || 0));
+    const sanitizedCommercialDiscount = Math.min(100, Math.max(0, Number(commercialDiscount) || 0));
     const discountAmount = projectPrice * (sanitizedCommercialDiscount / 100);
     const finalSalePrice = projectPrice - discountAmount;
     const profit = ((adjustedHourlyRate - minHourlyRate) * methodOutput.h_final) - discountAmount;

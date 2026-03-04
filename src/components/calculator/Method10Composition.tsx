@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
-import { AlertTriangle, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AlertCircle, AlertTriangle, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import SaveBudgetButton from "./SaveBudgetButton";
 import type { BudgetData } from "@/types/budget";
 import type { Method10Output, CenarioMethod10, TipologiaMethod10 } from "@/components/pricing/PricingEngineMethod10";
 import type { Expense } from "./ExpenseCard";
+import Tooltip from "@/components/ui/Tooltip";
+import { parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 
 type FactorSnapshot = {
   id: string;
@@ -98,9 +100,11 @@ export default function Method10Composition({
   onBudgetSaved,
 }: Props) {
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const [discountDraft, setDiscountDraft] = useState("0");
+  const [isEditingDiscount, setIsEditingDiscount] = useState(false);
   const baseHoras = cenario === "conservador" ? hCons : h50;
   const horasUsadas = output.h_final;
-  const sanitizedCommercialDiscount = Math.min(30, Math.max(0, Number(commercialDiscount) || 0));
+  const sanitizedCommercialDiscount = Math.min(100, Math.max(0, Number(commercialDiscount) || 0));
   const discountAmount = output.preco_final * (sanitizedCommercialDiscount / 100);
   const finalSalePrice = output.preco_final - discountAmount;
 
@@ -111,6 +115,11 @@ export default function Method10Composition({
 
   const showSubpricingAlert = percentualDiff <= -20;
   const showOverpricingAlert = percentualDiff >= 20;
+
+  useEffect(() => {
+    if (isEditingDiscount) return;
+    setDiscountDraft(String(sanitizedCommercialDiscount));
+  }, [sanitizedCommercialDiscount, isEditingDiscount]);
 
   const budgetData: BudgetData = {
     minHourlyRate,
@@ -243,37 +252,96 @@ export default function Method10Composition({
           ) : null}
         </section>
 
-        <section className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-4 text-center">
-          <div className="mb-3 rounded-lg border border-slate-200 bg-white/90 px-3 py-3 text-left">
-            <div className="mb-1 flex items-center justify-between gap-3">
-              <label className="text-sm font-medium text-slate-700">Desconto comercial</label>
-              <span className="text-sm font-semibold text-calcularq-blue">{sanitizedCommercialDiscount}%</span>
+        <section className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/5 px-4 py-4">
+          <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-700">
+            Desconto comercial: {sanitizedCommercialDiscount}%
+            <Tooltip text="Porcentagem de desconto aplicada sobre os honorários. O painel de resultados mostra o impacto no valor final." />
+          </label>
+          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+            <div className="mb-4">
+              <p className="text-xs text-slate-500 sm:text-sm">Arraste para ajustar ou digite o percentual.</p>
             </div>
-            <input
-              type="range"
-              min={0}
-              max={30}
-              step={1}
-              value={sanitizedCommercialDiscount}
-              onChange={(event) => onCommercialDiscountChange(Number(event.target.value) || 0)}
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-calcularq-blue"
-            />
-            <div className="mt-1 flex justify-between text-xs text-slate-500">
-              <span>0%</span>
-              <span>30%</span>
+
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_110px] sm:items-center">
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={sanitizedCommercialDiscount}
+                  onChange={(e) => {
+                    const next = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                    onCommercialDiscountChange(next);
+                    setDiscountDraft(String(next));
+                  }}
+                  className="h-3 w-full cursor-pointer appearance-none rounded-full bg-slate-200
+                    [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-5
+                    [&::-webkit-slider-thumb]:h-5
+                    [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-calcularq-blue
+                    [&::-webkit-slider-thumb]:cursor-pointer
+                    [&::-webkit-slider-thumb]:shadow-md
+                    [&::-webkit-slider-thumb]:transition-transform
+                    [&::-webkit-slider-thumb]:hover:scale-110
+                    [&::-moz-range-thumb]:w-5
+                    [&::-moz-range-thumb]:h-5
+                    [&::-moz-range-thumb]:rounded-full
+                    [&::-moz-range-thumb]:bg-calcularq-blue
+                    [&::-moz-range-thumb]:border-0
+                    [&::-moz-range-thumb]:cursor-pointer"
+                  aria-label="Ajustar desconto comercial pelo slider"
+                />
+                <div className="flex items-center justify-between px-0.5 text-xs text-slate-500">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              <div className="relative w-full sm:w-[110px]">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={discountDraft}
+                  onFocus={() => setIsEditingDiscount(true)}
+                  onChange={(e) => {
+                    const nextDraft = sanitizeNumberDraft(e.target.value);
+                    setDiscountDraft(nextDraft);
+                    const parsed = parsePtBrNumber(nextDraft);
+                    const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                    onCommercialDiscountChange(next);
+                  }}
+                  onBlur={() => {
+                    const parsed = parsePtBrNumber(discountDraft);
+                    const next = parsed === null ? 0 : Math.max(0, Math.min(100, Math.round(parsed)));
+                    setDiscountDraft(String(next));
+                    onCommercialDiscountChange(next);
+                    setIsEditingDiscount(false);
+                  }}
+                  className="w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2.5 pr-8 text-right text-base font-bold text-calcularq-blue transition-all focus:border-calcularq-blue focus:outline-none focus:ring-4 focus:ring-calcularq-blue/10"
+                  aria-label="Desconto comercial em porcentagem"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base font-bold text-calcularq-blue">%</span>
+              </div>
             </div>
           </div>
 
-          <p className="text-xs font-semibold text-calcularq-blue">PREÇO FINAL</p>
-          <p className="mt-1 text-3xl font-bold text-calcularq-blue">{formatCurrency(finalSalePrice)}</p>
           {sanitizedCommercialDiscount > 0 ? (
-            <p className="mt-1 text-xs text-slate-500">
-              Base: {formatCurrency(output.preco_final)} | Desconto: -{formatCurrency(discountAmount)}
-            </p>
+            <div className="mt-4 flex items-start gap-3 rounded-xl border-l-4 border-blue-500 bg-blue-50 px-4 py-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+              <div>
+                <p className="mb-0.5 text-sm font-semibold text-blue-900">Impacto do desconto</p>
+                <p className="text-sm text-blue-700">
+                  Sua remuneração será reduzida em{" "}
+                  <span className="font-bold">
+                    {formatCurrency(discountAmount)}
+                  </span>
+                  .
+                </p>
+              </div>
+            </div>
           ) : null}
-          <p className="mt-1 text-sm text-slate-600">
-            ({formatHours(output.h_final)}h x {formatCurrency(output.ht_aj)}/h)
-          </p>
         </section>
 
         <section className="space-y-3">
