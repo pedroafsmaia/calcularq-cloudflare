@@ -15,6 +15,11 @@ function toPositiveNumber(value) {
   return value;
 }
 
+function toNonNegativeNumber(value) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) return null;
+  return value;
+}
+
 function normalizeHoursByPhase(value) {
   if (value === undefined || value === null) return { value: null, error: null };
   if (typeof value !== "object" || Array.isArray(value)) {
@@ -81,6 +86,15 @@ export async function onRequest(context) {
     return jsonResponse({ success: false, message: "Feedback de fechamento inválido" }, { status: 400 });
   }
 
+  const hasClosedDealValue = body?.closedDealValue !== undefined && body?.closedDealValue !== null && body?.closedDealValue !== "";
+  let closedDealValue = null;
+  if (hasClosedDealValue) {
+    closedDealValue = toNonNegativeNumber(Number(body.closedDealValue));
+    if (closedDealValue === null) {
+      return jsonResponse({ success: false, message: "Valor fechado inválido" }, { status: 400 });
+    }
+  }
+
   const normalizedByPhase = normalizeHoursByPhase(body?.actualHoursByPhase);
   if (normalizedByPhase.error) {
     return jsonResponse({ success: false, message: normalizedByPhase.error }, { status: 400 });
@@ -114,6 +128,26 @@ export async function onRequest(context) {
   data.closeFeedback = closeFeedback;
   data.closedAt = now;
   data.hasPhaseMismatch = hasPhaseMismatch;
+  if (hasClosedDealValue && closedDealValue !== null) {
+    const variableExpenses = Array.isArray(data.variableExpenses) ? data.variableExpenses : [];
+    const despesasVariaveisTotal = variableExpenses.reduce((sum, expense) => {
+      const value = Number(expense?.value);
+      return Number.isFinite(value) ? sum + value : sum;
+    }, 0);
+
+    data.closedDealValue = closedDealValue;
+    data.closedDealContext = {
+      budgetId: id,
+      tipologia: typeof data.tipologia === "string" ? data.tipologia : undefined,
+      scoreComplexidade: Number.isFinite(Number(data.scoreComplexidade)) ? Number(data.scoreComplexidade) : undefined,
+      classificacaoComplexidade: typeof data.classificacaoComplexidade === "string" ? data.classificacaoComplexidade : undefined,
+      horasEscolhidas: Number.isFinite(Number(data.hFinal)) ? Number(data.hFinal) : Number.isFinite(Number(data.estimatedHours)) ? Number(data.estimatedHours) : undefined,
+      descontoAplicado: Number.isFinite(Number(data.commercialDiscount)) ? Number(data.commercialDiscount) : undefined,
+      despesasVariaveisTotal,
+      propostaCalculada: Number.isFinite(Number(data.results?.finalSalePrice)) ? Number(data.results.finalSalePrice) : undefined,
+      registradoEm: now,
+    };
+  }
 
   const serialized = JSON.stringify(data);
 

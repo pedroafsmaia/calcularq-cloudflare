@@ -4,6 +4,7 @@ import ExpenseCard, { Expense } from "./ExpenseCard";
 import Tooltip from "@/components/ui/Tooltip";
 import SectionHeader from "./SectionHeader";
 import { formatCurrencyPtBr, formatHoursPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
+import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, normalizeTechnicalPremium } from "@/lib/methodCalibration";
 
 interface MinimumHourCalculatorProps {
   initialFixedExpenses?: Expense[];
@@ -30,13 +31,12 @@ interface MinimumHourCalculatorProps {
   resultLabel?: string;
 }
 
-const TECHNICAL_PREMIUM_PRESETS = [0.25, 0.35, 0.45] as const;
 const clampPercent = (value: number) => Math.min(100, Math.max(0, value));
 
 const TECHNICAL_PREMIUM_OPTIONS = [
-  { value: 0.25, label: "Suave" },
-  { value: 0.35, label: "Equilibrado" },
-  { value: 0.45, label: "Agressivo" },
+  { value: 0.15, label: "Suave" },
+  { value: 0.25, label: "Equilibrado" },
+  { value: 0.35, label: "Agressivo" },
 ] as const;
 
 export default function MinimumHourCalculator({
@@ -55,7 +55,7 @@ export default function MinimumHourCalculator({
   onClearCalculation,
   initialMargin = 0.15,
   onMarginChange,
-  initialTechnicalPremium = 0.35,
+  initialTechnicalPremium = DEFAULT_METHOD_11_TECHNICAL_PREMIUM,
   onTechnicalPremiumChange,
   technicalLevel = 3,
   titleLabel = "Hora técnica mínima",
@@ -83,11 +83,7 @@ export default function MinimumHourCalculator({
     const percent = clampPercent(initialMargin * 100);
     return Number.isFinite(percent) ? percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) : "";
   });
-  const [technicalPremium, setTechnicalPremium] = useState(
-    TECHNICAL_PREMIUM_PRESETS.includes(initialTechnicalPremium as (typeof TECHNICAL_PREMIUM_PRESETS)[number])
-      ? initialTechnicalPremium
-      : 0.35
-  );
+  const [technicalPremium, setTechnicalPremium] = useState(normalizeTechnicalPremium(initialTechnicalPremium));
 
   const proLabore = useMemo(() => personalExpenses.reduce((sum, exp) => sum + exp.value, 0), [personalExpenses]);
 
@@ -176,11 +172,7 @@ export default function MinimumHourCalculator({
   }, [margin, onMarginChange]);
 
   useEffect(() => {
-    setTechnicalPremium(
-      TECHNICAL_PREMIUM_PRESETS.includes(initialTechnicalPremium as (typeof TECHNICAL_PREMIUM_PRESETS)[number])
-        ? initialTechnicalPremium
-        : 0.35
-    );
+    setTechnicalPremium(normalizeTechnicalPremium(initialTechnicalPremium));
   }, [initialTechnicalPremium]);
 
   useEffect(() => {

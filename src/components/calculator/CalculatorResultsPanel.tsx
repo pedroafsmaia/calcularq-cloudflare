@@ -1,4 +1,4 @@
-import Tooltip from "@/components/ui/Tooltip";
+﻿import Tooltip from "@/components/ui/Tooltip";
 import { describeHourlyRate } from "@/lib/hourlyRateBands";
 import { describePricePerSqm } from "@/lib/pricePerSqmBands";
 
@@ -64,13 +64,6 @@ export default function CalculatorResultsPanel({
           <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
             <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do Cálculo</p>
             <div className="space-y-2.5 text-sm text-slate-600">
-              <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                <span className="min-w-0 leading-snug">Hora técnica</span>
-                <span className="whitespace-nowrap font-medium text-slate-800">
-                  R$ {minHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                </span>
-              </div>
-
               {hasComplexitySelections ? (
                 <div className="grid grid-cols-[1fr_auto] items-start gap-3">
                   <span className="min-w-0 leading-snug">Score de Complexidade</span>
@@ -79,34 +72,30 @@ export default function CalculatorResultsPanel({
               ) : null}
 
               {displayValues.adjustedHourlyRate > 0 ? (
-                <>
-                  <div className="mt-1 grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5">
-                    <span className="min-w-0 font-semibold leading-snug text-slate-700">
-                      Hora Técnica Ajustada
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
-                        isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
-                      }`}
-                    >
-                      R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                      {adjustedHourlyRateDescription ? (
-                        <Tooltip
-                          title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
-                          tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
-                          iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
-                          text={[
-                            adjustedHourlyRateDescription.line1,
-                            adjustedHourlyRateDescription.line2,
-                            "Faixa estimada com base em CAGED 2025, Censo CAU 2020 e SINAPI.",
-                          ]
-                            .filter(Boolean)
-                            .join("\n")}
-                        />
-                      ) : null}
-                    </span>
-                  </div>
-                </>
+                <div className="mt-1 grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5">
+                  <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora Técnica Ajustada:</span>
+                  <span
+                    className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
+                      isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
+                    }`}
+                  >
+                    R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                    {adjustedHourlyRateDescription ? (
+                      <Tooltip
+                        title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
+                        tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
+                        iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
+                        text={[
+                          adjustedHourlyRateDescription.line1,
+                          adjustedHourlyRateDescription.line2,
+                          "Faixa estimada com base em CAGED 2025, Censo CAU 2020 e SINAPI.",
+                        ]
+                          .filter(Boolean)
+                          .join("\n")}
+                      />
+                    ) : null}
+                  </span>
+                </div>
               ) : null}
             </div>
           </div>

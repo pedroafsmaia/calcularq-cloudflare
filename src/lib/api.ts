@@ -177,6 +177,7 @@ class ApiClient {
       };
       scopeChange: BudgetScopeChange;
       closeFeedback?: BudgetCloseFeedback;
+      closedDealValue?: number;
     }
   ): Promise<{ success: boolean; budget: Budget }> {
     return this.request(`/api/budgets/${id}/close`, {

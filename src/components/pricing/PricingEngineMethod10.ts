@@ -1,6 +1,8 @@
-export const METHOD_10_VERSION = "1.0.0";
+﻿import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, isValidMethod11TechnicalPremium } from "@/lib/methodCalibration";
 
-export const M_DET = [0.85, 1.0, 1.12, 1.25, 1.4] as const;
+export const METHOD_10_VERSION = "1.1.0";
+
+export const M_DET = [0.85, 1.0, 1.1, 1.22, 1.35] as const;
 export const V_VOLUMETRIA = [1.0, 1.08, 1.15, 1.22, 1.3] as const;
 
 export const ETAPA_MULTIPLIERS = {
@@ -8,7 +10,7 @@ export const ETAPA_MULTIPLIERS = {
   2: 0.15,   // Estudo Preliminar
   3: 0.40,   // Anteprojeto
   4: 0.85,   // Projeto Executivo
-  5: 1.00,   // Compatibilização
+  5: 1.00,   // CompatibilizaÃ§Ã£o
 } as const;
 
 export const F6_OBRA_MULTIPLIERS = {
@@ -16,15 +18,15 @@ export const F6_OBRA_MULTIPLIERS = {
   2: 0.05,   // Pontual
   3: 0.10,   // Por Etapa
   4: 0.20,   // Acompanhamento
-  5: 0.35,   // Gestão
+  5: 0.35,   // GestÃ£o
 } as const;
 
 export const T_TIPOLOGIA = {
   residencial: 1.0,
-  comercial: 1.0,
-  institucional: 1.0,
+  comercial: 1.1,
+  institucional: 1.2,
   industrial: 1.0,
-  saude: 1.25,
+  saude: 1.4,
 } as const;
 
 export type TipologiaMethod10 = keyof typeof T_TIPOLOGIA;
@@ -99,10 +101,10 @@ export function reformFromLevel(level: number): boolean {
 }
 
 export function calcularProdutividade(area: number): number {
-  const r_min = 0.9;
-  const r_max = 1.85;
-  const k = 350;
-  const p = 1.2;
+  const r_min = 0.55;
+  const r_max = 1.2;
+  const k = 250;
+  const p = 1.4;
   return r_min + (r_max - r_min) / (1 + Math.pow(area / k, p));
 }
 
@@ -169,14 +171,14 @@ export function calcularScoreComplexidade(input: {
 
 export function classificarComplexidade(score: number): string {
   if (score <= 20) return "Muito Baixa";
-  if (score <= 40) return "Baixa a Média";
-  if (score <= 60) return "Média";
-  if (score <= 80) return "Média a Alta";
+  if (score <= 40) return "Baixa a MÃ©dia";
+  if (score <= 60) return "MÃ©dia";
+  if (score <= 80) return "MÃ©dia a Alta";
   return "Muito Alta";
 }
 
 export function calcularMethod10(input: Method10Input): Method10Output {
-  // Validações básicas
+  // ValidaÃ§Ãµes bÃ¡sicas
   if (!Number.isFinite(input.area) || input.area <= 0) throw new Error("Area invalida");
   if (!Number.isFinite(input.ht_min) || input.ht_min <= 0) throw new Error("HT_min invalida");
   if (!Number.isFinite(input.margem_lucro) || input.margem_lucro < 0) throw new Error("Margem invalida");
@@ -189,8 +191,9 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   const f5 = clampLevel(input.f5_burocracia);
   const volumetria = clampLevel(input.volumetria);
   
-  // Parâmetro A para teste A/B/C (0.25, 0.35, 0.45)
-  const A = Number.isFinite(input.A) ? Number(input.A) : 0.35;
+  // Parâmetro A no método 1.1: apenas 0.15, 0.25 ou 0.35
+  const rawA = Number(input.A);
+  const A = isValidMethod11TechnicalPremium(rawA) ? rawA : DEFAULT_METHOD_11_TECHNICAL_PREMIUM;
 
   const r_area = calcularProdutividade(area);
   const m_det = M_DET[f3 - 1];
@@ -200,13 +203,13 @@ export function calcularMethod10(input: Method10Input): Method10Output {
 
   const h50 = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
 
-  // Calcular horas de obra (F6) se aplicável
+  // Calcular horas de obra (F6) se aplicÃ¡vel
   let h_obra = 0;
   if (input.f6_obra && input.f6_obra > 1) {
     const f6 = clampLevel(input.f6_obra);
     const t_f6 = F6_OBRA_MULTIPLIERS[f6 as 1 | 2 | 3 | 4 | 5] ?? 0;
     
-    // H_obra = t(F6) × H_Executivo
+    // H_obra = t(F6) Ã— H_Executivo
     // H_Executivo = H50 quando etapa=4, ou proporcional
     const h_executivo = area * r_area * m_det * t_tipologia * v_volumetria * 0.85;
     h_obra = t_f6 * h_executivo;
@@ -214,12 +217,11 @@ export function calcularMethod10(input: Method10Input): Method10Output {
 
   const h50_total = h50 + h_obra;
 
-  const u_base = 0.2;
+  const u_base = 0.15;
   const u_f4 = 0.05 * normalizeLevel(f4);
-  const u_f5 = 0.25 * normalizeLevel(f5);
-  const u_tipologia =
-    input.tipologia === "comercial" || input.tipologia === "institucional" || input.tipologia === "industrial" ? 0.03 : 0;
-  const u_reforma = input.reforma ? (f4 + f5 < 7 ? 0.15 : 0.25) : 0;
+  const u_f5 = 0.2 * normalizeLevel(f5);
+  const u_tipologia = input.tipologia === "industrial" ? 0.02 : 0;
+  const u_reforma = input.reforma ? (f4 + f5 < 7 ? 0.15 : 0.2) : 0;
   const u_total = u_base + u_f4 + u_f5 + u_tipologia + u_reforma;
   const h_cons = h50_total * (1 + u_total);
 
@@ -231,7 +233,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     h_final = input.cenario === "conservador" ? manual * (1 + u_total) : manual;
   }
 
-  // Arredondar horas ANTES de calcular preços
+  // Arredondar horas ANTES de calcular preÃ§os
   const h50_rounded = Math.round(h50_total);
   const h_cons_rounded = Math.round(h_cons);
   const h_final_rounded = Math.round(h_final);
@@ -240,7 +242,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   const premio_tecnico = A * c_tech;
   const ht_aj = input.ht_min * (1 + input.margem_lucro + premio_tecnico);
 
-  // Calcular preços com horas arredondadas
+  // Calcular preÃ§os com horas arredondadas
   const preco_h50 = h50_rounded * ht_aj;
   const preco_conservador = h_cons_rounded * ht_aj;
   const preco_final = h_final_rounded * ht_aj;
@@ -290,3 +292,5 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     },
   };
 }
+
+

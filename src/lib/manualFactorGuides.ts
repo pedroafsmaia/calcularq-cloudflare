@@ -1,4 +1,4 @@
-type ManualFactorGuide = {
+﻿type ManualFactorGuide = {
   title: string;
   intro?: string;
   options: string[];
@@ -22,10 +22,10 @@ const MANUAL_FACTOR_GUIDES: Record<string, ManualFactorGuide> = {
     intro: "Natureza principal do projeto arquitetônico.",
     options: [
       "Residencial: Casas e apartamentos padrão",
-      "Comercial/Serviços: Lojas, escritórios e afins",
+      "Comercial/Serviços: Lojas, escritórios e galpão/logística/armazenagem simples",
       "Institucional: Escolas, sedes públicas e similares",
-      "Industrial: Galpões e plantas produtivas",
-      "Saúde: Clínicas e hospitais com alta exigência técnica",
+      "Industrial: Industrial de processos (layout de produção e exigências técnicas específicas)",
+      "Saúde: Clínicas/hospitais e casos com salas limpas, ANVISA ou farmacêutico",
     ],
   },
   stage: {
@@ -96,4 +96,3 @@ export function getManualFactorTooltip(factorId: string): string | undefined {
 
   return lines.join("\n");
 }
-

@@ -279,6 +279,7 @@ export default function BudgetsHistory() {
     actualHoursByPhase?: BudgetActualHoursByPhase;
     scopeChange: BudgetScopeChange;
     closeFeedback?: BudgetCloseFeedback;
+    closedDealValue?: number;
   }) => {
     if (!selectedCloseBudget) return;
     setIsSavingCloseFeedback(true);
@@ -288,8 +289,8 @@ export default function BudgetsHistory() {
       setCloseDialogBudgetId(null);
       toast({
         tone: "success",
-        title: "Projeto finalizado",
-        description: "Horas reais registradas com sucesso.",
+        title: "Feedback registrado",
+        description: "Dados do fechamento salvos com sucesso.",
       });
     } catch (e) {
       toast({

@@ -4,6 +4,7 @@ import type { Budget } from "@/lib/api";
 import type { BudgetActualHoursByPhase, BudgetScopeChange, BudgetCloseFeedback } from "@/types/budget";
 import AppDialog from "@/components/ui/AppDialog";
 import { Button } from "@/components/ui/button";
+import { formatCurrencyPtBr, parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 
 const PHASE_FIELDS: Array<{ key: keyof BudgetActualHoursByPhase; label: string }> = [
   { key: "briefing", label: "Briefing" },
@@ -19,6 +20,7 @@ type FeedbackPayload = {
   actualHoursByPhase?: BudgetActualHoursByPhase;
   scopeChange: BudgetScopeChange;
   closeFeedback: BudgetCloseFeedback;
+  closedDealValue?: number;
 };
 
 type Props = {
@@ -41,6 +43,7 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
   const [actualHoursTotal, setActualHoursTotal] = useState("");
   const [scopeChange, setScopeChange] = useState<BudgetScopeChange>("as_planned");
   const [closeFeedback, setCloseFeedback] = useState<BudgetCloseFeedback | "">("");
+  const [closedDealValueDraft, setClosedDealValueDraft] = useState("");
   const [phaseDrafts, setPhaseDrafts] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +70,12 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
     } else {
       setCloseFeedback("");
     }
+
+    setClosedDealValueDraft(
+      typeof budget.data.closedDealValue === "number" && Number.isFinite(budget.data.closedDealValue)
+        ? formatCurrencyPtBr(budget.data.closedDealValue)
+        : ""
+    );
 
     const nextDrafts: Record<string, string> = {};
     for (const field of PHASE_FIELDS) {
@@ -97,8 +106,8 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
     <AppDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Finalizar projeto"
-      description="Registre as horas reais e o fechamento comercial para calibrar o método com seu uso real."
+      title="Registrar feedback"
+      description="Registre as horas reais e o fechamento comercial para análise da evolução do método."
       maxWidthClassName="max-w-2xl"
       scrollBehavior="mobile-inner"
       footer={
@@ -122,6 +131,12 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
                 return;
               }
 
+              const closedDealValueParsed = parsePtBrNumber(closedDealValueDraft);
+              if (closedDealValueDraft.trim() && (closedDealValueParsed === null || closedDealValueParsed < 0)) {
+                setError("Informe um valor fechado válido ou deixe o campo em branco.");
+                return;
+              }
+
               const phasePayload: BudgetActualHoursByPhase = {};
               for (const field of PHASE_FIELDS) {
                 const value = Number(phaseDrafts[field.key]);
@@ -135,10 +150,11 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
                 actualHoursByPhase: Object.keys(phasePayload).length > 0 ? phasePayload : undefined,
                 scopeChange,
                 closeFeedback,
+                closedDealValue: closedDealValueParsed !== null ? closedDealValueParsed : undefined,
               });
             }}
           >
-            {isSaving ? "Salvando..." : "Finalizar projeto"}
+            {isSaving ? "Salvando..." : "Registrar feedback"}
           </Button>
         </div>
       }
@@ -152,7 +168,7 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
             {budget.data.closedAt ? (
               <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Finalizado em {new Date(budget.data.closedAt).toLocaleDateString("pt-BR")}
+                Feedback registrado em {new Date(budget.data.closedAt).toLocaleDateString("pt-BR")}
               </p>
             ) : null}
           </div>
@@ -216,6 +232,30 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
                   {option.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">Valor fechado com o cliente (opcional)</label>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">R$</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={closedDealValueDraft}
+                onChange={(e) => {
+                  setClosedDealValueDraft(sanitizeNumberDraft(e.target.value));
+                  if (error) setError(null);
+                }}
+                onBlur={() => {
+                  const parsed = parsePtBrNumber(closedDealValueDraft);
+                  if (parsed !== null && parsed >= 0) {
+                    setClosedDealValueDraft(formatCurrencyPtBr(parsed));
+                  }
+                }}
+                className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-3 text-sm focus:border-calcularq-blue focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20"
+                placeholder="0,00"
+              />
             </div>
           </div>
 

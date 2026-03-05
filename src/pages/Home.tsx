@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import { Calculator, Globe, DollarSign, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Calculator, Clock3, DollarSign, ArrowRight, CheckCircle2, Info } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { fadeUp, fadeX, listStagger, viewportOnce } from "@/lib/motion";
 
@@ -44,18 +44,54 @@ export default function Home() {
   const features = [
     {
       icon: Calculator,
-      title: "Cálculo da complexidade",
-      description: "Garante uma precificação justa ao considerar fatores de complexidade do projeto.",
+      title: "Precificação por complexidade",
+      description: "Cada projeto é avaliado por fatores reais que influenciam o esforço de desenvolvimento.",
     },
     {
-      icon: Globe,
-      title: "Acesso em qualquer lugar",
-      description: "Uma ferramenta prática e 100% online, pronta para usar em qualquer dispositivo.",
+      icon: Clock3,
+      title: "Estimativa de horas do projeto",
+      description: "A calculadora sugere horas de trabalho com base na complexidade do projeto.",
     },
     {
       icon: DollarSign,
-      title: "Preço acessível",
-      description: "Acesso completo por um valor único e justo, sem mensalidades ou custos surpresa.",
+      title: "Preço baseado na sua hora técnica",
+      description: "O valor final é calculado a partir da sua hora técnica e das horas estimadas.",
+    },
+  ];
+
+  const demoCards = [
+    {
+      header: "🏠 SIMPLES",
+      projectType: "Residencial",
+      area: "80m²",
+      stage: "Projeto Exec.",
+      score: "Score 28/100",
+      complexity: "Complexidade baixa",
+      hours: "152h",
+      price: "R$ 7.600",
+      sqm: "R$ 95/m²",
+    },
+    {
+      header: "🏢 MÉDIO",
+      projectType: "Comercial",
+      area: "150m²",
+      stage: "Projeto Exec.",
+      score: "Score 52/100",
+      complexity: "Complexidade moderada",
+      hours: "299h",
+      price: "R$ 14.950",
+      sqm: "R$ 100/m²",
+    },
+    {
+      header: "🏥 COMPLEXO",
+      projectType: "Clínica Saúde",
+      area: "250m²",
+      stage: "Projeto Exec.",
+      score: "Score 76/100",
+      complexity: "Complexidade alta",
+      hours: "595h",
+      price: "R$ 29.750",
+      sqm: "R$ 119/m²",
     },
   ];
 
@@ -135,14 +171,7 @@ export default function Home() {
                       className="w-full text-white px-8 py-6 text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-150 font-semibold sm:text-lg text-base"
                       style={{ backgroundColor: "#fc7338" }}
                     >
-                      {user?.hasPaid ? (
-                        "Acessar a Calcularq"
-                      ) : (
-                        <>
-                          <span className="hidden sm:inline">Acesse agora por apenas R$19,90</span>
-                          <span className="sm:hidden">Acessar por R$19,90</span>
-                        </>
-                      )}
+                      {user?.hasPaid ? "Acessar a Calcularq" : "Acessar a Calcularq — R$19,90"}
                     </Button>
                   </Link>
 
@@ -167,23 +196,6 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
-          <motion.div
-            variants={fadeUp(prefersReducedMotion, 14)}
-            initial="hidden"
-            whileInView="show"
-            viewport={viewportOnce}
-            className="rounded-3xl border border-slate-200 bg-white px-6 py-10 sm:px-10 sm:py-12 text-center shadow-sm mb-10 sm:mb-12 lg:mb-14"
-          >
-            <h2 className="text-2xl sm:text-3xl font-bold text-calcularq-blue mb-4 tracking-tight">Uma calculadora que evolui com você</h2>
-            <p className="mx-auto max-w-3xl text-sm sm:text-base text-slate-600 leading-relaxed">
-              A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o sistema ajusta
-              automaticamente as estimativas futuras.
-            </p>
-            <p className="mx-auto mt-4 max-w-3xl text-sm sm:text-base text-slate-600 leading-relaxed">
-              Quanto mais você usa, mais precisa ela fica.
-            </p>
-          </motion.div>
-
           <motion.div variants={listStagger} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <motion.div
@@ -210,6 +222,87 @@ export default function Home() {
         </div>
 
         <div id="como-funciona" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 scroll-mt-24">
+          <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" whileInView="show" viewport={viewportOnce} className="text-center">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">Como funciona</h2>
+            <p
+              className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[34ch] sm:max-w-[42ch] md:max-w-[50ch] lg:max-w-[54ch] mx-auto leading-relaxed"
+              style={{ textWrap: "balance" }}
+            >
+              Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número, em 3 etapas simples.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
+              <FormulaStep
+                number="1"
+                title="Hora técnica"
+                description="Informe suas despesas e horas de trabalho. O sistema calcula sua hora técnica mínima."
+              />
+              <FormulaStep
+                number="2"
+                title="Fatores de complexidade"
+                description="Informe as características do projeto. O sistema estima as horas necessárias e premia a complexidade."
+              />
+              <FormulaStep
+                number="3"
+                title="Preço e ajustes"
+                description="As horas estimadas são convertidas em preço com base na sua hora técnica ajustada."
+              />
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
+          <motion.div
+            variants={fadeUp(prefersReducedMotion, 14)}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 md:p-10 shadow-sm"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-calcularq-blue text-center tracking-tight">Mini-demo</h2>
+            <p className="mt-3 text-center text-sm sm:text-base text-slate-600">
+              Veja exemplos de cenários para entender como o método responde à complexidade.
+            </p>
+
+            <div className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm text-blue-800">
+              <Info className="h-4 w-4 shrink-0" />
+              <span>O preço depende da sua hora técnica.</span>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {demoCards.map((card) => (
+                <div key={card.header} className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
+                  <p className="text-sm font-semibold tracking-wide text-calcularq-blue">{card.header}</p>
+
+                  <div className="mt-3 space-y-1 text-sm text-slate-700">
+                    <p>{card.projectType}</p>
+                    <p>{card.area}</p>
+                    <p>{card.stage}</p>
+                  </div>
+
+                  <div className="mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2">
+                    <p className="text-sm font-semibold text-slate-800">{card.score}</p>
+                    <p className="text-xs text-slate-500">{card.complexity}</p>
+                  </div>
+
+                  <div className="mt-4 space-y-1 text-sm text-slate-700">
+                    <p>⏱️ {card.hours}</p>
+                    <p>💰 {card.price}</p>
+                    <p>📐 {card.sqm}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 text-center">
+              <Link to={createPageUrl("Calculator")} onClick={handleCalculatorClick} className="inline-block">
+                <Button className="bg-calcularq-blue text-white hover:bg-[#002366]">Calcular meu projeto →</Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
           <motion.div
             variants={fadeUp(prefersReducedMotion, 14)}
             initial="hidden"
@@ -221,7 +314,7 @@ export default function Home() {
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 tracking-tight">Fatores de complexidade</h2>
                 <p className="text-sm sm:text-base lg:text-lg text-slate-300 mb-6 leading-relaxed">
-                  Nossa calculadora considera 6 fatores essenciais para determinar a complexidade real do seu projeto.
+                  A Calcularq analisa 6 fatores para medir a complexidade do projeto e ajustar as estimativas de horas e valor.
                 </p>
                 <Link to={createPageUrl("Calculator")} className="inline-block">
                   <Button className="bg-white text-calcularq-blue border-2 border-white hover:bg-slate-50 hover:border-slate-200 shadow-md hover:shadow-lg transition-colors transition-shadow duration-150 font-semibold px-6 py-3">
@@ -246,31 +339,29 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
-          <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" whileInView="show" viewport={viewportOnce} className="text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-calcularq-blue mb-4 tracking-tight">Como funciona</h2>
-            <p
-              className="text-base sm:text-lg text-slate-700 mb-10 sm:mb-12 max-w-[34ch] sm:max-w-[42ch] md:max-w-[50ch] lg:max-w-[54ch] mx-auto leading-relaxed"
-              style={{ textWrap: "balance" }}
-            >
-              {"Cada projeto tem sua complexidade. O Calcularq te ajuda a transformar isso em um número — em 3 etapas simples."}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
-              <FormulaStep
-                number="1"
-                title="Hora técnica"
-                description="Informe suas despesas e horas de trabalho. O Calcularq descobre sua hora técnica base."
-              />
-              <FormulaStep
-                number="2"
-                title="Informações do projeto"
-                description="Informe área e características do projeto para o método medir a complexidade e estimar o esforço real."
-              />
-              <FormulaStep
-                number="3"
-                title="Composição final"
-                description="Estime as horas de projeto, adicione despesas variáveis e desconto. O preço de venda aparece na hora."
-              />
+          <motion.div
+            variants={fadeUp(prefersReducedMotion, 14)}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="rounded-3xl border border-slate-200 bg-white px-6 py-10 sm:px-8 sm:py-12 shadow-sm"
+          >
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-calcularq-blue mb-4 tracking-tight">Uma calculadora que evolui com você</h2>
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-[58ch]">
+                  A Calcularq aprende com cada projeto que você finaliza e ajusta as próximas estimativas automaticamente.
+                  Quanto mais você usa, mais precisa ela fica para o seu perfil de trabalho.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-calcularq-blue mb-3">Como funciona:</h3>
+                <ul className="space-y-2.5 text-sm sm:text-base text-slate-600">
+                  <li>1️⃣ Finalize projetos e registre as horas reais</li>
+                  <li>2️⃣ O sistema calibra automaticamente</li>
+                  <li>3️⃣ Estimativas ficam personalizadas para você</li>
+                </ul>
+              </div>
             </div>
           </motion.div>
         </div>

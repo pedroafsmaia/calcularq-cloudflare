@@ -38,6 +38,9 @@ export type BudgetCloseFeedback =
   | "could_charge_more"
   | "did_not_close_other";
 
+// Método 1.1: grupos A/B/C = 0.15 / 0.25 / 0.35
+export type BudgetTechnicalPremium = 0.15 | 0.25 | 0.35;
+
 export type BudgetTipologia = "residencial" | "comercial" | "institucional" | "industrial" | "saude";
 export type BudgetCenario = "conservador" | "otimista";
 
@@ -48,6 +51,18 @@ export type BudgetActualHoursByPhase = {
   ex?: number;
   compat?: number;
   obra?: number;
+};
+
+export type BudgetClosedDealContext = {
+  budgetId: string;
+  tipologia?: BudgetTipologia;
+  scoreComplexidade?: number;
+  classificacaoComplexidade?: string;
+  horasEscolhidas?: number;
+  descontoAplicado?: number;
+  despesasVariaveisTotal?: number;
+  propostaCalculada?: number;
+  registradoEm: string;
 };
 
 export type BudgetData = {
@@ -66,7 +81,8 @@ export type BudgetData = {
   scoreComplexidade?: number;
   classificacaoComplexidade?: string;
   aTestGroup?: "A" | "B" | "C";
-  aValue?: number;
+  // Preferir 0.15, 0.25 ou 0.35 (compatibilização de legado ocorre na hidratação)
+  aValue?: BudgetTechnicalPremium | number;
   area?: number | null;
   factors: BudgetFactorData[];
   areaIntervals: BudgetAreaIntervalData[];
@@ -88,6 +104,8 @@ export type BudgetData = {
   closeFeedback?: BudgetCloseFeedback;
   closedAt?: string;
   hasPhaseMismatch?: boolean;
+  closedDealValue?: number;
+  closedDealContext?: BudgetClosedDealContext;
   profitProfile?: "portfolio" | "estabelecido" | "referencia";
 };
 
@@ -95,7 +113,7 @@ export type CalculatorDraft = {
   minHourlyRate?: number | null;
   useManualMinHourlyRate?: boolean;
   profitMargin?: number;
-  technicalPremium?: number;
+  technicalPremium?: BudgetTechnicalPremium | number;
   fixedExpenses?: ExpenseItem[];
   personalExpenses?: ExpenseItem[];
   proLabore?: number;

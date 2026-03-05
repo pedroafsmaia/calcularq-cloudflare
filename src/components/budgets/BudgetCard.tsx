@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { Calendar, CheckCircle2, Eye, Trash2 } from "lucide-react";
+﻿import { motion } from "framer-motion";
+import { Calendar, CheckCircle2, Eye, MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Budget } from "@/lib/api";
 
@@ -100,16 +100,16 @@ export default function BudgetCard({
         </div>
       </div>
 
-        <div className="grid grid-cols-2 gap-2.5 mb-4">
-          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-            <div className="text-xs uppercase tracking-wide text-slate-500">Complexidade</div>
-            <div className="mt-0.5 font-semibold text-slate-800">{complexityScore}/100</div>
-          </div>
-          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-            <div className="text-xs uppercase tracking-wide text-slate-500">Horas</div>
-            <div className="mt-0.5 font-semibold text-slate-800">{hoursLabel}{cenarioLabel}</div>
-          </div>
+      <div className="grid grid-cols-2 gap-2.5 mb-4">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+          <div className="text-xs uppercase tracking-wide text-slate-500">Complexidade</div>
+          <div className="mt-0.5 font-semibold text-slate-800">{complexityScore}/100</div>
         </div>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+          <div className="text-xs uppercase tracking-wide text-slate-500">Horas</div>
+          <div className="mt-0.5 font-semibold text-slate-800">{hoursLabel}{cenarioLabel}</div>
+        </div>
+      </div>
 
       <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
         <Calendar className="w-3.5 h-3.5" />
@@ -123,34 +123,32 @@ export default function BudgetCard({
         </span>
       </div>
 
-      {showCloseProjectAction ? (
-        <div className="mb-4">
-          {isProjectClosed ? (
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Finalizado em{" "}
-              {budget.data.closedAt ? new Date(budget.data.closedAt).toLocaleDateString("pt-BR") : "data indisponível"}
-            </div>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenCloseProject(budget);
-              }}
-            >
-              Finalizar projeto / Registrar horas reais
-            </Button>
-          )}
+      {showCloseProjectAction && isProjectClosed ? (
+        <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Feedback registrado em {budget.data.closedAt ? new Date(budget.data.closedAt).toLocaleDateString("pt-BR") : "data indisponível"}
         </div>
       ) : null}
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-2 sm:flex-row">
+        {showCloseProjectAction ? (
+          <Button
+            type="button"
+            className="w-full bg-calcularq-blue hover:bg-[#002366] text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenCloseProject(budget);
+            }}
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Registrar feedback
+          </Button>
+        ) : null}
+
         <Button
           type="button"
-          className="w-full bg-calcularq-blue hover:bg-[#002366] text-white"
+          variant="ghost"
+          className="w-full border border-slate-200 text-slate-700 hover:bg-slate-50"
           onClick={(e) => {
             e.stopPropagation();
             onOpenDetails(budget);

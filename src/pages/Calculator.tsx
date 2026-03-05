@@ -29,14 +29,15 @@ import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../compon
 import { createPageUrl } from "@/utils";
 import { fadeUp } from "@/lib/motion";
 import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "@/lib/calculatorDraft";
+import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, resolveTechnicalPremium } from "@/lib/methodCalibration";
 import { useCalculatorProgress } from "@/hooks/calculator/useCalculatorProgress";
 import { useCalculatorReset } from "@/hooks/calculator/useCalculatorReset";
 import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImport";
 
 const STEPS = [
-  { n: 1, label: "Hora técnica" },
-  { n: 2, label: "Informações do projeto" },
-  { n: 3, label: "Composição final" },
+  { n: 1, label: "Hora técnica", line1: "Hora", line2: "técnica" },
+  { n: 2, label: "Fatores de complexidade", line1: "Fatores de", line2: "complexidade" },
+  { n: 3, label: "Preço e ajustes", line1: "Preço e", line2: "ajustes" },
 ];
 
 export default function Calculator() {
@@ -68,7 +69,7 @@ export default function Calculator() {
   const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
   const [useManualMinHourlyRate, setUseManualMinHourlyRate] = useState(false);
   const [profitMargin, setProfitMargin] = useState(0.15);
-  const [technicalPremium, setTechnicalPremium] = useState(0.35);
+  const [technicalPremium, setTechnicalPremium] = useState<number>(DEFAULT_METHOD_11_TECHNICAL_PREMIUM);
   const [fixedExpenses, setFixedExpenses] = useState<ExpenseItem[]>([]);
   const [personalExpenses, setPersonalExpenses] = useState<ExpenseItem[]>([]);
   const [proLabore, setProLabore] = useState(0);
@@ -147,12 +148,7 @@ export default function Calculator() {
     if (typeof draft.profitMargin === "number" && Number.isFinite(draft.profitMargin)) {
       setProfitMargin(draft.profitMargin);
     }
-    if (typeof draft.technicalPremium === "number" && Number.isFinite(draft.technicalPremium)) {
-      const parsed = Number(draft.technicalPremium);
-      if (parsed === 0.25 || parsed === 0.35 || parsed === 0.45) {
-        setTechnicalPremium(parsed);
-      }
-    }
+    setTechnicalPremium(resolveTechnicalPremium(draft.technicalPremium, "B"));
     if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
     if (draft.personalExpenses) setPersonalExpenses(draft.personalExpenses);
     if (draft.proLabore) setProLabore(draft.proLabore);
@@ -223,20 +219,7 @@ export default function Calculator() {
         } else {
           setProfitMargin(0.15);
         }
-        if (typeof budget.data.aValue === "number" && Number.isFinite(budget.data.aValue)) {
-          const parsed = Number(budget.data.aValue);
-          if (parsed === 0.25 || parsed === 0.35 || parsed === 0.45) {
-            setTechnicalPremium(parsed);
-          } else {
-            setTechnicalPremium(0.35);
-          }
-        } else if (budget.data.aTestGroup === "A") {
-          setTechnicalPremium(0.25);
-        } else if (budget.data.aTestGroup === "C") {
-          setTechnicalPremium(0.45);
-        } else {
-          setTechnicalPremium(0.35);
-        }
+        setTechnicalPremium(resolveTechnicalPremium(budget.data.aValue, budget.data.aTestGroup));
         if (budget.data.cenarioEscolhido === "otimista" || budget.data.cenarioEscolhido === "conservador") {
           setCenarioEscolhido(budget.data.cenarioEscolhido);
         } else {
@@ -475,21 +458,23 @@ export default function Calculator() {
 
     const adjustedHourlyRate = methodOutput.ht_aj;
     const projectPrice = methodOutput.preco_final;
+    const totalVariableExpenses = variableExpenses.reduce((sum, expense) => sum + (Number(expense.value) || 0), 0);
     const sanitizedCommercialDiscount = Math.min(100, Math.max(0, Number(commercialDiscount) || 0));
     const discountAmount = projectPrice * (sanitizedCommercialDiscount / 100);
-    const finalSalePrice = projectPrice - discountAmount;
+    const projectPriceWithDiscount = projectPrice - discountAmount;
+    const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
     const profit = ((adjustedHourlyRate - minHourlyRate) * methodOutput.h_final) - discountAmount;
 
     return {
-      totalVariableExpenses: 0,
+      totalVariableExpenses,
       adjustedHourlyRate,
       projectPrice,
-      projectPriceWithDiscount: finalSalePrice,
+      projectPriceWithDiscount,
       discountAmount,
       finalSalePrice,
       profit: Number(profit.toFixed(2)),
     };
-  }, [commercialDiscount, methodOutput, minHourlyRate]);
+  }, [commercialDiscount, methodOutput, minHourlyRate, variableExpenses]);
 
   const effectiveAreaForCub = useMemo(() => {
     if (typeof area === "number" && Number.isFinite(area) && area > 0) return area;
@@ -814,11 +799,12 @@ export default function Calculator() {
                       </span>
                     </button>
                     <span
-                      className={`mt-1.5 text-[13px] sm:text-sm font-medium text-center leading-tight max-w-[12ch]
+                      className={`mt-1.5 inline-flex flex-col text-[13px] sm:text-sm font-medium text-center leading-tight max-w-[12ch]
                       ${done || active ? "text-calcularq-blue" : "text-slate-400"}`}
                       style={{ textWrap: "balance" }}
                     >
-                      {step.label}
+                      <span>{step.line1}</span>
+                      <span>{step.line2}</span>
                     </span>
                   </div>
                   {i < STEPS.length - 1 && (
@@ -924,7 +910,10 @@ export default function Calculator() {
               <div className="flex items-center justify-between gap-3 rounded-lg px-1 py-1.5 hover:bg-slate-50 transition-colors duration-150">
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de {STEPS.length}</p>
-                  <p className="truncate text-sm font-semibold text-calcularq-blue">{currentStepLabel}</p>
+                  <p className="text-sm font-semibold leading-tight text-calcularq-blue">
+                    <span className="block">{STEPS[currentStep - 1]?.line1}</span>
+                    <span className="block">{STEPS[currentStep - 1]?.line2}</span>
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <ChevronDown className="h-4 w-4 text-slate-500" />
@@ -965,8 +954,9 @@ export default function Calculator() {
                       >
                         {done ? "✓" : step.n}
                       </span>
-                      <span className={["text-sm leading-snug", active ? "font-semibold" : ""].join(" ")}>
-                        {step.label}
+                      <span className={["inline-flex flex-col text-sm leading-snug", active ? "font-semibold" : ""].join(" ")}>
+                        <span>{step.line1}</span>
+                        <span>{step.line2}</span>
                       </span>
                     </span>
                   </button>
@@ -1024,7 +1014,7 @@ export default function Calculator() {
                 {currentStep === 2 && (
                   <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
                     <SectionHeader
-                      title="Informações do projeto"
+                      title="Fatores de complexidade"
                       description="Preencha os campos da etapa para que o método calcule horas e preço com base na complexidade."
                       icon={<BarChart2 className="w-5 h-5 text-calcularq-blue" />}
                     />
@@ -1088,6 +1078,8 @@ export default function Calculator() {
                     onCenarioChange={setCenarioEscolhido}
                     commercialDiscount={commercialDiscount}
                     onCommercialDiscountChange={setCommercialDiscount}
+                    variableExpenses={variableExpenses}
+                    onVariableExpensesChange={setVariableExpenses}
                     technicalPremium={technicalPremium}
                     horasManual={horasManuais}
                     onHorasManualChange={setHorasManuais}

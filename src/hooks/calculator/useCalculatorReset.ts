@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { ExpenseItem } from "@/types/budget";
 import type { Factor, AreaInterval } from "@/components/pricing/PricingEngine";
 import { clearCalculatorDraft } from "@/lib/calculatorDraft";
+import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM } from "@/lib/methodCalibration";
 
 type Params = {
   currentStep: number;
@@ -68,7 +69,7 @@ export function useCalculatorReset({
       setMinHourlyRate(null);
       setUseManualMinHourlyRate(false);
       if (setProfitMargin) setProfitMargin(0.15);
-      if (setTechnicalPremium) setTechnicalPremium(0.35);
+      if (setTechnicalPremium) setTechnicalPremium(DEFAULT_METHOD_11_TECHNICAL_PREMIUM);
       setFixedExpenses([]);
       setPersonalExpenses([]);
       setProLabore(0);
@@ -130,7 +131,7 @@ export function useCalculatorReset({
     setMinHourlyRate(null);
     setUseManualMinHourlyRate(false);
     if (setProfitMargin) setProfitMargin(0.15);
-    if (setTechnicalPremium) setTechnicalPremium(0.35);
+    if (setTechnicalPremium) setTechnicalPremium(DEFAULT_METHOD_11_TECHNICAL_PREMIUM);
     setFixedExpenses([]);
     setPersonalExpenses([]);
     setProLabore(0);

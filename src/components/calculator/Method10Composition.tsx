@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, AlertTriangle, DollarSign } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import SaveBudgetButton from "./SaveBudgetButton";
+import ExpenseCard, { type Expense } from "./ExpenseCard";
 import type { BudgetData } from "@/types/budget";
 import type { Method10Output, CenarioMethod10, TipologiaMethod10 } from "@/components/pricing/PricingEngineMethod10";
-import type { Expense } from "./ExpenseCard";
 import Tooltip from "@/components/ui/Tooltip";
 import { parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
+import { technicalPremiumGroup } from "@/lib/methodCalibration";
 
 type FactorSnapshot = {
   id: string;
@@ -45,6 +46,8 @@ type Props = {
   onCenarioChange: (value: CenarioMethod10) => void;
   commercialDiscount: number;
   onCommercialDiscountChange: (value: number) => void;
+  variableExpenses: Expense[];
+  onVariableExpensesChange: (expenses: Expense[]) => void;
   horasManual: number | null;
   onHorasManualChange: (value: number | null) => void;
   h50: number;
@@ -92,6 +95,8 @@ export default function Method10Composition({
   onCenarioChange,
   commercialDiscount,
   onCommercialDiscountChange,
+  variableExpenses,
+  onVariableExpensesChange,
   horasManual,
   onHorasManualChange,
   h50,
@@ -101,11 +106,17 @@ export default function Method10Composition({
 }: Props) {
   const [discountDraft, setDiscountDraft] = useState("0");
   const [isEditingDiscount, setIsEditingDiscount] = useState(false);
+
   const baseHoras = cenario === "conservador" ? hCons : h50;
   const horasUsadas = output.h_final;
   const sanitizedCommercialDiscount = Math.min(100, Math.max(0, Number(commercialDiscount) || 0));
+  const totalVariableExpenses = useMemo(
+    () => variableExpenses.reduce((sum, expense) => sum + (Number(expense.value) || 0), 0),
+    [variableExpenses]
+  );
   const discountAmount = output.preco_final * (sanitizedCommercialDiscount / 100);
-  const finalSalePrice = output.preco_final - discountAmount;
+  const finalSalePrice = output.preco_final - discountAmount + totalVariableExpenses;
+  const pricePerSqm = area > 0 ? finalSalePrice / area : null;
 
   const percentualDiff = useMemo(() => {
     if (baseHoras <= 0) return 0;
@@ -119,6 +130,18 @@ export default function Method10Composition({
     if (isEditingDiscount) return;
     setDiscountDraft(String(sanitizedCommercialDiscount));
   }, [sanitizedCommercialDiscount, isEditingDiscount]);
+
+  const handleAddExpense = (expense: Expense) => {
+    onVariableExpensesChange([...variableExpenses, expense]);
+  };
+
+  const handleRemoveExpense = (id: string) => {
+    onVariableExpensesChange(variableExpenses.filter((expense) => expense.id !== id));
+  };
+
+  const handleUpdateExpense = (id: string, updates: Partial<Expense>) => {
+    onVariableExpensesChange(variableExpenses.map((expense) => (expense.id === id ? { ...expense, ...updates } : expense)));
+  };
 
   const budgetData: BudgetData = {
     minHourlyRate,
@@ -135,7 +158,7 @@ export default function Method10Composition({
     scoreComplexidade: output.score_complexidade,
     classificacaoComplexidade: output.classificacao_complexidade,
     aValue: technicalPremium,
-    aTestGroup: technicalPremium <= 0.25 ? "A" : technicalPremium >= 0.45 ? "C" : "B",
+    aTestGroup: technicalPremiumGroup(technicalPremium),
     area,
     factors: factors.map((factor) => ({
       id: factor.id,
@@ -151,7 +174,7 @@ export default function Method10Composition({
     proLabore,
     productiveHours,
     commercialDiscount: sanitizedCommercialDiscount,
-    variableExpenses: [],
+    variableExpenses,
     results: {
       globalComplexity: Number((output.score_complexidade / 100).toFixed(2)),
       adjustedHourlyRate: output.ht_aj,
@@ -164,8 +187,8 @@ export default function Method10Composition({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-sm">
       <SectionHeader
-        title="Composição final"
-        description="Escolha o cenário, ajuste horas se necessário e salve o projeto."
+        title="Preço e ajustes"
+        description="Revise as horas sugeridas pelo método e ajuste sua proposta considerando despesas ou descontos comerciais."
         icon={<DollarSign className="w-5 h-5 text-calcularq-blue" />}
       />
 
@@ -200,8 +223,12 @@ export default function Method10Composition({
           </div>
 
           {cenario === "otimista" ? (
-            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Este cenário não inclui margem de segurança para imprevistos.
+            <div className="flex items-start gap-3 rounded-xl border-l-4 border-blue-500 bg-blue-50 px-4 py-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+              <div>
+                <p className="mb-0.5 text-sm font-semibold text-blue-900">Cenário otimista selecionado</p>
+                <p className="text-sm text-blue-700">Este cenário não inclui margem de segurança para imprevistos.</p>
+              </div>
             </div>
           ) : null}
 
@@ -235,9 +262,7 @@ export default function Method10Composition({
             <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 mt-0.5" />
-                <p>
-                  Risco de subprecificação: sua estimativa está {Math.abs(Math.round(percentualDiff))}% abaixo da sugestão.
-                </p>
+                <p>Risco de subprecificação: sua estimativa está {Math.abs(Math.round(percentualDiff))}% abaixo da sugestão.</p>
               </div>
             </div>
           ) : null}
@@ -252,6 +277,18 @@ export default function Method10Composition({
               </div>
             </div>
           ) : null}
+        </section>
+
+        <section>
+          <ExpenseCard
+            expenses={variableExpenses}
+            onAdd={handleAddExpense}
+            onRemove={handleRemoveExpense}
+            onUpdate={handleUpdateExpense}
+            placeholder="Ex.: RRT, deslocamento..."
+            label="Despesas variáveis do projeto (R$)"
+            tooltip="Custos específicos deste contrato que serão repassados ao cliente."
+          />
         </section>
 
         <section className="rounded-xl border border-slate-200 bg-white px-4 py-4">
@@ -335,15 +372,47 @@ export default function Method10Composition({
               <div>
                 <p className="mb-0.5 text-sm font-semibold text-blue-900">Impacto do desconto</p>
                 <p className="text-sm text-blue-700">
-                  Sua remuneração será reduzida em{" "}
-                  <span className="font-bold">
-                    {formatCurrency(discountAmount)}
-                  </span>
-                  .
+                  Sua remuneração será reduzida em <span className="font-bold">{formatCurrency(discountAmount)}</span>.
                 </p>
               </div>
             </div>
           ) : null}
+        </section>
+
+        <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+          <h3 className="text-base font-semibold text-calcularq-blue">Resultado</h3>
+          <div className="mt-3 space-y-2 text-sm text-slate-700">
+            <div className="flex items-center justify-between gap-3">
+              <span>Preço de honorários</span>
+              <span className="font-semibold text-slate-900">{formatCurrency(output.preco_final)}</span>
+            </div>
+            {discountAmount > 0 ? (
+              <div className="flex items-center justify-between gap-3">
+                <span>(-) Desconto comercial</span>
+                <span className="font-semibold text-red-600">- {formatCurrency(discountAmount)}</span>
+              </div>
+            ) : null}
+            {totalVariableExpenses > 0 ? (
+              <div className="flex items-center justify-between gap-3">
+                <span>(+) Despesas variáveis</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(totalVariableExpenses)}</span>
+              </div>
+            ) : null}
+            <div className="mt-2 border-t border-slate-200 pt-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-semibold text-calcularq-blue">Preço final da proposta</span>
+                <span className="text-lg font-bold text-calcularq-blue">{formatCurrency(finalSalePrice)}</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-2.5">
+              <span>Preço/m²</span>
+              <span className="font-semibold text-slate-900">{pricePerSqm !== null ? formatCurrency(pricePerSqm) : "—"}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span>Horas consideradas</span>
+              <span className="font-semibold text-slate-900">{formatHours(output.h_final)}h</span>
+            </div>
+          </div>
         </section>
 
         <SaveBudgetButton
