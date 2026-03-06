@@ -772,7 +772,7 @@ export default function Calculator() {
             Calculadora de Precificação
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Configure sua hora técnica, descreva o projeto e finalize o preço com base no Método Calcularq 1.1.
+            Configure sua hora técnica, descreva o projeto e calcule um preço com base na complexidade real.
           </p>
         </motion.div>
 

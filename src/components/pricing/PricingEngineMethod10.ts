@@ -1,6 +1,18 @@
 ﻿import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, isValidMethod11TechnicalPremium } from "@/lib/methodCalibration";
 
-export const METHOD_10_VERSION = "1.1.0";
+export const METHOD_12_VERSION = "1.2.0";
+// Backward-compatible alias to avoid touching imports in the app.
+export const METHOD_10_VERSION = METHOD_12_VERSION;
+
+export const METHOD_12_PARAMS = {
+  r_min: 0.55,
+  r_max: 1.2,
+  k: 250,
+  p: 1.4,
+  hfix_alpha: 18,
+  hfix_a0: 15,
+  hfix_q: 1.8,
+} as const;
 
 export const M_DET = [0.85, 1.0, 1.1, 1.22, 1.35] as const;
 export const V_VOLUMETRIA = [1.0, 1.08, 1.15, 1.22, 1.3] as const;
@@ -70,6 +82,8 @@ export interface Method10Output {
     t_tipologia: number;
     v_volumetria: number;
     e_etapa: number;
+    h_var: number;
+    h_fix: number;
     h_projeto: number;
     h_obra: number;
     u_base: number;
@@ -101,11 +115,18 @@ export function reformFromLevel(level: number): boolean {
 }
 
 export function calcularProdutividade(area: number): number {
-  const r_min = 0.55;
-  const r_max = 1.2;
-  const k = 250;
-  const p = 1.4;
+  const { r_min, r_max, k, p } = METHOD_12_PARAMS;
   return r_min + (r_max - r_min) / (1 + Math.pow(area / k, p));
+}
+
+export function calcularComponenteFixa(
+  area: number,
+  eEtapa: number,
+  params: Pick<typeof METHOD_12_PARAMS, "hfix_alpha" | "hfix_a0" | "hfix_q"> = METHOD_12_PARAMS
+): number {
+  if (!Number.isFinite(area) || area <= 0) return 0;
+  if (!Number.isFinite(eEtapa) || eEtapa <= 0) return 0;
+  return (params.hfix_alpha * eEtapa) / (1 + Math.pow(area / params.hfix_a0, params.hfix_q));
 }
 
 export function calcularScoreComplexidade(input: {
@@ -201,7 +222,9 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   const v_volumetria = V_VOLUMETRIA[volumetria - 1];
   const e_etapa = ETAPA_MULTIPLIERS[clampLevel(input.etapa) as 1 | 2 | 3 | 4 | 5] ?? 1.0;
 
-  const h50 = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
+  const h_var = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
+  const h_fix = calcularComponenteFixa(area, e_etapa);
+  const h_projeto = h_var + h_fix;
 
   // Calcular horas de obra (F6) se aplicável
   let h_obra = 0;
@@ -211,11 +234,13 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     
     // H_obra = t(F6) x H_Executivo
     // H_Executivo = H50 quando etapa=4, ou proporcional
-    const h_executivo = area * r_area * m_det * t_tipologia * v_volumetria * 0.85;
+    const h_executivo_var = area * r_area * m_det * t_tipologia * v_volumetria * 0.85;
+    const h_executivo_fix = calcularComponenteFixa(area, 0.85);
+    const h_executivo = h_executivo_var + h_executivo_fix;
     h_obra = t_f6 * h_executivo;
   }
 
-  const h50_total = h50 + h_obra;
+  const h50_total = h_projeto + h_obra;
 
   const u_base = 0.15;
   const u_f4 = 0.05 * normalizeLevel(f4);
@@ -270,7 +295,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     score_complexidade,
     classificacao_complexidade: classificarComplexidade(score_complexidade),
     u_total: Number(u_total.toFixed(4)),
-    method_version: METHOD_10_VERSION,
+    method_version: METHOD_12_VERSION,
     cenario_usado: input.cenario,
     usuario_editou_horas,
     breakdown: {
@@ -279,7 +304,9 @@ export function calcularMethod10(input: Method10Input): Method10Output {
       t_tipologia,
       v_volumetria,
       e_etapa,
-      h_projeto: Math.round(h50),
+      h_var: Number(h_var.toFixed(4)),
+      h_fix: Number(h_fix.toFixed(4)),
+      h_projeto: Math.round(h_projeto),
       h_obra: Math.round(h_obra),
       u_base,
       u_f4: Number(u_f4.toFixed(4)),
