@@ -1100,8 +1100,7 @@ export default function Calculator() {
               </motion.div>
             </AnimatePresence>
 
-            {currentStep === 3 ? (
-              <div className="lg:hidden mt-4">
+            <div className="lg:hidden mt-4">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -1118,8 +1117,7 @@ export default function Calculator() {
                     <ResultsPanel />
                   </div>
                 </motion.div>
-              </div>
-            ) : null}
+            </div>
 
           </div>
 

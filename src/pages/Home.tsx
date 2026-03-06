@@ -139,13 +139,13 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 xl:gap-12">
-              <div className="hidden lg:block">
-                <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" transition={{ delay: 0.12 }} className="px-2">
+            <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
+              <div className="hidden lg:flex lg:items-center">
+                <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" transition={{ delay: 0.12 }} className="w-full px-2">
                   <img
                     src="/mockup.png"
                     alt="Interface da Calculadora Calcularq"
-                    className="h-auto w-[112%] max-w-none object-contain drop-shadow-2xl lg:-translate-x-4 xl:-translate-x-6"
+                    className="h-auto w-full max-h-[clamp(23rem,36vw,32rem)] object-contain drop-shadow-2xl"
                   />
                 </motion.div>
               </div>
@@ -234,7 +234,7 @@ export default function Home() {
       <div id="como-funciona" className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
         <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" whileInView="show" viewport={viewportOnce} className="text-center">
           <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Como funciona</h2>
-          <p className="mx-auto mb-12 max-w-[54ch] text-base leading-relaxed text-slate-700 sm:text-lg">
+          <p className="mx-auto mb-12 max-w-[56ch] text-base leading-relaxed text-slate-700 sm:text-lg" style={{ textWrap: "balance" }}>
             Cada projeto tem sua complexidade. O Calcularq transforma isso em número, em três etapas simples.
           </p>
 
@@ -243,7 +243,7 @@ export default function Home() {
               {howItWorksSteps.map((step, index) => (
                 <div key={step.number} className="flex min-w-0 flex-1 items-start">
                   <div className="flex w-full flex-col items-center px-2">
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-calcularq-blue bg-white text-sm font-bold text-calcularq-blue shadow-sm sm:h-12 sm:w-12">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-calcularq-blue bg-calcularq-blue text-sm font-bold text-white shadow-sm sm:h-12 sm:w-12">
                       {step.number}
                     </span>
                     <h3 className="mt-3 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">{step.title}</h3>
@@ -260,7 +260,7 @@ export default function Home() {
               {howItWorksSteps.map((step, index) => (
                 <div key={step.number} className="flex items-start gap-3">
                   <div className="relative flex flex-col items-center">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-calcularq-blue bg-white text-sm font-bold text-calcularq-blue shadow-sm">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-calcularq-blue bg-calcularq-blue text-sm font-bold text-white shadow-sm">
                       {step.number}
                     </span>
                     {index < howItWorksSteps.length - 1 ? <span className="mt-2 h-10 w-0.5 rounded-full bg-slate-200" /> : null}
