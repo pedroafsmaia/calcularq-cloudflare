@@ -10,13 +10,23 @@ export const motionEase = [0.22, 1, 0.36, 1] as const;
 
 export const viewportOnce = { once: true, amount: 0.18 } as const;
 
-export function fadeUp(_reduced: boolean, _distance = 16): Variants {
+export function fadeUp(reduced: boolean, distance = 16): Variants {
   return {
-    hidden: { opacity: 0, y: 0 },
+    hidden: { opacity: 0, y: reduced ? 0 : distance },
     show: {
       opacity: 1,
       y: 0,
       transition: { duration: motionTiming.normal, ease: motionEase },
+    },
+  };
+}
+
+export function fadeOnly(reduced: boolean): Variants {
+  return {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { duration: reduced ? motionTiming.fast : motionTiming.normal, ease: motionEase },
     },
   };
 }

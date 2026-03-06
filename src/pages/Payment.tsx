@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import LegalModal from "@/components/LegalModal";
 import { termsContent, privacyContent } from "@/lib/legalContent";
-import { fadeUp } from "@/lib/motion";
+import { fadeUp, fadeOnly } from "@/lib/motion";
 
 const POLL_INTERVAL = 3000;
 const MAX_POLL_ATTEMPTS = 60;
@@ -192,9 +192,9 @@ export default function Payment() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+          variants={fadeOnly(prefersReducedMotion)}
+          initial="hidden"
+          animate="show"
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full text-center"
         >
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -212,9 +212,9 @@ export default function Payment() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+          variants={fadeOnly(prefersReducedMotion)}
+          initial="hidden"
+          animate="show"
           className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full text-center"
         >
           <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
