@@ -101,7 +101,7 @@ export default function Footer() {
       <LegalModal
         isOpen={showTerms}
         onClose={() => setShowTerms(false)}
-        title="Termos e Condições Gerais de Uso"
+        title="Termos de Uso da Plataforma Calcularq"
         content={termsContent}
       />
       

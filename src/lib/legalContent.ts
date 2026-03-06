@@ -3,209 +3,276 @@
 export const termsContent = `
   <div class="space-y-6">
     <div>
-      <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS E CONDIÇÕES GERAIS DE USO E LICENCIAMENTO DE SOFTWARE</h2>
+      <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS DE USO DA PLATAFORMA CALCULARQ</h2>
       <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Data de Vigência: [Inserir Data de Lançamento]</p>
       <p class="text-slate-700 mb-4">
-        O presente Instrumento de Termos e Condições Gerais de Uso ("Termos") regula o
-        licenciamento de uso do software CALCULARQ, disponibilizado por PEDRO AFONSO
-        MAIA PIRES, pessoa física, doravante denominado LICENCIANTE.
+        O presente Instrumento de Termos de Uso ("Termos") disciplina as condições gerais de acesso, cadastro, contratação e utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>LICENCIANTE</strong>.
       </p>
       <p class="text-slate-700 mb-6">
-        A aceitação destes Termos é indispensável para a utilização da plataforma. Ao realizar o
-        pagamento e acessar o sistema, o indivíduo, doravante denominado LICENCIADO (ou
-        USUÁRIO), declara ter lido, compreendido e aceito integralmente as disposições aqui
-        contidas.
+        Ao criar conta, contratar plano, acessar ou utilizar a plataforma, o usuário declara ter lido, compreendido e aceitado integralmente estes Termos, bem como a Política de Privacidade aplicável.
       </p>
     </div>
 
     <div>
       <h3 class="text-xl font-bold text-calcularq-blue mb-3">1. DO OBJETO</h3>
       <p class="text-slate-700 mb-3">
-        O presente contrato tem por objeto a concessão de uma licença de uso de software
-        (modalidade SaaS - Software as a Service), em caráter oneroso, pessoal, intransferível e
-        não exclusivo.
+        O CALCULARQ consiste em uma plataforma digital destinada a apoiar profissionais e escritórios de arquitetura na estimativa, organização, registro e acompanhamento de cálculos relacionados à precificação de projetos, parâmetros de complexidade, histórico de orçamentos, registros de feedback e informações correlatas.
+      </p>
+      <p class="text-slate-700 mb-2">A plataforma poderá disponibilizar, entre outras, funcionalidades de:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>cálculo e estimativa de valores;</li>
+        <li>registro e armazenamento de histórico de orçamentos;</li>
+        <li>organização de dados de projeto;</li>
+        <li>registro de feedback real do projeto;</li>
+        <li>geração de relatórios e exportações;</li>
+        <li>visualização de métricas, painéis e dados agregados;</li>
+        <li>recursos administrativos internos do LICENCIANTE.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA NATUREZA DA FERRAMENTA</h3>
+      <p class="text-slate-700 mb-3">
+        O CALCULARQ constitui ferramenta de apoio técnico, organizacional e decisório, não se caracterizando como consultoria jurídica, contábil, tributária, financeira, pericial ou de engenharia legal.
+      </p>
+      <p class="text-slate-700 mb-3">
+        As estimativas, parâmetros, sugestões, projeções, alertas, classificações, indicadores, relatórios e demais saídas da plataforma possuem natureza <strong>instrumental e auxiliar</strong>, devendo ser interpretados pelo USUÁRIO conforme seu contexto profissional, experiência, escopo efetivo do projeto, negociação comercial, condições regionais de mercado e demais variáveis relevantes.
       </p>
       <p class="text-slate-700">
-        O software CALCULARQ consiste em uma ferramenta digital de precificação de projetos
-        arquitetônicos, permitindo ao LICENCIADO realizar cálculos e armazenar o histórico dos
-        orçamentos gerados, mediante inserção de dados próprios.
+        O LICENCIANTE não garante que os resultados sugeridos pela plataforma correspondam, em todos os casos, ao valor final contratado, ao preço de mercado, ao tempo efetivamente consumido no projeto ou ao desempenho comercial do USUÁRIO.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA VIGÊNCIA E MODALIDADE DE ACESSO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DO CADASTRO E DO ACESSO</h3>
       <p class="text-slate-700 mb-3">
-        O acesso ao software é concedido mediante a modalidade de pagamento único, regido
-        pelas seguintes disposições de vigência e perenidade:
+        Para utilização de determinadas funcionalidades, poderá ser exigida a criação de conta com fornecimento de informações verídicas, completas e atualizadas.
       </p>
-      <div class="space-y-3 text-slate-700">
-        <div>
-          <p class="font-semibold mb-1">2.1. Garantia Mínima de Disponibilidade</p>
-          <p>
-            O LICENCIANTE assegura a manutenção do serviço e o acesso irrestrito à plataforma pelo
-            período mínimo de 06 (seis) meses, contados a partir da data de confirmação do
-            pagamento.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">2.2. Vigência Estendida (Life of the Software)</p>
-          <p>
-            Após o decurso do período de garantia mínima supramencionado, a licença de uso
-            permanecerá válida por prazo indeterminado, vigorando enquanto o software estiver
-            operacional e disponibilizado pelo LICENCIANTE na rede mundial de computadores
-            (modelo conhecido internacionalmente como "Life of the Software").
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">2.3. Descontinuidade do Serviço</p>
-          <p>
-            O LICENCIANTE reserva-se o direito de encerrar as operações da plataforma a qualquer
-            momento após o cumprimento do período de garantia mínima de 06 (seis) meses.
-            Na hipótese de encerramento definitivo das atividades, o LICENCIADO será notificado
-            através do endereço de e-mail cadastrado ou por aviso na plataforma, com antecedência
-            mínima de 30 (trinta) dias, para que possa realizar a extração de seus dados e relatórios.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DO PREÇO E FORMA DE PAGAMENTO</h3>
+      <p class="text-slate-700 mb-2">O USUÁRIO compromete-se a:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>fornecer dados verdadeiros, exatos e atualizados;</li>
+        <li>manter a confidencialidade de suas credenciais de acesso;</li>
+        <li>não compartilhar sua conta com terceiros sem autorização expressa do LICENCIANTE;</li>
+        <li>comunicar, sem demora indevida, qualquer suspeita de acesso não autorizado, uso indevido, comprometimento de conta ou incidente relacionado à segurança de suas credenciais.</li>
+      </ul>
       <p class="text-slate-700 mb-3">
-        Em contrapartida à licença de uso concedida, o LICENCIADO pagará o valor único vigente
-        na data da contratação, divulgado na página oficial do produto.
-      </p>
-      <p class="text-slate-700 mb-3">
-        O processamento das transações financeiras é realizado integralmente pela empresa Stripe
-        Inc. O LICENCIANTE não armazena dados bancários ou números de cartão de crédito em
-        seus servidores.
+        O USUÁRIO é responsável pelas atividades realizadas por meio de sua conta, ressalvadas hipóteses de falha comprovada de segurança imputável ao LICENCIANTE.
       </p>
       <p class="text-slate-700">
-        A liberação do acesso ao software ocorrerá de forma automática e imediata após a
-        confirmação do pagamento pela instituição financeira.
+        O LICENCIANTE poderá adotar mecanismos de autenticação, validação de sessão, prevenção a fraudes, limitação de acesso e controles adicionais de segurança sempre que reputar necessário para proteção da plataforma e dos usuários.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DA POLÍTICA DE ARREPENDIMENTO E REEMBOLSO</h3>
-      <div class="space-y-3 text-slate-700">
-        <div>
-          <p class="font-semibold mb-1">4.1. Direito de Arrependimento (7 Dias)</p>
-          <p>
-            Em estrita observância ao Artigo 49 do Código de Defesa do Consumidor (Lei nº
-            8.078/1990), é assegurado ao LICENCIADO o direito de desistir da contratação no prazo de
-            até 07 (sete) dias corridos, a contar da data da compra.
-          </p>
-          <p class="mt-2">
-            Nesta hipótese, o LICENCIADO deverá formalizar o pedido de cancelamento através do
-            e-mail atendimento@calcularq.com.br, sendo garantido o reembolso integral do valor
-            pago.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">4.2. Reembolso por Descontinuidade Precoce</p>
-          <p>
-            Caso o LICENCIANTE encerre as atividades da plataforma antes de completado o período
-            de garantia mínima de 06 (seis) meses previsto na Cláusula 2.1, o LICENCIADO terá direito
-            ao reembolso integral do valor pago, independentemente do tempo de uso já usufruído.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">4.3. Ausência de Reembolso Após Prazo Legal</p>
-          <p>
-            Decorrido o prazo legal de 07 (sete) dias, e salvo a exceção de descontinuidade precoce
-            prevista no item anterior, não caberá reembolso por mera desistência, ressalvados os
-            direitos de garantia legal e vícios ocultos previstos no Código de Defesa do Consumidor.
-          </p>
-        </div>
-      </div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DOS PLANOS, LICENÇA DE USO E PAGAMENTOS</h3>
+      <p class="text-slate-700 mb-3">
+        O acesso à plataforma poderá ocorrer em modalidades gratuitas, promocionais, de teste, pagas ou condicionadas a assinatura, conforme as condições comerciais vigentes no momento da contratação.
+      </p>
+      <p class="text-slate-700 mb-3">
+        Ao contratar plano pago, o USUÁRIO adquire licença de uso <strong>limitada, pessoal, não exclusiva, intransferível e revogável</strong>, restrita ao período contratado e às funcionalidades correspondentes ao plano escolhido.
+      </p>
+      <p class="text-slate-700 mb-3">
+        Os preços, formas de pagamento, periodicidades, condições promocionais, renovação, cancelamento e eventuais períodos de teste observarão a oferta vigente no momento da contratação.
+      </p>
+      <p class="text-slate-700 mb-3">
+        O processamento financeiro poderá ser realizado por terceiros especializados, e o LICENCIANTE não armazena integralmente dados completos de cartão de crédito ou equivalentes quando processados em ambiente próprio do provedor de pagamento.
+      </p>
+      <p class="text-slate-700 mb-2">A inadimplência poderá ensejar, conforme aplicável e observadas as condições comerciais e legais:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>suspensão de funcionalidades;</li>
+        <li>limitação de acesso;</li>
+        <li>cancelamento de assinatura;</li>
+        <li>impedimento de novas contratações até regularização.</li>
+      </ul>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DAS LIMITAÇÕES DE RESPONSABILIDADE</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DAS FUNCIONALIDADES, DISPONIBILIDADE E EVOLUÇÃO DO SERVIÇO</h3>
       <p class="text-slate-700 mb-3">
-        O CALCULARQ é uma ferramenta instrumental de auxílio ao cálculo. O LICENCIANTE não
-        presta serviços de consultoria financeira, contábil ou jurídica.
+        O LICENCIANTE envidará esforços razoáveis para manter a plataforma disponível, segura e funcional, ressalvadas hipóteses de manutenção, atualização, indisponibilidades técnicas, falhas de terceiros, caso fortuito, força maior ou outros eventos alheios ao seu controle razoável.
       </p>
-      <p class="text-slate-700 mb-3">
-        O LICENCIADO reconhece expressamente que é o único e exclusivo responsável pela
-        inserção dos dados e pela interpretação dos resultados gerados.
+      <p class="text-slate-700 mb-2">O LICENCIANTE poderá, a qualquer tempo e independentemente de autorização prévia individual, desde que observados os limites legais:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>atualizar a interface, fluxos e experiência de uso;</li>
+        <li>corrigir erros e inconsistências;</li>
+        <li>aperfeiçoar a metodologia, regras de cálculo, critérios internos, parâmetros e funcionalidades;</li>
+        <li>incluir, alterar, restringir ou descontinuar recursos da plataforma;</li>
+        <li>implantar novas integrações, controles, filtros, visualizações e recursos administrativos;</li>
+        <li>realizar testes, medições internas, monitoramento técnico e melhorias operacionais.</li>
+      </ul>
+      <p class="text-slate-700">
+        Tais alterações não geram, por si sós, direito adquirido à manutenção perpétua de layout, versão, fórmula, recurso específico, nomenclatura ou comportamento exato anteriormente disponibilizado.
       </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DOS DADOS INSERIDOS PELO USUÁRIO</h3>
       <p class="text-slate-700 mb-3">
-        O LICENCIANTE não se responsabiliza por prejuízos financeiros decorrentes de
-        orçamentos elaborados com base na ferramenta, recusa de propostas comerciais por parte
-        dos clientes do LICENCIADO ou erros de cálculo provenientes de dados imprecisos
-        inseridos pelo LICENCIADO.
+        O USUÁRIO poderá inserir na plataforma informações relacionadas a projetos, clientes, obras, orçamentos, valores, parâmetros de cálculo, observações, feedbacks, horas reais, fases do projeto e demais registros necessários ao uso da ferramenta.
       </p>
-      <p class="text-slate-700 mb-3">
-        O software é fornecido "no estado em que se encontra" (as is), sem garantias implícitas de
-        adequação a um fim específico ou de rentabilidade garantida, ressalvadas as garantias
-        legais obrigatórias previstas no Código de Defesa do Consumidor.
+      <p class="text-slate-700 mb-2">O USUÁRIO declara e garante que:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>possui legitimidade para inserir os dados lançados na plataforma;</li>
+        <li>é responsável pela veracidade, pertinência e legalidade das informações cadastradas;</li>
+        <li>não utilizará a plataforma para tratar dados em desconformidade com a legislação aplicável;</li>
+        <li>não inserirá conteúdo ilícito, fraudulento, difamatório, abusivo, ofensivo, discriminatório ou que viole direitos de terceiros.</li>
+      </ul>
+      <p class="text-slate-700">
+        Quando o USUÁRIO inserir dados pessoais de terceiros no histórico de orçamentos, projetos ou registros correlatos, assume integral responsabilidade pela base legal da coleta originária, pela prestação de informações adequadas aos titulares e pelo tratamento legítimo desses dados, na forma da legislação aplicável.
       </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DO USO ACEITÁVEL E DAS VEDAÇÕES</h3>
+      <p class="text-slate-700 mb-2">É vedado ao USUÁRIO:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>utilizar a plataforma para fins ilícitos ou em desconformidade com a legislação aplicável;</li>
+        <li>violar direitos de propriedade intelectual do LICENCIANTE ou de terceiros;</li>
+        <li>tentar acessar áreas, contas, sistemas, rotas, APIs, painéis ou dados sem autorização;</li>
+        <li>contornar medidas de autenticação, limitação, pagamento, segurança ou controle de acesso;</li>
+        <li>explorar vulnerabilidades, realizar engenharia reversa indevida, scraping abusivo, automações não autorizadas ou práticas que comprometam a estabilidade do serviço;</li>
+        <li>reproduzir, revender, sublicenciar, redistribuir, espelhar ou explorar comercialmente a plataforma sem autorização expressa;</li>
+        <li>utilizar a plataforma para desenvolver produto concorrente com cópia substancial de interface, metodologia protegível, estrutura funcional ou materiais proprietários do LICENCIANTE;</li>
+        <li>inserir vírus, scripts maliciosos, rotinas automatizadas nocivas ou qualquer conteúdo apto a prejudicar a plataforma ou terceiros.</li>
+      </ul>
+      <p class="text-slate-700">
+        O descumprimento deste item poderá ensejar suspensão, bloqueio ou cancelamento da conta, sem prejuízo das medidas legais cabíveis.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DA PROPRIEDADE INTELECTUAL</h3>
       <p class="text-slate-700 mb-3">
-        Não serão consideradas violações à garantia de disponibilidade as interrupções
-        temporárias necessárias para manutenções técnicas programadas, atualizações de
-        segurança ou melhorias na plataforma, desde que não impliquem na descontinuidade
-        definitiva do serviço.
+        Salvo disposição expressa em contrário, todos os direitos relativos à plataforma, incluindo software, interface, layout, identidade visual, textos, marcas, sinais distintivos, bases estruturadas, organização funcional, conteúdos proprietários, relatórios-padrão, documentação, códigos, fluxos, componentes, elementos gráficos e demais ativos intelectuais associados ao CALCULARQ pertencem ao LICENCIANTE ou a terceiros que o tenham licenciado.
       </p>
       <p class="text-slate-700">
-        A limitação de responsabilidade aqui prevista não se aplica aos casos de dolo, culpa grave
-        ou falhas estruturais do sistema que impeçam a utilização da plataforma durante o período
-        de garantia mínima, ressalvadas as janelas de manutenção supracitadas.
+        Estes Termos não implicam cessão, transferência ou alienação de quaisquer direitos de propriedade intelectual ao USUÁRIO, limitando-se à concessão da licença de uso prevista neste instrumento.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DA PROPRIEDADE INTELECTUAL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DOS RESULTADOS, RELATÓRIOS E EXPORTAÇÕES</h3>
       <p class="text-slate-700 mb-3">
-        Todos os direitos de propriedade intelectual relativos ao software, incluindo seu
-        código-fonte, banco de dados, design, interface gráfica, logomarca e metodologia de
-        cálculo, são de titularidade exclusiva do LICENCIANTE.
+        A plataforma poderá disponibilizar resultados de cálculo, comparativos, classificações, alertas, relatórios técnicos, relatórios gerenciais, exportações em formatos digitais e visualizações administrativas ou operacionais.
       </p>
-      <p class="text-slate-700 mb-3">
-        É vedado ao LICENCIADO ceder, sublicenciar, vender, alugar ou transferir sua conta a
-        terceiros.
-      </p>
+      <p class="text-slate-700 mb-2">Tais saídas refletem a lógica, parâmetros, entradas e condições existentes no momento do processamento, podendo ser alteradas futuramente em razão de:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>atualização metodológica;</li>
+        <li>mudança de inputs;</li>
+        <li>correção de erros;</li>
+        <li>refinamento de critérios;</li>
+        <li>evolução do produto;</li>
+        <li>novas regras de negócio.</li>
+      </ul>
       <p class="text-slate-700">
-        É vedado realizar engenharia reversa, descompilação ou desmontagem do software, bem
-        como utilizar técnicas de data mining ou bots para extração de dados da plataforma.
+        O USUÁRIO reconhece que relatórios, inclusive exportações em <code>.md</code> ou outros formatos, podem servir como apoio operacional, organizacional, documental ou analítico, mas não substituem validação profissional, jurídica, contábil, tributária ou contratual independente, quando necessária.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DA PROTEÇÃO DE DADOS E PRIVACIDADE</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">10. DO DASHBOARD ADMINISTRATIVO E DOS RECURSOS INTERNOS</h3>
       <p class="text-slate-700 mb-3">
-        O tratamento dos dados pessoais do LICENCIADO e dos dados de terceiros inseridos na
-        plataforma reger-se-á pela Política de Privacidade, parte integrante e indissociável destes
-        Termos.
+        A plataforma poderá conter funcionalidades administrativas de uso exclusivo do LICENCIANTE, inclusive painéis internos, recursos de monitoramento, auditoria, métricas, relatórios agregados, exportações administrativas, controles técnicos e mecanismos de gestão operacional.
       </p>
+      <p class="text-slate-700 mb-2">Tais funcionalidades:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>não integram, necessariamente, o escopo de uso ordinário do USUÁRIO;</li>
+        <li>podem ficar ocultas, indisponíveis ou restritas por perfil de acesso;</li>
+        <li>destinam-se à segurança, suporte, auditoria, melhoria do serviço, acompanhamento operacional e aperfeiçoamento metodológico da plataforma.</li>
+      </ul>
       <p class="text-slate-700">
-        Ao utilizar a funcionalidade de "Histórico de Orçamentos", o LICENCIADO declara possuir
-        as devidas autorizações legais para inserir dados de seus clientes na plataforma,
-        assumindo a posição de Controlador desses dados perante a Lei Geral de Proteção de
-        Dados (LGPD).
+        O LICENCIANTE adotará, sempre que possível, critérios de minimização, restrição de acesso e preferência por dados agregados ou anonimizados nas rotinas administrativas internas.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DAS DISPOSIÇÕES GERAIS E FORO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">11. DA PRIVACIDADE E PROTEÇÃO DE DADOS</h3>
       <p class="text-slate-700 mb-3">
-        O LICENCIANTE poderá alterar os presentes Termos visando sua adequação a novas
-        legislações ou funcionalidades do sistema.
-      </p>
-      <p class="text-slate-700 mb-3">
-        As alterações relevantes serão comunicadas ao LICENCIADO, por e-mail ou aviso na
-        plataforma, com antecedência mínima de 15 (quinze) dias. Caso o LICENCIADO não
-        concorde com as modificações substanciais, poderá optar pela rescisão do contrato.
-      </p>
-      <p class="text-slate-700 mb-3">
-        Fica estabelecido que eventuais alterações contratuais não afetarão direitos adquiridos,
-        valores já pagos ou garantias de disponibilidade já iniciadas.
+        O tratamento de dados pessoais relacionado ao uso da plataforma observará a Política de Privacidade do CALCULARQ, que integra estes Termos para todos os fins.
       </p>
       <p class="text-slate-700">
-        Para dirimir quaisquer controvérsias oriundas deste contrato, fica eleito o foro da Comarca
-        de domicílio do LICENCIADO (Consumidor), em conformidade com o Artigo 101, I, do
-        Código de Defesa do Consumidor.
+        Ao utilizar a plataforma, o USUÁRIO declara ciência de que determinados dados técnicos, operacionais, cadastrais e transacionais poderão ser tratados para viabilizar a prestação do serviço, a segurança da conta, o cumprimento de obrigações legais, a prevenção a fraudes, a melhoria da plataforma e o aperfeiçoamento metodológico do produto, nos limites da legislação aplicável e da Política de Privacidade.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">12. DAS RESPONSABILIDADES E LIMITAÇÕES</h3>
+      <p class="text-slate-700 mb-2">Na máxima extensão permitida pela legislação aplicável, o LICENCIANTE não será responsável por:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>decisões comerciais, técnicas, profissionais ou estratégicas tomadas pelo USUÁRIO com base exclusiva nos resultados da plataforma;</li>
+        <li>perda de oportunidade, perda de lucro, frustração de expectativa, dano indireto ou reflexo decorrente do uso da ferramenta;</li>
+        <li>divergência entre estimativas sugeridas e resultados efetivos de mercado, contratação, execução, prazo ou rentabilidade;</li>
+        <li>indisponibilidades, falhas, atrasos ou inconsistências causadas por fatos de terceiros, provedores externos, integrações, falhas de conectividade, eventos de segurança causados por terceiros, caso fortuito ou força maior;</li>
+        <li>uso inadequado, interpretação equivocada ou utilização da plataforma em desconformidade com estes Termos.</li>
+      </ul>
+      <p class="text-slate-700">
+        Nada nestes Termos exclui responsabilidade em hipóteses que não possam ser legalmente afastadas, especialmente em matéria consumerista, proteção de dados e deveres legais inderrogáveis.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">13. DA SUSPENSÃO, BLOQUEIO E CANCELAMENTO</h3>
+      <p class="text-slate-700 mb-2">O LICENCIANTE poderá suspender, restringir, bloquear ou cancelar o acesso do USUÁRIO, total ou parcialmente, temporária ou definitivamente, quando verificada, entre outras hipóteses:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>violação destes Termos;</li>
+        <li>uso fraudulento, abusivo ou ilícito da plataforma;</li>
+        <li>tentativa de acesso indevido a áreas restritas;</li>
+        <li>inadimplência, quando aplicável;</li>
+        <li>risco à segurança da plataforma, de terceiros ou do próprio USUÁRIO;</li>
+        <li>exigência legal, regulatória ou ordem de autoridade competente.</li>
+      </ul>
+      <p class="text-slate-700">
+        Sempre que possível e compatível com a natureza do caso, o LICENCIANTE poderá adotar medidas graduais ou comunicações prévias, sem que isso constitua obrigação em situações de urgência, segurança ou risco relevante.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">14. DA VIGÊNCIA E DA RESCISÃO</h3>
+      <p class="text-slate-700 mb-3">
+        Estes Termos vigoram por prazo indeterminado, a partir do primeiro acesso, cadastro ou contratação, conforme aplicável.
+      </p>
+      <p class="text-slate-700 mb-3">
+        O USUÁRIO poderá deixar de utilizar a plataforma e, quando cabível, solicitar o cancelamento da conta ou da assinatura, observadas as condições comerciais aplicáveis, inclusive quanto a ciclos já contratados, obrigações pendentes e prazos técnicos razoáveis para processamento da solicitação.
+      </p>
+      <p class="text-slate-700 mb-2">A extinção da relação contratual não afasta:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>obrigações vencidas e não adimplidas;</li>
+        <li>deveres legais de retenção de dados e registros;</li>
+        <li>direitos do LICENCIANTE ao exercício regular de direitos;</li>
+        <li>disposições que, por sua natureza, devam subsistir após o término da relação.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">15. DAS ALTERAÇÕES DESTES TERMOS</h3>
+      <p class="text-slate-700 mb-3">
+        O LICENCIANTE poderá alterar estes Termos a qualquer tempo, para refletir mudanças legais, regulatórias, técnicas, operacionais, metodológicas, comerciais ou funcionais da plataforma.
+      </p>
+      <p class="text-slate-700 mb-3">
+        A versão vigente será aquela disponibilizada na plataforma, com indicação de data de vigência. Caso as alterações sejam relevantes, o LICENCIANTE envidará esforços razoáveis para conferir publicidade adequada ao novo texto.
+      </p>
+      <p class="text-slate-700">
+        A continuidade de uso da plataforma após a entrada em vigor da nova versão poderá caracterizar aceitação dos Termos atualizados, ressalvados os direitos legalmente assegurados ao USUÁRIO.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">16. DO SUPORTE E CANAL DE CONTATO</h3>
+      <p class="text-slate-700 mb-3">
+        Para dúvidas, solicitações, comunicações ou suporte relacionado à plataforma, o USUÁRIO poderá utilizar o canal oficial:
+      </p>
+      <p class="text-slate-700 font-semibold">
+        E-mail: atendimento@calcularq.com.br
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">17. DO FORO E DA LEGISLAÇÃO APLICÁVEL</h3>
+      <p class="text-slate-700 mb-3">
+        Estes Termos serão regidos, interpretados e executados de acordo com as leis da República Federativa do Brasil.
+      </p>
+      <p class="text-slate-700">
+        Fica assegurado ao USUÁRIO, quando aplicável, o foro de seu domicílio, nos termos da legislação consumerista e demais normas aplicáveis.
       </p>
     </div>
   </div>
@@ -217,215 +284,272 @@ export const privacyContent = `
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">POLÍTICA DE PRIVACIDADE E PROTEÇÃO DE DADOS PESSOAIS</h2>
       <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Data de Vigência: [Inserir Data de Lançamento]</p>
       <p class="text-slate-700 mb-4">
-        O presente Instrumento de Política de Privacidade ("Política") tem por escopo disciplinar as
-        condições de tratamento de dados pessoais no âmbito da utilização da plataforma
-        CALCULARQ, de titularidade de PEDRO AFONSO MAIA PIRES, pessoa física, doravante
-        denominado CONTROLADOR.
+        O presente Instrumento de Política de Privacidade ("Política") tem por escopo disciplinar as condições de tratamento de dados pessoais no âmbito da utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>CONTROLADOR</strong>.
       </p>
       <p class="text-slate-700 mb-6">
-        A presente Política foi elaborada em estrita consonância com a Constituição Federal
-        Brasileira, o Código de Defesa do Consumidor (Lei nº 8.078/1990), o Marco Civil da Internet
-        (Lei nº 12.965/2014) e, precipuamente, a Lei Geral de Proteção de Dados Pessoais (Lei nº
-        13.709/2018 – "LGPD").
+        A presente Política foi elaborada em consonância com a Constituição Federal da República Federativa do Brasil, o Código de Defesa do Consumidor (Lei nº 8.078/1990), o Marco Civil da Internet (Lei nº 12.965/2014) e, especialmente, a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 – "LGPD").
       </p>
     </div>
 
     <div>
       <h3 class="text-xl font-bold text-calcularq-blue mb-3">1. DAS DEFINIÇÕES E CONCEITOS</h3>
       <p class="text-slate-700 mb-3">
-        Para a correta interpretação deste instrumento, adotam-se as definições legais
-        estabelecidas no Artigo 5º da LGPD.
+        Para a correta interpretação deste instrumento, adotam-se as definições legais estabelecidas na legislação aplicável, em especial no art. 5º da LGPD.
       </p>
-      <ul class="space-y-2 text-slate-700 list-disc list-inside">
-        <li>Considera-se <strong>Dado Pessoal</strong> toda informação relacionada a pessoa natural identificada ou identificável.</li>
-        <li>Considera-se <strong>Tratamento</strong> toda operação realizada com dados pessoais, como coleta, produção, recepção, classificação, utilização, acesso, reprodução, transmissão, distribuição, processamento, arquivamento, armazenamento, eliminação, avaliação ou controle da informação.</li>
-        <li>Considera-se <strong>Titular</strong> a pessoa natural a quem se referem os dados pessoais que são objeto de tratamento.</li>
-        <li>Considera-se <strong>Controlador</strong> a pessoa natural ou jurídica a quem competem as decisões referentes ao tratamento de dados pessoais.</li>
-        <li>Considera-se <strong>Operador</strong> a pessoa natural ou jurídica que realiza o tratamento de dados pessoais em nome do controlador.</li>
-      </ul>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Dado Pessoal</strong> toda informação relacionada a pessoa natural identificada ou identificável.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Tratamento</strong> toda operação realizada com dados pessoais, tais como coleta, produção, recepção, classificação, utilização, acesso, reprodução, transmissão, distribuição, processamento, arquivamento, armazenamento, eliminação, avaliação, controle, modificação, comunicação, transferência, difusão ou extração.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Titular</strong> a pessoa natural a quem se referem os dados pessoais objeto de tratamento.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Controlador</strong> a pessoa natural ou jurídica a quem competem as decisões referentes ao tratamento de dados pessoais.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Operador</strong> a pessoa natural ou jurídica que realiza o tratamento de dados pessoais em nome do controlador.</p>
+      <p class="text-slate-700">Consideram-se <strong>Dados Anonimizados</strong>, quando cabível, os dados relativos a titular que não possa ser identificado, considerados os meios técnicos razoáveis e disponíveis na ocasião de seu tratamento.</p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA QUALIFICAÇÃO DAS PARTES E RESPONSABILIDADES (DATA CONTROLLERSHIP)</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA QUALIFICAÇÃO DAS PARTES E RESPONSABILIDADES</h3>
       <p class="text-slate-700 mb-3">
-        Reconhece-se, para os devidos fins de direito, a distinção dos papéis no tratamento de
-        dados, conforme a natureza da informação processada pela plataforma.
-      </p>
-      <p class="text-slate-700 mb-3">
-        No que tange aos dados de cadastro, faturamento e acesso do USUÁRIO (licenciado), o
-        CALCULARQ atua como CONTROLADOR, determinando a finalidade e os meios de
-        tratamento.
-      </p>
-      <p class="text-slate-700 mb-3">
-        Diversamente, no que tange aos dados inseridos pelo USUÁRIO na ferramenta de
-        "Histórico de Orçamentos" (ex: nomes de clientes finais, endereços de obras, dados de
-        terceiros), o USUÁRIO figura como único e exclusivo CONTROLADOR.
-      </p>
-      <p class="text-slate-700">
-        Nesta segunda hipótese, o CALCULARQ atua meramente como OPERADOR de
-        infraestrutura. A responsabilidade do CALCULARQ limita-se à segurança do
-        armazenamento e ao cumprimento das instruções lícitas do USUÁRIO, nos termos do Art.
-        42 da LGPD, não respondendo pela legalidade da coleta original desses dados realizada
-        pelo USUÁRIO, salvo em caso de comprovada negligência quanto às normas de segurança
-        da informação.
-      </p>
-    </div>
-
-    <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DA COLETA E ESCOPO DO TRATAMENTO</h3>
-      <p class="text-slate-700 mb-3">
-        Os dados pessoais serão coletados e tratados apenas quando estritamente necessários
-        para a execução do contrato de licença de uso, nas seguintes modalidades:
+        Reconhece-se, para os devidos fins de direito, a distinção dos papéis no tratamento de dados, conforme a natureza da informação processada pela plataforma.
       </p>
       <div class="space-y-4">
         <div>
-          <p class="font-semibold text-slate-900 mb-2">3.1. Dados de Identificação Digital e Acesso</p>
-          <p class="text-slate-700 mb-2">
-            Serão tratados o endereço de correio eletrônico (e-mail), as credenciais de acesso (senha
-            submetida a hashing criptográfico) e os registros de conexão (Endereço IP, User-Agent,
-            data e hora).
-          </p>
+          <p class="font-semibold text-slate-900 mb-2">2.1. Dados de cadastro, acesso, cobrança e relacionamento com o USUÁRIO</p>
           <p class="text-slate-700">
-            O tratamento destes dados fundamenta-se no cumprimento de obrigação legal (Art. 7º, II,
-            LGPD c/c Art. 15, Lei 12.965/14) e na necessidade para a execução de contrato (Art. 7º, V,
-            LGPD).
+            No que tange aos dados de cadastro, autenticação, licenciamento, cobrança, suporte, segurança da conta, prevenção a fraudes, métricas operacionais da plataforma e relatórios administrativos internos, o <strong>CALCULARQ atua como CONTROLADOR</strong>, determinando as finalidades e os meios de tratamento.
           </p>
         </div>
         <div>
-          <p class="font-semibold text-slate-900 mb-2">3.2. Dados Financeiros e de Transação</p>
-          <p class="text-slate-700 mb-2">
-            Serão tratados o histórico de pagamentos, os identificadores de transação e o status da
-            licença adquirida.
+          <p class="font-semibold text-slate-900 mb-2">2.2. Dados inseridos pelo USUÁRIO em seus orçamentos e registros de projeto</p>
+          <p class="text-slate-700 mb-3">
+            No que tange aos dados inseridos pelo <strong>USUÁRIO</strong> na funcionalidade de histórico de orçamentos, projetos e registros correlatos — inclusive eventuais nomes de clientes finais, endereços de obras, contatos, observações ou outras informações de terceiros — o <strong>USUÁRIO figura como único e exclusivo CONTROLADOR</strong> no que se refere à licitude da coleta original, à pertinência da inserção desses dados e à definição da base legal adequada.
+          </p>
+          <p class="text-slate-700 mb-3">
+            Nessa hipótese, o <strong>CALCULARQ atua predominantemente como OPERADOR de infraestrutura</strong>, limitando sua atuação ao armazenamento, organização, disponibilização técnica e proteção dessas informações, nos termos das instruções lícitas do USUÁRIO e da legislação aplicável.
           </p>
           <p class="text-slate-700">
-            O CONTROLADOR declara expressamente não armazenar, processar ou deter acesso aos
-            dados sensíveis de pagamento, tais como número de cartão de crédito e código CVV. Tais
-            dados são processados exclusivamente pela gateway de pagamentos Stripe Payments,
-            em ambiente certificado PCI-DSS (Payment Card Industry Data Security Standard).
+            O CALCULARQ não responde pela legalidade da coleta originária realizada pelo USUÁRIO perante terceiros, salvo nos casos de comprovada falha de segurança, atuação em desconformidade com a lei ou descumprimento de deveres próprios.
           </p>
         </div>
         <div>
-          <p class="font-semibold text-slate-900 mb-2">3.3. Dados de Input do Usuário (Histórico de Orçamentos)</p>
-          <p class="text-slate-700 mb-2">
-            Serão armazenados os resultados dos cálculos e os dados de identificação dos projetos
-            (ex: Nome do Cliente/Projeto, valores finais) inseridos discricionariamente pelo USUÁRIO.
-          </p>
-          <p class="text-slate-700 mb-2">
-            A finalidade deste armazenamento é viabilizar a persistência de dados e a funcionalidade
-            de memória de cálculo da ferramenta, permitindo consulta futura pelo USUÁRIO.
-          </p>
+          <p class="font-semibold text-slate-900 mb-2">2.3. Metadados operacionais, dados agregados e informações anonimizadas</p>
           <p class="text-slate-700">
-            É vedada a utilização destes dados para fins de inteligência de mercado, publicidade ou
-            cessão a terceiros. O acesso a tais informações é restrito logicamente ao ID do USUÁRIO.
+            Sem prejuízo do disposto no item anterior, o CALCULARQ poderá atuar como <strong>CONTROLADOR</strong> em relação a metadados de uso da plataforma, registros operacionais, métricas agregadas, indicadores estatísticos e informações anonimizadas ou pseudonimizadas geradas a partir da utilização do serviço, desde que tratadas para finalidades legítimas, específicas e compatíveis com a operação da plataforma, tais como segurança, suporte, auditoria, monitoramento, prevenção a abusos, melhoria contínua do serviço e aperfeiçoamento metodológico.
           </p>
         </div>
       </div>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DO COMPARTILHAMENTO E TRANSFERÊNCIA INTERNACIONAL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DA COLETA, DO ESCOPO E DAS FINALIDADES DO TRATAMENTO</h3>
       <p class="text-slate-700 mb-3">
-        O CONTROLADOR declara que não comercializa dados pessoais. O compartilhamento
-        limita-se aos provedores de infraestrutura tecnológica essenciais, configurando-se
-        Transferência Internacional de Dados (Art. 33, LGPD), visto que os servidores podem estar
-        localizados fora do território nacional.
+        Os dados pessoais serão coletados e tratados apenas na medida do necessário para a prestação do serviço, para a execução do contrato, para o cumprimento de obrigações legais e regulatórias, para o exercício regular de direitos, para a segurança da plataforma e, quando cabível, para atender a legítimos interesses do CONTROLADOR ou de terceiros, sempre com observância dos direitos e legítimas expectativas do titular.
+      </p>
+      <div class="space-y-4">
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.1. Dados de Identificação Digital e Acesso</p>
+          <p class="text-slate-700 mb-2">Serão tratados, conforme aplicável:</p>
+          <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+            <li>nome e/ou identificador da conta;</li>
+            <li>endereço de correio eletrônico (e-mail);</li>
+            <li>credenciais de acesso, quando existentes, armazenadas sob técnicas adequadas de proteção;</li>
+            <li>registros de conexão e/ou de acesso à aplicação, tais como endereço IP, user-agent, data e hora, identificadores técnicos e logs de autenticação.</li>
+          </ul>
+          <p class="text-slate-700">
+            O tratamento desses dados fundamenta-se, conforme o caso concreto, no cumprimento de obrigação legal, na execução do contrato, na segurança da aplicação, na prevenção a fraudes e abusos e no exercício regular de direitos.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.2. Dados Financeiros e de Transação</p>
+          <p class="text-slate-700 mb-2">Serão tratados, quando aplicável:</p>
+          <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+            <li>histórico de pagamentos;</li>
+            <li>identificadores de transação;</li>
+            <li>status do plano, licença ou assinatura;</li>
+            <li>informações mínimas necessárias à conciliação financeira, prevenção a fraudes e suporte ao usuário.</li>
+          </ul>
+          <p class="text-slate-700">
+            O CONTROLADOR declara não armazenar, processar ou deter acesso direto aos dados completos de cartão de crédito, código de segurança (CVV) ou equivalentes, quando tais dados forem processados por provedor de pagamento terceirizado em ambiente próprio e certificado.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.3. Dados Inseridos pelo Usuário em Orçamentos, Projetos e Registros</p>
+          <p class="text-slate-700 mb-3">
+            Serão armazenados os dados e resultados de cálculo inseridos discricionariamente pelo USUÁRIO, inclusive informações de identificação de projeto, valores, parâmetros escolhidos, feedbacks operacionais e registros de acompanhamento do projeto.
+          </p>
+          <p class="text-slate-700 mb-3">
+            A finalidade principal desse tratamento é viabilizar a funcionalidade de memória, histórico, recuperação, organização e acompanhamento dos cálculos e projetos pelo próprio USUÁRIO.
+          </p>
+          <p class="text-slate-700 mb-3">
+            Tais dados <strong>não serão comercializados</strong> nem utilizados para publicidade comportamental ou cessão onerosa a terceiros.
+          </p>
+          <p class="text-slate-700">
+            O acesso a informações individualizadas será, em regra, logicamente restrito ao próprio USUÁRIO e aos agentes estritamente autorizados para fins técnicos, de segurança, suporte, prevenção a fraudes, cumprimento de obrigação legal, exercício regular de direitos ou manutenção da plataforma, sempre sob critérios de necessidade e restrição de acesso.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.4. Dados de Uso, Métricas Operacionais, Analytics Internos e Aperfeiçoamento da Plataforma</p>
+          <p class="text-slate-700 mb-3">
+            O CALCULARQ poderá tratar dados de uso da plataforma, eventos de navegação interna, registros operacionais, métricas de utilização da calculadora, padrões de uso, indicadores de desempenho do serviço, dados estatísticos agregados e informações derivadas da interação com a plataforma para as seguintes finalidades legítimas:
+          </p>
+          <ol class="space-y-1 text-slate-700 list-[lower-alpha] list-inside mb-3">
+            <li>monitoramento técnico e operacional da plataforma;</li>
+            <li>prevenção a falhas, fraudes, abusos e incidentes de segurança;</li>
+            <li>suporte e melhoria contínua da experiência do usuário;</li>
+            <li>geração de painéis administrativos internos, métricas gerenciais e relatórios operacionais;</li>
+            <li>auditoria interna, análise de desempenho e controle de qualidade;</li>
+            <li>avaliação, evolução, ajuste e aperfeiçoamento metodológico da calculadora e de suas estimativas, preferencialmente mediante uso de dados agregados, anonimizados ou com minimização de elementos identificadores.</li>
+          </ol>
+          <p class="text-slate-700">
+            Sempre que possível, tais atividades serão realizadas com preferência por dados agregados, estatísticos, anonimizados ou com redução de granularidade, em observância aos princípios da necessidade, minimização, adequação e prevenção.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.5. Relatórios Administrativos e Exportação de Dados</p>
+          <p class="text-slate-700 mb-3">
+            A plataforma poderá gerar relatórios técnicos, gerenciais, estatísticos ou administrativos, inclusive em formatos digitais exportáveis, com base em filtros, métricas e dados tratados no contexto da prestação do serviço.
+          </p>
+          <p class="text-slate-700 mb-2">Tais relatórios poderão conter:</p>
+          <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+            <li>indicadores agregados de uso;</li>
+            <li>métricas operacionais;</li>
+            <li>análises comparativas;</li>
+            <li>sinais de aderência entre estimativas e resultados;</li>
+            <li>alertas técnicos e administrativos;</li>
+            <li>recortes filtrados por período, categoria, tipologia ou outros parâmetros da plataforma.</li>
+          </ul>
+          <p class="text-slate-700">
+            Sempre que possível e tecnicamente viável, a geração desses relatórios observará critérios de minimização e limitação de exposição de dados pessoais, especialmente em rotinas de auditoria interna e exportação administrativa.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DAS BASES LEGAIS</h3>
+      <p class="text-slate-700 mb-3">
+        O tratamento de dados pessoais poderá fundamentar-se, conforme a natureza da operação e a finalidade correspondente, nas hipóteses legais previstas na LGPD, incluindo, sem limitação:
+      </p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>cumprimento de obrigação legal ou regulatória;</li>
+        <li>execução de contrato ou de procedimentos preliminares relacionados a contrato do qual seja parte o titular;</li>
+        <li>exercício regular de direitos em processo judicial, administrativo ou arbitral;</li>
+        <li>proteção do crédito, quando aplicável;</li>
+        <li>legítimo interesse do CONTROLADOR ou de terceiros, desde que observados os direitos e legítimas expectativas do titular e adotadas medidas de minimização, necessidade, proporcionalidade e transparência;</li>
+        <li>consentimento do titular, quando especificamente exigido ou adotado como base legal para determinada finalidade.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DO COMPARTILHAMENTO E DA TRANSFERÊNCIA INTERNACIONAL</h3>
+      <p class="text-slate-700 mb-3">
+        O CONTROLADOR declara que não comercializa dados pessoais.
       </p>
       <p class="text-slate-700 mb-3">
-        Os dados são hospedados na infraestrutura de nuvem da Cloudflare, Inc. (Cloudflare
-        Pages e Cloudflare D1), que atua como provedora de serviços de computação e
-        armazenamento de banco de dados. A transferência baseia-se em cláusulas contratuais
-        padrão e protocolos globais de segurança.
+        O compartilhamento de dados limita-se aos terceiros estritamente necessários à operação da plataforma, ao processamento de pagamentos, ao suporte tecnológico, à segurança da informação, ao cumprimento de obrigações legais e regulatórias, ao exercício regular de direitos e à prestação dos serviços contratados.
       </p>
+      <p class="text-slate-700 mb-3">
+        Os dados poderão ser processados por provedores de infraestrutura e tecnologia, inclusive em ambiente de computação em nuvem e com eventual transferência internacional de dados, observadas as bases legais e os mecanismos admitidos pela LGPD.
+      </p>
+      <p class="text-slate-700 mb-2">Atualmente, os dados poderão ser hospedados ou processados, conforme aplicável, por provedores como:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li><strong>Cloudflare, Inc.</strong>, para fins de infraestrutura de aplicação, hospedagem, proteção e banco de dados;</li>
+        <li><strong>Stripe, Inc.</strong> ou outro provedor de pagamento equivalente, para fins de processamento de pagamentos, prevenção a fraudes e gestão de transações.</li>
+      </ul>
       <p class="text-slate-700">
-        Os dados financeiros são processados pela Stripe Inc. (Global), para fins exclusivos de
-        processamento de pagamentos e prevenção a fraudes financeiras.
+        Sempre que houver transferência internacional, o CONTROLADOR buscará adotar medidas contratuais, organizacionais e técnicas razoáveis para preservação da segurança, confidencialidade e integridade dos dados, em conformidade com a legislação aplicável.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DA SEGURANÇA DA INFORMAÇÃO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DA SEGURANÇA DA INFORMAÇÃO E DOS CONTROLES INTERNOS</h3>
       <p class="text-slate-700 mb-3">
-        O CONTROLADOR emprega medidas técnicas e administrativas aptas a proteger os dados
-        pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição,
-        perda, alteração, comunicação ou difusão.
+        O CONTROLADOR emprega medidas técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou difusão.
       </p>
-      <p class="text-slate-700 mb-3">
-        As comunicações entre o dispositivo do USUÁRIO e os servidores são protegidas por
-        criptografia em trânsito, através da utilização de protocolo SSL/TLS (Secure Sockets Layer).
-      </p>
-      <p class="text-slate-700 mb-3">
-        O ambiente de servidor é configurado com controles de acesso restritos e medidas de
-        segurança perimetral, garantindo que os dados armazenados por um USUÁRIO sejam
-        tecnicamente inacessíveis a outros usuários da plataforma.
-      </p>
+      <p class="text-slate-700 mb-2">Entre tais medidas, incluem-se, conforme aplicável:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>criptografia em trânsito por meio de protocolos seguros;</li>
+        <li>controles de autenticação e gestão de sessão;</li>
+        <li>segregação lógica de acesso entre usuários;</li>
+        <li>restrição de acesso administrativo por necessidade e privilégio mínimo;</li>
+        <li>registros internos de eventos e operações técnicas relevantes;</li>
+        <li>revisão e melhoria contínua dos mecanismos de proteção;</li>
+        <li>medidas voltadas à redução de exposição indevida em relatórios, painéis e rotinas administrativas.</li>
+      </ul>
       <p class="text-slate-700">
-        A coleta de dados obedece ao princípio da minimização, restringindo-se estritamente ao
-        necessário para a finalidade proposta.
+        O CONTROLADOR adota, sempre que possível, o princípio da minimização, limitando o tratamento ao estritamente necessário para as finalidades declaradas.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DOS DIREITOS DO TITULAR</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DOS DIREITOS DO TITULAR</h3>
       <p class="text-slate-700 mb-3">
-        Em conformidade com o Art. 18 da LGPD, o USUÁRIO poderá requerer, a qualquer
-        momento e mediante requisição expressa, a confirmação da existência de tratamento e o
-        acesso aos seus dados pessoais.
+        Nos termos da legislação aplicável, especialmente do art. 18 da LGPD, o titular poderá requerer, observados os limites legais e regulatórios:
       </p>
-      <p class="text-slate-700 mb-3">
-        É assegurado ao USUÁRIO o direito de solicitar a correção de dados incompletos, inexatos
-        ou desatualizados constantes em seu cadastro, bem como a portabilidade de seus dados a
-        outro fornecedor, observados os segredos comercial e industrial.
-      </p>
-      <p class="text-slate-700 mb-3">
-        O USUÁRIO poderá requerer a eliminação dos dados pessoais tratados, excetuadas as
-        hipóteses de guarda obrigatória previstas no art. 16 da Lei.
-      </p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>confirmação da existência de tratamento;</li>
+        <li>acesso aos dados;</li>
+        <li>correção de dados incompletos, inexatos ou desatualizados;</li>
+        <li>anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a lei, quando cabível;</li>
+        <li>portabilidade dos dados, observados segredos comercial e industrial e regulamentação aplicável;</li>
+        <li>eliminação dos dados tratados com consentimento, quando essa for a base legal e ressalvadas as hipóteses legais de conservação;</li>
+        <li>informação sobre compartilhamentos realizados, quando cabível;</li>
+        <li>informação sobre a possibilidade de não fornecer consentimento e sobre as consequências da negativa, quando aplicável;</li>
+        <li>revogação do consentimento, nos casos em que ele for a base legal adotada.</li>
+      </ul>
       <p class="text-slate-700">
-        Quando a base legal para o tratamento for o consentimento, a revogação poderá ser
-        exercida a qualquer momento mediante manifestação expressa do titular, ratificados os
-        tratamentos realizados sob amparo do consentimento anteriormente manifestado.
+        As solicitações serão analisadas e respondidas na forma e nos prazos aplicáveis, ressalvadas hipóteses de retenção obrigatória, exercício regular de direitos, proteção do crédito, cumprimento de dever legal ou outras limitações juridicamente admitidas.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DO ENCARREGADO E CANAL DE CONTATO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DO ENCARREGADO E DO CANAL DE CONTATO</h3>
       <p class="text-slate-700 mb-3">
-        Para o exercício de quaisquer direitos previstos nesta Política ou na legislação aplicável,
-        bem como para o esclarecimento de dúvidas referentes ao tratamento de dados, o Titular
-        deverá entrar em contato através do canal oficial:
+        Para o exercício de quaisquer direitos previstos nesta Política ou na legislação aplicável, bem como para esclarecimento de dúvidas referentes ao tratamento de dados, o titular poderá entrar em contato por meio do canal oficial:
       </p>
-      <p class="text-slate-700 font-semibold">
+      <p class="text-slate-700 font-semibold mb-3">
         E-mail: atendimento@calcularq.com.br
       </p>
-      <p class="text-slate-700 mt-3">
-        As solicitações serão recebidas, analisadas e respondidas dentro dos prazos legais
-        estabelecidos pela Autoridade Nacional de Proteção de Dados (ANPD).
+      <p class="text-slate-700">
+        As solicitações serão recebidas, analisadas e respondidas nos termos da legislação aplicável e das orientações regulatórias pertinentes.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DO TÉRMINO DO TRATAMENTO E RETENÇÃO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DA RETENÇÃO, CONSERVAÇÃO E ELIMINAÇÃO</h3>
+      <p class="text-slate-700 mb-2">Os dados pessoais serão mantidos:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>enquanto perdurar a relação contratual;</li>
+        <li>pelo tempo necessário para cumprir as finalidades informadas nesta Política;</li>
+        <li>pelo prazo exigido por obrigação legal ou regulatória;</li>
+        <li>pelo período necessário ao exercício regular de direitos do CONTROLADOR ou do USUÁRIO.</li>
+      </ul>
+      <p class="text-slate-700 mb-2">
+        Após o encerramento da conta ou o término da relação contratual, os dados poderão ser eliminados, anonimizados ou conservados, conforme o caso concreto, quando houver fundamento legal para sua retenção, inclusive para:
+      </p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>cumprimento de obrigação legal ou regulatória;</li>
+        <li>exercício regular de direitos;</li>
+        <li>prevenção a fraudes e segurança;</li>
+        <li>preservação de registros obrigatórios;</li>
+        <li>manutenção de estatísticas, métricas e informações agregadas ou anonimizadas que não permitam a identificação direta do titular, quando cabível.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">10. DAS ALTERAÇÕES DESTA POLÍTICA</h3>
       <p class="text-slate-700 mb-3">
-        Os dados pessoais serão mantidos enquanto perdurar a relação contratual.
+        Esta Política poderá ser atualizada a qualquer tempo, para refletir alterações legais, regulatórias, tecnológicas, operacionais ou funcionais da plataforma.
       </p>
       <p class="text-slate-700">
-        Após o encerramento da conta, seja por solicitação do USUÁRIO ou por descontinuidade do
-        serviço, os dados serão excluídos definitivamente, ressalvada a conservação para
-        cumprimento de obrigação legal ou regulatória (ex: guarda de registros de acesso por 6
-        meses e dados fiscais por 5 anos).
+        A versão vigente será sempre aquela disponibilizada na plataforma, com indicação de data de vigência. Caso as alterações sejam relevantes e afetem substancialmente o tratamento de dados, o CONTROLADOR envidará esforços razoáveis para dar ciência aos usuários por meios adequados.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DO FORO E LEGISLAÇÃO APLICÁVEL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">11. DO FORO E DA LEGISLAÇÃO APLICÁVEL</h3>
       <p class="text-slate-700 mb-3">
-        Esta Política será regida, interpretada e executada de acordo com as Leis da República
-        Federativa do Brasil, especialmente a Lei nº 13.709/2018.
+        Esta Política será regida, interpretada e executada de acordo com as leis da República Federativa do Brasil, especialmente a Lei nº 13.709/2018.
       </p>
       <p class="text-slate-700">
-        Fica assegurado ao titular o direito de ajuizar eventual demanda no foro de seu domicílio,
-        nos termos do Código de Defesa do Consumidor e da legislação aplicável, com renúncia
-        expressa a qualquer outro.
+        Fica assegurado ao titular o direito de ajuizar eventual demanda no foro de seu domicílio, nos termos da legislação aplicável.
       </p>
     </div>
   </div>
