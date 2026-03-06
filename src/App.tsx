@@ -13,6 +13,7 @@ const Payment = lazy(() => import('./pages/Payment'))
 const PaymentClose = lazy(() => import('./pages/PaymentClose'))
 const BudgetsHistory = lazy(() => import('./pages/BudgetsHistory'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const Admin = lazy(() => import('./pages/Admin'))
 
 function App() {
   return (
@@ -52,6 +53,14 @@ function App() {
               element={
                 <ProtectedRoute requirePayment={true}>
                   <BudgetsHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requirePayment={false}>
+                  <Admin />
                 </ProtectedRoute>
               }
             />
