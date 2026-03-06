@@ -217,215 +217,272 @@ export const privacyContent = `
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">POLÍTICA DE PRIVACIDADE E PROTEÇÃO DE DADOS PESSOAIS</h2>
       <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Data de Vigência: [Inserir Data de Lançamento]</p>
       <p class="text-slate-700 mb-4">
-        O presente Instrumento de Política de Privacidade ("Política") tem por escopo disciplinar as
-        condições de tratamento de dados pessoais no âmbito da utilização da plataforma
-        CALCULARQ, de titularidade de PEDRO AFONSO MAIA PIRES, pessoa física, doravante
-        denominado CONTROLADOR.
+        O presente Instrumento de Política de Privacidade ("Política") tem por escopo disciplinar as condições de tratamento de dados pessoais no âmbito da utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>CONTROLADOR</strong>.
       </p>
       <p class="text-slate-700 mb-6">
-        A presente Política foi elaborada em estrita consonância com a Constituição Federal
-        Brasileira, o Código de Defesa do Consumidor (Lei nº 8.078/1990), o Marco Civil da Internet
-        (Lei nº 12.965/2014) e, precipuamente, a Lei Geral de Proteção de Dados Pessoais (Lei nº
-        13.709/2018 – "LGPD").
+        A presente Política foi elaborada em consonância com a Constituição Federal da República Federativa do Brasil, o Código de Defesa do Consumidor (Lei nº 8.078/1990), o Marco Civil da Internet (Lei nº 12.965/2014) e, especialmente, a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 – "LGPD").
       </p>
     </div>
 
     <div>
       <h3 class="text-xl font-bold text-calcularq-blue mb-3">1. DAS DEFINIÇÕES E CONCEITOS</h3>
       <p class="text-slate-700 mb-3">
-        Para a correta interpretação deste instrumento, adotam-se as definições legais
-        estabelecidas no Artigo 5º da LGPD.
+        Para a correta interpretação deste instrumento, adotam-se as definições legais estabelecidas na legislação aplicável, em especial no art. 5º da LGPD.
       </p>
-      <ul class="space-y-2 text-slate-700 list-disc list-inside">
-        <li>Considera-se <strong>Dado Pessoal</strong> toda informação relacionada a pessoa natural identificada ou identificável.</li>
-        <li>Considera-se <strong>Tratamento</strong> toda operação realizada com dados pessoais, como coleta, produção, recepção, classificação, utilização, acesso, reprodução, transmissão, distribuição, processamento, arquivamento, armazenamento, eliminação, avaliação ou controle da informação.</li>
-        <li>Considera-se <strong>Titular</strong> a pessoa natural a quem se referem os dados pessoais que são objeto de tratamento.</li>
-        <li>Considera-se <strong>Controlador</strong> a pessoa natural ou jurídica a quem competem as decisões referentes ao tratamento de dados pessoais.</li>
-        <li>Considera-se <strong>Operador</strong> a pessoa natural ou jurídica que realiza o tratamento de dados pessoais em nome do controlador.</li>
-      </ul>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Dado Pessoal</strong> toda informação relacionada a pessoa natural identificada ou identificável.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Tratamento</strong> toda operação realizada com dados pessoais, tais como coleta, produção, recepção, classificação, utilização, acesso, reprodução, transmissão, distribuição, processamento, arquivamento, armazenamento, eliminação, avaliação, controle, modificação, comunicação, transferência, difusão ou extração.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Titular</strong> a pessoa natural a quem se referem os dados pessoais objeto de tratamento.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Controlador</strong> a pessoa natural ou jurídica a quem competem as decisões referentes ao tratamento de dados pessoais.</p>
+      <p class="text-slate-700 mb-2">Considera-se <strong>Operador</strong> a pessoa natural ou jurídica que realiza o tratamento de dados pessoais em nome do controlador.</p>
+      <p class="text-slate-700">Consideram-se <strong>Dados Anonimizados</strong>, quando cabível, os dados relativos a titular que não possa ser identificado, considerados os meios técnicos razoáveis e disponíveis na ocasião de seu tratamento.</p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA QUALIFICAÇÃO DAS PARTES E RESPONSABILIDADES (DATA CONTROLLERSHIP)</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA QUALIFICAÇÃO DAS PARTES E RESPONSABILIDADES</h3>
       <p class="text-slate-700 mb-3">
-        Reconhece-se, para os devidos fins de direito, a distinção dos papéis no tratamento de
-        dados, conforme a natureza da informação processada pela plataforma.
-      </p>
-      <p class="text-slate-700 mb-3">
-        No que tange aos dados de cadastro, faturamento e acesso do USUÁRIO (licenciado), o
-        CALCULARQ atua como CONTROLADOR, determinando a finalidade e os meios de
-        tratamento.
-      </p>
-      <p class="text-slate-700 mb-3">
-        Diversamente, no que tange aos dados inseridos pelo USUÁRIO na ferramenta de
-        "Histórico de Orçamentos" (ex: nomes de clientes finais, endereços de obras, dados de
-        terceiros), o USUÁRIO figura como único e exclusivo CONTROLADOR.
-      </p>
-      <p class="text-slate-700">
-        Nesta segunda hipótese, o CALCULARQ atua meramente como OPERADOR de
-        infraestrutura. A responsabilidade do CALCULARQ limita-se à segurança do
-        armazenamento e ao cumprimento das instruções lícitas do USUÁRIO, nos termos do Art.
-        42 da LGPD, não respondendo pela legalidade da coleta original desses dados realizada
-        pelo USUÁRIO, salvo em caso de comprovada negligência quanto às normas de segurança
-        da informação.
-      </p>
-    </div>
-
-    <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DA COLETA E ESCOPO DO TRATAMENTO</h3>
-      <p class="text-slate-700 mb-3">
-        Os dados pessoais serão coletados e tratados apenas quando estritamente necessários
-        para a execução do contrato de licença de uso, nas seguintes modalidades:
+        Reconhece-se, para os devidos fins de direito, a distinção dos papéis no tratamento de dados, conforme a natureza da informação processada pela plataforma.
       </p>
       <div class="space-y-4">
         <div>
-          <p class="font-semibold text-slate-900 mb-2">3.1. Dados de Identificação Digital e Acesso</p>
-          <p class="text-slate-700 mb-2">
-            Serão tratados o endereço de correio eletrônico (e-mail), as credenciais de acesso (senha
-            submetida a hashing criptográfico) e os registros de conexão (Endereço IP, User-Agent,
-            data e hora).
-          </p>
+          <p class="font-semibold text-slate-900 mb-2">2.1. Dados de cadastro, acesso, cobrança e relacionamento com o USUÁRIO</p>
           <p class="text-slate-700">
-            O tratamento destes dados fundamenta-se no cumprimento de obrigação legal (Art. 7º, II,
-            LGPD c/c Art. 15, Lei 12.965/14) e na necessidade para a execução de contrato (Art. 7º, V,
-            LGPD).
+            No que tange aos dados de cadastro, autenticação, licenciamento, cobrança, suporte, segurança da conta, prevenção a fraudes, métricas operacionais da plataforma e relatórios administrativos internos, o <strong>CALCULARQ atua como CONTROLADOR</strong>, determinando as finalidades e os meios de tratamento.
           </p>
         </div>
         <div>
-          <p class="font-semibold text-slate-900 mb-2">3.2. Dados Financeiros e de Transação</p>
-          <p class="text-slate-700 mb-2">
-            Serão tratados o histórico de pagamentos, os identificadores de transação e o status da
-            licença adquirida.
+          <p class="font-semibold text-slate-900 mb-2">2.2. Dados inseridos pelo USUÁRIO em seus orçamentos e registros de projeto</p>
+          <p class="text-slate-700 mb-3">
+            No que tange aos dados inseridos pelo <strong>USUÁRIO</strong> na funcionalidade de histórico de orçamentos, projetos e registros correlatos — inclusive eventuais nomes de clientes finais, endereços de obras, contatos, observações ou outras informações de terceiros — o <strong>USUÁRIO figura como único e exclusivo CONTROLADOR</strong> no que se refere à licitude da coleta original, à pertinência da inserção desses dados e à definição da base legal adequada.
+          </p>
+          <p class="text-slate-700 mb-3">
+            Nessa hipótese, o <strong>CALCULARQ atua predominantemente como OPERADOR de infraestrutura</strong>, limitando sua atuação ao armazenamento, organização, disponibilização técnica e proteção dessas informações, nos termos das instruções lícitas do USUÁRIO e da legislação aplicável.
           </p>
           <p class="text-slate-700">
-            O CONTROLADOR declara expressamente não armazenar, processar ou deter acesso aos
-            dados sensíveis de pagamento, tais como número de cartão de crédito e código CVV. Tais
-            dados são processados exclusivamente pela gateway de pagamentos Stripe Payments,
-            em ambiente certificado PCI-DSS (Payment Card Industry Data Security Standard).
+            O CALCULARQ não responde pela legalidade da coleta originária realizada pelo USUÁRIO perante terceiros, salvo nos casos de comprovada falha de segurança, atuação em desconformidade com a lei ou descumprimento de deveres próprios.
           </p>
         </div>
         <div>
-          <p class="font-semibold text-slate-900 mb-2">3.3. Dados de Input do Usuário (Histórico de Orçamentos)</p>
-          <p class="text-slate-700 mb-2">
-            Serão armazenados os resultados dos cálculos e os dados de identificação dos projetos
-            (ex: Nome do Cliente/Projeto, valores finais) inseridos discricionariamente pelo USUÁRIO.
-          </p>
-          <p class="text-slate-700 mb-2">
-            A finalidade deste armazenamento é viabilizar a persistência de dados e a funcionalidade
-            de memória de cálculo da ferramenta, permitindo consulta futura pelo USUÁRIO.
-          </p>
+          <p class="font-semibold text-slate-900 mb-2">2.3. Metadados operacionais, dados agregados e informações anonimizadas</p>
           <p class="text-slate-700">
-            É vedada a utilização destes dados para fins de inteligência de mercado, publicidade ou
-            cessão a terceiros. O acesso a tais informações é restrito logicamente ao ID do USUÁRIO.
+            Sem prejuízo do disposto no item anterior, o CALCULARQ poderá atuar como <strong>CONTROLADOR</strong> em relação a metadados de uso da plataforma, registros operacionais, métricas agregadas, indicadores estatísticos e informações anonimizadas ou pseudonimizadas geradas a partir da utilização do serviço, desde que tratadas para finalidades legítimas, específicas e compatíveis com a operação da plataforma, tais como segurança, suporte, auditoria, monitoramento, prevenção a abusos, melhoria contínua do serviço e aperfeiçoamento metodológico.
           </p>
         </div>
       </div>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DO COMPARTILHAMENTO E TRANSFERÊNCIA INTERNACIONAL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DA COLETA, DO ESCOPO E DAS FINALIDADES DO TRATAMENTO</h3>
       <p class="text-slate-700 mb-3">
-        O CONTROLADOR declara que não comercializa dados pessoais. O compartilhamento
-        limita-se aos provedores de infraestrutura tecnológica essenciais, configurando-se
-        Transferência Internacional de Dados (Art. 33, LGPD), visto que os servidores podem estar
-        localizados fora do território nacional.
+        Os dados pessoais serão coletados e tratados apenas na medida do necessário para a prestação do serviço, para a execução do contrato, para o cumprimento de obrigações legais e regulatórias, para o exercício regular de direitos, para a segurança da plataforma e, quando cabível, para atender a legítimos interesses do CONTROLADOR ou de terceiros, sempre com observância dos direitos e legítimas expectativas do titular.
+      </p>
+      <div class="space-y-4">
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.1. Dados de Identificação Digital e Acesso</p>
+          <p class="text-slate-700 mb-2">Serão tratados, conforme aplicável:</p>
+          <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+            <li>nome e/ou identificador da conta;</li>
+            <li>endereço de correio eletrônico (e-mail);</li>
+            <li>credenciais de acesso, quando existentes, armazenadas sob técnicas adequadas de proteção;</li>
+            <li>registros de conexão e/ou de acesso à aplicação, tais como endereço IP, user-agent, data e hora, identificadores técnicos e logs de autenticação.</li>
+          </ul>
+          <p class="text-slate-700">
+            O tratamento desses dados fundamenta-se, conforme o caso concreto, no cumprimento de obrigação legal, na execução do contrato, na segurança da aplicação, na prevenção a fraudes e abusos e no exercício regular de direitos.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.2. Dados Financeiros e de Transação</p>
+          <p class="text-slate-700 mb-2">Serão tratados, quando aplicável:</p>
+          <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+            <li>histórico de pagamentos;</li>
+            <li>identificadores de transação;</li>
+            <li>status do plano, licença ou assinatura;</li>
+            <li>informações mínimas necessárias à conciliação financeira, prevenção a fraudes e suporte ao usuário.</li>
+          </ul>
+          <p class="text-slate-700">
+            O CONTROLADOR declara não armazenar, processar ou deter acesso direto aos dados completos de cartão de crédito, código de segurança (CVV) ou equivalentes, quando tais dados forem processados por provedor de pagamento terceirizado em ambiente próprio e certificado.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.3. Dados Inseridos pelo Usuário em Orçamentos, Projetos e Registros</p>
+          <p class="text-slate-700 mb-3">
+            Serão armazenados os dados e resultados de cálculo inseridos discricionariamente pelo USUÁRIO, inclusive informações de identificação de projeto, valores, parâmetros escolhidos, feedbacks operacionais e registros de acompanhamento do projeto.
+          </p>
+          <p class="text-slate-700 mb-3">
+            A finalidade principal desse tratamento é viabilizar a funcionalidade de memória, histórico, recuperação, organização e acompanhamento dos cálculos e projetos pelo próprio USUÁRIO.
+          </p>
+          <p class="text-slate-700 mb-3">
+            Tais dados <strong>não serão comercializados</strong> nem utilizados para publicidade comportamental ou cessão onerosa a terceiros.
+          </p>
+          <p class="text-slate-700">
+            O acesso a informações individualizadas será, em regra, logicamente restrito ao próprio USUÁRIO e aos agentes estritamente autorizados para fins técnicos, de segurança, suporte, prevenção a fraudes, cumprimento de obrigação legal, exercício regular de direitos ou manutenção da plataforma, sempre sob critérios de necessidade e restrição de acesso.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.4. Dados de Uso, Métricas Operacionais, Analytics Internos e Aperfeiçoamento da Plataforma</p>
+          <p class="text-slate-700 mb-3">
+            O CALCULARQ poderá tratar dados de uso da plataforma, eventos de navegação interna, registros operacionais, métricas de utilização da calculadora, padrões de uso, indicadores de desempenho do serviço, dados estatísticos agregados e informações derivadas da interação com a plataforma para as seguintes finalidades legítimas:
+          </p>
+          <ol class="space-y-1 text-slate-700 list-[lower-alpha] list-inside mb-3">
+            <li>monitoramento técnico e operacional da plataforma;</li>
+            <li>prevenção a falhas, fraudes, abusos e incidentes de segurança;</li>
+            <li>suporte e melhoria contínua da experiência do usuário;</li>
+            <li>geração de painéis administrativos internos, métricas gerenciais e relatórios operacionais;</li>
+            <li>auditoria interna, análise de desempenho e controle de qualidade;</li>
+            <li>avaliação, evolução, ajuste e aperfeiçoamento metodológico da calculadora e de suas estimativas, preferencialmente mediante uso de dados agregados, anonimizados ou com minimização de elementos identificadores.</li>
+          </ol>
+          <p class="text-slate-700">
+            Sempre que possível, tais atividades serão realizadas com preferência por dados agregados, estatísticos, anonimizados ou com redução de granularidade, em observância aos princípios da necessidade, minimização, adequação e prevenção.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900 mb-2">3.5. Relatórios Administrativos e Exportação de Dados</p>
+          <p class="text-slate-700 mb-3">
+            A plataforma poderá gerar relatórios técnicos, gerenciais, estatísticos ou administrativos, inclusive em formatos digitais exportáveis, com base em filtros, métricas e dados tratados no contexto da prestação do serviço.
+          </p>
+          <p class="text-slate-700 mb-2">Tais relatórios poderão conter:</p>
+          <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+            <li>indicadores agregados de uso;</li>
+            <li>métricas operacionais;</li>
+            <li>análises comparativas;</li>
+            <li>sinais de aderência entre estimativas e resultados;</li>
+            <li>alertas técnicos e administrativos;</li>
+            <li>recortes filtrados por período, categoria, tipologia ou outros parâmetros da plataforma.</li>
+          </ul>
+          <p class="text-slate-700">
+            Sempre que possível e tecnicamente viável, a geração desses relatórios observará critérios de minimização e limitação de exposição de dados pessoais, especialmente em rotinas de auditoria interna e exportação administrativa.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DAS BASES LEGAIS</h3>
+      <p class="text-slate-700 mb-3">
+        O tratamento de dados pessoais poderá fundamentar-se, conforme a natureza da operação e a finalidade correspondente, nas hipóteses legais previstas na LGPD, incluindo, sem limitação:
+      </p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>cumprimento de obrigação legal ou regulatória;</li>
+        <li>execução de contrato ou de procedimentos preliminares relacionados a contrato do qual seja parte o titular;</li>
+        <li>exercício regular de direitos em processo judicial, administrativo ou arbitral;</li>
+        <li>proteção do crédito, quando aplicável;</li>
+        <li>legítimo interesse do CONTROLADOR ou de terceiros, desde que observados os direitos e legítimas expectativas do titular e adotadas medidas de minimização, necessidade, proporcionalidade e transparência;</li>
+        <li>consentimento do titular, quando especificamente exigido ou adotado como base legal para determinada finalidade.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DO COMPARTILHAMENTO E DA TRANSFERÊNCIA INTERNACIONAL</h3>
+      <p class="text-slate-700 mb-3">
+        O CONTROLADOR declara que não comercializa dados pessoais.
       </p>
       <p class="text-slate-700 mb-3">
-        Os dados são hospedados na infraestrutura de nuvem da Cloudflare, Inc. (Cloudflare
-        Pages e Cloudflare D1), que atua como provedora de serviços de computação e
-        armazenamento de banco de dados. A transferência baseia-se em cláusulas contratuais
-        padrão e protocolos globais de segurança.
+        O compartilhamento de dados limita-se aos terceiros estritamente necessários à operação da plataforma, ao processamento de pagamentos, ao suporte tecnológico, à segurança da informação, ao cumprimento de obrigações legais e regulatórias, ao exercício regular de direitos e à prestação dos serviços contratados.
       </p>
+      <p class="text-slate-700 mb-3">
+        Os dados poderão ser processados por provedores de infraestrutura e tecnologia, inclusive em ambiente de computação em nuvem e com eventual transferência internacional de dados, observadas as bases legais e os mecanismos admitidos pela LGPD.
+      </p>
+      <p class="text-slate-700 mb-2">Atualmente, os dados poderão ser hospedados ou processados, conforme aplicável, por provedores como:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li><strong>Cloudflare, Inc.</strong>, para fins de infraestrutura de aplicação, hospedagem, proteção e banco de dados;</li>
+        <li><strong>Stripe, Inc.</strong> ou outro provedor de pagamento equivalente, para fins de processamento de pagamentos, prevenção a fraudes e gestão de transações.</li>
+      </ul>
       <p class="text-slate-700">
-        Os dados financeiros são processados pela Stripe Inc. (Global), para fins exclusivos de
-        processamento de pagamentos e prevenção a fraudes financeiras.
+        Sempre que houver transferência internacional, o CONTROLADOR buscará adotar medidas contratuais, organizacionais e técnicas razoáveis para preservação da segurança, confidencialidade e integridade dos dados, em conformidade com a legislação aplicável.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DA SEGURANÇA DA INFORMAÇÃO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DA SEGURANÇA DA INFORMAÇÃO E DOS CONTROLES INTERNOS</h3>
       <p class="text-slate-700 mb-3">
-        O CONTROLADOR emprega medidas técnicas e administrativas aptas a proteger os dados
-        pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição,
-        perda, alteração, comunicação ou difusão.
+        O CONTROLADOR emprega medidas técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou difusão.
       </p>
-      <p class="text-slate-700 mb-3">
-        As comunicações entre o dispositivo do USUÁRIO e os servidores são protegidas por
-        criptografia em trânsito, através da utilização de protocolo SSL/TLS (Secure Sockets Layer).
-      </p>
-      <p class="text-slate-700 mb-3">
-        O ambiente de servidor é configurado com controles de acesso restritos e medidas de
-        segurança perimetral, garantindo que os dados armazenados por um USUÁRIO sejam
-        tecnicamente inacessíveis a outros usuários da plataforma.
-      </p>
+      <p class="text-slate-700 mb-2">Entre tais medidas, incluem-se, conforme aplicável:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>criptografia em trânsito por meio de protocolos seguros;</li>
+        <li>controles de autenticação e gestão de sessão;</li>
+        <li>segregação lógica de acesso entre usuários;</li>
+        <li>restrição de acesso administrativo por necessidade e privilégio mínimo;</li>
+        <li>registros internos de eventos e operações técnicas relevantes;</li>
+        <li>revisão e melhoria contínua dos mecanismos de proteção;</li>
+        <li>medidas voltadas à redução de exposição indevida em relatórios, painéis e rotinas administrativas.</li>
+      </ul>
       <p class="text-slate-700">
-        A coleta de dados obedece ao princípio da minimização, restringindo-se estritamente ao
-        necessário para a finalidade proposta.
+        O CONTROLADOR adota, sempre que possível, o princípio da minimização, limitando o tratamento ao estritamente necessário para as finalidades declaradas.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DOS DIREITOS DO TITULAR</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DOS DIREITOS DO TITULAR</h3>
       <p class="text-slate-700 mb-3">
-        Em conformidade com o Art. 18 da LGPD, o USUÁRIO poderá requerer, a qualquer
-        momento e mediante requisição expressa, a confirmação da existência de tratamento e o
-        acesso aos seus dados pessoais.
+        Nos termos da legislação aplicável, especialmente do art. 18 da LGPD, o titular poderá requerer, observados os limites legais e regulatórios:
       </p>
-      <p class="text-slate-700 mb-3">
-        É assegurado ao USUÁRIO o direito de solicitar a correção de dados incompletos, inexatos
-        ou desatualizados constantes em seu cadastro, bem como a portabilidade de seus dados a
-        outro fornecedor, observados os segredos comercial e industrial.
-      </p>
-      <p class="text-slate-700 mb-3">
-        O USUÁRIO poderá requerer a eliminação dos dados pessoais tratados, excetuadas as
-        hipóteses de guarda obrigatória previstas no art. 16 da Lei.
-      </p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>confirmação da existência de tratamento;</li>
+        <li>acesso aos dados;</li>
+        <li>correção de dados incompletos, inexatos ou desatualizados;</li>
+        <li>anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a lei, quando cabível;</li>
+        <li>portabilidade dos dados, observados segredos comercial e industrial e regulamentação aplicável;</li>
+        <li>eliminação dos dados tratados com consentimento, quando essa for a base legal e ressalvadas as hipóteses legais de conservação;</li>
+        <li>informação sobre compartilhamentos realizados, quando cabível;</li>
+        <li>informação sobre a possibilidade de não fornecer consentimento e sobre as consequências da negativa, quando aplicável;</li>
+        <li>revogação do consentimento, nos casos em que ele for a base legal adotada.</li>
+      </ul>
       <p class="text-slate-700">
-        Quando a base legal para o tratamento for o consentimento, a revogação poderá ser
-        exercida a qualquer momento mediante manifestação expressa do titular, ratificados os
-        tratamentos realizados sob amparo do consentimento anteriormente manifestado.
+        As solicitações serão analisadas e respondidas na forma e nos prazos aplicáveis, ressalvadas hipóteses de retenção obrigatória, exercício regular de direitos, proteção do crédito, cumprimento de dever legal ou outras limitações juridicamente admitidas.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DO ENCARREGADO E CANAL DE CONTATO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DO ENCARREGADO E DO CANAL DE CONTATO</h3>
       <p class="text-slate-700 mb-3">
-        Para o exercício de quaisquer direitos previstos nesta Política ou na legislação aplicável,
-        bem como para o esclarecimento de dúvidas referentes ao tratamento de dados, o Titular
-        deverá entrar em contato através do canal oficial:
+        Para o exercício de quaisquer direitos previstos nesta Política ou na legislação aplicável, bem como para esclarecimento de dúvidas referentes ao tratamento de dados, o titular poderá entrar em contato por meio do canal oficial:
       </p>
-      <p class="text-slate-700 font-semibold">
+      <p class="text-slate-700 font-semibold mb-3">
         E-mail: atendimento@calcularq.com.br
       </p>
-      <p class="text-slate-700 mt-3">
-        As solicitações serão recebidas, analisadas e respondidas dentro dos prazos legais
-        estabelecidos pela Autoridade Nacional de Proteção de Dados (ANPD).
+      <p class="text-slate-700">
+        As solicitações serão recebidas, analisadas e respondidas nos termos da legislação aplicável e das orientações regulatórias pertinentes.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DO TÉRMINO DO TRATAMENTO E RETENÇÃO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DA RETENÇÃO, CONSERVAÇÃO E ELIMINAÇÃO</h3>
+      <p class="text-slate-700 mb-2">Os dados pessoais serão mantidos:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>enquanto perdurar a relação contratual;</li>
+        <li>pelo tempo necessário para cumprir as finalidades informadas nesta Política;</li>
+        <li>pelo prazo exigido por obrigação legal ou regulatória;</li>
+        <li>pelo período necessário ao exercício regular de direitos do CONTROLADOR ou do USUÁRIO.</li>
+      </ul>
+      <p class="text-slate-700 mb-2">
+        Após o encerramento da conta ou o término da relação contratual, os dados poderão ser eliminados, anonimizados ou conservados, conforme o caso concreto, quando houver fundamento legal para sua retenção, inclusive para:
+      </p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>cumprimento de obrigação legal ou regulatória;</li>
+        <li>exercício regular de direitos;</li>
+        <li>prevenção a fraudes e segurança;</li>
+        <li>preservação de registros obrigatórios;</li>
+        <li>manutenção de estatísticas, métricas e informações agregadas ou anonimizadas que não permitam a identificação direta do titular, quando cabível.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">10. DAS ALTERAÇÕES DESTA POLÍTICA</h3>
       <p class="text-slate-700 mb-3">
-        Os dados pessoais serão mantidos enquanto perdurar a relação contratual.
+        Esta Política poderá ser atualizada a qualquer tempo, para refletir alterações legais, regulatórias, tecnológicas, operacionais ou funcionais da plataforma.
       </p>
       <p class="text-slate-700">
-        Após o encerramento da conta, seja por solicitação do USUÁRIO ou por descontinuidade do
-        serviço, os dados serão excluídos definitivamente, ressalvada a conservação para
-        cumprimento de obrigação legal ou regulatória (ex: guarda de registros de acesso por 6
-        meses e dados fiscais por 5 anos).
+        A versão vigente será sempre aquela disponibilizada na plataforma, com indicação de data de vigência. Caso as alterações sejam relevantes e afetem substancialmente o tratamento de dados, o CONTROLADOR envidará esforços razoáveis para dar ciência aos usuários por meios adequados.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DO FORO E LEGISLAÇÃO APLICÁVEL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">11. DO FORO E DA LEGISLAÇÃO APLICÁVEL</h3>
       <p class="text-slate-700 mb-3">
-        Esta Política será regida, interpretada e executada de acordo com as Leis da República
-        Federativa do Brasil, especialmente a Lei nº 13.709/2018.
+        Esta Política será regida, interpretada e executada de acordo com as leis da República Federativa do Brasil, especialmente a Lei nº 13.709/2018.
       </p>
       <p class="text-slate-700">
-        Fica assegurado ao titular o direito de ajuizar eventual demanda no foro de seu domicílio,
-        nos termos do Código de Defesa do Consumidor e da legislação aplicável, com renúncia
-        expressa a qualquer outro.
+        Fica assegurado ao titular o direito de ajuizar eventual demanda no foro de seu domicílio, nos termos da legislação aplicável.
       </p>
     </div>
   </div>
