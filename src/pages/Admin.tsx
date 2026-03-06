@@ -513,8 +513,7 @@ export default function Admin() {
     setFilters(newFilters);
   }
 
-  const isV2Tab = (tab: AdminTab) =>
-    ["tendencias", "alertas", "segmentacao", "evolucao"].includes(tab);
+  const activeTabDef = TABS.find((t) => t.id === activeTab);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -592,7 +591,7 @@ export default function Admin() {
                 calibration={calibration}
               />
             )}
-            {isV2Tab(activeTab) && <V2Placeholder />}
+            {activeTabDef?.v2 && <V2Placeholder />}
           </div>
         )}
       </div>

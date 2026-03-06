@@ -70,27 +70,32 @@ export async function onRequest(context) {
 
     // Most underestimated: method suggested LESS than actual (actual > suggested)
     // Most overestimated: method suggested MORE than actual (actual < suggested)
-    const withDiffPct = calibrationBudgets.map((c) => ({
-      id: c.budget.id,
-      tipologia: c.d.tipologia || null,
-      area: c.d.area || null,
-      reforma: !!c.d.reforma,
-      suggested: c.suggested,
-      actual: c.actual,
-      diffPct: ((c.actual - c.suggested) / c.suggested) * 100,
-    }));
+    function buildLabel(tipologia, area, reforma) {
+      const parts = [];
+      if (tipologia) parts.push(tipologia);
+      if (typeof area === "number") parts.push(`${area}m²`);
+      if (reforma) parts.push("reforma");
+      return parts.length > 0 ? parts.join(" · ") : "sem categoria";
+    }
+
+    const withDiffPct = calibrationBudgets
+      .filter((c) => c.suggested > 0)
+      .map((c) => ({
+        label: buildLabel(c.d.tipologia, c.d.area, c.d.reforma),
+        diffPercent: ((c.actual - c.suggested) / c.suggested) * 100,
+      }));
 
     const underestimated = withDiffPct
-      .filter((r) => r.diffPct > 0)
-      .sort((a, b) => b.diffPct - a.diffPct)
+      .filter((r) => r.diffPercent > 0)
+      .sort((a, b) => b.diffPercent - a.diffPercent)
       .slice(0, 5)
-      .map((r) => ({ ...r, diffPct: round4(r.diffPct) }));
+      .map((r) => ({ label: r.label, diffPercent: round4(r.diffPercent) }));
 
     const overestimated = withDiffPct
-      .filter((r) => r.diffPct < 0)
-      .sort((a, b) => a.diffPct - b.diffPct)
+      .filter((r) => r.diffPercent < 0)
+      .sort((a, b) => a.diffPercent - b.diffPercent)
       .slice(0, 5)
-      .map((r) => ({ ...r, diffPct: round4(r.diffPct) }));
+      .map((r) => ({ label: r.label, diffPercent: round4(r.diffPercent) }));
 
     return jsonResponse({
       success: true,
