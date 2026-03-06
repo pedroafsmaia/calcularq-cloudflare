@@ -6,6 +6,7 @@ export function createPageUrl(page: string): string {
     Login: '/login',
     Payment: '/payment',
     BudgetsHistory: '/budgets',
+    Admin: '/admin',
   }
   
   return pageMap[page] || `/${page.toLowerCase()}`

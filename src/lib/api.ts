@@ -38,6 +38,60 @@ export interface PaymentStatus {
   stripeCustomerId: string | null;
 }
 
+export interface AdminSummaryData {
+  totalUsers: number;
+  totalPaidUsers: number;
+  totalBudgets: number;
+  totalFeedbacks: number;
+  feedbackRate: number | null;
+  closingRate: number | null;
+  hoursAdherence: number | null;
+  priceAdherence: number | null;
+}
+
+export interface AdminUsageData {
+  tipologiaDistribution: Record<string, number>;
+  areaDistribution: Record<string, number>;
+  f3Distribution: Record<string, number>;
+  f4Distribution: Record<string, number>;
+  f5Distribution: Record<string, number>;
+  volumetriaDistribution: Record<string, number>;
+  reformaDistribution: { reforma: number; novaObra: number };
+  monthlyEvolution: Record<string, number>;
+}
+
+export interface AdminCommercialData {
+  avgSuggestedPrice: number | null;
+  avgClosedPrice: number | null;
+  avgDifference: number | null;
+  avgDiscount: number | null;
+  pricePerSqmByTipologia: Record<string, { suggested: number | null; closed: number | null }>;
+  feedbackDistribution: Record<string, number>;
+}
+
+export interface AdminCalibrationData {
+  hoursComparison: { suggested: number | null; actual: number | null; difference: number | null };
+  differenceByTipologia: Record<string, { suggested: number | null; actual: number | null; diff: number | null }>;
+  differenceByAreaRange: Record<string, { suggested: number | null; actual: number | null; diff: number | null }>;
+  differenceByF3: Record<string, { suggested: number | null; actual: number | null; diff: number | null }>;
+  differenceByF4: Record<string, { suggested: number | null; actual: number | null; diff: number | null }>;
+  differenceByF5: Record<string, { suggested: number | null; actual: number | null; diff: number | null }>;
+  differenceByReforma: Record<string, { suggested: number | null; actual: number | null; diff: number | null }>;
+  mostUnderestimated: Array<{ label: string; diffPercent: number }>;
+  mostOverestimated: Array<{ label: string; diffPercent: number }>;
+}
+
+export type AdminFilters = {
+  period_start?: string;
+  period_end?: string;
+  tipologia?: string;
+  area_min?: string;
+  area_max?: string;
+  feedback_only?: string;
+  reforma?: string;
+  close_status?: string;
+};
+
 type ApiUser = {
   id: string;
   email: string;
@@ -45,6 +99,7 @@ type ApiUser = {
   hasPaid: boolean;
   paymentDate: string | null;
   stripeCustomerId?: string | null;
+  isAdmin?: boolean;
   createdAt?: string;
 };
 
@@ -191,6 +246,32 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify({ token, newPassword }),
     });
+  }
+
+  private buildAdminQuery(filters?: AdminFilters): string {
+    if (!filters) return "";
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== "") params.set(key, value);
+    }
+    const qs = params.toString();
+    return qs ? `?${qs}` : "";
+  }
+
+  async getAdminSummary(filters?: AdminFilters): Promise<{ success: boolean; data: AdminSummaryData }> {
+    return this.request(`/api/admin/summary${this.buildAdminQuery(filters)}`);
+  }
+
+  async getAdminUsage(filters?: AdminFilters): Promise<{ success: boolean; data: AdminUsageData }> {
+    return this.request(`/api/admin/usage${this.buildAdminQuery(filters)}`);
+  }
+
+  async getAdminCommercial(filters?: AdminFilters): Promise<{ success: boolean; data: AdminCommercialData }> {
+    return this.request(`/api/admin/commercial${this.buildAdminQuery(filters)}`);
+  }
+
+  async getAdminCalibration(filters?: AdminFilters): Promise<{ success: boolean; data: AdminCalibrationData }> {
+    return this.request(`/api/admin/calibration${this.buildAdminQuery(filters)}`);
   }
 }
 

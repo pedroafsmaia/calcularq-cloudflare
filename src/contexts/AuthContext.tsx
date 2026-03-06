@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ...me.user,
           paymentDate: me.user.paymentDate ?? undefined,
           stripeCustomerId: me.user.stripeCustomerId ?? undefined,
+          isAdmin: me.user.isAdmin ?? undefined,
           createdAt: me.user.createdAt ?? new Date().toISOString(),
         };
         db.setCurrentUser(userData);
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...response.user,
       paymentDate: response.user.paymentDate ?? undefined,
       stripeCustomerId: response.user.stripeCustomerId ?? undefined,
+      isAdmin: undefined,
       createdAt: response.user.createdAt ?? new Date().toISOString(),
     };
     db.setCurrentUser(userData);
@@ -58,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...response.user,
       paymentDate: response.user.paymentDate ?? undefined,
       stripeCustomerId: response.user.stripeCustomerId ?? undefined,
+      isAdmin: undefined,
       createdAt: response.user.createdAt ?? new Date().toISOString(),
     };
     db.setCurrentUser(userData);
