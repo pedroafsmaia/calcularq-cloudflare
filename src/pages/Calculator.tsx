@@ -789,6 +789,8 @@ export default function Calculator() {
           </p>
         </motion.div>
 
+        <div ref={stepContentTopRef} />
+
         {/* Stepper horizontal unificado (desktop/tablet) */}
         <div className="hidden sm:block mb-4 sm:mb-5 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
           <div className="flex min-w-full justify-center">
@@ -993,7 +995,6 @@ export default function Calculator() {
           </details>
         </div>
 
-        <div ref={stepContentTopRef} />
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
           {/* Coluna principal */}
           <div className="flex-1 min-w-0">

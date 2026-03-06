@@ -38,9 +38,13 @@ function Row({ label, value, valueClassName = "text-slate-800", labelClassName =
 }) {
   const isPendingValue = valueClassName.includes("text-slate-400");
   return (
-    <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-sm">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-sm">
       <span className={`min-w-0 leading-snug ${labelClassName}`}>{label}</span>
-      <span className={`${noWrapValue ? "whitespace-nowrap" : ""} ${isPendingValue ? "font-normal" : "font-semibold"} ${valueClassName}`}>{value}</span>
+      <span
+        className={`${noWrapValue ? "whitespace-nowrap" : ""} self-start pt-0.5 text-right ${isPendingValue ? "font-normal" : "font-semibold"} ${valueClassName}`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -72,6 +76,7 @@ export default function CalculatorResultsPanel({
       ? describeHourlyRate(displayValues.adjustedHourlyRate)
       : null;
   const isExtremeAdjustedHourlyRate = adjustedHourlyRateDescription?.kind === "extreme";
+  const showAdjustedAsPrimary = currentStep >= 3 && displayValues.adjustedHourlyRate > 0;
 
   return (
     <div className="space-y-4 bg-transparent p-4 sm:p-5">
@@ -79,13 +84,24 @@ export default function CalculatorResultsPanel({
         <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do cálculo</p>
         <div className="space-y-2.5">
           <Row
-            label="Hora técnica mínima"
+            label={showAdjustedAsPrimary ? "Hora técnica ajustada" : "Hora técnica mínima"}
             value={
-              hasMinHourlyRate
-                ? `R$ ${Number(minHourlyRate).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h`
-                : "Pendente"
+              showAdjustedAsPrimary
+                ? `R$ ${displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h`
+                : hasMinHourlyRate
+                  ? `R$ ${Number(minHourlyRate).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h`
+                  : "Pendente"
             }
-            valueClassName={hasMinHourlyRate ? "text-slate-800" : "text-slate-400"}
+            valueClassName={
+              showAdjustedAsPrimary
+                ? isExtremeAdjustedHourlyRate
+                  ? "text-amber-700"
+                  : "text-slate-800"
+                : hasMinHourlyRate
+                  ? "text-slate-800"
+                  : "text-slate-400"
+            }
+            labelClassName={showAdjustedAsPrimary ? "text-slate-700" : "text-slate-600"}
           />
 
           <Row
@@ -94,7 +110,7 @@ export default function CalculatorResultsPanel({
             valueClassName={selectedFactorsCount > 0 ? "text-slate-800" : "text-slate-400"}
           />
 
-          {displayValues.adjustedHourlyRate > 0 ? (
+          {!showAdjustedAsPrimary && displayValues.adjustedHourlyRate > 0 ? (
             <div className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5 text-sm">
               <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora técnica ajustada</span>
               <span
