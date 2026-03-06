@@ -149,6 +149,28 @@ export async function requireAuth(context) {
   }
 }
 
+export async function requireAdmin(context) {
+  const auth = await requireAuth(context);
+  if (!auth.ok) return auth;
+
+  const db = context.env.DB;
+  const user = await db
+    .prepare("SELECT email FROM users WHERE id = ?")
+    .bind(auth.userId)
+    .first();
+
+  if (!user) {
+    return { ok: false, response: jsonResponse({ success: false, message: "Usuário não encontrado" }, { status: 404 }) };
+  }
+
+  const adminEmail = String(context.env.ADMIN_EMAIL || "").trim().toLowerCase();
+  if (!adminEmail || user.email.toLowerCase() !== adminEmail) {
+    return { ok: false, response: jsonResponse({ success: false, message: "Acesso negado" }, { status: 403 }) };
+  }
+
+  return { ok: true, userId: auth.userId };
+}
+
 const MAX_REQUEST_BODY_BYTES = 1_000_000; // 1 MB
 
 export async function readJson(request) {

@@ -20,6 +20,9 @@ export async function onRequest(context) {
       return jsonResponse({ success: false, message: "Usuário não encontrado" }, { status: 404 });
     }
 
+    const adminEmail = String(context.env.ADMIN_EMAIL || "").trim().toLowerCase();
+    const isAdmin = !!(adminEmail && user.email.toLowerCase() === adminEmail);
+
     return jsonResponse({
       success: true,
       user: {
@@ -30,6 +33,7 @@ export async function onRequest(context) {
         paymentDate: user.payment_date,
         stripeCustomerId: user.stripe_customer_id,
         createdAt: user.created_at,
+        isAdmin,
       },
     });
   } catch (error) {
