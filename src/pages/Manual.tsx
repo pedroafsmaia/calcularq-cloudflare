@@ -337,7 +337,6 @@ export default function Manual() {
                           id="expenses"
                           title="Despesas operacionais fixas"
                           description="Os custos recorrentes mensais para manter seu escritório funcionando: aluguel, softwares, salários, contador, anuidades profissionais e serviços essenciais."
-                          hint={<p className="text-sm text-slate-500">Ex.: aluguel, softwares, salários, contador, anuidades e serviços essenciais.</p>}
                         />
                         <Step1FieldAccordion
                           id="personal"
