@@ -22,7 +22,6 @@ interface MinimumHourCalculatorProps {
   titleLabel?: string;
   manualToggleLabel?: string;
   manualFieldLabel?: string;
-  resultLabel?: string;
 }
 
 export default function MinimumHourCalculator({
@@ -42,7 +41,6 @@ export default function MinimumHourCalculator({
   titleLabel = "Hora técnica mínima",
   manualToggleLabel = "Já sei a minha hora técnica.",
   manualFieldLabel = "Hora técnica (R$/hora)",
-  resultLabel = "Hora técnica (R$/hora):",
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
   const [personalExpenses, setPersonalExpenses] = useState<Expense[]>(
@@ -316,14 +314,6 @@ export default function MinimumHourCalculator({
             </>
           )}
 
-          <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/10 p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-semibold text-calcularq-blue">{resultLabel}</span>
-              <span className="text-xl font-bold text-calcularq-blue sm:text-2xl">
-                R$ {calculatedMinHourRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-            </div>
-          </div>
         </div>
       </section>
     </div>

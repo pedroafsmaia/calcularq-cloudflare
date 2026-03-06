@@ -782,7 +782,7 @@ export default function Calculator() {
           className="mb-4 sm:mb-5 text-center"
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-calcularq-blue mb-2">
-            Calculadora de Precificação
+            Calculadora de precificação
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
             Configure sua hora técnica, descreva o projeto e calcule um preço com base na complexidade real.
@@ -928,9 +928,8 @@ export default function Calculator() {
               <div className="flex items-center justify-between gap-3 rounded-lg px-1 py-1.5 hover:bg-slate-50 transition-colors duration-150">
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-slate-500">Etapa {currentStep} de {STEPS.length}</p>
-                  <p className="text-sm font-semibold leading-tight text-calcularq-blue">
-                    <span className="block">{STEPS[currentStep - 1]?.line1}</span>
-                    <span className="block">{STEPS[currentStep - 1]?.line2}</span>
+                  <p className="truncate text-sm font-semibold leading-tight text-calcularq-blue">
+                    {STEPS[currentStep - 1]?.line1} {STEPS[currentStep - 1]?.line2}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -972,9 +971,8 @@ export default function Calculator() {
                       >
                         {done ? "✓" : step.n}
                       </span>
-                      <span className={["inline-flex flex-col text-sm leading-snug", active ? "font-semibold" : ""].join(" ")}>
-                        <span>{step.line1}</span>
-                        <span>{step.line2}</span>
+                      <span className={["truncate text-sm leading-snug", active ? "font-semibold" : ""].join(" ")}>
+                        {step.line1} {step.line2}
                       </span>
                     </span>
                   </button>
@@ -1102,6 +1100,19 @@ export default function Calculator() {
                     hCons={methodOutputSuggested.h_cons}
                     output={methodOutput}
                     onBudgetSaved={handleBudgetSaved}
+                    mobileResultsPanel={
+                      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6">
+                        <SectionHeader
+                          compact
+                          title="Resultados"
+                          description="Resumo do cálculo atual"
+                          icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
+                        />
+                        <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
+                          <ResultsPanel />
+                        </div>
+                      </div>
+                    }
                   />
                 )}
                 {currentStep === 3 && (!minHourlyRate || !methodOutput) && (
@@ -1137,24 +1148,7 @@ export default function Calculator() {
                     </div>
                   </details>
                 </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
-                  className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6"
-                >
-                  <SectionHeader
-                    compact
-                    title="Resultados"
-                    description="Resumo do cálculo atual"
-                    icon={<PieChart className="w-5 h-5 text-calcularq-blue" />}
-                  />
-                  <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
-                    <ResultsPanel />
-                  </div>
-                </motion.div>
-              )}
+              ) : null}
             </div>
 
           </div>

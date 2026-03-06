@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AlertCircle, AlertTriangle, Clock3, DollarSign, TrendingUp } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import SaveBudgetButton from "./SaveBudgetButton";
@@ -56,6 +56,7 @@ type Props = {
   hCons: number;
   output: Method10Output;
   onBudgetSaved?: () => void;
+  mobileResultsPanel?: ReactNode;
 };
 
 const clampPercent = (value: number) => Math.min(100, Math.max(0, value));
@@ -129,6 +130,7 @@ export default function FinalCalculation({
   hCons,
   output,
   onBudgetSaved,
+  mobileResultsPanel,
 }: Props) {
   const [discountDraft, setDiscountDraft] = useState("0");
   const [isEditingDiscount, setIsEditingDiscount] = useState(false);
@@ -587,6 +589,8 @@ export default function FinalCalculation({
         />
       </section>
 
+      {mobileResultsPanel ? <div className="lg:hidden">{mobileResultsPanel}</div> : null}
+
       <SaveBudgetButton
         budgetId={budgetId}
         initialBudgetName={initialBudgetName}
@@ -600,3 +604,4 @@ export default function FinalCalculation({
     </div>
   );
 }
+

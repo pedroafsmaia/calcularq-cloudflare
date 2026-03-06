@@ -69,9 +69,9 @@ export default function Home() {
       stage: "Projeto executivo",
       score: "18/100",
       complexity: "Baixa",
-      hours: "75h",
-      price: "R$ 3.300",
-      sqm: "R$ 41/m²",
+      hours: "82h",
+      price: "R$ 5.966",
+      sqm: "R$ 75/m²",
     },
     {
       header: "MÉDIO",
@@ -80,9 +80,9 @@ export default function Home() {
       stage: "Projeto executivo",
       score: "38/100",
       complexity: "Moderada",
-      hours: "165h",
-      price: "R$ 7.673",
-      sqm: "R$ 51/m²",
+      hours: "183h",
+      price: "R$ 14.000",
+      sqm: "R$ 93/m²",
     },
     {
       header: "COMPLEXO",
@@ -91,9 +91,9 @@ export default function Home() {
       stage: "Projeto executivo",
       score: "64/100",
       complexity: "Alta",
-      hours: "365h",
-      price: "R$ 18.798",
-      sqm: "R$ 75/m²",
+      hours: "380h",
+      price: "R$ 31.920",
+      sqm: "R$ 128/m²",
     },
   ];
 
