@@ -329,7 +329,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold tracking-wide text-calcularq-blue">{card.header}</p>
                   <span className="rounded-full border border-calcularq-blue/20 bg-calcularq-blue/10 px-2 py-0.5 text-xs font-medium text-calcularq-blue">
-                    Score {card.score}
+                    Score de complexidade {card.score}
                   </span>
                 </div>
 

@@ -168,6 +168,11 @@ export default function FinalCalculation({
     setCustomPremiumDraft(percent.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
   }, [technicalPremium]);
 
+  useEffect(() => {
+    if (variableExpenses.length > 0) return;
+    onVariableExpensesChange([{ id: Date.now().toString(), name: "", value: 0 }]);
+  }, [onVariableExpensesChange, variableExpenses.length]);
+
   const technicalPremiumTooltipText = useMemo(() => {
     const technicalLevel = Math.max(1, Math.min(5, Math.round(Number(selections.technical ?? 1))));
     const cTech = (technicalLevel - 1) / 4;

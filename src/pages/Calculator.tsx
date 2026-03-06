@@ -96,6 +96,8 @@ export default function Calculator() {
   const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftStatusResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mobileStepperRef = useRef<HTMLDetailsElement | null>(null);
+  const stepContentTopRef = useRef<HTMLDivElement | null>(null);
+  const previousStepRef = useRef(currentStep);
 
   useEffect(() => {
     if (!user || budgetId) return;
@@ -680,6 +682,17 @@ export default function Calculator() {
   }, [handleConfirmResetCalculation, toast]);
 
   useEffect(() => {
+    if (previousStepRef.current === currentStep) return;
+    previousStepRef.current = currentStep;
+
+    const target = stepContentTopRef.current;
+    if (!target) return;
+
+    const top = target.getBoundingClientRect().top + window.scrollY - 92;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  }, [currentStep]);
+
+  useEffect(() => {
     const isTypingTarget = (target: EventTarget | null) => {
       const el = target as HTMLElement | null;
       if (!el) return false;
@@ -980,6 +993,7 @@ export default function Calculator() {
           </details>
         </div>
 
+        <div ref={stepContentTopRef} />
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
           {/* Coluna principal */}
           <div className="flex-1 min-w-0">
