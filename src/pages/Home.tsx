@@ -106,6 +106,24 @@ export default function Home() {
     "Dedicação à obra",
   ];
 
+  const howItWorksSteps = [
+    {
+      number: 1,
+      title: "Hora técnica",
+      description: "Informe suas despesas e horas de trabalho. O sistema calcula sua hora técnica mínima.",
+    },
+    {
+      number: 2,
+      title: "Fatores de complexidade",
+      description: "Informe as características do projeto. O sistema estima as horas necessárias e premia a complexidade.",
+    },
+    {
+      number: 3,
+      title: "Preço e ajustes",
+      description: "As horas estimadas são convertidas em preço com base na sua hora técnica ajustada.",
+    },
+  ] as const;
+
   return (
     <div className="min-h-screen bg-white">
       <div className="relative overflow-hidden bg-gradient-to-b from-calcularq-blue via-calcularq-blue to-[#01265c]">
@@ -114,17 +132,21 @@ export default function Home() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
-          <div className="relative z-10 mx-auto max-w-5xl">
-            <div className="relative z-20 mx-auto mb-4 max-w-[21.5rem] px-2 sm:mb-5 sm:max-w-[24rem] lg:hidden">
+          <div className="relative z-10 mx-auto max-w-6xl">
+            <div className="relative z-20 mx-auto mb-[-0.75rem] max-w-[21.5rem] px-2 sm:mb-[-1rem] sm:max-w-[22.5rem] lg:hidden">
               <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" transition={{ delay: 0.12 }}>
                 <img src="/mockup.png" alt="Interface da Calculadora Calcularq" className="h-auto w-full object-contain drop-shadow-2xl" />
               </motion.div>
             </div>
 
-            <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
+            <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10 xl:gap-12">
               <div className="hidden lg:block">
                 <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" transition={{ delay: 0.12 }} className="px-2">
-                  <img src="/mockup.png" alt="Interface da Calculadora Calcularq" className="h-auto w-full object-contain drop-shadow-2xl" />
+                  <img
+                    src="/mockup.png"
+                    alt="Interface da Calculadora Calcularq"
+                    className="h-auto w-[112%] max-w-none object-contain drop-shadow-2xl lg:-translate-x-4 xl:-translate-x-6"
+                  />
                 </motion.div>
               </div>
 
@@ -133,7 +155,7 @@ export default function Home() {
                 initial="hidden"
                 animate="show"
                 transition={{ delay: 0.2 }}
-                className="rounded-2xl bg-white p-5 pt-10 shadow-2xl sm:p-8 sm:pt-12 lg:p-10 lg:pt-10"
+                className="relative z-10 rounded-2xl bg-white p-5 pt-10 shadow-2xl sm:p-8 sm:pt-12 lg:p-10 lg:pt-10"
               >
                 <h1 className="mb-4 text-center text-[2.05rem] font-bold leading-[1.12] tracking-tight text-calcularq-blue sm:mb-5 sm:text-4xl lg:text-[2.5rem]">
                   SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
@@ -216,24 +238,40 @@ export default function Home() {
             Cada projeto tem sua complexidade. O Calcularq transforma isso em número, em três etapas simples.
           </p>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <HowStep
-              number="1"
-              title="Hora técnica"
-              description="Informe suas despesas e horas de trabalho. O sistema calcula sua hora técnica mínima."
-              showConnector
-            />
-            <HowStep
-              number="2"
-              title="Fatores de complexidade"
-              description="Informe as características do projeto. O sistema estima as horas necessárias e premia a complexidade."
-              showConnector
-            />
-            <HowStep
-              number="3"
-              title="Preço e ajustes"
-              description="As horas estimadas são convertidas em preço com base na sua hora técnica ajustada."
-            />
+          <div className="hidden md:block">
+            <div className="mx-auto flex w-full max-w-5xl items-start justify-between">
+              {howItWorksSteps.map((step, index) => (
+                <div key={step.number} className="flex min-w-0 flex-1 items-start">
+                  <div className="flex w-full flex-col items-center px-2">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-calcularq-blue bg-white text-sm font-bold text-calcularq-blue shadow-sm sm:h-12 sm:w-12">
+                      {step.number}
+                    </span>
+                    <h3 className="mt-3 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">{step.title}</h3>
+                    <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-slate-600 sm:text-[0.95rem]">{step.description}</p>
+                  </div>
+                  {index < howItWorksSteps.length - 1 ? <span className="mt-5 h-0.5 w-10 shrink-0 rounded-full bg-slate-200 lg:w-16" /> : null}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mx-auto max-w-xl md:hidden">
+            <div className="space-y-5 text-left">
+              {howItWorksSteps.map((step, index) => (
+                <div key={step.number} className="flex items-start gap-3">
+                  <div className="relative flex flex-col items-center">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-calcularq-blue bg-white text-sm font-bold text-calcularq-blue shadow-sm">
+                      {step.number}
+                    </span>
+                    {index < howItWorksSteps.length - 1 ? <span className="mt-2 h-10 w-0.5 rounded-full bg-slate-200" /> : null}
+                  </div>
+                  <div className="pt-0.5">
+                    <h3 className="text-base font-semibold leading-snug text-calcularq-blue">{step.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{step.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>
@@ -354,36 +392,6 @@ export default function Home() {
           </div>
         </motion.div>
       </div>
-    </div>
-  );
-}
-
-function HowStep({
-  number,
-  title,
-  description,
-  showConnector = false,
-}: {
-  number: string;
-  title: string;
-  description: string;
-  showConnector?: boolean;
-}) {
-  return (
-    <div className="relative h-full">
-      <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm transition-colors transition-shadow duration-150 hover:border-calcularq-blue/80 hover:shadow-md sm:p-6">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-calcularq-blue text-lg font-bold text-white">
-          {number}
-        </div>
-        <h3 className="mx-auto mb-2 flex min-h-[3.2rem] max-w-[18ch] items-center justify-center px-1 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">
-          {title}
-        </h3>
-        <p className="mx-auto max-w-[31ch] px-1 text-sm leading-relaxed text-slate-600 sm:text-[0.95rem]">{description}</p>
-      </div>
-
-      {showConnector ? (
-        <div className="pointer-events-none absolute right-[-1.55rem] top-6 hidden h-1 w-6 rounded-full bg-slate-200 xl:block" />
-      ) : null}
     </div>
   );
 }

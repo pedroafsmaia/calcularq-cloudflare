@@ -29,16 +29,17 @@ type Props = {
   productiveHours: number;
 };
 
-function Row({ label, value, valueClassName = "text-slate-800", labelClassName = "text-slate-600" }: {
+function Row({ label, value, valueClassName = "text-slate-800", labelClassName = "text-slate-600", noWrapValue = true }: {
   label: string;
   value: string;
   valueClassName?: string;
   labelClassName?: string;
+  noWrapValue?: boolean;
 }) {
   return (
     <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-sm">
       <span className={`min-w-0 leading-snug ${labelClassName}`}>{label}</span>
-      <span className={`whitespace-nowrap font-semibold ${valueClassName}`}>{value}</span>
+      <span className={`${noWrapValue ? "whitespace-nowrap" : ""} font-semibold ${valueClassName}`}>{value}</span>
     </div>
   );
 }
@@ -168,9 +169,12 @@ export default function CalculatorResultsPanel({
           />
           <Row
             label="Horas estimadas"
-            value={hasComplexitySelections && estimatedHours > 0 ? `${estimatedHours}h` : "Aguardando conclusão da etapa"}
+            value={hasComplexitySelections && estimatedHours > 0 ? `${estimatedHours}h` : "Pendente"}
             valueClassName={hasComplexitySelections && estimatedHours > 0 ? "text-slate-800" : "text-slate-400"}
           />
+          {!hasComplexitySelections || estimatedHours <= 0 ? (
+            <p className="text-xs text-slate-400">Aguardando conclusão da etapa para estimar as horas.</p>
+          ) : null}
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
             Próximo passo: finalize os ajustes de preço na Etapa 3.
           </p>
