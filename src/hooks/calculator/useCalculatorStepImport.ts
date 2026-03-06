@@ -71,12 +71,6 @@ export function useCalculatorStepImport({
       if (currentStep === 1) {
         setMinHourlyRate(sourceData.minHourlyRate ?? null);
         setUseManualMinHourlyRate(Boolean(sourceData.useManualMinHourlyRate));
-        if (setProfitMargin && typeof sourceData.margemLucro === "number" && Number.isFinite(sourceData.margemLucro)) {
-          setProfitMargin(sourceData.margemLucro);
-        }
-        if (setTechnicalPremium) {
-          setTechnicalPremium(resolveTechnicalPremium(sourceData.aValue, sourceData.aTestGroup));
-        }
         setFixedExpenses(Array.isArray(sourceData.fixedExpenses) ? sourceData.fixedExpenses : []);
         setPersonalExpenses(Array.isArray(sourceData.personalExpenses) ? sourceData.personalExpenses : []);
         setProLabore(typeof sourceData.proLabore === "number" ? sourceData.proLabore : 0);
@@ -127,6 +121,13 @@ export function useCalculatorStepImport({
         const fallbackHours = typeof sourceData.estimatedHours === "number" ? sourceData.estimatedHours : 0;
         const methodHours = typeof sourceData.hFinal === "number" ? sourceData.hFinal : fallbackHours;
         setEstimatedHours(methodHours);
+        if (setProfitMargin) {
+          const margin = Number(sourceData.margemLucro);
+          setProfitMargin(Number.isFinite(margin) ? margin : 0.15);
+        }
+        if (setTechnicalPremium) {
+          setTechnicalPremium(resolveTechnicalPremium(sourceData.aValue, sourceData.aTestGroup));
+        }
         if (setCenarioEscolhido) {
           setCenarioEscolhido(sourceData.cenarioEscolhido === "otimista" ? "otimista" : "conservador");
         }

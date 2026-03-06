@@ -10,7 +10,7 @@ import type { CenarioMethod10 } from "@/components/pricing/PricingEngineMethod10
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
 import AreaFactorCard from "../components/calculator/AreaFactorCard";
 import FactorCard from "../components/pricing/FactorCard";
-import Method10Composition from "../components/calculator/Method10Composition";
+import FinalCalculation from "../components/calculator/FinalCalculation";
 import SectionHeader from "../components/calculator/SectionHeader";
 import CalculatorResultsPanel from "../components/calculator/CalculatorResultsPanel";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -769,7 +769,7 @@ export default function Calculator() {
             Calculadora de Precificação
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Configure sua hora técnica, descreva o projeto e finalize o preço com base no Método Calcularq 1.0.
+            Configure sua hora técnica, descreva o projeto e finalize o preço com base no Método Calcularq 1.1.
           </p>
         </motion.div>
 
@@ -995,11 +995,6 @@ export default function Calculator() {
                     initialMinHourRate={minHourlyRate || undefined}
                     initialUseManual={useManualMinHourlyRate}
                     onManualModeChange={setUseManualMinHourlyRate}
-                    initialMargin={profitMargin}
-                    onMarginChange={setProfitMargin}
-                    initialTechnicalPremium={technicalPremium}
-                    onTechnicalPremiumChange={setTechnicalPremium}
-                    technicalLevel={Number(selections.technical ?? 1)}
                     onFixedExpensesChange={setFixedExpenses}
                     onProductiveHoursChange={setProductiveHours}
                     onProLaboreChange={setProLabore}
@@ -1054,7 +1049,7 @@ export default function Calculator() {
                 )}
 
                 {currentStep === 3 && minHourlyRate && minHourlyRate > 0 && area && area > 0 && methodOutput && methodOutputSuggested && (
-                  <Method10Composition
+                  <FinalCalculation
                     budgetId={budgetId || undefined}
                     initialBudgetName={loadedBudgetName || undefined}
                     initialClientName={loadedClientName || undefined}
@@ -1071,6 +1066,7 @@ export default function Calculator() {
                     areaIntervals={areaIntervals}
                     selections={selections}
                     margin={profitMargin}
+                    onMarginChange={setProfitMargin}
                     tipologia={tipologiaFromLevel(Number(selections.tipology ?? 1))}
                     volumetria={Number(selections.volumetry ?? 1)}
                     reforma={reformFromLevel(Number(selections.reform ?? 1))}
@@ -1081,6 +1077,7 @@ export default function Calculator() {
                     variableExpenses={variableExpenses}
                     onVariableExpensesChange={setVariableExpenses}
                     technicalPremium={technicalPremium}
+                    onTechnicalPremiumChange={setTechnicalPremium}
                     horasManual={horasManuais}
                     onHorasManualChange={setHorasManuais}
                     h50={methodOutputSuggested.h50}
@@ -1194,8 +1191,8 @@ export default function Calculator() {
         title="Reiniciar cálculo"
         description={
           budgetId
-            ? "Deseja reiniciar todos os dados preenchidos deste cálculo? O cálculo salvo permanecerá intacto."
-            : "Deseja reiniciar todos os dados preenchidos deste cálculo?"
+            ? "Deseja reiniciar este cálculo? O cálculo salvo permanecerá intacto."
+            : "Deseja reiniciar este cálculo?"
         }
         confirmLabel="Reiniciar cálculo"
         onConfirm={handleConfirmResetCalculationWithFeedback}

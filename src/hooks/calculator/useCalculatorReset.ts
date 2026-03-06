@@ -68,8 +68,6 @@ export function useCalculatorReset({
     if (currentStep === 1) {
       setMinHourlyRate(null);
       setUseManualMinHourlyRate(false);
-      if (setProfitMargin) setProfitMargin(0.15);
-      if (setTechnicalPremium) setTechnicalPremium(DEFAULT_METHOD_11_TECHNICAL_PREMIUM);
       setFixedExpenses([]);
       setPersonalExpenses([]);
       setProLabore(0);
@@ -94,6 +92,8 @@ export function useCalculatorReset({
       setEstimatedHours(0);
       if (setCenarioEscolhido) setCenarioEscolhido("conservador");
       if (setHorasManuais) setHorasManuais(null);
+      if (setProfitMargin) setProfitMargin(0.15);
+      if (setTechnicalPremium) setTechnicalPremium(DEFAULT_METHOD_11_TECHNICAL_PREMIUM);
       setCommercialDiscount(0);
       setVariableExpenses([]);
     }

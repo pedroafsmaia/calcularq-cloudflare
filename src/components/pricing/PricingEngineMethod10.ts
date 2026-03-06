@@ -10,7 +10,7 @@ export const ETAPA_MULTIPLIERS = {
   2: 0.15,   // Estudo Preliminar
   3: 0.40,   // Anteprojeto
   4: 0.85,   // Projeto Executivo
-  5: 1.00,   // CompatibilizaÃ§Ã£o
+  5: 1.00,   // Compatibilização
 } as const;
 
 export const F6_OBRA_MULTIPLIERS = {
@@ -18,7 +18,7 @@ export const F6_OBRA_MULTIPLIERS = {
   2: 0.05,   // Pontual
   3: 0.10,   // Por Etapa
   4: 0.20,   // Acompanhamento
-  5: 0.35,   // GestÃ£o
+  5: 0.35,   // Gestão
 } as const;
 
 export const T_TIPOLOGIA = {
@@ -171,14 +171,14 @@ export function calcularScoreComplexidade(input: {
 
 export function classificarComplexidade(score: number): string {
   if (score <= 20) return "Muito Baixa";
-  if (score <= 40) return "Baixa a MÃ©dia";
-  if (score <= 60) return "MÃ©dia";
-  if (score <= 80) return "MÃ©dia a Alta";
+  if (score <= 40) return "Baixa a Média";
+  if (score <= 60) return "Média";
+  if (score <= 80) return "Média a Alta";
   return "Muito Alta";
 }
 
 export function calcularMethod10(input: Method10Input): Method10Output {
-  // ValidaÃ§Ãµes bÃ¡sicas
+  // Validações básicas
   if (!Number.isFinite(input.area) || input.area <= 0) throw new Error("Area invalida");
   if (!Number.isFinite(input.ht_min) || input.ht_min <= 0) throw new Error("HT_min invalida");
   if (!Number.isFinite(input.margem_lucro) || input.margem_lucro < 0) throw new Error("Margem invalida");
@@ -203,13 +203,13 @@ export function calcularMethod10(input: Method10Input): Method10Output {
 
   const h50 = area * r_area * m_det * t_tipologia * v_volumetria * e_etapa;
 
-  // Calcular horas de obra (F6) se aplicÃ¡vel
+  // Calcular horas de obra (F6) se aplicável
   let h_obra = 0;
   if (input.f6_obra && input.f6_obra > 1) {
     const f6 = clampLevel(input.f6_obra);
     const t_f6 = F6_OBRA_MULTIPLIERS[f6 as 1 | 2 | 3 | 4 | 5] ?? 0;
     
-    // H_obra = t(F6) Ã— H_Executivo
+    // H_obra = t(F6) x H_Executivo
     // H_Executivo = H50 quando etapa=4, ou proporcional
     const h_executivo = area * r_area * m_det * t_tipologia * v_volumetria * 0.85;
     h_obra = t_f6 * h_executivo;
@@ -233,7 +233,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
     h_final = input.cenario === "conservador" ? manual * (1 + u_total) : manual;
   }
 
-  // Arredondar horas ANTES de calcular preÃ§os
+  // Arredondar horas antes de calcular preços
   const h50_rounded = Math.round(h50_total);
   const h_cons_rounded = Math.round(h_cons);
   const h_final_rounded = Math.round(h_final);
@@ -242,7 +242,7 @@ export function calcularMethod10(input: Method10Input): Method10Output {
   const premio_tecnico = A * c_tech;
   const ht_aj = input.ht_min * (1 + input.margem_lucro + premio_tecnico);
 
-  // Calcular preÃ§os com horas arredondadas
+  // Calcular preços com horas arredondadas
   const preco_h50 = h50_rounded * ht_aj;
   const preco_conservador = h_cons_rounded * ht_aj;
   const preco_final = h_final_rounded * ht_aj;

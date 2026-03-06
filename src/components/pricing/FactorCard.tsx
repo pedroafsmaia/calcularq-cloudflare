@@ -14,7 +14,7 @@ export default function FactorCard({ factor, value, onChange, reformValue, onRef
   const tooltipText = getManualFactorTooltip(factor.id);
 
   return (
-    <div className="bg-slate-50/80 rounded-2xl border border-slate-200 p-5 shadow-sm transition-colors transition-shadow duration-150 hover:border-slate-300 hover:shadow-sm sm:p-6">
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm transition-colors transition-shadow duration-150 hover:border-slate-300 hover:shadow-sm sm:p-6">
       <div className="mb-4">
         <div className="mb-2 flex items-start justify-between gap-3">
           <h3 className="min-w-0 flex items-center gap-1.5 font-semibold text-slate-900">
