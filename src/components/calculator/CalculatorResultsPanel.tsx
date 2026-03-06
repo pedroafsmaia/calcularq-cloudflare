@@ -36,10 +36,11 @@ function Row({ label, value, valueClassName = "text-slate-800", labelClassName =
   labelClassName?: string;
   noWrapValue?: boolean;
 }) {
+  const isPendingValue = valueClassName.includes("text-slate-400");
   return (
     <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-sm">
       <span className={`min-w-0 leading-snug ${labelClassName}`}>{label}</span>
-      <span className={`${noWrapValue ? "whitespace-nowrap" : ""} font-semibold ${valueClassName}`}>{value}</span>
+      <span className={`${noWrapValue ? "whitespace-nowrap" : ""} ${isPendingValue ? "font-normal" : "font-semibold"} ${valueClassName}`}>{value}</span>
     </div>
   );
 }
@@ -75,7 +76,7 @@ export default function CalculatorResultsPanel({
   return (
     <div className="space-y-4 bg-transparent p-4 sm:p-5">
       <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
-        <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do Cálculo</p>
+        <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do cálculo</p>
         <div className="space-y-2.5">
           <Row
             label="Hora técnica mínima"
@@ -88,14 +89,14 @@ export default function CalculatorResultsPanel({
           />
 
           <Row
-            label="Score de Complexidade"
+            label="Score de complexidade"
             value={selectedFactorsCount > 0 ? `${complexityScore}/100` : "Pendente"}
             valueClassName={selectedFactorsCount > 0 ? "text-slate-800" : "text-slate-400"}
           />
 
           {displayValues.adjustedHourlyRate > 0 ? (
             <div className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5 text-sm">
-              <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora Técnica Ajustada</span>
+              <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora técnica ajustada</span>
               <span
                 className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
                   isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
@@ -126,7 +127,7 @@ export default function CalculatorResultsPanel({
 
       {currentStep === 1 ? (
         <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-sm font-semibold text-slate-700">Progresso da Etapa 1</p>
+          <p className="text-sm font-semibold text-slate-700">Progresso da etapa 1</p>
           {useManualMinHourlyRate ? (
             <p className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
               Modo manual ativo: despesas e horas produtivas ficam dispensadas.
@@ -157,7 +158,7 @@ export default function CalculatorResultsPanel({
 
       {currentStep === 2 ? (
         <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-sm font-semibold text-slate-700">Progresso da Etapa 2</p>
+          <p className="text-sm font-semibold text-slate-700">Progresso da etapa 2</p>
           <Row label="Fatores classificados" value={`${selectedFactorsCount} / ${totalFactors}`} valueClassName="text-calcularq-blue" />
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
             <div className="h-full rounded-full bg-calcularq-blue transition-all duration-200" style={{ width: `${factorsProgress}%` }} />

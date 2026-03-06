@@ -158,7 +158,7 @@ export default function Home() {
                 className="relative z-10 rounded-2xl bg-white p-5 pt-10 shadow-2xl sm:p-8 sm:pt-12 lg:p-10 lg:pt-10"
               >
                 <h1 className="mb-4 text-center text-[2.05rem] font-bold leading-[1.12] tracking-tight text-calcularq-blue sm:mb-5 sm:text-4xl lg:text-[2.5rem]">
-                  SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
+                  Sua calculadora de precificação por complexidade
                 </h1>
 
                 <p className="mx-auto mb-6 max-w-[54ch] text-center text-[0.98rem] leading-relaxed text-slate-700 sm:mb-7 sm:text-lg">
@@ -247,7 +247,7 @@ export default function Home() {
                       {step.number}
                     </span>
                     <h3 className="mt-3 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">{step.title}</h3>
-                    <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-slate-600 sm:text-[0.95rem]">{step.description}</p>
+                    <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-slate-700 sm:text-[0.95rem]">{step.description}</p>
                   </div>
                   {index < howItWorksSteps.length - 1 ? <span className="mt-5 h-0.5 w-10 shrink-0 rounded-full bg-slate-200 lg:w-16" /> : null}
                 </div>
@@ -267,7 +267,7 @@ export default function Home() {
                   </div>
                   <div className="pt-0.5">
                     <h3 className="text-base font-semibold leading-snug text-calcularq-blue">{step.title}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{step.description}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{step.description}</p>
                   </div>
                 </div>
               ))}
