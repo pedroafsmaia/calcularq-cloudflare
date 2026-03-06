@@ -157,7 +157,11 @@ export async function readJson(request) {
     if (contentLength && parseInt(contentLength, 10) > MAX_REQUEST_BODY_BYTES) {
       return null;
     }
-    return await request.json();
+    const text = await request.text();
+    if (text.length > MAX_REQUEST_BODY_BYTES) {
+      return null;
+    }
+    return JSON.parse(text);
   } catch {
     return null;
   }
