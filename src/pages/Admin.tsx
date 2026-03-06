@@ -96,8 +96,6 @@ const TABS: TabDef[] = [
   { id: "evolucao", label: "Evolução", v2: true },
 ];
 
-const PRIMARY_TABS = TABS.filter((tab) => !tab.v2);
-const SECONDARY_TABS = TABS.filter((tab) => tab.v2);
 
 function StatCard({
   title,
@@ -563,7 +561,6 @@ export default function Admin() {
 
   const activeTabDef = TABS.find((t) => t.id === activeTab);
   const hasAnyData = !!(summary || usage || commercial || calibration);
-  const activeSecondaryTab = SECONDARY_TABS.some((tab) => tab.id === activeTab) ? activeTab : "";
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -607,38 +604,30 @@ export default function Admin() {
         ) : null}
 
         <div className="mb-6 overflow-x-auto">
-          <nav className="flex items-center gap-1 border-b border-slate-200 pb-1" aria-label="Abas do dashboard">
-            {PRIMARY_TABS.map((tab) => (
+          <nav className="flex gap-1 border-b border-slate-200" aria-label="Abas do dashboard">
+            {TABS.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative shrink-0 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue focus-visible:ring-offset-2 ${
-                  activeTab === tab.id
-                    ? "border-b-2 border-calcularq-blue bg-white text-calcularq-blue"
-                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-                }`}
+                className={`
+                  relative shrink-0 px-4 py-2.5 text-sm font-medium transition-colors
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue focus-visible:ring-offset-2 rounded-t-lg
+                  ${
+                    activeTab === tab.id
+                      ? "text-calcularq-blue border-b-2 border-calcularq-blue bg-white"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                  }
+                `}
               >
                 {tab.label}
+                {tab.v2 ? (
+                  <span className="ml-1.5 inline-block rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 align-middle">
+                    Em breve
+                  </span>
+                ) : null}
               </button>
             ))}
-
-            <div className="ml-auto min-w-[180px]">
-              <select
-                aria-label="Seções secundárias"
-                value={activeSecondaryTab}
-                onChange={(e) => {
-                  const next = e.target.value as AdminTab;
-                  if (next) setActiveTab(next);
-                }}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-600"
-              >
-                <option value="">Mais seções (em breve)</option>
-                {SECONDARY_TABS.map((tab) => (
-                  <option key={tab.id} value={tab.id}>{tab.label}</option>
-                ))}
-              </select>
-            </div>
           </nav>
         </div>
 

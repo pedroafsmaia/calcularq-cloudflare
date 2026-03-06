@@ -107,8 +107,8 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
       </div>
 
       <div className={`mt-4 ${isMobileExpanded ? "block" : "hidden"} sm:block`}>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          <div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12">
+          <div className="xl:col-span-2">
             <label htmlFor="filter-period-start" className={labelBase}>Período (de)</label>
             <input
               id="filter-period-start"
@@ -119,7 +119,7 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             />
           </div>
 
-          <div>
+          <div className="xl:col-span-2">
             <label htmlFor="filter-period-end" className={labelBase}>Período (até)</label>
             <input
               id="filter-period-end"
@@ -130,7 +130,7 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             />
           </div>
 
-          <div>
+          <div className="xl:col-span-2">
             <label htmlFor="filter-tipologia" className={labelBase}>Tipologia</label>
             <select
               id="filter-tipologia"
@@ -144,8 +144,8 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             </select>
           </div>
 
-          <div>
-            <label htmlFor="filter-area-min" className={labelBase}>Área mínima (m²)</label>
+          <div className="xl:col-span-1">
+            <label htmlFor="filter-area-min" className={labelBase}>Área min. (m²)</label>
             <input
               id="filter-area-min"
               type="number"
@@ -157,8 +157,8 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             />
           </div>
 
-          <div>
-            <label htmlFor="filter-area-max" className={labelBase}>Área máxima (m²)</label>
+          <div className="xl:col-span-1">
+            <label htmlFor="filter-area-max" className={labelBase}>Área máx. (m²)</label>
             <input
               id="filter-area-max"
               type="number"
@@ -170,7 +170,7 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             />
           </div>
 
-          <div>
+          <div className="xl:col-span-2">
             <label htmlFor="filter-reforma" className={labelBase}>Reforma</label>
             <select
               id="filter-reforma"
@@ -183,10 +183,7 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
               ))}
             </select>
           </div>
-        </div>
-
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div>
+          <div className="xl:col-span-2">
             <label htmlFor="filter-close-status" className={labelBase}>Status de fechamento</label>
             <select
               id="filter-close-status"
@@ -199,7 +196,9 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
               ))}
             </select>
           </div>
+        </div>
 
+        <div className="mt-3 flex flex-wrap items-end gap-3 xl:flex-nowrap">
           <div className="flex items-end pb-1">
             <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
               <input
@@ -212,7 +211,7 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             </label>
           </div>
 
-          <div className="sm:col-span-2 xl:col-span-2 flex flex-wrap items-end gap-3">
+          <div className="flex flex-wrap items-end gap-3">
             <button
               type="button"
               onClick={handleApply}
