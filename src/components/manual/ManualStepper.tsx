@@ -25,7 +25,7 @@ export default function ManualStepper({ steps, activeStepId, activeStepIndex, on
                 <button
                   type="button"
                   onClick={() => onStepClick(step.id)}
-                  className="group flex w-full min-w-0 flex-col items-center gap-2 rounded-xl px-1 py-1 text-center"
+                  className="group flex w-full min-w-0 flex-col items-center gap-2 rounded-xl px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue/40 focus-visible:ring-offset-1"
                   aria-current={isActive ? "step" : undefined}
                 >
                   <span
