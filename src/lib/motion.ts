@@ -21,27 +21,6 @@ export function fadeUp(_reduced: boolean, _distance = 16): Variants {
   };
 }
 
-export function fadeIn(_reduced: boolean): Variants {
-  return {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { duration: motionTiming.fast, ease: motionEase },
-    },
-  };
-}
-
-export function fadeX(_reduced: boolean, _distance = 16, _direction: 1 | -1 = 1): Variants {
-  return {
-    hidden: { opacity: 0, x: 0 },
-    show: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: motionTiming.normal, ease: motionEase },
-    },
-  };
-}
-
 export const listStagger: Variants = {
   hidden: {},
   show: {

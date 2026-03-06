@@ -1,8 +1,6 @@
 ﻿import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, isValidMethod11TechnicalPremium } from "@/lib/methodCalibration";
 
 export const METHOD_12_VERSION = "1.2.0";
-// Backward-compatible alias to avoid touching imports in the app.
-export const METHOD_10_VERSION = METHOD_12_VERSION;
 
 export const METHOD_12_PARAMS = {
   r_min: 0.55,

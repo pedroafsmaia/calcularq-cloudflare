@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Calculator } from "lucide-react";
 import ExpenseCard, { type Expense } from "./ExpenseCard";
 import Tooltip from "@/components/ui/Tooltip";
@@ -18,7 +18,6 @@ interface MinimumHourCalculatorProps {
   onProductiveHoursChange?: (hours: number) => void;
   initialUseManual?: boolean;
   onManualModeChange?: (value: boolean) => void;
-  onClearCalculation?: () => void;
   titleLabel?: string;
   manualToggleLabel?: string;
   manualFieldLabel?: string;
@@ -37,7 +36,6 @@ export default function MinimumHourCalculator({
   initialProductiveHours,
   initialUseManual = false,
   onManualModeChange,
-  onClearCalculation,
   titleLabel = "Hora técnica mínima",
   manualToggleLabel = "Já sei a minha hora técnica.",
   manualFieldLabel = "Hora técnica (R$/hora)",
@@ -129,18 +127,18 @@ export default function MinimumHourCalculator({
     onManualModeChange?.(useManual);
   }, [useManual, onManualModeChange]);
 
-  const handleAddExpense = (expense: Expense) => {
+  const handleAddExpense = useCallback((expense: Expense) => {
     const updated = [...fixedExpenses, expense];
     setFixedExpenses(updated);
     onFixedExpensesChange?.(updated);
-  };
+  }, [fixedExpenses, onFixedExpensesChange]);
 
-  const handleAddPersonalExpense = (expense: Expense) => {
+  const handleAddPersonalExpense = useCallback((expense: Expense) => {
     const updated = [...personalExpenses, expense];
     setPersonalExpenses(updated);
     onPersonalExpensesChange?.(updated);
     onProLaboreChange?.(updated.reduce((sum, exp) => sum + exp.value, 0));
-  };
+  }, [onPersonalExpensesChange, onProLaboreChange, personalExpenses]);
 
   const handleRemovePersonalExpense = (id: string) => {
     const updated = personalExpenses.filter((exp) => exp.id !== id);
@@ -184,28 +182,16 @@ export default function MinimumHourCalculator({
     if (!useManual && fixedExpenses.length === 0) {
       handleAddExpense({ id: Date.now().toString(), name: "", value: 0 });
     }
-  }, [fixedExpenses.length, useManual]);
+  }, [fixedExpenses.length, handleAddExpense, useManual]);
 
   useEffect(() => {
     if (!useManual && personalExpenses.length === 0 && (initialProLabore ?? 0) === 0) {
       handleAddPersonalExpense({ id: `${Date.now()}-personal`, name: "", value: 0 });
     }
-  }, [initialProLabore, personalExpenses.length, useManual]);
+  }, [handleAddPersonalExpense, initialProLabore, personalExpenses.length, useManual]);
 
   return (
     <div className="space-y-6">
-      {onClearCalculation ? (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={onClearCalculation}
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 sm:w-auto"
-          >
-            Reiniciar cálculo
-          </button>
-        </div>
-      ) : null}
-
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
         <SectionHeader
           className="mb-6"
