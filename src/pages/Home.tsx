@@ -328,9 +328,12 @@ export default function Home() {
               <div key={card.header} className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold tracking-wide text-calcularq-blue">{card.header}</p>
-                  <span className="rounded-full border border-calcularq-blue/20 bg-calcularq-blue/10 px-2 py-0.5 text-xs font-medium text-calcularq-blue">
-                    Score de complexidade {card.score}
-                  </span>
+                  <div className="text-right">
+                    <span className="rounded-full border border-calcularq-blue/20 bg-calcularq-blue/10 px-2 py-0.5 text-xs font-medium text-calcularq-blue">
+                      Score de complexidade {card.score}
+                    </span>
+                    <p className="mt-1 text-xs text-slate-500">Complexidade {card.complexity.toLowerCase()}.</p>
+                  </div>
                 </div>
 
                 <div className="mt-3 space-y-1 text-sm text-slate-700">
@@ -356,8 +359,6 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-
-                <p className="mt-3 text-xs text-slate-500">Complexidade {card.complexity.toLowerCase()}.</p>
               </div>
             ))}
           </div>
