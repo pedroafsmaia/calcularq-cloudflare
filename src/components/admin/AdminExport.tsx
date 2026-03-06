@@ -1,5 +1,8 @@
 import type { AdminFilters, AdminSummaryData, AdminUsageData, AdminCommercialData, AdminCalibrationData } from "@/types/admin";
 
+const MIN_FEEDBACK_WARNING = 30;
+const MIN_FEEDBACK_LIMITATION = 50;
+
 interface ExportProps {
   filters: AdminFilters;
   summary: AdminSummaryData | null;
@@ -179,7 +182,7 @@ function buildFullReport(data: ExportProps): string {
     md += `## Tamanho da Amostra\n\n`;
     md += `- Total de cálculos: ${fmtNum(summary.totalBudgets)}\n`;
     md += `- Com feedback: ${fmtNum(summary.totalFeedbacks)}\n\n`;
-    if (summary.totalFeedbacks < 30) {
+    if (summary.totalFeedbacks < MIN_FEEDBACK_WARNING) {
       md += `> ⚠️ **Alerta:** Amostra pequena (${summary.totalFeedbacks} feedbacks). Os indicadores de calibração e comerciais podem não ser representativos.\n\n`;
     }
   }
@@ -309,7 +312,7 @@ function buildFullReport(data: ExportProps): string {
   }
 
   // Limitations
-  if (summary && summary.totalFeedbacks < 50) {
+  if (summary && summary.totalFeedbacks < MIN_FEEDBACK_LIMITATION) {
     md += `## Limitações da Amostra\n\n`;
     md += `> A base analisada contém ${fmtNum(summary.totalFeedbacks)} feedbacks. Resultados devem ser interpretados com cautela.\n\n`;
   }

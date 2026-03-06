@@ -12,14 +12,14 @@ const TIPOLOGIA_OPTIONS = [
 
 const REFORMA_OPTIONS = [
   { value: "", label: "Todos" },
-  { value: "sim", label: "Sim" },
-  { value: "nao", label: "Não" },
+  { value: "true", label: "Sim" },
+  { value: "false", label: "Não" },
 ];
 
 const CLOSE_STATUS_OPTIONS = [
   { value: "", label: "Todos" },
-  { value: "fechado", label: "Fechado" },
-  { value: "nao_fechado", label: "Não fechado" },
+  { value: "closed", label: "Fechado" },
+  { value: "not_closed", label: "Não fechado" },
 ];
 
 interface AdminFiltersBarProps {
