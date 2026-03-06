@@ -5,7 +5,7 @@ import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
 
 type DetailPreview = {
-  globalComplexity: number;
+  scoreComplexidade: number;
   adjustedHourlyRate: number;
   projectPrice: number;
   finalSalePrice: number;
@@ -167,9 +167,13 @@ export default function BudgetDetailsDialog({
                 </div>
 
                 <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-slate-500">Complexidade global</span>
+                  <span className="text-slate-500">Score de complexidade</span>
                   <span className="font-semibold text-slate-800">
-                    {(detailPreview?.globalComplexity ?? selectedBudget.data.results.globalComplexity).toFixed(2)}x
+                    {detailPreview?.scoreComplexidade ?? (
+                      typeof selectedBudget.data.scoreComplexidade === "number" && Number.isFinite(selectedBudget.data.scoreComplexidade)
+                        ? Math.round(selectedBudget.data.scoreComplexidade)
+                        : Math.round((selectedBudget.data.results.globalComplexity || 0) * 20)
+                    )}/100
                   </span>
                 </div>
 

@@ -22,7 +22,7 @@ import type { BudgetActualHoursByPhase, BudgetScopeChange, BudgetCloseFeedback }
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
 
 type DetailPreview = {
-  globalComplexity: number;
+  scoreComplexidade: number;
   adjustedHourlyRate: number;
   projectPrice: number;
   finalSalePrice: number;
@@ -69,15 +69,16 @@ const calculatePreview = (data: BudgetData): DetailPreview => {
     ? data.variableExpenses.reduce((sum, expense) => sum + toSafeNumber(expense?.value, 0), 0)
     : 0;
 
-  let globalComplexity = toSafeNumber(data.results?.globalComplexity, 0);
   let adjustedHourlyRate = toSafeNumber(data.results?.adjustedHourlyRate, 0);
   let projectPrice = toSafeNumber(data.results?.projectPrice, 0);
 
+  const scoreComplexidade =
+    typeof data.scoreComplexidade === "number" && Number.isFinite(data.scoreComplexidade)
+      ? Math.round(data.scoreComplexidade)
+      : Math.round(toSafeNumber(data.results?.globalComplexity, 0) * 20);
+
   if (isMethod10) {
-    globalComplexity =
-      typeof data.scoreComplexidade === "number" && Number.isFinite(data.scoreComplexidade)
-        ? Number((data.scoreComplexidade / 100).toFixed(2))
-        : globalComplexity;
+    // Method 1.0 uses stored values directly
   } else if (minHourlyRate > 0 && estimatedHours >= 0) {
     const factorsForComplexity: PricingFactor[] = (data.factors ?? []).map((factor) => ({
       id: factor.id,
@@ -87,9 +88,10 @@ const calculatePreview = (data: BudgetData): DetailPreview => {
       weight: toSafeNumber(factor.weight, 1),
     }));
     const computedComplexity = calculateGlobalComplexity(factorsForComplexity, selections);
-    if (computedComplexity > 0) globalComplexity = computedComplexity;
-    adjustedHourlyRate = minHourlyRate * globalComplexity;
-    projectPrice = adjustedHourlyRate * estimatedHours;
+    if (computedComplexity > 0) {
+      adjustedHourlyRate = minHourlyRate * computedComplexity;
+      projectPrice = adjustedHourlyRate * estimatedHours;
+    }
   }
 
   const discountAmount = projectPrice * (discountPercent / 100);
@@ -104,7 +106,7 @@ const calculatePreview = (data: BudgetData): DetailPreview => {
   const pricePerSqm = effectiveArea && effectiveArea > 0 && finalSalePrice > 0 ? finalSalePrice / effectiveArea : null;
 
   return {
-    globalComplexity,
+    scoreComplexidade,
     adjustedHourlyRate,
     projectPrice,
     finalSalePrice,
