@@ -165,8 +165,8 @@ export default function BudgetsHistory() {
     const sorted = [...filtered];
     sorted.sort((a, b) => {
       if (sortBy === "recent") return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-      if (sortBy === "price_desc") return b.data.results.finalSalePrice - a.data.results.finalSalePrice;
-      if (sortBy === "price_asc") return a.data.results.finalSalePrice - b.data.results.finalSalePrice;
+      if (sortBy === "price_desc") return (b.data.results?.finalSalePrice ?? 0) - (a.data.results?.finalSalePrice ?? 0);
+      if (sortBy === "price_asc") return (a.data.results?.finalSalePrice ?? 0) - (b.data.results?.finalSalePrice ?? 0);
       return (a.name || "").localeCompare(b.name || "", "pt-BR", { sensitivity: "base" });
     });
 

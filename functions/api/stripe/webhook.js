@@ -86,7 +86,7 @@ export async function onRequest(context) {
 
   if (!verified.ok) {
     console.log("Stripe webhook verify failed:", verified.reason);
-    return new Response(`Invalid webhook: ${verified.reason}`, { status: 400 });
+    return new Response("Invalid webhook", { status: 400 });
   }
 
   // 2) Parse do evento
@@ -100,7 +100,7 @@ export async function onRequest(context) {
   const type = event?.type;
   const eventId = event?.id ? String(event.id) : null;
 
-  if (!eventId) {
+  if (!eventId || eventId.length > 255) {
     return new Response("Invalid event id", { status: 400 });
   }
 

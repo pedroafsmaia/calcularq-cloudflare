@@ -118,7 +118,7 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
           <Button
             type="button"
             className="bg-calcularq-blue text-white hover:bg-[#002366]"
-            disabled={isSaving || !budget}
+            disabled={isSaving || !budget || !actualHoursTotal.trim() || !closeFeedback}
             onClick={() => {
               const total = Number(actualHoursTotal);
               if (!Number.isFinite(total) || total <= 0) {

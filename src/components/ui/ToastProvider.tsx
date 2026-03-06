@@ -43,7 +43,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     ({ title, description, tone = "info", durationMs = 3200 }: ToastInput) => {
       const id = crypto.randomUUID();
       const item: ToastItem = { id, title, description, tone, durationMs };
-      setItems((prev) => [...prev, item]);
+      setItems((prev) => [...prev, item].slice(-5));
       timeoutIds.current[id] = setTimeout(() => removeToast(id), durationMs);
     },
     [removeToast]

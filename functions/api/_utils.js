@@ -149,8 +149,14 @@ export async function requireAuth(context) {
   }
 }
 
+const MAX_REQUEST_BODY_BYTES = 1_000_000; // 1 MB
+
 export async function readJson(request) {
   try {
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > MAX_REQUEST_BODY_BYTES) {
+      return null;
+    }
     return await request.json();
   } catch {
     return null;
