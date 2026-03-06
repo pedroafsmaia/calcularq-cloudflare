@@ -268,7 +268,7 @@ export default function Home() {
           <div className="relative grid items-center gap-8 md:grid-cols-2">
             <div className="text-center md:text-left">
               <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">Fatores de complexidade</h2>
-              <p className="mb-6 text-sm leading-relaxed text-blue-100 sm:text-base lg:text-lg">
+              <p className="mb-6 text-base leading-relaxed text-blue-100 sm:text-lg" style={{ textWrap: "balance" }}>
                 A Calcularq analisa seis fatores para medir a complexidade do projeto e ajustar as estimativas de horas e valor.
               </p>
               <Link to={createPageUrl("Calculator")} className="inline-block" onClick={handleCalculatorClick}>
