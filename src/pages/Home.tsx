@@ -300,8 +300,8 @@ export default function Home() {
           className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:p-10"
         >
           <h2 className="text-center text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Exemplos de Precificação</h2>
-          <p className="mt-3 text-center text-base leading-relaxed text-slate-600 sm:text-lg">
-            Cenários ilustrativos para mostrar como o método responde a diferentes níveis de complexidade.
+          <p className="mx-auto mt-3 max-w-[56ch] text-center text-base leading-relaxed text-slate-600 sm:text-lg" style={{ textWrap: "balance" }}>
+            Cenários ilustrativos para mostrar como o método responde a diferentes níveis de complexidade. Os valores irão variar de acordo com a hora técnica de cada arquiteto.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
