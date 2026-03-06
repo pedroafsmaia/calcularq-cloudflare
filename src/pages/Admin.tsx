@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { api } from "@/lib/api";
 import type {
-  AdminSummaryData,
-  AdminUsageData,
-  AdminCommercialData,
   AdminCalibrationData,
+  AdminCommercialData,
   AdminFilters,
+  AdminSummaryData,
   AdminTab,
+  AdminUsageData,
 } from "@/types/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { PageLoadingState } from "@/components/ui/LoadingStates";
@@ -15,28 +15,35 @@ import { createPageUrl } from "@/utils";
 import AdminFiltersBar from "@/components/admin/AdminFilters";
 import AdminExport from "@/components/admin/AdminExport";
 
-/* ------------------------------------------------------------------ */
-/*  Formatting helpers                                                 */
-/* ------------------------------------------------------------------ */
-
 function fmtNum(v: number | null | undefined): string {
-  if (v == null) return "â€”";
+  if (v == null) return "—";
   return v.toLocaleString("pt-BR");
 }
 
 function fmtPct(v: number | null | undefined): string {
-  if (v == null) return "â€”";
+  if (v == null) return "—";
   return `${(v * 100).toFixed(1)}%`;
 }
 
 function fmtCurrency(v: number | null | undefined): string {
-  if (v == null) return "â€”";
+  if (v == null) return "—";
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 function fmtRatio(v: number | null | undefined): string {
-  if (v == null) return "â€”";
+  if (v == null) return "—";
   return v.toFixed(2);
+}
+
+function fmtDateTime(value: Date | null): string {
+  if (!value) return "—";
+  return value.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function adherenceColor(v: number | null | undefined): string {
@@ -55,7 +62,7 @@ function diffColor(diff: number | null | undefined): string {
 }
 
 function diffLabel(diff: number | null | undefined): string {
-  if (diff == null) return "â€”";
+  if (diff == null) return "—";
   const abs = Math.abs(diff);
   if (abs <= 0.05) return "Bem alinhado";
   const pct = `${(abs * 100).toFixed(1)}%`;
@@ -66,14 +73,10 @@ function diffLabel(diff: number | null | undefined): string {
 const FEEDBACK_LABELS: Record<string, string> = {
   too_expensive: "Muito caro",
   accepted_no_questions: "Aceito sem questionar",
-  accepted_after_negotiation: "Aceito apÃ³s negociaÃ§Ã£o",
+  accepted_after_negotiation: "Aceito após negociação",
   could_charge_more: "Poderia cobrar mais",
-  did_not_close_other: "NÃ£o fechou (outros motivos)",
+  did_not_close_other: "Não fechou (outros motivos)",
 };
-
-/* ------------------------------------------------------------------ */
-/*  Tab definitions                                                    */
-/* ------------------------------------------------------------------ */
 
 interface TabDef {
   id: AdminTab;
@@ -85,23 +88,39 @@ const TABS: TabDef[] = [
   { id: "resumo", label: "Resumo" },
   { id: "uso", label: "Uso" },
   { id: "comercial", label: "Comercial" },
-  { id: "calibracao", label: "CalibraÃ§Ã£o" },
-  { id: "exportacao", label: "ExportaÃ§Ã£o" },
-  { id: "tendencias", label: "TendÃªncias", v2: true },
+  { id: "calibracao", label: "Calibração" },
+  { id: "exportacao", label: "Exportação" },
+  { id: "tendencias", label: "Tendências", v2: true },
   { id: "alertas", label: "Alertas", v2: true },
-  { id: "segmentacao", label: "SegmentaÃ§Ã£o", v2: true },
-  { id: "evolucao", label: "EvoluÃ§Ã£o", v2: true },
+  { id: "segmentacao", label: "Segmentação", v2: true },
+  { id: "evolucao", label: "Evolução", v2: true },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Reusable sub-components                                            */
-/* ------------------------------------------------------------------ */
+const PRIMARY_TABS = TABS.filter((tab) => !tab.v2);
+const SECONDARY_TABS = TABS.filter((tab) => tab.v2);
 
-function StatCard({ title, value, legend, className }: { title: string; value: string; legend: string; className?: string }) {
+function StatCard({
+  title,
+  value,
+  legend,
+  className,
+  badge,
+}: {
+  title: string;
+  value: string;
+  legend: string;
+  className?: string;
+  badge?: string;
+}) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-      <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{title}</p>
-      <p className={`mt-2 text-2xl font-bold ${className ?? "text-calcularq-blue"}`}>{value}</p>
+    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{title}</p>
+        {badge ? (
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">{badge}</span>
+        ) : null}
+      </div>
+      <p className={`mt-2 text-3xl font-bold ${className ?? "text-calcularq-blue"}`}>{value}</p>
       <p className="mt-1 text-xs text-slate-400">{legend}</p>
     </div>
   );
@@ -111,20 +130,17 @@ function HorizontalBar({ label, count, maxCount }: { label: string; count: numbe
   const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-slate-700 w-24 shrink-0 truncate" title={label}>{label}</span>
-      <div className="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
-        <div
-          className="bg-calcularq-blue/70 h-full rounded-full transition-all"
-          style={{ width: `${pct}%` }}
-        />
+      <span className="w-24 shrink-0 truncate text-sm text-slate-700" title={label}>{label}</span>
+      <div className="h-5 flex-1 overflow-hidden rounded-full bg-slate-100">
+        <div className="h-full rounded-full bg-calcularq-blue/70 transition-all" style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-sm font-medium text-slate-600 w-12 text-right">{fmtNum(count)}</span>
+      <span className="w-12 text-right text-sm font-medium text-slate-600">{fmtNum(count)}</span>
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-base font-semibold text-slate-800 mb-3">{children}</h3>;
+  return <h3 className="mb-3 text-base font-semibold text-slate-800">{children}</h3>;
 }
 
 function ComparisonTable({
@@ -143,21 +159,19 @@ function ComparisonTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200">
-              <th className="text-left py-2 px-3 font-medium text-slate-600">Categoria</th>
-              <th className="text-right py-2 px-3 font-medium text-slate-600">Sugerido</th>
-              <th className="text-right py-2 px-3 font-medium text-slate-600">Real</th>
-              <th className="text-right py-2 px-3 font-medium text-slate-600">DiferenÃ§a</th>
+              <th className="px-3 py-2 text-left font-medium text-slate-600">Categoria</th>
+              <th className="px-3 py-2 text-right font-medium text-slate-600">Sugerido</th>
+              <th className="px-3 py-2 text-right font-medium text-slate-600">Real</th>
+              <th className="px-3 py-2 text-right font-medium text-slate-600">Diferença</th>
             </tr>
           </thead>
           <tbody>
             {entries.map(([key, val], i) => (
               <tr key={key} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                <td className="py-2 px-3 text-slate-700">{key}</td>
-                <td className="py-2 px-3 text-right text-slate-600">{fmtNum(val.suggested)}</td>
-                <td className="py-2 px-3 text-right text-slate-600">{fmtNum(val.actual)}</td>
-                <td className={`py-2 px-3 text-right font-medium ${diffColor(val.diff)}`}>
-                  {diffLabel(val.diff)}
-                </td>
+                <td className="px-3 py-2 text-slate-700">{key}</td>
+                <td className="px-3 py-2 text-right text-slate-600">{fmtNum(val.suggested)}</td>
+                <td className="px-3 py-2 text-right text-slate-600">{fmtNum(val.actual)}</td>
+                <td className={`px-3 py-2 text-right font-medium ${diffColor(val.diff)}`}>{diffLabel(val.diff)}</td>
               </tr>
             ))}
           </tbody>
@@ -169,45 +183,103 @@ function ComparisonTable({
 
 function V2Placeholder() {
   return (
-    <div className="bg-slate-50 rounded-xl border border-slate-200 p-8 text-center">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
       <p className="text-lg font-medium text-slate-400">Em desenvolvimento</p>
-      <p className="text-sm text-slate-400 mt-1">Esta seÃ§Ã£o serÃ¡ implementada na prÃ³xima versÃ£o</p>
+      <p className="mt-1 text-sm text-slate-400">Esta seção será implementada na próxima versão</p>
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Tab content renderers                                              */
-/* ------------------------------------------------------------------ */
-
 function TabResumo({ summary }: { summary: AdminSummaryData | null }) {
-  if (!summary) return <p className="text-sm text-slate-500">Sem dados disponÃ­veis.</p>;
+  if (!summary) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
+
+  const hasFeedback = summary.totalFeedbacks > 0;
+  const cards = [
+    {
+      title: "Total de usuários",
+      value: fmtNum(summary.totalUsers),
+      legend: "Quantidade de contas registradas no sistema",
+    },
+    {
+      title: "Usuários pagantes",
+      value: fmtNum(summary.totalPaidUsers),
+      legend: "Usuários que completaram o pagamento",
+    },
+    {
+      title: "Cálculos salvos",
+      value: fmtNum(summary.totalBudgets),
+      legend: "Total de orçamentos criados por todos os usuários",
+    },
+    {
+      title: "Feedbacks registrados",
+      value: fmtNum(summary.totalFeedbacks),
+      legend: "Projetos que tiveram retorno sobre resultado real",
+      badge: hasFeedback ? "Com base" : "Sem base",
+    },
+    {
+      title: "Taxa de feedback",
+      value: fmtPct(summary.feedbackRate),
+      legend: "Proporção de cálculos com retorno real",
+      badge: hasFeedback ? "Com base" : "Sem base",
+    },
+    {
+      title: "Taxa de fechamento",
+      value: fmtPct(summary.closingRate),
+      legend: "Proporção de projetos aceitos pelo cliente",
+      badge: hasFeedback ? "Com base" : "Sem base",
+    },
+    {
+      title: "Aderência de horas",
+      value: fmtRatio(summary.hoursAdherence),
+      legend: hasFeedback
+        ? "Relação entre horas reais e horas sugeridas (1.0 = perfeito)"
+        : "Sem feedback suficiente para calcular aderência",
+      className: adherenceColor(summary.hoursAdherence),
+      badge: hasFeedback ? "Com base" : "Sem base",
+    },
+    {
+      title: "Aderência de preço",
+      value: fmtRatio(summary.priceAdherence),
+      legend: hasFeedback
+        ? "Relação entre valor fechado e sugerido (1.0 = perfeito)"
+        : "Sem feedback suficiente para calcular aderência",
+      className: adherenceColor(summary.priceAdherence),
+      badge: hasFeedback ? "Com base" : "Sem base",
+    },
+  ];
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard title="Total de UsuÃ¡rios" value={fmtNum(summary.totalUsers)} legend="Quantidade de contas registradas no sistema" />
-      <StatCard title="UsuÃ¡rios Pagantes" value={fmtNum(summary.totalPaidUsers)} legend="UsuÃ¡rios que completaram o pagamento" />
-      <StatCard title="CÃ¡lculos Salvos" value={fmtNum(summary.totalBudgets)} legend="Total de orÃ§amentos criados por todos os usuÃ¡rios" />
-      <StatCard title="Feedbacks Registrados" value={fmtNum(summary.totalFeedbacks)} legend="Projetos que tiveram retorno sobre resultado real" />
-      <StatCard title="Taxa de Feedback" value={fmtPct(summary.feedbackRate)} legend="ProporÃ§Ã£o de cÃ¡lculos que receberam retorno do resultado real" />
-      <StatCard title="Taxa de Fechamento" value={fmtPct(summary.closingRate)} legend="ProporÃ§Ã£o de projetos com feedback que foram aceitos pelo cliente" />
-      <StatCard
-        title="AderÃªncia de Horas"
-        value={fmtRatio(summary.hoursAdherence)}
-        legend="RelaÃ§Ã£o entre horas reais e horas sugeridas pelo mÃ©todo (1.0 = perfeito)"
-        className={adherenceColor(summary.hoursAdherence)}
-      />
-      <StatCard
-        title="AderÃªncia de PreÃ§o"
-        value={fmtRatio(summary.priceAdherence)}
-        legend="RelaÃ§Ã£o entre valor fechado e valor sugerido pelo mÃ©todo (1.0 = perfeito)"
-        className={adherenceColor(summary.priceAdherence)}
-      />
+    <div className="space-y-4">
+      {!hasFeedback ? (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+          <p className="font-medium">Ainda não há feedbacks reais suficientes.</p>
+          <p className="mt-1 text-blue-800">
+            Registre fechamento de projetos em "Meus cálculos" para destravar calibração e aderência.
+          </p>
+        </div>
+      ) : null}
+
+      <div className="-mx-1 overflow-x-auto pb-2 md:hidden">
+        <div className="flex snap-x snap-mandatory gap-3 px-1">
+          {cards.map((card) => (
+            <div key={card.title} className="min-w-[280px] snap-start">
+              <StatCard {...card} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hidden gap-4 sm:grid-cols-2 lg:grid-cols-4 md:grid">
+        {cards.map((card) => (
+          <StatCard key={card.title} {...card} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function TabUso({ usage }: { usage: AdminUsageData | null }) {
-  if (!usage) return <p className="text-sm text-slate-500">Sem dados disponÃ­veis.</p>;
+  if (!usage) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const tipEntries = Object.entries(usage.tipologiaDistribution);
   const tipMax = Math.max(...tipEntries.map(([, v]) => v), 1);
@@ -222,7 +294,6 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
 
   return (
     <div className="space-y-8">
-      {/* Tipologia distribution */}
       <div>
         <SectionTitle>Tipologias mais usadas</SectionTitle>
         <div className="space-y-2">
@@ -232,9 +303,8 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
         </div>
       </div>
 
-      {/* Area distribution */}
       <div>
-        <SectionTitle>Faixas de Ã¡rea</SectionTitle>
+        <SectionTitle>Faixas de área</SectionTitle>
         <div className="space-y-2">
           {areaEntries.map(([label, count]) => (
             <HorizontalBar key={label} label={label} count={count} maxCount={areaMax} />
@@ -242,27 +312,26 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
         </div>
       </div>
 
-      {/* F3/F4/F5 distributions */}
       <div className="grid gap-6 md:grid-cols-3">
         {(["f3Distribution", "f4Distribution", "f5Distribution"] as const).map((key) => {
           const label = key.replace("Distribution", "").toUpperCase();
           const entries = Object.entries(usage[key]);
           return (
             <div key={key}>
-              <SectionTitle>DistribuiÃ§Ã£o de {label}</SectionTitle>
+              <SectionTitle>Distribuição de {label}</SectionTitle>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-200">
-                      <th className="text-left py-2 px-3 font-medium text-slate-600">Valor</th>
-                      <th className="text-right py-2 px-3 font-medium text-slate-600">Contagem</th>
+                      <th className="px-3 py-2 text-left font-medium text-slate-600">Valor</th>
+                      <th className="px-3 py-2 text-right font-medium text-slate-600">Contagem</th>
                     </tr>
                   </thead>
                   <tbody>
                     {entries.map(([k, v], i) => (
                       <tr key={k} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                        <td className="py-2 px-3 text-slate-700">{k}</td>
-                        <td className="py-2 px-3 text-right text-slate-600">{fmtNum(v)}</td>
+                        <td className="px-3 py-2 text-slate-700">{k}</td>
+                        <td className="px-3 py-2 text-right text-slate-600">{fmtNum(v)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -273,9 +342,8 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
         })}
       </div>
 
-      {/* Volumetria */}
       <div>
-        <SectionTitle>DistribuiÃ§Ã£o de volumetria</SectionTitle>
+        <SectionTitle>Distribuição de volumetria</SectionTitle>
         <div className="space-y-2">
           {volEntries.map(([label, count]) => (
             <HorizontalBar key={label} label={label} count={count} maxCount={volMax} />
@@ -283,31 +351,29 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
         </div>
       </div>
 
-      {/* Reforma vs Obra Nova */}
       <div>
         <SectionTitle>Reforma vs Obra Nova</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2 max-w-md">
+        <div className="grid max-w-md gap-4 sm:grid-cols-2">
           <StatCard title="Reforma" value={fmtNum(usage.reformaDistribution.reforma)} legend="Projetos de reforma" />
           <StatCard title="Obra Nova" value={fmtNum(usage.reformaDistribution.novaObra)} legend="Projetos de obra nova" />
         </div>
       </div>
 
-      {/* Monthly evolution */}
       <div>
-        <SectionTitle>EvoluÃ§Ã£o mensal</SectionTitle>
+        <SectionTitle>Evolução mensal</SectionTitle>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200">
-                <th className="text-left py-2 px-3 font-medium text-slate-600">MÃªs</th>
-                <th className="text-right py-2 px-3 font-medium text-slate-600">CÃ¡lculos</th>
+                <th className="px-3 py-2 text-left font-medium text-slate-600">Mês</th>
+                <th className="px-3 py-2 text-right font-medium text-slate-600">Cálculos</th>
               </tr>
             </thead>
             <tbody>
               {monthEntries.map(([k, v], i) => (
                 <tr key={k} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                  <td className="py-2 px-3 text-slate-700">{k}</td>
-                  <td className="py-2 px-3 text-right text-slate-600">{fmtNum(v)}</td>
+                  <td className="px-3 py-2 text-slate-700">{k}</td>
+                  <td className="px-3 py-2 text-right text-slate-600">{fmtNum(v)}</td>
                 </tr>
               ))}
             </tbody>
@@ -319,7 +385,7 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
 }
 
 function TabComercial({ commercial }: { commercial: AdminCommercialData | null }) {
-  if (!commercial) return <p className="text-sm text-slate-500">Sem dados disponÃ­veis.</p>;
+  if (!commercial) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const priceEntries = Object.entries(commercial.pricePerSqmByTipologia);
   const feedbackEntries = Object.entries(commercial.feedbackDistribution);
@@ -327,32 +393,30 @@ function TabComercial({ commercial }: { commercial: AdminCommercialData | null }
 
   return (
     <div className="space-y-8">
-      {/* Price summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="PreÃ§o mÃ©dio sugerido" value={fmtCurrency(commercial.avgSuggestedPrice)} legend="Valor mÃ©dio calculado pelo mÃ©todo" />
-        <StatCard title="PreÃ§o mÃ©dio fechado" value={fmtCurrency(commercial.avgClosedPrice)} legend="Valor mÃ©dio informado como fechado" />
-        <StatCard title="DiferenÃ§a mÃ©dia" value={fmtCurrency(commercial.avgDifference)} legend="DiferenÃ§a entre sugerido e fechado" />
-        <StatCard title="Desconto mÃ©dio" value={fmtPct(commercial.avgDiscount)} legend="Desconto mÃ©dio aplicado sobre o sugerido" />
+        <StatCard title="Preço médio sugerido" value={fmtCurrency(commercial.avgSuggestedPrice)} legend="Valor médio calculado pelo método" />
+        <StatCard title="Preço médio fechado" value={fmtCurrency(commercial.avgClosedPrice)} legend="Valor médio informado como fechado" />
+        <StatCard title="Diferença média" value={fmtCurrency(commercial.avgDifference)} legend="Diferença entre sugerido e fechado" />
+        <StatCard title="Desconto médio" value={fmtPct(commercial.avgDiscount)} legend="Desconto médio aplicado" />
       </div>
 
-      {/* R$/mÂ² by tipologia */}
       <div>
-        <SectionTitle>R$/mÂ² por tipologia</SectionTitle>
+        <SectionTitle>R$/m² por tipologia</SectionTitle>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200">
-                <th className="text-left py-2 px-3 font-medium text-slate-600">Tipologia</th>
-                <th className="text-right py-2 px-3 font-medium text-slate-600">Sugerido (R$/mÂ²)</th>
-                <th className="text-right py-2 px-3 font-medium text-slate-600">Fechado (R$/mÂ²)</th>
+                <th className="px-3 py-2 text-left font-medium text-slate-600">Tipologia</th>
+                <th className="px-3 py-2 text-right font-medium text-slate-600">Sugerido (R$/m²)</th>
+                <th className="px-3 py-2 text-right font-medium text-slate-600">Fechado (R$/m²)</th>
               </tr>
             </thead>
             <tbody>
               {priceEntries.map(([key, val], i) => (
                 <tr key={key} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                  <td className="py-2 px-3 text-slate-700">{key}</td>
-                  <td className="py-2 px-3 text-right text-slate-600">{fmtCurrency(val.suggested)}</td>
-                  <td className="py-2 px-3 text-right text-slate-600">{fmtCurrency(val.closed)}</td>
+                  <td className="px-3 py-2 text-slate-700">{key}</td>
+                  <td className="px-3 py-2 text-right text-slate-600">{fmtCurrency(val.suggested)}</td>
+                  <td className="px-3 py-2 text-right text-slate-600">{fmtCurrency(val.closed)}</td>
                 </tr>
               ))}
             </tbody>
@@ -360,17 +424,11 @@ function TabComercial({ commercial }: { commercial: AdminCommercialData | null }
         </div>
       </div>
 
-      {/* Feedback distribution */}
       <div>
-        <SectionTitle>DistribuiÃ§Ã£o de feedbacks</SectionTitle>
+        <SectionTitle>Distribuição de feedbacks</SectionTitle>
         <div className="space-y-2">
           {feedbackEntries.map(([key, count]) => (
-            <HorizontalBar
-              key={key}
-              label={FEEDBACK_LABELS[key] ?? key}
-              count={count}
-              maxCount={feedbackMax}
-            />
+            <HorizontalBar key={key} label={FEEDBACK_LABELS[key] ?? key} count={count} maxCount={feedbackMax} />
           ))}
         </div>
       </div>
@@ -379,91 +437,49 @@ function TabComercial({ commercial }: { commercial: AdminCommercialData | null }
 }
 
 function TabCalibracao({ calibration }: { calibration: AdminCalibrationData | null }) {
-  if (!calibration) return <p className="text-sm text-slate-500">Sem dados disponÃ­veis.</p>;
+  if (!calibration) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const hc = calibration.hoursComparison;
 
   return (
     <div className="space-y-8">
-      {/* Hours comparison */}
       <div>
-        <SectionTitle>ComparaÃ§Ã£o de horas</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-3 max-w-2xl">
-          <StatCard title="Horas sugeridas" value={fmtNum(hc.suggested)} legend="MÃ©dia de horas calculada pelo mÃ©todo" />
-          <StatCard title="Horas reais" value={fmtNum(hc.actual)} legend="MÃ©dia de horas informadas pelo usuÃ¡rio" />
-          <StatCard
-            title="DiferenÃ§a"
-            value={diffLabel(hc.difference)}
-            legend="Desvio entre sugerido e real"
-            className={diffColor(hc.difference)}
-          />
+        <SectionTitle>Comparação de horas</SectionTitle>
+        <div className="grid max-w-2xl gap-4 sm:grid-cols-3">
+          <StatCard title="Horas sugeridas" value={fmtNum(hc.suggested)} legend="Média de horas do método" />
+          <StatCard title="Horas reais" value={fmtNum(hc.actual)} legend="Média de horas informadas" />
+          <StatCard title="Diferença" value={diffLabel(hc.difference)} legend="Desvio entre sugerido e real" className={diffColor(hc.difference)} />
         </div>
       </div>
 
-      <ComparisonTable title="DiferenÃ§a por tipologia" data={calibration.differenceByTipologia} />
-      <ComparisonTable title="DiferenÃ§a por faixa de Ã¡rea" data={calibration.differenceByAreaRange} />
-      <ComparisonTable title="DiferenÃ§a por F3" data={calibration.differenceByF3} />
-      <ComparisonTable title="DiferenÃ§a por F4" data={calibration.differenceByF4} />
-      <ComparisonTable title="DiferenÃ§a por F5" data={calibration.differenceByF5} />
+      <ComparisonTable title="Diferença por tipologia" data={calibration.differenceByTipologia} />
+      <ComparisonTable title="Diferença por faixa de área" data={calibration.differenceByAreaRange} />
+      <ComparisonTable title="Diferença por F3" data={calibration.differenceByF3} />
+      <ComparisonTable title="Diferença por F4" data={calibration.differenceByF4} />
+      <ComparisonTable title="Diferença por F5" data={calibration.differenceByF5} />
 
-      {/* Reforma */}
       <div>
-        <SectionTitle>DiferenÃ§a por reforma</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2 max-w-lg">
+        <SectionTitle>Diferença por reforma</SectionTitle>
+        <div className="grid max-w-lg gap-4 sm:grid-cols-2">
           {Object.entries(calibration.differenceByReforma).map(([key, val]) => (
             <StatCard
               key={key}
               title={key}
               value={diffLabel(val.diff)}
-              legend={`Sugerido: ${fmtNum(val.suggested)} Â· Real: ${fmtNum(val.actual)}`}
+              legend={`Sugerido: ${fmtNum(val.suggested)} · Real: ${fmtNum(val.actual)}`}
               className={diffColor(val.diff)}
             />
           ))}
         </div>
       </div>
-
-      {/* Most underestimated */}
-      {calibration.mostUnderestimated.length > 0 && (
-        <div>
-          <SectionTitle>Maior subestimaÃ§Ã£o</SectionTitle>
-          <p className="text-xs text-slate-500 mb-2">O mÃ©todo sugeriu menos do que aconteceu</p>
-          <ul className="space-y-1">
-            {calibration.mostUnderestimated.map((item) => (
-              <li key={item.label} className="flex items-center gap-2 text-sm">
-                <span className="text-slate-700">{item.label}</span>
-                <span className="font-medium text-orange-500">
-                  {item.diffPercent > 0 ? "+" : ""}{item.diffPercent.toFixed(1)}%
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Most overestimated */}
-      {calibration.mostOverestimated.length > 0 && (
-        <div>
-          <SectionTitle>Maior superestimaÃ§Ã£o</SectionTitle>
-          <p className="text-xs text-slate-500 mb-2">O mÃ©todo sugeriu mais do que aconteceu</p>
-          <ul className="space-y-1">
-            {calibration.mostOverestimated.map((item) => (
-              <li key={item.label} className="flex items-center gap-2 text-sm">
-                <span className="text-slate-700">{item.label}</span>
-                <span className="font-medium text-blue-500">
-                  {item.diffPercent > 0 ? "+" : ""}{item.diffPercent.toFixed(1)}%
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Main Admin page                                                    */
-/* ------------------------------------------------------------------ */
+type FilterChip = {
+  key: keyof AdminFilters;
+  label: string;
+};
 
 export default function Admin() {
   const { user, isLoading: authLoading } = useAuth();
@@ -477,10 +493,25 @@ export default function Admin() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+
+  const activeFilterChips = useMemo<FilterChip[]>(() => {
+    const chips: FilterChip[] = [];
+    if (filters.period_start) chips.push({ key: "period_start", label: `De ${filters.period_start}` });
+    if (filters.period_end) chips.push({ key: "period_end", label: `Até ${filters.period_end}` });
+    if (filters.tipologia) chips.push({ key: "tipologia", label: `Tipologia: ${filters.tipologia}` });
+    if (filters.area_min) chips.push({ key: "area_min", label: `Área mín: ${filters.area_min}m²` });
+    if (filters.area_max) chips.push({ key: "area_max", label: `Área máx: ${filters.area_max}m²` });
+    if (filters.reforma) chips.push({ key: "reforma", label: `Reforma: ${filters.reforma === "true" ? "Sim" : "Não"}` });
+    if (filters.close_status) chips.push({ key: "close_status", label: `Status: ${filters.close_status}` });
+    if (filters.feedback_only === "true") chips.push({ key: "feedback_only", label: "Somente feedback" });
+    return chips;
+  }, [filters]);
 
   const fetchData = useCallback(async (f: AdminFilters) => {
     setLoading(true);
     setError(null);
+
     const [sumRes, useRes, comRes, calRes] = await Promise.allSettled([
       api.getAdminSummary(f),
       api.getAdminUsage(f),
@@ -495,10 +526,14 @@ export default function Admin() {
     if (comRes.status === "fulfilled" && comRes.value.success) setCommercial(comRes.value.data);
     if (calRes.status === "fulfilled" && calRes.value.success) setCalibration(calRes.value.data);
 
+    if (failures.length < 4) {
+      setLastUpdatedAt(new Date());
+    }
+
     if (failures.length === 4) {
       setError("Erro ao carregar dados do dashboard. Tente novamente.");
     } else if (failures.length > 0) {
-      setError("Algumas seÃ§Ãµes nÃ£o puderam ser carregadas. Verifique migrations do banco e tente novamente.");
+      setError("Algumas seções não puderam ser carregadas. Revise os filtros e tente novamente.");
     }
 
     setLoading(false);
@@ -510,7 +545,7 @@ export default function Admin() {
     }
   }, [user, filters, fetchData]);
 
-  if (authLoading) return <PageLoadingState label="Verificando permissÃµes..." />;
+  if (authLoading) return <PageLoadingState label="Verificando permissões..." />;
   if (!user) return <Navigate to={createPageUrl("Login")} replace />;
   if (!user.isAdmin) return <Navigate to={createPageUrl("Calculator")} replace />;
 
@@ -518,86 +553,135 @@ export default function Admin() {
     setFilters(newFilters);
   }
 
+  function handleRemoveFilter(key: keyof AdminFilters) {
+    setFilters((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }
+
   const activeTabDef = TABS.find((t) => t.id === activeTab);
+  const hasAnyData = !!(summary || usage || commercial || calibration);
+  const activeSecondaryTab = SECONDARY_TABS.some((tab) => tab.id === activeTab) ? activeTab : "";
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-calcularq-blue sm:text-3xl">
-            Dashboard Administrativo
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            VisÃ£o geral do uso, resultados comerciais e calibraÃ§Ã£o do mÃ©todo Calcularq.
-          </p>
+          <h1 className="text-2xl font-bold text-calcularq-blue sm:text-3xl">Dashboard Administrativo</h1>
+          <p className="mt-1 text-sm text-slate-500">Visão geral do uso, resultados comerciais e calibração do método Calcularq.</p>
+
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+            <span className="rounded-full bg-slate-100 px-2 py-1">Última atualização: {fmtDateTime(lastUpdatedAt)}</span>
+            <span className="rounded-full bg-slate-100 px-2 py-1">Filtros ativos: {activeFilterChips.length}</span>
+            <span className="rounded-full bg-slate-100 px-2 py-1">Período: {filters.period_start || "início"} até {filters.period_end || "hoje"}</span>
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="mb-6">
-          <AdminFiltersBar onApply={handleApplyFilters} />
+        <div className="mb-4">
+          <AdminFiltersBar filters={filters} onApply={handleApplyFilters} />
         </div>
 
-        {/* Tab navigation */}
+        {activeFilterChips.length > 0 ? (
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            {activeFilterChips.map((chip) => (
+              <button
+                key={`${chip.key}:${chip.label}`}
+                type="button"
+                onClick={() => handleRemoveFilter(chip.key)}
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                title="Remover filtro"
+              >
+                {chip.label} ×
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFilters({})}
+              className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-500 hover:bg-slate-50"
+            >
+              Limpar todos
+            </button>
+          </div>
+        ) : null}
+
         <div className="mb-6 overflow-x-auto">
-          <nav className="flex gap-1 border-b border-slate-200" aria-label="Abas do dashboard">
-            {TABS.map((tab) => (
+          <nav className="flex items-center gap-1 border-b border-slate-200 pb-1" aria-label="Abas do dashboard">
+            {PRIMARY_TABS.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`
-                  relative shrink-0 px-4 py-2.5 text-sm font-medium transition-colors
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue focus-visible:ring-offset-2 rounded-t-lg
-                  ${
-                    activeTab === tab.id
-                      ? "text-calcularq-blue border-b-2 border-calcularq-blue bg-white"
-                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-                  }
-                `}
+                className={`relative shrink-0 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue focus-visible:ring-offset-2 ${
+                  activeTab === tab.id
+                    ? "border-b-2 border-calcularq-blue bg-white text-calcularq-blue"
+                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                }`}
               >
                 {tab.label}
-                {tab.v2 && (
-                  <span className="ml-1.5 inline-block rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 align-middle">
-                    Em breve
-                  </span>
-                )}
               </button>
             ))}
+
+            <div className="ml-auto min-w-[180px]">
+              <select
+                aria-label="Seções secundárias"
+                value={activeSecondaryTab}
+                onChange={(e) => {
+                  const next = e.target.value as AdminTab;
+                  if (next) setActiveTab(next);
+                }}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-600"
+              >
+                <option value="">Mais seções (em breve)</option>
+                {SECONDARY_TABS.map((tab) => (
+                  <option key={tab.id} value={tab.id}>{tab.label}</option>
+                ))}
+              </select>
+            </div>
           </nav>
         </div>
 
-        {/* Tab content */}
         {loading ? (
           <PageLoadingState label="Carregando dados..." compact />
-        ) : error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-            <p className="text-sm font-medium text-red-700">{error}</p>
-            <button
-              type="button"
-              onClick={() => fetchData(filters)}
-              className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              Tentar novamente
-            </button>
-          </div>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            {activeTab === "resumo" && <TabResumo summary={summary} />}
-            {activeTab === "uso" && <TabUso usage={usage} />}
-            {activeTab === "comercial" && <TabComercial commercial={commercial} />}
-            {activeTab === "calibracao" && <TabCalibracao calibration={calibration} />}
-            {activeTab === "exportacao" && (
-              <AdminExport
-                filters={filters}
-                summary={summary}
-                usage={usage}
-                commercial={commercial}
-                calibration={calibration}
-              />
+          <>
+            {error ? (
+              <div className={`mb-4 rounded-xl border p-4 text-sm ${hasAnyData ? "border-amber-200 bg-amber-50 text-amber-800" : "border-red-200 bg-red-50 text-red-700"}`}>
+                <p className="font-medium">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => fetchData(filters)}
+                  className={`mt-3 rounded-lg px-4 py-2 text-sm font-medium ${hasAnyData ? "bg-amber-600 text-white hover:bg-amber-700" : "bg-red-600 text-white hover:bg-red-700"}`}
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : null}
+
+            {hasAnyData ? (
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                {activeTab === "resumo" && <TabResumo summary={summary} />}
+                {activeTab === "uso" && <TabUso usage={usage} />}
+                {activeTab === "comercial" && <TabComercial commercial={commercial} />}
+                {activeTab === "calibracao" && <TabCalibracao calibration={calibration} />}
+                {activeTab === "exportacao" && (
+                  <AdminExport
+                    filters={filters}
+                    summary={summary}
+                    usage={usage}
+                    commercial={commercial}
+                    calibration={calibration}
+                  />
+                )}
+                {activeTabDef?.v2 ? <V2Placeholder /> : null}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+                Sem dados disponíveis para os filtros atuais.
+              </div>
             )}
-            {activeTabDef?.v2 && <V2Placeholder />}
-          </div>
+          </>
         )}
       </div>
     </div>
