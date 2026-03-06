@@ -1116,6 +1116,28 @@ export default function Calculator() {
             </AnimatePresence>
 
             <div className="lg:hidden mt-4">
+              {currentStep < 3 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+                >
+                  <details className="rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur-sm">
+                    <summary className="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
+                      <div className="flex items-center justify-between gap-3 rounded-lg px-1 py-1.5 hover:bg-slate-50 transition-colors duration-150">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-calcularq-blue">Resultados</p>
+                          <p className="text-xs text-slate-500">Resumo do cálculo atual</p>
+                        </div>
+                        <ChevronDown className="h-4 w-4 text-slate-500" />
+                      </div>
+                    </summary>
+                    <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm p-2.5 sm:p-3 overflow-hidden">
+                      <ResultsPanel />
+                    </div>
+                  </details>
+                </motion.div>
+              ) : (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -1132,6 +1154,7 @@ export default function Calculator() {
                     <ResultsPanel />
                   </div>
                 </motion.div>
+              )}
             </div>
 
           </div>
