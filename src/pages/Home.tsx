@@ -5,7 +5,7 @@ import { ArrowRight, Calculator, CheckCircle2, Clock3, DollarSign } from "lucide
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPageUrl } from "@/utils";
-import { fadeUp, fadeX, listStagger, viewportOnce } from "@/lib/motion";
+import { fadeUp, listStagger, viewportOnce } from "@/lib/motion";
 
 export default function Home() {
   const { user } = useAuth();
@@ -114,134 +114,88 @@ export default function Home() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
-          <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
-            <div className="hidden lg:block">
-              <motion.div
-                variants={fadeX(prefersReducedMotion, 18, -1)}
-                initial="hidden"
-                animate="show"
-                transition={{ delay: 0.18 }}
-                className="relative px-2"
-              >
-                <img
-                  src="/mockup.png"
-                  alt="Interface da Calculadora Calcularq"
-                  className="h-auto w-full scale-[0.96] object-contain drop-shadow-2xl xl:scale-100"
-                />
-              </motion.div>
-            </div>
-
-            <div className="relative z-10">
-              <motion.div
-                variants={fadeUp(prefersReducedMotion, 16)}
-                initial="hidden"
-                animate="show"
-                transition={{ delay: 0.2 }}
-                className="rounded-2xl bg-white p-5 pt-10 shadow-2xl sm:p-8 sm:pt-12 lg:p-10 lg:pt-10"
-              >
-                <h1 className="mb-4 text-center text-[2.05rem] font-bold leading-[1.12] tracking-tight text-calcularq-blue sm:mb-5 sm:text-4xl lg:text-[2.5rem] xl:text-[2.65rem]">
-                  SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
-                </h1>
-
-                <p className="mx-auto mb-6 max-w-[46ch] text-center text-[0.98rem] leading-relaxed text-slate-700 sm:mb-7 sm:text-lg">
-                  Precifique seus projetos de arquitetura com inteligência. A Calcularq é uma ferramenta que evolui com
-                  você, alinhando seus cálculos à dedicação que cada projeto exige.
-                </p>
-
-                {!user?.hasPaid ? (
-                  <div className="mb-4 flex items-center justify-center sm:mb-5">
-                    <div
-                      className="senja-embed"
-                      data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
-                      data-mode="shadow"
-                      data-lazyload="false"
-                      style={{ display: "block", width: "100%", transform: "scale(1.2)", transformOrigin: "center", margin: "0 auto" }}
-                    />
-                  </div>
-                ) : null}
-
-                <Link to={user ? createPageUrl("Calculator") : createPageUrl("Login")} onClick={handleCalculatorClick} className="mb-2.5 block sm:mb-3">
-                  <Button
-                    size="lg"
-                    className="w-full rounded-xl px-8 py-6 text-base font-semibold text-white shadow-md transition-shadow duration-150 hover:shadow-lg sm:text-lg"
-                    style={{ backgroundColor: "#fc7338" }}
-                  >
-                    {user?.hasPaid ? "Acessar a Calcularq" : "Acessar a Calcularq — R$19,90"}
-                  </Button>
-                </Link>
-
-                {user?.hasPaid ? (
-                  <a href="https://senja.io/p/calcularq/r/GRdv6A" target="_blank" rel="noopener noreferrer" className="mb-3 block sm:mb-3.5">
-                    <Button
-                      type="button"
-                      size="lg"
-                      variant="outline"
-                      className="w-full rounded-xl border-slate-200/90 px-8 py-6 text-base text-slate-600 shadow-sm hover:bg-slate-50 hover:text-calcularq-blue sm:text-lg"
-                    >
-                      Avalie a Calcularq
-                    </Button>
-                  </a>
-                ) : null}
-
-                <p className="text-center text-sm text-slate-600">Pagamento único. Sem mensalidades.</p>
-              </motion.div>
-            </div>
-
-            <div className="relative z-20 mx-auto mb-[-0.75rem] max-w-[21.5rem] px-2 lg:hidden sm:mb-[-1rem] sm:max-w-[22.5rem]">
+          <div className="relative z-10 mx-auto max-w-5xl">
+            <div className="relative z-20 mx-auto mb-4 max-w-[21.5rem] px-2 sm:mb-5 sm:max-w-[24rem] lg:max-w-[30rem]">
               <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" animate="show" transition={{ delay: 0.12 }}>
                 <img src="/mockup.png" alt="Interface da Calculadora Calcularq" className="h-auto w-full object-contain drop-shadow-2xl" />
               </motion.div>
             </div>
+
+            <motion.div
+              variants={fadeUp(prefersReducedMotion, 16)}
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.2 }}
+              className="rounded-2xl bg-white p-5 pt-10 shadow-2xl sm:p-8 sm:pt-12 lg:p-10 lg:pt-10"
+            >
+              <h1 className="mb-4 text-center text-[2.05rem] font-bold leading-[1.12] tracking-tight text-calcularq-blue sm:mb-5 sm:text-4xl lg:text-[2.5rem]">
+                SUA CALCULADORA DE PRECIFICAÇÃO POR COMPLEXIDADE
+              </h1>
+
+              <p className="mx-auto mb-6 max-w-[54ch] text-center text-[0.98rem] leading-relaxed text-slate-700 sm:mb-7 sm:text-lg">
+                Precifique seus projetos de arquitetura com inteligência. A Calcularq é uma ferramenta que evolui com você, alinhando seus cálculos à complexidade de cada projeto.
+              </p>
+
+              {!user?.hasPaid ? (
+                <div className="mb-4 flex items-center justify-center sm:mb-5">
+                  <div
+                    className="senja-embed"
+                    data-id="5c4b77f9-c453-43c6-8dd1-8c015286d9e7"
+                    data-mode="shadow"
+                    data-lazyload="false"
+                    style={{ display: "block", width: "100%", transform: "scale(1.2)", transformOrigin: "center", margin: "0 auto" }}
+                  />
+                </div>
+              ) : null}
+
+              <Link to={user ? createPageUrl("Calculator") : createPageUrl("Login")} onClick={handleCalculatorClick} className="mb-2.5 block sm:mb-3">
+                <Button
+                  size="lg"
+                  className="w-full rounded-xl px-8 py-6 text-base font-semibold text-white shadow-md transition-shadow duration-150 hover:shadow-lg sm:text-lg"
+                  style={{ backgroundColor: "#fc7338" }}
+                >
+                  {user?.hasPaid ? "Acessar a Calcularq" : "Acessar a Calcularq - R$19,90"}
+                </Button>
+              </Link>
+
+              {user?.hasPaid ? (
+                <a href="https://senja.io/p/calcularq/r/GRdv6A" target="_blank" rel="noopener noreferrer" className="mb-3 block sm:mb-3.5">
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="w-full rounded-xl border-slate-200/90 px-8 py-6 text-base text-slate-600 shadow-sm hover:bg-slate-50 hover:text-calcularq-blue sm:text-lg"
+                  >
+                    Avalie a Calcularq
+                  </Button>
+                </a>
+              ) : null}
+
+              <p className="text-center text-sm text-slate-600">Pagamento único. Sem mensalidades.</p>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-        <motion.div
-          variants={fadeUp(prefersReducedMotion, 14)}
-          initial="hidden"
-          whileInView="show"
-          viewport={viewportOnce}
-          className="rounded-3xl border border-calcularq-blue/25 bg-gradient-to-br from-calcularq-blue via-[#002d6f] to-[#001f4f] px-6 py-10 sm:px-8 sm:py-12 md:px-10 md:py-14"
-        >
-          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
-            <div>
-              <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">Uma calculadora que evolui com você</h2>
-              <p className="max-w-[58ch] text-sm leading-relaxed text-blue-100 sm:text-base">
-                A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o
-                sistema ajusta automaticamente as estimativas futuras.
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">Quanto mais você usa, mais precisa ela fica.</p>
-            </div>
-
-            <div className="grid gap-3">
-              {["Registre suas horas reais", "Receba ajustes automáticos", "Evolua sua precificação ao longo do uso"].map((item) => (
-                <div key={item} className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-3">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-300" />
-                  <span className="text-sm text-white sm:text-[0.95rem]">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-24">
         <motion.div variants={listStagger} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
               variants={fadeUp(prefersReducedMotion, 12)}
               transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
-              className="flex h-full flex-col rounded-2xl border border-calcularq-blue/30 bg-calcularq-blue p-6 text-center shadow-sm transition-colors duration-150 hover:border-white/50 hover:shadow-md"
+              className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-colors transition-shadow duration-150 hover:border-calcularq-blue/35 hover:shadow-md"
             >
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
-                <feature.icon className="h-6 w-6 text-white" />
+              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-calcularq-blue/10 blur-2xl" />
+              <div className="pointer-events-none absolute -left-10 bottom-0 h-20 w-20 rounded-full bg-calcularq-blue/10 blur-xl" />
+
+              <div className="relative mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-calcularq-blue/10">
+                <feature.icon className="h-6 w-6 text-calcularq-blue" />
               </div>
-              <h3 className="mx-auto mb-2 flex min-h-[3.2rem] max-w-[18ch] items-center justify-center px-1 text-base font-semibold leading-snug text-white sm:text-lg">
+              <h3 className="relative mx-auto mb-2 flex min-h-[3.2rem] max-w-[18ch] items-center justify-center px-1 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">
                 {feature.title}
               </h3>
-              <p className="mx-auto max-w-[31ch] px-1 text-sm leading-relaxed text-blue-100 sm:text-[0.95rem]">{feature.description}</p>
+              <p className="relative mx-auto max-w-[31ch] px-1 text-sm leading-relaxed text-slate-600 sm:text-[0.95rem]">{feature.description}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -310,7 +264,7 @@ export default function Home() {
         </motion.div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 sm:pb-24 lg:px-8 lg:pb-28">
+      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
         <motion.div
           variants={fadeUp(prefersReducedMotion, 14)}
           initial="hidden"
@@ -360,6 +314,35 @@ export default function Home() {
                 <p className="mt-3 text-xs text-slate-500">Complexidade {card.complexity.toLowerCase()}.</p>
               </div>
             ))}
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 sm:pb-24 lg:px-8 lg:pb-28">
+        <motion.div
+          variants={fadeUp(prefersReducedMotion, 14)}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="rounded-3xl border border-calcularq-blue/25 bg-gradient-to-br from-calcularq-blue via-[#002d6f] to-[#001f4f] px-6 py-10 sm:px-8 sm:py-12 md:px-10 md:py-14"
+        >
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">Uma calculadora que evolui com você</h2>
+              <p className="max-w-[58ch] text-sm leading-relaxed text-blue-100 sm:text-base">
+                A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o sistema ajusta automaticamente as estimativas futuras.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">Quanto mais você usa, mais precisa ela fica.</p>
+            </div>
+
+            <div className="grid gap-3">
+              {["Registre suas horas reais", "Receba ajustes automáticos", "Evolua sua precificação ao longo do uso"].map((item) => (
+                <div key={item} className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-3">
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-300" />
+                  <span className="text-sm text-white sm:text-[0.95rem]">{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>
