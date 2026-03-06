@@ -73,9 +73,9 @@ function diffLabel(diff: number | null | undefined): string {
 const FEEDBACK_LABELS: Record<string, string> = {
   too_expensive: "Muito caro",
   accepted_no_questions: "Aceito sem questionar",
-  accepted_after_negotiation: "Aceito apos negociacao",
+  accepted_after_negotiation: "Aceito após negociação",
   could_charge_more: "Poderia cobrar mais",
-  did_not_close_other: "Nao fechou (outros motivos)",
+  did_not_close_other: "Não fechou (outros motivos)",
 };
 
 interface TabDef {
@@ -88,12 +88,12 @@ const TABS: TabDef[] = [
   { id: "resumo", label: "Resumo" },
   { id: "uso", label: "Uso" },
   { id: "comercial", label: "Comercial" },
-  { id: "calibracao", label: "Calibracao" },
-  { id: "exportacao", label: "Exportacao" },
-  { id: "tendencias", label: "Tendencias", v2: true },
+  { id: "calibracao", label: "Calibração" },
+  { id: "exportacao", label: "Exportação" },
+  { id: "tendencias", label: "Tendências", v2: true },
   { id: "alertas", label: "Alertas", v2: true },
-  { id: "segmentacao", label: "Segmentacao", v2: true },
-  { id: "evolucao", label: "Evolucao", v2: true },
+  { id: "segmentacao", label: "Segmentação", v2: true },
+  { id: "evolucao", label: "Evolução", v2: true },
 ];
 
 const PRIMARY_TABS = TABS.filter((tab) => !tab.v2);
@@ -162,7 +162,7 @@ function ComparisonTable({
               <th className="px-3 py-2 text-left font-medium text-slate-600">Categoria</th>
               <th className="px-3 py-2 text-right font-medium text-slate-600">Sugerido</th>
               <th className="px-3 py-2 text-right font-medium text-slate-600">Real</th>
-              <th className="px-3 py-2 text-right font-medium text-slate-600">Diferenca</th>
+              <th className="px-3 py-2 text-right font-medium text-slate-600">Diferença</th>
             </tr>
           </thead>
           <tbody>
@@ -185,30 +185,30 @@ function V2Placeholder() {
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
       <p className="text-lg font-medium text-slate-400">Em desenvolvimento</p>
-      <p className="mt-1 text-sm text-slate-400">Esta secao sera implementada na proxima versao</p>
+      <p className="mt-1 text-sm text-slate-400">Esta seção será implementada na próxima versão</p>
     </div>
   );
 }
 
 function TabResumo({ summary }: { summary: AdminSummaryData | null }) {
-  if (!summary) return <p className="text-sm text-slate-500">Sem dados disponiveis.</p>;
+  if (!summary) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const hasFeedback = summary.totalFeedbacks > 0;
   const cards = [
     {
-      title: "Total de usuarios",
+      title: "Total de usuários",
       value: fmtNum(summary.totalUsers),
       legend: "Quantidade de contas registradas no sistema",
     },
     {
-      title: "Usuarios pagantes",
+      title: "Usuários pagantes",
       value: fmtNum(summary.totalPaidUsers),
-      legend: "Usuarios que completaram o pagamento",
+      legend: "Usuários que completaram o pagamento",
     },
     {
-      title: "Calculos salvos",
+      title: "Cálculos salvos",
       value: fmtNum(summary.totalBudgets),
-      legend: "Total de orcamentos criados por todos os usuarios",
+      legend: "Total de orçamentos criados por todos os usuários",
     },
     {
       title: "Feedbacks registrados",
@@ -219,30 +219,30 @@ function TabResumo({ summary }: { summary: AdminSummaryData | null }) {
     {
       title: "Taxa de feedback",
       value: fmtPct(summary.feedbackRate),
-      legend: "Proporcao de calculos com retorno real",
+      legend: "Proporção de cálculos com retorno real",
       badge: hasFeedback ? "Com base" : "Sem base",
     },
     {
       title: "Taxa de fechamento",
       value: fmtPct(summary.closingRate),
-      legend: "Proporcao de projetos aceitos pelo cliente",
+      legend: "Proporção de projetos aceitos pelo cliente",
       badge: hasFeedback ? "Com base" : "Sem base",
     },
     {
-      title: "Aderencia de horas",
+      title: "Aderência de horas",
       value: fmtRatio(summary.hoursAdherence),
       legend: hasFeedback
-        ? "Relacao entre horas reais e horas sugeridas (1.0 = perfeito)"
-        : "Sem feedback suficiente para calcular aderencia",
+        ? "Relação entre horas reais e horas sugeridas (1.0 = perfeito)"
+        : "Sem feedback suficiente para calcular aderência",
       className: adherenceColor(summary.hoursAdherence),
       badge: hasFeedback ? "Com base" : "Sem base",
     },
     {
-      title: "Aderencia de preco",
+      title: "Aderência de preço",
       value: fmtRatio(summary.priceAdherence),
       legend: hasFeedback
-        ? "Relacao entre valor fechado e sugerido (1.0 = perfeito)"
-        : "Sem feedback suficiente para calcular aderencia",
+        ? "Relação entre valor fechado e sugerido (1.0 = perfeito)"
+        : "Sem feedback suficiente para calcular aderência",
       className: adherenceColor(summary.priceAdherence),
       badge: hasFeedback ? "Com base" : "Sem base",
     },
@@ -252,9 +252,9 @@ function TabResumo({ summary }: { summary: AdminSummaryData | null }) {
     <div className="space-y-4">
       {!hasFeedback ? (
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-          <p className="font-medium">Ainda nao ha feedbacks reais suficientes.</p>
+          <p className="font-medium">Ainda não há feedbacks reais suficientes.</p>
           <p className="mt-1 text-blue-800">
-            Registre fechamento de projetos em "Meus calculos" para destravar calibracao e aderencia.
+            Registre fechamento de projetos em "Meus cálculos" para destravar calibração e aderência.
           </p>
         </div>
       ) : null}
@@ -279,7 +279,7 @@ function TabResumo({ summary }: { summary: AdminSummaryData | null }) {
 }
 
 function TabUso({ usage }: { usage: AdminUsageData | null }) {
-  if (!usage) return <p className="text-sm text-slate-500">Sem dados disponiveis.</p>;
+  if (!usage) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const tipEntries = Object.entries(usage.tipologiaDistribution);
   const tipMax = Math.max(...tipEntries.map(([, v]) => v), 1);
@@ -304,7 +304,7 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
       </div>
 
       <div>
-        <SectionTitle>Faixas de area</SectionTitle>
+        <SectionTitle>Faixas de área</SectionTitle>
         <div className="space-y-2">
           {areaEntries.map(([label, count]) => (
             <HorizontalBar key={label} label={label} count={count} maxCount={areaMax} />
@@ -318,7 +318,7 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
           const entries = Object.entries(usage[key]);
           return (
             <div key={key}>
-              <SectionTitle>Distribuicao de {label}</SectionTitle>
+              <SectionTitle>Distribuição de {label}</SectionTitle>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -343,7 +343,7 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
       </div>
 
       <div>
-        <SectionTitle>Distribuicao de volumetria</SectionTitle>
+        <SectionTitle>Distribuição de volumetria</SectionTitle>
         <div className="space-y-2">
           {volEntries.map(([label, count]) => (
             <HorizontalBar key={label} label={label} count={count} maxCount={volMax} />
@@ -360,13 +360,13 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
       </div>
 
       <div>
-        <SectionTitle>Evolucao mensal</SectionTitle>
+        <SectionTitle>Evolução mensal</SectionTitle>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200">
-                <th className="px-3 py-2 text-left font-medium text-slate-600">Mes</th>
-                <th className="px-3 py-2 text-right font-medium text-slate-600">Calculos</th>
+                <th className="px-3 py-2 text-left font-medium text-slate-600">Mês</th>
+                <th className="px-3 py-2 text-right font-medium text-slate-600">Cálculos</th>
               </tr>
             </thead>
             <tbody>
@@ -385,7 +385,7 @@ function TabUso({ usage }: { usage: AdminUsageData | null }) {
 }
 
 function TabComercial({ commercial }: { commercial: AdminCommercialData | null }) {
-  if (!commercial) return <p className="text-sm text-slate-500">Sem dados disponiveis.</p>;
+  if (!commercial) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const priceEntries = Object.entries(commercial.pricePerSqmByTipologia);
   const feedbackEntries = Object.entries(commercial.feedbackDistribution);
@@ -394,10 +394,10 @@ function TabComercial({ commercial }: { commercial: AdminCommercialData | null }
   return (
     <div className="space-y-8">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Preco medio sugerido" value={fmtCurrency(commercial.avgSuggestedPrice)} legend="Valor medio calculado pelo metodo" />
-        <StatCard title="Preco medio fechado" value={fmtCurrency(commercial.avgClosedPrice)} legend="Valor medio informado como fechado" />
-        <StatCard title="Diferenca media" value={fmtCurrency(commercial.avgDifference)} legend="Diferenca entre sugerido e fechado" />
-        <StatCard title="Desconto medio" value={fmtPct(commercial.avgDiscount)} legend="Desconto medio aplicado" />
+        <StatCard title="Preço médio sugerido" value={fmtCurrency(commercial.avgSuggestedPrice)} legend="Valor médio calculado pelo método" />
+        <StatCard title="Preço médio fechado" value={fmtCurrency(commercial.avgClosedPrice)} legend="Valor médio informado como fechado" />
+        <StatCard title="Diferença média" value={fmtCurrency(commercial.avgDifference)} legend="Diferença entre sugerido e fechado" />
+        <StatCard title="Desconto médio" value={fmtPct(commercial.avgDiscount)} legend="Desconto médio aplicado" />
       </div>
 
       <div>
@@ -425,7 +425,7 @@ function TabComercial({ commercial }: { commercial: AdminCommercialData | null }
       </div>
 
       <div>
-        <SectionTitle>Distribuicao de feedbacks</SectionTitle>
+        <SectionTitle>Distribuição de feedbacks</SectionTitle>
         <div className="space-y-2">
           {feedbackEntries.map(([key, count]) => (
             <HorizontalBar key={key} label={FEEDBACK_LABELS[key] ?? key} count={count} maxCount={feedbackMax} />
@@ -437,29 +437,29 @@ function TabComercial({ commercial }: { commercial: AdminCommercialData | null }
 }
 
 function TabCalibracao({ calibration }: { calibration: AdminCalibrationData | null }) {
-  if (!calibration) return <p className="text-sm text-slate-500">Sem dados disponiveis.</p>;
+  if (!calibration) return <p className="text-sm text-slate-500">Sem dados disponíveis.</p>;
 
   const hc = calibration.hoursComparison;
 
   return (
     <div className="space-y-8">
       <div>
-        <SectionTitle>Comparacao de horas</SectionTitle>
+        <SectionTitle>Comparação de horas</SectionTitle>
         <div className="grid max-w-2xl gap-4 sm:grid-cols-3">
-          <StatCard title="Horas sugeridas" value={fmtNum(hc.suggested)} legend="Media de horas do metodo" />
-          <StatCard title="Horas reais" value={fmtNum(hc.actual)} legend="Media de horas informadas" />
-          <StatCard title="Diferenca" value={diffLabel(hc.difference)} legend="Desvio entre sugerido e real" className={diffColor(hc.difference)} />
+          <StatCard title="Horas sugeridas" value={fmtNum(hc.suggested)} legend="Média de horas do método" />
+          <StatCard title="Horas reais" value={fmtNum(hc.actual)} legend="Média de horas informadas" />
+          <StatCard title="Diferença" value={diffLabel(hc.difference)} legend="Desvio entre sugerido e real" className={diffColor(hc.difference)} />
         </div>
       </div>
 
-      <ComparisonTable title="Diferenca por tipologia" data={calibration.differenceByTipologia} />
-      <ComparisonTable title="Diferenca por faixa de area" data={calibration.differenceByAreaRange} />
-      <ComparisonTable title="Diferenca por F3" data={calibration.differenceByF3} />
-      <ComparisonTable title="Diferenca por F4" data={calibration.differenceByF4} />
-      <ComparisonTable title="Diferenca por F5" data={calibration.differenceByF5} />
+      <ComparisonTable title="Diferença por tipologia" data={calibration.differenceByTipologia} />
+      <ComparisonTable title="Diferença por faixa de área" data={calibration.differenceByAreaRange} />
+      <ComparisonTable title="Diferença por F3" data={calibration.differenceByF3} />
+      <ComparisonTable title="Diferença por F4" data={calibration.differenceByF4} />
+      <ComparisonTable title="Diferença por F5" data={calibration.differenceByF5} />
 
       <div>
-        <SectionTitle>Diferenca por reforma</SectionTitle>
+        <SectionTitle>Diferença por reforma</SectionTitle>
         <div className="grid max-w-lg gap-4 sm:grid-cols-2">
           {Object.entries(calibration.differenceByReforma).map(([key, val]) => (
             <StatCard
@@ -498,11 +498,11 @@ export default function Admin() {
   const activeFilterChips = useMemo<FilterChip[]>(() => {
     const chips: FilterChip[] = [];
     if (filters.period_start) chips.push({ key: "period_start", label: `De ${filters.period_start}` });
-    if (filters.period_end) chips.push({ key: "period_end", label: `Ate ${filters.period_end}` });
+    if (filters.period_end) chips.push({ key: "period_end", label: `Até ${filters.period_end}` });
     if (filters.tipologia) chips.push({ key: "tipologia", label: `Tipologia: ${filters.tipologia}` });
-    if (filters.area_min) chips.push({ key: "area_min", label: `Area min: ${filters.area_min}m²` });
-    if (filters.area_max) chips.push({ key: "area_max", label: `Area max: ${filters.area_max}m²` });
-    if (filters.reforma) chips.push({ key: "reforma", label: `Reforma: ${filters.reforma === "true" ? "Sim" : "Nao"}` });
+    if (filters.area_min) chips.push({ key: "area_min", label: `Área mín: ${filters.area_min}m²` });
+    if (filters.area_max) chips.push({ key: "area_max", label: `Área máx: ${filters.area_max}m²` });
+    if (filters.reforma) chips.push({ key: "reforma", label: `Reforma: ${filters.reforma === "true" ? "Sim" : "Não"}` });
     if (filters.close_status) chips.push({ key: "close_status", label: `Status: ${filters.close_status}` });
     if (filters.feedback_only === "true") chips.push({ key: "feedback_only", label: "Somente feedback" });
     return chips;
@@ -533,7 +533,7 @@ export default function Admin() {
     if (failures.length === 4) {
       setError("Erro ao carregar dados do dashboard. Tente novamente.");
     } else if (failures.length > 0) {
-      setError("Algumas secoes nao puderam ser carregadas. Revise os filtros e tente novamente.");
+      setError("Algumas seções não puderam ser carregadas. Revise os filtros e tente novamente.");
     }
 
     setLoading(false);
@@ -545,7 +545,7 @@ export default function Admin() {
     }
   }, [user, filters, fetchData]);
 
-  if (authLoading) return <PageLoadingState label="Verificando permissoes..." />;
+  if (authLoading) return <PageLoadingState label="Verificando permissões..." />;
   if (!user) return <Navigate to={createPageUrl("Login")} replace />;
   if (!user.isAdmin) return <Navigate to={createPageUrl("Calculator")} replace />;
 
@@ -570,12 +570,12 @@ export default function Admin() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-calcularq-blue sm:text-3xl">Dashboard Administrativo</h1>
-          <p className="mt-1 text-sm text-slate-500">Visao geral do uso, resultados comerciais e calibracao do metodo Calcularq.</p>
+          <p className="mt-1 text-sm text-slate-500">Visão geral do uso, resultados comerciais e calibração do método Calcularq.</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
-            <span className="rounded-full bg-slate-100 px-2 py-1">Ultima atualizacao: {fmtDateTime(lastUpdatedAt)}</span>
+            <span className="rounded-full bg-slate-100 px-2 py-1">Última atualização: {fmtDateTime(lastUpdatedAt)}</span>
             <span className="rounded-full bg-slate-100 px-2 py-1">Filtros ativos: {activeFilterChips.length}</span>
-            <span className="rounded-full bg-slate-100 px-2 py-1">Periodo: {filters.period_start || "inicio"} ate {filters.period_end || "hoje"}</span>
+            <span className="rounded-full bg-slate-100 px-2 py-1">Período: {filters.period_start || "início"} até {filters.period_end || "hoje"}</span>
           </div>
         </div>
 
@@ -625,7 +625,7 @@ export default function Admin() {
 
             <div className="ml-auto min-w-[180px]">
               <select
-                aria-label="Secoes secundarias"
+                aria-label="Seções secundárias"
                 value={activeSecondaryTab}
                 onChange={(e) => {
                   const next = e.target.value as AdminTab;
@@ -633,7 +633,7 @@ export default function Admin() {
                 }}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-600"
               >
-                <option value="">Mais secoes (em breve)</option>
+                <option value="">Mais seções (em breve)</option>
                 {SECONDARY_TABS.map((tab) => (
                   <option key={tab.id} value={tab.id}>{tab.label}</option>
                 ))}
@@ -678,7 +678,7 @@ export default function Admin() {
               </div>
             ) : (
               <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-                Sem dados disponiveis para os filtros atuais.
+                Sem dados disponíveis para os filtros atuais.
               </div>
             )}
           </>
