@@ -8,6 +8,7 @@ export interface User {
   hasPaid: boolean;
   paymentDate?: string;
   stripeCustomerId?: string;
+  isAdmin?: boolean;
   createdAt: string;
 }
 

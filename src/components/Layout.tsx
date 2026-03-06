@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPageUrl } from "@/utils";
-import { Calculator, Home, BookOpen, LogIn, LogOut, User, History } from "lucide-react";
+import { Calculator, Home, BookOpen, LogIn, LogOut, User, History, LayoutDashboard, ChevronDown } from "lucide-react";
 import Footer from "./Footer";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,6 +12,18 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const navigation = [
     { name: "Home", page: "Home", icon: Home },
@@ -100,15 +112,43 @@ export default function Layout({ children }: LayoutProps) {
                       </Link>
                     )}
 
-                    <div className="hidden 2xl:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600">
-                      <User className="w-4 h-4" />
-                      <span>{user.name}</span>
-                    </div>
+                    <div className="relative" ref={userMenuRef}>
+                      <button
+                        onClick={() => setUserMenuOpen((v) => !v)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-colors duration-150 border border-transparent"
+                      >
+                        <User className="w-4 h-4" />
+                        <span className="hidden 2xl:inline">{user.name}</span>
+                        <ChevronDown className="w-3.5 h-3.5 hidden 2xl:inline" />
+                      </button>
 
-                    <button onClick={logout} className={desktopNavItem(false)}>
-                      <LogOut className="w-4 h-4" />
-                      <span className="hidden xl:inline">Sair</span>
-                    </button>
+                      {userMenuOpen && (
+                        <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-slate-200 shadow-lg z-50 py-1">
+                          <div className="px-4 py-2.5 text-xs text-slate-500">
+                            <span className="block font-medium text-slate-700 text-sm">{user.name}</span>
+                            {user.email}
+                          </div>
+                          <div className="border-t border-slate-200 my-1" />
+                          {user.isAdmin && (
+                            <Link
+                              to={createPageUrl("Admin")}
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-calcularq-blue transition-colors"
+                            >
+                              <LayoutDashboard className="w-4 h-4" />
+                              Dashboard administrativo
+                            </Link>
+                          )}
+                          <button
+                            onClick={() => { setUserMenuOpen(false); logout(); }}
+                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Sair
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <Link to={createPageUrl("Login")} className={desktopNavItem(false)}>
@@ -143,6 +183,12 @@ export default function Layout({ children }: LayoutProps) {
                         aria-label="Manual"
                       >
                         <BookOpen className="w-[18px] h-[18px]" />
+                      </Link>
+                    )}
+
+                    {user.isAdmin && (
+                      <Link to={createPageUrl("Admin")} className={mobileIconItem()} aria-label="Dashboard administrativo">
+                        <LayoutDashboard className="w-[18px] h-[18px]" />
                       </Link>
                     )}
 
