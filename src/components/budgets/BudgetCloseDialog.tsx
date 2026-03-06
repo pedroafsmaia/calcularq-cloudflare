@@ -264,7 +264,7 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
             <div className="grid gap-3 sm:grid-cols-2">
               {PHASE_FIELDS.map((field) => (
                 <label key={field.key} className="block">
-                  <span className="mb-1 block text-xs font-medium tracking-wide text-slate-500">{field.label}</span>
+                  <span className="mb-1 block text-xs font-medium normal-case text-slate-500">{field.label}</span>
                   <input
                     type="number"
                     min={0}

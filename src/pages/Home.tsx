@@ -258,16 +258,19 @@ export default function Home() {
           initial="hidden"
           whileInView="show"
           viewport={viewportOnce}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:p-12"
+          className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue p-6 shadow-sm sm:p-8 md:p-12"
         >
-          <div className="grid items-center gap-8 md:grid-cols-2">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+          <div className="pointer-events-none absolute -left-20 bottom-0 h-40 w-40 rounded-full bg-white/10 blur-xl" />
+
+          <div className="relative grid items-center gap-8 md:grid-cols-2">
             <div className="text-center md:text-left">
-              <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Fatores de complexidade</h2>
-              <p className="mb-6 text-sm leading-relaxed text-slate-700 sm:text-base lg:text-lg">
+              <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">Fatores de complexidade</h2>
+              <p className="mb-6 text-sm leading-relaxed text-blue-100 sm:text-base lg:text-lg">
                 A Calcularq analisa seis fatores para medir a complexidade do projeto e ajustar as estimativas de horas e valor.
               </p>
               <Link to={createPageUrl("Calculator")} className="inline-block" onClick={handleCalculatorClick}>
-                <Button className="border-2 border-calcularq-blue bg-calcularq-blue px-6 py-3 font-semibold text-white shadow-md transition-colors transition-shadow duration-150 hover:bg-calcularq-blue/90 hover:shadow-lg">
+                <Button className="border-2 border-white bg-white px-6 py-3 font-semibold text-calcularq-blue shadow-md transition-colors transition-shadow duration-150 hover:bg-blue-50 hover:shadow-lg">
                   Experimentar agora
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -276,9 +279,9 @@ export default function Home() {
 
             <div className="grid grid-cols-2 gap-3">
               {factorsList.map((factor) => (
-                <div key={factor} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-500" />
-                  <span className="min-w-0 text-sm leading-snug text-slate-700 sm:text-[0.95rem]">{factor}</span>
+                <div key={factor} className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-3">
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-400" />
+                  <span className="min-w-0 text-sm leading-snug text-white sm:text-[0.95rem]">{factor}</span>
                 </div>
               ))}
             </div>
