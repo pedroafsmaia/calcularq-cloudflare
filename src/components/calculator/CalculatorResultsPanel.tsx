@@ -1,4 +1,4 @@
-﻿import Tooltip from "@/components/ui/Tooltip";
+import Tooltip from "@/components/ui/Tooltip";
 import { describeHourlyRate } from "@/lib/hourlyRateBands";
 import { describePricePerSqm } from "@/lib/pricePerSqmBands";
 
@@ -17,28 +17,52 @@ type Props = {
   hasComplexitySelections: boolean;
   complexityScore: number;
   currentStep: number;
-  currentStepLabel: string;
   selectedFactorsCount: number;
   totalFactors: number;
   estimatedHours: number;
   commercialDiscount: number;
   pricePerSqm: number | null;
   displayValues: CalculatorDisplayValues;
+  useManualMinHourlyRate: boolean;
+  fixedExpensesTotal: number;
+  personalExpensesTotal: number;
+  productiveHours: number;
 };
+
+function Row({ label, value, valueClassName = "text-slate-800", labelClassName = "text-slate-600" }: {
+  label: string;
+  value: string;
+  valueClassName?: string;
+  labelClassName?: string;
+}) {
+  return (
+    <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-sm">
+      <span className={`min-w-0 leading-snug ${labelClassName}`}>{label}</span>
+      <span className={`whitespace-nowrap font-semibold ${valueClassName}`}>{value}</span>
+    </div>
+  );
+}
 
 export default function CalculatorResultsPanel({
   minHourlyRate,
   hasComplexitySelections,
   complexityScore,
   currentStep,
-  currentStepLabel,
   selectedFactorsCount,
   totalFactors,
   estimatedHours,
   commercialDiscount,
   pricePerSqm,
   displayValues,
+  useManualMinHourlyRate,
+  fixedExpensesTotal,
+  personalExpensesTotal,
+  productiveHours,
 }: Props) {
+  const hasMinHourlyRate = Number.isFinite(minHourlyRate) && Number(minHourlyRate) > 0;
+  const hasFinalPrice = Number.isFinite(displayValues.finalSalePrice) && displayValues.finalSalePrice > 0;
+  const factorsProgress = totalFactors > 0 ? Math.min(100, Math.max(0, (selectedFactorsCount / totalFactors) * 100)) : 0;
+
   const pricePerSqmDescription = pricePerSqm !== null ? describePricePerSqm(pricePerSqm) : null;
   const isExtremePricePerSqm = pricePerSqmDescription?.kind === "extreme";
   const adjustedHourlyRateDescription =
@@ -48,67 +72,113 @@ export default function CalculatorResultsPanel({
   const isExtremeAdjustedHourlyRate = adjustedHourlyRateDescription?.kind === "extreme";
 
   return (
-    <>
-      {!minHourlyRate || minHourlyRate <= 0 ? (
-        <div className="bg-transparent p-5 space-y-3">
-          <div className="rounded-xl border-2 border-dashed border-slate-200 p-6 text-center">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-              <span className="text-lg font-bold text-slate-400">1</span>
-            </div>
-            <p className="mb-1 text-sm font-medium text-slate-600">Comece pela Etapa 1</p>
-            <p className="text-xs text-slate-400">Complete {currentStepLabel.toLowerCase()} para liberar a base do cálculo.</p>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-transparent p-4 space-y-4 sm:p-5">
-          <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
-            <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do Cálculo</p>
-            <div className="space-y-2.5 text-sm text-slate-600">
-              {hasComplexitySelections ? (
-                <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                  <span className="min-w-0 leading-snug">Score de Complexidade</span>
-                  <span className="whitespace-nowrap font-medium text-slate-800">{complexityScore}/100</span>
-                </div>
-              ) : null}
+    <div className="space-y-4 bg-transparent p-4 sm:p-5">
+      <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
+        <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do Cálculo</p>
+        <div className="space-y-2.5">
+          <Row
+            label="Hora técnica mínima"
+            value={
+              hasMinHourlyRate
+                ? `R$ ${Number(minHourlyRate).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h`
+                : "Pendente"
+            }
+            valueClassName={hasMinHourlyRate ? "text-slate-800" : "text-slate-400"}
+          />
 
-              {displayValues.adjustedHourlyRate > 0 ? (
-                <div className="mt-1 grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5">
-                  <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora Técnica Ajustada:</span>
-                  <span
-                    className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
-                      isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
-                    }`}
-                  >
-                    R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                    {adjustedHourlyRateDescription ? (
-                      <Tooltip
-                        title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
-                        tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
-                        iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
-                        text={[
-                          adjustedHourlyRateDescription.line1,
-                          adjustedHourlyRateDescription.line2,
-                          "Faixa estimada com base em CAGED 2025, Censo CAU 2020 e SINAPI.",
-                        ]
-                          .filter(Boolean)
-                          .join("\n")}
-                      />
-                    ) : null}
-                  </span>
-                </div>
-              ) : null}
-            </div>
-          </div>
+          <Row
+            label="Score de Complexidade"
+            value={selectedFactorsCount > 0 ? `${complexityScore}/100` : "Pendente"}
+            valueClassName={selectedFactorsCount > 0 ? "text-slate-800" : "text-slate-400"}
+          />
 
-          {currentStep === 2 ? (
-            <div className="flex items-center justify-between px-1 text-xs text-slate-500">
-              <span>Fatores classificados</span>
-              <span className={`font-semibold ${selectedFactorsCount === totalFactors ? "text-green-600" : "text-calcularq-blue"}`}>
-                {selectedFactorsCount} / {totalFactors}
+          {displayValues.adjustedHourlyRate > 0 ? (
+            <div className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5 text-sm">
+              <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora Técnica Ajustada</span>
+              <span
+                className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
+                  isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
+                }`}
+              >
+                R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
+                {adjustedHourlyRateDescription ? (
+                  <Tooltip
+                    title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
+                    tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
+                    iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
+                    text={[
+                      adjustedHourlyRateDescription.line1,
+                      adjustedHourlyRateDescription.line2,
+                      "Faixa estimada com base em CAGED 2025, Censo CAU 2020 e SINAPI.",
+                    ]
+                      .filter(Boolean)
+                      .join("\n")}
+                  />
+                ) : null}
               </span>
             </div>
+          ) : currentStep >= 3 ? (
+            <p className="border-t border-slate-200 pt-2.5 text-sm text-slate-400">A hora técnica ajustada será exibida após os ajustes de preço.</p>
+          ) : null}
+        </div>
+      </div>
+
+      {currentStep === 1 ? (
+        <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+          <p className="text-sm font-semibold text-slate-700">Progresso da Etapa 1</p>
+          {useManualMinHourlyRate ? (
+            <p className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+              Modo manual ativo: despesas e horas produtivas ficam dispensadas.
+            </p>
           ) : null}
 
+          <Row
+            label="Despesas operacionais"
+            value={fixedExpensesTotal > 0 ? "Preenchido" : "Pendente"}
+            valueClassName={fixedExpensesTotal > 0 ? "text-emerald-700" : "text-slate-400"}
+          />
+          <Row
+            label="Despesas pessoais"
+            value={personalExpensesTotal > 0 ? "Preenchido" : "Pendente"}
+            valueClassName={personalExpensesTotal > 0 ? "text-emerald-700" : "text-slate-400"}
+          />
+          <Row
+            label="Horas produtivas"
+            value={productiveHours > 0 ? "Preenchido" : "Pendente"}
+            valueClassName={productiveHours > 0 ? "text-emerald-700" : "text-slate-400"}
+          />
+
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+            Próximo passo: classificar os fatores de complexidade.
+          </p>
+        </div>
+      ) : null}
+
+      {currentStep === 2 ? (
+        <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+          <p className="text-sm font-semibold text-slate-700">Progresso da Etapa 2</p>
+          <Row label="Fatores classificados" value={`${selectedFactorsCount} / ${totalFactors}`} valueClassName="text-calcularq-blue" />
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-calcularq-blue transition-all duration-200" style={{ width: `${factorsProgress}%` }} />
+          </div>
+          <Row
+            label="Score parcial"
+            value={selectedFactorsCount > 0 ? `${complexityScore}/100` : "Aguardando"}
+            valueClassName={selectedFactorsCount > 0 ? "text-slate-800" : "text-slate-400"}
+          />
+          <Row
+            label="Horas estimadas"
+            value={hasComplexitySelections && estimatedHours > 0 ? `${estimatedHours}h` : "Aguardando conclusão da etapa"}
+            valueClassName={hasComplexitySelections && estimatedHours > 0 ? "text-slate-800" : "text-slate-400"}
+          />
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+            Próximo passo: finalize os ajustes de preço na Etapa 3.
+          </p>
+        </div>
+      ) : null}
+
+      {currentStep === 3 ? (
+        <>
           {displayValues.projectPrice > 0 ? (
             <div className="space-y-2.5 px-1 py-1 text-sm">
               <div className="grid grid-cols-[1fr_auto] items-start gap-2">
@@ -148,7 +218,7 @@ export default function CalculatorResultsPanel({
             </div>
           ) : null}
 
-          {displayValues.finalSalePrice > 0 ? (
+          {hasFinalPrice ? (
             <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 text-center shadow-sm">
               <p className="mb-1 text-xs font-semibold text-calcularq-blue">Preço de Venda Final</p>
               <p className="text-2xl font-bold text-calcularq-blue">
@@ -157,11 +227,11 @@ export default function CalculatorResultsPanel({
             </div>
           ) : (
             <div className="rounded-xl border-2 border-dashed border-slate-200 p-4 text-center">
-              <p className="text-xs text-slate-400">O preço de venda aparecerá aqui</p>
+              <p className="text-xs text-slate-400">Conclua os ajustes de preço para liberar o valor final.</p>
             </div>
           )}
 
-          {displayValues.finalSalePrice > 0 ? (
+          {hasFinalPrice ? (
             <>
               <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-1 pt-1">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
@@ -202,8 +272,8 @@ export default function CalculatorResultsPanel({
               ) : null}
             </>
           ) : null}
-        </div>
-      )}
-    </>
+        </>
+      ) : null}
+    </div>
   );
 }

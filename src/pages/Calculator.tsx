@@ -744,13 +744,16 @@ export default function Calculator() {
       hasComplexitySelections={hasComplexitySelections}
       complexityScore={complexityScore}
       currentStep={currentStep}
-      currentStepLabel={currentStepLabel}
       selectedFactorsCount={selectedFactorsCount}
       totalFactors={totalFactors}
       estimatedHours={estimatedHours}
       commercialDiscount={commercialDiscount}
       pricePerSqm={pricePerSqm}
       displayValues={displayValues}
+      useManualMinHourlyRate={useManualMinHourlyRate}
+      fixedExpensesTotal={fixedExpenses.reduce((sum, expense) => sum + (Number(expense.value) || 0), 0)}
+      personalExpensesTotal={personalExpenses.reduce((sum, expense) => sum + (Number(expense.value) || 0), 0)}
+      productiveHours={productiveHours}
     />
   );
 
