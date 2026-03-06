@@ -20,6 +20,7 @@ import { fadeUp } from "@/lib/motion";
 
 type FactorId = "volume" | "typology" | "stage" | "detail" | "technical" | "bureaucratic" | "monitoring";
 type Step1FieldId = "expenses" | "personal" | "hours";
+type Step3FieldId = "hoursEstimate" | "variableExpenses" | "commercialDiscount";
 
 const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
@@ -59,6 +60,12 @@ export default function Manual() {
     hours: false,
   });
 
+  const [expandedStep3Fields, setExpandedStep3Fields] = useState<Record<Step3FieldId, boolean>>({
+    hoursEstimate: true,
+    variableExpenses: false,
+    commercialDiscount: false,
+  });
+
   const toggleFactor = (factorId: FactorId) => {
     setExpandedFactors((prev) => ({
       ...prev,
@@ -68,6 +75,13 @@ export default function Manual() {
 
   const toggleField = (fieldId: Step1FieldId) => {
     setExpandedFields((prev) => ({
+      ...prev,
+      [fieldId]: !prev[fieldId],
+    }));
+  };
+
+  const toggleStep3Field = (fieldId: Step3FieldId) => {
+    setExpandedStep3Fields((prev) => ({
       ...prev,
       [fieldId]: !prev[fieldId],
     }));
@@ -263,6 +277,55 @@ export default function Manual() {
     </div>
   );
 
+  const Step3FieldAccordion = ({
+    id,
+    title,
+    description,
+    hint,
+  }: {
+    id: Step3FieldId;
+    title: string;
+    description: React.ReactNode;
+    hint?: React.ReactNode;
+  }) => (
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <button
+        type="button"
+        onClick={() => toggleStep3Field(id)}
+        className="flex w-full items-center justify-between gap-3 bg-slate-50 px-4 py-3 min-h-[44px] text-left hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue/40 focus-visible:ring-offset-1"
+        aria-expanded={expandedStep3Fields[id]}
+        aria-controls={`step3-${id}-panel`}
+        id={`step3-${id}-trigger`}
+      >
+        <h3 className="text-sm sm:text-base font-semibold text-calcularq-blue">{title}</h3>
+        {expandedStep3Fields[id] ? (
+          <ChevronUp className="w-4 h-4 text-calcularq-blue shrink-0" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-calcularq-blue shrink-0" />
+        )}
+      </button>
+      <AnimatePresence initial={false}>
+        {expandedStep3Fields[id] ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+            className="overflow-hidden"
+            id={`step3-${id}-panel`}
+            role="region"
+            aria-labelledby={`step3-${id}-trigger`}
+          >
+            <div className="border-t border-slate-200 px-4 py-4 space-y-2">
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed">{description}</p>
+              {hint ? <div>{hint}</div> : null}
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
+
   return (
     <div className="bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
@@ -284,7 +347,7 @@ export default function Manual() {
               </p>
 
               <div className="mt-5 text-left">
-                <NoteBox tone="amber">
+                <NoteBox>
                   <strong>Método em construção:</strong> A Calcularq está numa fase de estruturação do seu método final. Os parâmetros atuais foram calibrados com base em referências técnicas e serão refinados continuamente a partir do feedback real dos usuários. Os resultados são estimativas estruturadas — quanto mais você usa, mais o método evolui.
                 </NoteBox>
               </div>
@@ -512,32 +575,37 @@ export default function Manual() {
 
                     <div>
                       <h3 className="text-base font-semibold text-calcularq-blue mb-2">O que você encontra nesta etapa</h3>
-                      <ul className="space-y-3">
-                        <li>
-                          <strong>Estimativa de horas de projeto:</strong> A calculadora já preencheu esse valor automaticamente com base nos dados do projeto. Você pode substituí-lo se preferir usar sua própria estimativa.
-                          <p className="text-sm text-slate-500 mt-1">A estimativa padrão já considera uma margem de incerteza — ela é conservadora por definição. Você também pode consultar o cenário principal, que representa a estimativa sem essa margem adicional.</p>
-                        </li>
-                        <li>
-                          <strong>Despesas variáveis:</strong> Custos específicos deste contrato que serão repassados ao cliente.
-                          <p className="text-sm text-slate-500 mt-1">Ex.: RRT/ART, deslocamentos, plotagens, taxas e custos logísticos.</p>
-                        </li>
-                        <li>
-                          <strong>Desconto comercial:</strong> Ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente.</li>
-                      </ul>
+                      <div className="space-y-3">
+                        <Step3FieldAccordion
+                          id="hoursEstimate"
+                          title="Estimativa de horas de projeto"
+                          description="A calculadora já preencheu esse valor automaticamente com base nos dados do projeto. Você pode substituí-lo se preferir usar sua própria estimativa."
+                          hint={<p className="text-sm text-slate-500">A estimativa padrão já considera uma margem de incerteza — ela é conservadora por definição. Você também pode consultar o cenário principal, que representa a estimativa sem essa margem adicional.</p>}
+                        />
+                        <Step3FieldAccordion
+                          id="variableExpenses"
+                          title="Despesas variáveis"
+                          description="Custos específicos deste contrato que serão repassados ao cliente."
+                          hint={<p className="text-sm text-slate-500">Ex.: RRT/ART, deslocamentos, plotagens, taxas e custos logísticos.</p>}
+                        />
+                        <Step3FieldAccordion
+                          id="commercialDiscount"
+                          title="Desconto comercial"
+                          description="Ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente."
+                        />
+                      </div>
                     </div>
 
                     <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
                       <h3 className="font-semibold text-calcularq-blue mb-3">Resultado apresentado ao final</h3>
                       <ul className="space-y-2 text-sm sm:text-base text-slate-700 leading-relaxed">
                         {[
-                          "Hora Técnica Mínima",
-                          "Complexidade Global",
+                          "Score",
                           "Hora Técnica Ajustada",
                           "Estimativa de Horas de Projeto",
-                          "Preço do Projeto (honorários)",
                           "Despesas Variáveis",
-                          "Valor do Desconto (se houver)",
                           "Preço de Venda Final",
+                          "Valor do Desconto (se houver)",
                           "Preço/m² (indicador comparativo)",
                           "Lucro estimado (margem bruta entre hora ajustada e hora mínima)",
                         ].map((item) => (
@@ -557,15 +625,18 @@ export default function Manual() {
             </motion.div>
 
             <motion.div className="order-4" variants={fadeUp(prefersReducedMotion, 12)} initial="hidden" animate="show" transition={{ delay: prefersReducedMotion ? 0 : 0.11 }}>
-              <section id="encerramento" className="scroll-mt-[136px] md:scroll-mt-[96px] rounded-2xl bg-gradient-to-br from-calcularq-blue to-[#002366] p-6 sm:p-8 text-white shadow-sm">
-                <div className="flex items-start gap-3 mb-4">
+              <section id="encerramento" className="relative scroll-mt-[136px] md:scroll-mt-[96px] overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue p-6 sm:p-8 text-white shadow-sm">
+                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+                <div className="pointer-events-none absolute -left-20 bottom-0 h-40 w-40 rounded-full bg-white/10 blur-xl" />
+
+                <div className="relative flex items-start gap-3 mb-4">
                   <Info className="w-6 h-6 mt-0.5 shrink-0" />
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold">Você tem uma referência. O próximo passo é seu.</h2>
                   </div>
                 </div>
 
-                <div className="space-y-3 text-white/95 leading-relaxed text-sm sm:text-base">
+                <div className="relative space-y-3 text-white/95 leading-relaxed text-sm sm:text-base">
                   <p>
                     A calculadora entrega estrutura: uma estimativa de esforço, uma composição de custo e uma referência de preço baseadas nos dados do projeto. O que ela não entrega é o julgamento — sobre o cliente, o mercado e o momento. Isso é seu.
                   </p>
@@ -574,7 +645,7 @@ export default function Manual() {
                   </p>
                 </div>
 
-                <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
+                <div className="relative mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
                   <Link
                     to={createPageUrl("Calculator")}
                     className="inline-flex h-10 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-calcularq-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-calcularq-blue hover:bg-slate-100"
