@@ -1,4 +1,4 @@
-import { jsonResponse, requireAdmin } from "../_utils.js";
+import { jsonResponse, rateLimitByIp, requireAdmin } from "../_utils.js";
 import { parseFilters, fetchFilteredBudgets, safeAvg, round4 } from "./_admin_utils.js";
 
 export async function onRequest(context) {
@@ -9,7 +9,18 @@ export async function onRequest(context) {
   const auth = await requireAdmin(context);
   if (!auth.ok) return auth.response;
 
+  const rate = await rateLimitByIp(context, { endpoint: "admin:summary", limit: 60, windowMs: 60_000 });
+  if (!rate.ok) {
+    return jsonResponse(
+      { success: false, message: "Muitas consultas. Tente novamente em instantes." },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+    );
+  }
+
   const db = context.env.DB;
+  if (!db) {
+    return jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 });
+  }
   const url = new URL(context.request.url);
   const filters = parseFilters(url);
 

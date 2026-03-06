@@ -115,7 +115,7 @@ export default function Layout({ children }: LayoutProps) {
                       }}
                       className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 transition-colors duration-150 border border-transparent ${user.isAdmin ? "hover:bg-slate-100 hover:text-calcularq-blue cursor-pointer" : ""}`}
                     >
-                      <span className="hidden 2xl:inline">{user.name}</span>
+                      <span className="inline max-w-[120px] truncate">{user.name}</span>
                     </span>
 
                     <button onClick={logout} className={desktopNavItem(false)} aria-label="Sair">

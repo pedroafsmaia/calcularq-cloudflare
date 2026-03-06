@@ -481,22 +481,27 @@ export default function Admin() {
   const fetchData = useCallback(async (f: AdminFilters) => {
     setLoading(true);
     setError(null);
-    try {
-      const [sumRes, useRes, comRes, calRes] = await Promise.all([
-        api.getAdminSummary(f),
-        api.getAdminUsage(f),
-        api.getAdminCommercial(f),
-        api.getAdminCalibration(f),
-      ]);
-      if (sumRes.success) setSummary(sumRes.data);
-      if (useRes.success) setUsage(useRes.data);
-      if (comRes.success) setCommercial(comRes.data);
-      if (calRes.success) setCalibration(calRes.data);
-    } catch {
+    const [sumRes, useRes, comRes, calRes] = await Promise.allSettled([
+      api.getAdminSummary(f),
+      api.getAdminUsage(f),
+      api.getAdminCommercial(f),
+      api.getAdminCalibration(f),
+    ]);
+
+    const failures = [sumRes, useRes, comRes, calRes].filter((r) => r.status === "rejected");
+
+    if (sumRes.status === "fulfilled" && sumRes.value.success) setSummary(sumRes.value.data);
+    if (useRes.status === "fulfilled" && useRes.value.success) setUsage(useRes.value.data);
+    if (comRes.status === "fulfilled" && comRes.value.success) setCommercial(comRes.value.data);
+    if (calRes.status === "fulfilled" && calRes.value.success) setCalibration(calRes.value.data);
+
+    if (failures.length === 4) {
       setError("Erro ao carregar dados do dashboard. Tente novamente.");
-    } finally {
-      setLoading(false);
+    } else if (failures.length > 0) {
+      setError("Algumas seções não puderam ser carregadas. Verifique migrations do banco e tente novamente.");
     }
+
+    setLoading(false);
   }, []);
 
   useEffect(() => {

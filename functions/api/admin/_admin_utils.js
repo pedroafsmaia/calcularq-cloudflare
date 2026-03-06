@@ -71,9 +71,22 @@ export function round4(v) {
 }
 
 export async function fetchFilteredBudgets(db, filters) {
-  const { results: rawBudgets } = await db
-    .prepare("SELECT id, data, created_at, updated_at, closed_at FROM budgets")
-    .all();
+  let rawBudgets = [];
+  try {
+    const withClosedAt = await db
+      .prepare("SELECT id, data, created_at, updated_at, closed_at FROM budgets")
+      .all();
+    rawBudgets = withClosedAt.results || [];
+  } catch (error) {
+    const message = String(error?.message || "");
+    if (!message.includes("no such column: closed_at")) throw error;
+
+    // Backward compatibility for databases that have not applied migration 0003.
+    const withoutClosedAt = await db
+      .prepare("SELECT id, data, created_at, updated_at FROM budgets")
+      .all();
+    rawBudgets = (withoutClosedAt.results || []).map((row) => ({ ...row, closed_at: null }));
+  }
 
   const budgets = (rawBudgets || []).map((b) => ({ ...b, _parsed: parseBudgetData(b) }));
   return applyFilters(budgets, filters);

@@ -120,6 +120,9 @@ export function clearSessionCookie(headers) {
 }
 
 export async function signSessionToken(payload, secret) {
+  if (!secret || String(secret).trim().length < 16) {
+    throw new Error("Missing or invalid JWT_SECRET");
+  }
   const key = new TextEncoder().encode(secret);
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -129,12 +132,18 @@ export async function signSessionToken(payload, secret) {
 }
 
 export async function verifySessionToken(token, secret) {
+  if (!secret || String(secret).trim().length < 16) {
+    throw new Error("Missing or invalid JWT_SECRET");
+  }
   const key = new TextEncoder().encode(secret);
   const { payload } = await jwtVerify(token, key, { algorithms: ["HS256"] });
   return payload;
 }
 
 export async function requireAuth(context) {
+  if (!context.env.JWT_SECRET || String(context.env.JWT_SECRET).trim().length < 16) {
+    return { ok: false, response: jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 }) };
+  }
   const token = getCookie(context.request, SESSION_COOKIE_NAME);
   if (!token) {
     return { ok: false, response: jsonResponse({ success: false, message: "Não autenticado" }, { status: 401 }) };

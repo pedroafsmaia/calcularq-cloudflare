@@ -46,6 +46,12 @@ export async function onRequest(context) {
   }
 
   const db = context.env.DB;
+  if (!context.env.JWT_SECRET || String(context.env.JWT_SECRET).trim().length < 16) {
+    return jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 });
+  }
+  if (!db) {
+    return jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 });
+  }
 
   const existing = await db.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
   if (existing) {
