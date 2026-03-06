@@ -331,7 +331,7 @@ export default function Payment() {
         </motion.div>
       </div>
 
-      <LegalModal isOpen={showTerms} onClose={() => setShowTerms(false)} title="Termos e Condições Gerais de Uso" content={termsContent} />
+      <LegalModal isOpen={showTerms} onClose={() => setShowTerms(false)} title="Termos de Uso da Plataforma Calcularq" content={termsContent} />
       <LegalModal
         isOpen={showPrivacy}
         onClose={() => setShowPrivacy(false)}

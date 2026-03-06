@@ -3,209 +3,276 @@
 export const termsContent = `
   <div class="space-y-6">
     <div>
-      <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS E CONDIÇÕES GERAIS DE USO E LICENCIAMENTO DE SOFTWARE</h2>
+      <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS DE USO DA PLATAFORMA CALCULARQ</h2>
       <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Data de Vigência: [Inserir Data de Lançamento]</p>
       <p class="text-slate-700 mb-4">
-        O presente Instrumento de Termos e Condições Gerais de Uso ("Termos") regula o
-        licenciamento de uso do software CALCULARQ, disponibilizado por PEDRO AFONSO
-        MAIA PIRES, pessoa física, doravante denominado LICENCIANTE.
+        O presente Instrumento de Termos de Uso ("Termos") disciplina as condições gerais de acesso, cadastro, contratação e utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>LICENCIANTE</strong>.
       </p>
       <p class="text-slate-700 mb-6">
-        A aceitação destes Termos é indispensável para a utilização da plataforma. Ao realizar o
-        pagamento e acessar o sistema, o indivíduo, doravante denominado LICENCIADO (ou
-        USUÁRIO), declara ter lido, compreendido e aceito integralmente as disposições aqui
-        contidas.
+        Ao criar conta, contratar plano, acessar ou utilizar a plataforma, o usuário declara ter lido, compreendido e aceitado integralmente estes Termos, bem como a Política de Privacidade aplicável.
       </p>
     </div>
 
     <div>
       <h3 class="text-xl font-bold text-calcularq-blue mb-3">1. DO OBJETO</h3>
       <p class="text-slate-700 mb-3">
-        O presente contrato tem por objeto a concessão de uma licença de uso de software
-        (modalidade SaaS - Software as a Service), em caráter oneroso, pessoal, intransferível e
-        não exclusivo.
+        O CALCULARQ consiste em uma plataforma digital destinada a apoiar profissionais e escritórios de arquitetura na estimativa, organização, registro e acompanhamento de cálculos relacionados à precificação de projetos, parâmetros de complexidade, histórico de orçamentos, registros de feedback e informações correlatas.
+      </p>
+      <p class="text-slate-700 mb-2">A plataforma poderá disponibilizar, entre outras, funcionalidades de:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>cálculo e estimativa de valores;</li>
+        <li>registro e armazenamento de histórico de orçamentos;</li>
+        <li>organização de dados de projeto;</li>
+        <li>registro de feedback real do projeto;</li>
+        <li>geração de relatórios e exportações;</li>
+        <li>visualização de métricas, painéis e dados agregados;</li>
+        <li>recursos administrativos internos do LICENCIANTE.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA NATUREZA DA FERRAMENTA</h3>
+      <p class="text-slate-700 mb-3">
+        O CALCULARQ constitui ferramenta de apoio técnico, organizacional e decisório, não se caracterizando como consultoria jurídica, contábil, tributária, financeira, pericial ou de engenharia legal.
+      </p>
+      <p class="text-slate-700 mb-3">
+        As estimativas, parâmetros, sugestões, projeções, alertas, classificações, indicadores, relatórios e demais saídas da plataforma possuem natureza <strong>instrumental e auxiliar</strong>, devendo ser interpretados pelo USUÁRIO conforme seu contexto profissional, experiência, escopo efetivo do projeto, negociação comercial, condições regionais de mercado e demais variáveis relevantes.
       </p>
       <p class="text-slate-700">
-        O software CALCULARQ consiste em uma ferramenta digital de precificação de projetos
-        arquitetônicos, permitindo ao LICENCIADO realizar cálculos e armazenar o histórico dos
-        orçamentos gerados, mediante inserção de dados próprios.
+        O LICENCIANTE não garante que os resultados sugeridos pela plataforma correspondam, em todos os casos, ao valor final contratado, ao preço de mercado, ao tempo efetivamente consumido no projeto ou ao desempenho comercial do USUÁRIO.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">2. DA VIGÊNCIA E MODALIDADE DE ACESSO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DO CADASTRO E DO ACESSO</h3>
       <p class="text-slate-700 mb-3">
-        O acesso ao software é concedido mediante a modalidade de pagamento único, regido
-        pelas seguintes disposições de vigência e perenidade:
+        Para utilização de determinadas funcionalidades, poderá ser exigida a criação de conta com fornecimento de informações verídicas, completas e atualizadas.
       </p>
-      <div class="space-y-3 text-slate-700">
-        <div>
-          <p class="font-semibold mb-1">2.1. Garantia Mínima de Disponibilidade</p>
-          <p>
-            O LICENCIANTE assegura a manutenção do serviço e o acesso irrestrito à plataforma pelo
-            período mínimo de 06 (seis) meses, contados a partir da data de confirmação do
-            pagamento.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">2.2. Vigência Estendida (Life of the Software)</p>
-          <p>
-            Após o decurso do período de garantia mínima supramencionado, a licença de uso
-            permanecerá válida por prazo indeterminado, vigorando enquanto o software estiver
-            operacional e disponibilizado pelo LICENCIANTE na rede mundial de computadores
-            (modelo conhecido internacionalmente como "Life of the Software").
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">2.3. Descontinuidade do Serviço</p>
-          <p>
-            O LICENCIANTE reserva-se o direito de encerrar as operações da plataforma a qualquer
-            momento após o cumprimento do período de garantia mínima de 06 (seis) meses.
-            Na hipótese de encerramento definitivo das atividades, o LICENCIADO será notificado
-            através do endereço de e-mail cadastrado ou por aviso na plataforma, com antecedência
-            mínima de 30 (trinta) dias, para que possa realizar a extração de seus dados e relatórios.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">3. DO PREÇO E FORMA DE PAGAMENTO</h3>
+      <p class="text-slate-700 mb-2">O USUÁRIO compromete-se a:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>fornecer dados verdadeiros, exatos e atualizados;</li>
+        <li>manter a confidencialidade de suas credenciais de acesso;</li>
+        <li>não compartilhar sua conta com terceiros sem autorização expressa do LICENCIANTE;</li>
+        <li>comunicar, sem demora indevida, qualquer suspeita de acesso não autorizado, uso indevido, comprometimento de conta ou incidente relacionado à segurança de suas credenciais.</li>
+      </ul>
       <p class="text-slate-700 mb-3">
-        Em contrapartida à licença de uso concedida, o LICENCIADO pagará o valor único vigente
-        na data da contratação, divulgado na página oficial do produto.
-      </p>
-      <p class="text-slate-700 mb-3">
-        O processamento das transações financeiras é realizado integralmente pela empresa Stripe
-        Inc. O LICENCIANTE não armazena dados bancários ou números de cartão de crédito em
-        seus servidores.
+        O USUÁRIO é responsável pelas atividades realizadas por meio de sua conta, ressalvadas hipóteses de falha comprovada de segurança imputável ao LICENCIANTE.
       </p>
       <p class="text-slate-700">
-        A liberação do acesso ao software ocorrerá de forma automática e imediata após a
-        confirmação do pagamento pela instituição financeira.
+        O LICENCIANTE poderá adotar mecanismos de autenticação, validação de sessão, prevenção a fraudes, limitação de acesso e controles adicionais de segurança sempre que reputar necessário para proteção da plataforma e dos usuários.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DA POLÍTICA DE ARREPENDIMENTO E REEMBOLSO</h3>
-      <div class="space-y-3 text-slate-700">
-        <div>
-          <p class="font-semibold mb-1">4.1. Direito de Arrependimento (7 Dias)</p>
-          <p>
-            Em estrita observância ao Artigo 49 do Código de Defesa do Consumidor (Lei nº
-            8.078/1990), é assegurado ao LICENCIADO o direito de desistir da contratação no prazo de
-            até 07 (sete) dias corridos, a contar da data da compra.
-          </p>
-          <p class="mt-2">
-            Nesta hipótese, o LICENCIADO deverá formalizar o pedido de cancelamento através do
-            e-mail atendimento@calcularq.com.br, sendo garantido o reembolso integral do valor
-            pago.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">4.2. Reembolso por Descontinuidade Precoce</p>
-          <p>
-            Caso o LICENCIANTE encerre as atividades da plataforma antes de completado o período
-            de garantia mínima de 06 (seis) meses previsto na Cláusula 2.1, o LICENCIADO terá direito
-            ao reembolso integral do valor pago, independentemente do tempo de uso já usufruído.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">4.3. Ausência de Reembolso Após Prazo Legal</p>
-          <p>
-            Decorrido o prazo legal de 07 (sete) dias, e salvo a exceção de descontinuidade precoce
-            prevista no item anterior, não caberá reembolso por mera desistência, ressalvados os
-            direitos de garantia legal e vícios ocultos previstos no Código de Defesa do Consumidor.
-          </p>
-        </div>
-      </div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DOS PLANOS, LICENÇA DE USO E PAGAMENTOS</h3>
+      <p class="text-slate-700 mb-3">
+        O acesso à plataforma poderá ocorrer em modalidades gratuitas, promocionais, de teste, pagas ou condicionadas a assinatura, conforme as condições comerciais vigentes no momento da contratação.
+      </p>
+      <p class="text-slate-700 mb-3">
+        Ao contratar plano pago, o USUÁRIO adquire licença de uso <strong>limitada, pessoal, não exclusiva, intransferível e revogável</strong>, restrita ao período contratado e às funcionalidades correspondentes ao plano escolhido.
+      </p>
+      <p class="text-slate-700 mb-3">
+        Os preços, formas de pagamento, periodicidades, condições promocionais, renovação, cancelamento e eventuais períodos de teste observarão a oferta vigente no momento da contratação.
+      </p>
+      <p class="text-slate-700 mb-3">
+        O processamento financeiro poderá ser realizado por terceiros especializados, e o LICENCIANTE não armazena integralmente dados completos de cartão de crédito ou equivalentes quando processados em ambiente próprio do provedor de pagamento.
+      </p>
+      <p class="text-slate-700 mb-2">A inadimplência poderá ensejar, conforme aplicável e observadas as condições comerciais e legais:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>suspensão de funcionalidades;</li>
+        <li>limitação de acesso;</li>
+        <li>cancelamento de assinatura;</li>
+        <li>impedimento de novas contratações até regularização.</li>
+      </ul>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DAS LIMITAÇÕES DE RESPONSABILIDADE</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">5. DAS FUNCIONALIDADES, DISPONIBILIDADE E EVOLUÇÃO DO SERVIÇO</h3>
       <p class="text-slate-700 mb-3">
-        O CALCULARQ é uma ferramenta instrumental de auxílio ao cálculo. O LICENCIANTE não
-        presta serviços de consultoria financeira, contábil ou jurídica.
+        O LICENCIANTE envidará esforços razoáveis para manter a plataforma disponível, segura e funcional, ressalvadas hipóteses de manutenção, atualização, indisponibilidades técnicas, falhas de terceiros, caso fortuito, força maior ou outros eventos alheios ao seu controle razoável.
       </p>
-      <p class="text-slate-700 mb-3">
-        O LICENCIADO reconhece expressamente que é o único e exclusivo responsável pela
-        inserção dos dados e pela interpretação dos resultados gerados.
+      <p class="text-slate-700 mb-2">O LICENCIANTE poderá, a qualquer tempo e independentemente de autorização prévia individual, desde que observados os limites legais:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>atualizar a interface, fluxos e experiência de uso;</li>
+        <li>corrigir erros e inconsistências;</li>
+        <li>aperfeiçoar a metodologia, regras de cálculo, critérios internos, parâmetros e funcionalidades;</li>
+        <li>incluir, alterar, restringir ou descontinuar recursos da plataforma;</li>
+        <li>implantar novas integrações, controles, filtros, visualizações e recursos administrativos;</li>
+        <li>realizar testes, medições internas, monitoramento técnico e melhorias operacionais.</li>
+      </ul>
+      <p class="text-slate-700">
+        Tais alterações não geram, por si sós, direito adquirido à manutenção perpétua de layout, versão, fórmula, recurso específico, nomenclatura ou comportamento exato anteriormente disponibilizado.
       </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DOS DADOS INSERIDOS PELO USUÁRIO</h3>
       <p class="text-slate-700 mb-3">
-        O LICENCIANTE não se responsabiliza por prejuízos financeiros decorrentes de
-        orçamentos elaborados com base na ferramenta, recusa de propostas comerciais por parte
-        dos clientes do LICENCIADO ou erros de cálculo provenientes de dados imprecisos
-        inseridos pelo LICENCIADO.
+        O USUÁRIO poderá inserir na plataforma informações relacionadas a projetos, clientes, obras, orçamentos, valores, parâmetros de cálculo, observações, feedbacks, horas reais, fases do projeto e demais registros necessários ao uso da ferramenta.
       </p>
-      <p class="text-slate-700 mb-3">
-        O software é fornecido "no estado em que se encontra" (as is), sem garantias implícitas de
-        adequação a um fim específico ou de rentabilidade garantida, ressalvadas as garantias
-        legais obrigatórias previstas no Código de Defesa do Consumidor.
+      <p class="text-slate-700 mb-2">O USUÁRIO declara e garante que:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>possui legitimidade para inserir os dados lançados na plataforma;</li>
+        <li>é responsável pela veracidade, pertinência e legalidade das informações cadastradas;</li>
+        <li>não utilizará a plataforma para tratar dados em desconformidade com a legislação aplicável;</li>
+        <li>não inserirá conteúdo ilícito, fraudulento, difamatório, abusivo, ofensivo, discriminatório ou que viole direitos de terceiros.</li>
+      </ul>
+      <p class="text-slate-700">
+        Quando o USUÁRIO inserir dados pessoais de terceiros no histórico de orçamentos, projetos ou registros correlatos, assume integral responsabilidade pela base legal da coleta originária, pela prestação de informações adequadas aos titulares e pelo tratamento legítimo desses dados, na forma da legislação aplicável.
       </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DO USO ACEITÁVEL E DAS VEDAÇÕES</h3>
+      <p class="text-slate-700 mb-2">É vedado ao USUÁRIO:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>utilizar a plataforma para fins ilícitos ou em desconformidade com a legislação aplicável;</li>
+        <li>violar direitos de propriedade intelectual do LICENCIANTE ou de terceiros;</li>
+        <li>tentar acessar áreas, contas, sistemas, rotas, APIs, painéis ou dados sem autorização;</li>
+        <li>contornar medidas de autenticação, limitação, pagamento, segurança ou controle de acesso;</li>
+        <li>explorar vulnerabilidades, realizar engenharia reversa indevida, scraping abusivo, automações não autorizadas ou práticas que comprometam a estabilidade do serviço;</li>
+        <li>reproduzir, revender, sublicenciar, redistribuir, espelhar ou explorar comercialmente a plataforma sem autorização expressa;</li>
+        <li>utilizar a plataforma para desenvolver produto concorrente com cópia substancial de interface, metodologia protegível, estrutura funcional ou materiais proprietários do LICENCIANTE;</li>
+        <li>inserir vírus, scripts maliciosos, rotinas automatizadas nocivas ou qualquer conteúdo apto a prejudicar a plataforma ou terceiros.</li>
+      </ul>
+      <p class="text-slate-700">
+        O descumprimento deste item poderá ensejar suspensão, bloqueio ou cancelamento da conta, sem prejuízo das medidas legais cabíveis.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DA PROPRIEDADE INTELECTUAL</h3>
       <p class="text-slate-700 mb-3">
-        Não serão consideradas violações à garantia de disponibilidade as interrupções
-        temporárias necessárias para manutenções técnicas programadas, atualizações de
-        segurança ou melhorias na plataforma, desde que não impliquem na descontinuidade
-        definitiva do serviço.
+        Salvo disposição expressa em contrário, todos os direitos relativos à plataforma, incluindo software, interface, layout, identidade visual, textos, marcas, sinais distintivos, bases estruturadas, organização funcional, conteúdos proprietários, relatórios-padrão, documentação, códigos, fluxos, componentes, elementos gráficos e demais ativos intelectuais associados ao CALCULARQ pertencem ao LICENCIANTE ou a terceiros que o tenham licenciado.
       </p>
       <p class="text-slate-700">
-        A limitação de responsabilidade aqui prevista não se aplica aos casos de dolo, culpa grave
-        ou falhas estruturais do sistema que impeçam a utilização da plataforma durante o período
-        de garantia mínima, ressalvadas as janelas de manutenção supracitadas.
+        Estes Termos não implicam cessão, transferência ou alienação de quaisquer direitos de propriedade intelectual ao USUÁRIO, limitando-se à concessão da licença de uso prevista neste instrumento.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DA PROPRIEDADE INTELECTUAL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DOS RESULTADOS, RELATÓRIOS E EXPORTAÇÕES</h3>
       <p class="text-slate-700 mb-3">
-        Todos os direitos de propriedade intelectual relativos ao software, incluindo seu
-        código-fonte, banco de dados, design, interface gráfica, logomarca e metodologia de
-        cálculo, são de titularidade exclusiva do LICENCIANTE.
+        A plataforma poderá disponibilizar resultados de cálculo, comparativos, classificações, alertas, relatórios técnicos, relatórios gerenciais, exportações em formatos digitais e visualizações administrativas ou operacionais.
       </p>
-      <p class="text-slate-700 mb-3">
-        É vedado ao LICENCIADO ceder, sublicenciar, vender, alugar ou transferir sua conta a
-        terceiros.
-      </p>
+      <p class="text-slate-700 mb-2">Tais saídas refletem a lógica, parâmetros, entradas e condições existentes no momento do processamento, podendo ser alteradas futuramente em razão de:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>atualização metodológica;</li>
+        <li>mudança de inputs;</li>
+        <li>correção de erros;</li>
+        <li>refinamento de critérios;</li>
+        <li>evolução do produto;</li>
+        <li>novas regras de negócio.</li>
+      </ul>
       <p class="text-slate-700">
-        É vedado realizar engenharia reversa, descompilação ou desmontagem do software, bem
-        como utilizar técnicas de data mining ou bots para extração de dados da plataforma.
+        O USUÁRIO reconhece que relatórios, inclusive exportações em <code>.md</code> ou outros formatos, podem servir como apoio operacional, organizacional, documental ou analítico, mas não substituem validação profissional, jurídica, contábil, tributária ou contratual independente, quando necessária.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DA PROTEÇÃO DE DADOS E PRIVACIDADE</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">10. DO DASHBOARD ADMINISTRATIVO E DOS RECURSOS INTERNOS</h3>
       <p class="text-slate-700 mb-3">
-        O tratamento dos dados pessoais do LICENCIADO e dos dados de terceiros inseridos na
-        plataforma reger-se-á pela Política de Privacidade, parte integrante e indissociável destes
-        Termos.
+        A plataforma poderá conter funcionalidades administrativas de uso exclusivo do LICENCIANTE, inclusive painéis internos, recursos de monitoramento, auditoria, métricas, relatórios agregados, exportações administrativas, controles técnicos e mecanismos de gestão operacional.
       </p>
+      <p class="text-slate-700 mb-2">Tais funcionalidades:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>não integram, necessariamente, o escopo de uso ordinário do USUÁRIO;</li>
+        <li>podem ficar ocultas, indisponíveis ou restritas por perfil de acesso;</li>
+        <li>destinam-se à segurança, suporte, auditoria, melhoria do serviço, acompanhamento operacional e aperfeiçoamento metodológico da plataforma.</li>
+      </ul>
       <p class="text-slate-700">
-        Ao utilizar a funcionalidade de "Histórico de Orçamentos", o LICENCIADO declara possuir
-        as devidas autorizações legais para inserir dados de seus clientes na plataforma,
-        assumindo a posição de Controlador desses dados perante a Lei Geral de Proteção de
-        Dados (LGPD).
+        O LICENCIANTE adotará, sempre que possível, critérios de minimização, restrição de acesso e preferência por dados agregados ou anonimizados nas rotinas administrativas internas.
       </p>
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DAS DISPOSIÇÕES GERAIS E FORO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">11. DA PRIVACIDADE E PROTEÇÃO DE DADOS</h3>
       <p class="text-slate-700 mb-3">
-        O LICENCIANTE poderá alterar os presentes Termos visando sua adequação a novas
-        legislações ou funcionalidades do sistema.
-      </p>
-      <p class="text-slate-700 mb-3">
-        As alterações relevantes serão comunicadas ao LICENCIADO, por e-mail ou aviso na
-        plataforma, com antecedência mínima de 15 (quinze) dias. Caso o LICENCIADO não
-        concorde com as modificações substanciais, poderá optar pela rescisão do contrato.
-      </p>
-      <p class="text-slate-700 mb-3">
-        Fica estabelecido que eventuais alterações contratuais não afetarão direitos adquiridos,
-        valores já pagos ou garantias de disponibilidade já iniciadas.
+        O tratamento de dados pessoais relacionado ao uso da plataforma observará a Política de Privacidade do CALCULARQ, que integra estes Termos para todos os fins.
       </p>
       <p class="text-slate-700">
-        Para dirimir quaisquer controvérsias oriundas deste contrato, fica eleito o foro da Comarca
-        de domicílio do LICENCIADO (Consumidor), em conformidade com o Artigo 101, I, do
-        Código de Defesa do Consumidor.
+        Ao utilizar a plataforma, o USUÁRIO declara ciência de que determinados dados técnicos, operacionais, cadastrais e transacionais poderão ser tratados para viabilizar a prestação do serviço, a segurança da conta, o cumprimento de obrigações legais, a prevenção a fraudes, a melhoria da plataforma e o aperfeiçoamento metodológico do produto, nos limites da legislação aplicável e da Política de Privacidade.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">12. DAS RESPONSABILIDADES E LIMITAÇÕES</h3>
+      <p class="text-slate-700 mb-2">Na máxima extensão permitida pela legislação aplicável, o LICENCIANTE não será responsável por:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>decisões comerciais, técnicas, profissionais ou estratégicas tomadas pelo USUÁRIO com base exclusiva nos resultados da plataforma;</li>
+        <li>perda de oportunidade, perda de lucro, frustração de expectativa, dano indireto ou reflexo decorrente do uso da ferramenta;</li>
+        <li>divergência entre estimativas sugeridas e resultados efetivos de mercado, contratação, execução, prazo ou rentabilidade;</li>
+        <li>indisponibilidades, falhas, atrasos ou inconsistências causadas por fatos de terceiros, provedores externos, integrações, falhas de conectividade, eventos de segurança causados por terceiros, caso fortuito ou força maior;</li>
+        <li>uso inadequado, interpretação equivocada ou utilização da plataforma em desconformidade com estes Termos.</li>
+      </ul>
+      <p class="text-slate-700">
+        Nada nestes Termos exclui responsabilidade em hipóteses que não possam ser legalmente afastadas, especialmente em matéria consumerista, proteção de dados e deveres legais inderrogáveis.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">13. DA SUSPENSÃO, BLOQUEIO E CANCELAMENTO</h3>
+      <p class="text-slate-700 mb-2">O LICENCIANTE poderá suspender, restringir, bloquear ou cancelar o acesso do USUÁRIO, total ou parcialmente, temporária ou definitivamente, quando verificada, entre outras hipóteses:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
+        <li>violação destes Termos;</li>
+        <li>uso fraudulento, abusivo ou ilícito da plataforma;</li>
+        <li>tentativa de acesso indevido a áreas restritas;</li>
+        <li>inadimplência, quando aplicável;</li>
+        <li>risco à segurança da plataforma, de terceiros ou do próprio USUÁRIO;</li>
+        <li>exigência legal, regulatória ou ordem de autoridade competente.</li>
+      </ul>
+      <p class="text-slate-700">
+        Sempre que possível e compatível com a natureza do caso, o LICENCIANTE poderá adotar medidas graduais ou comunicações prévias, sem que isso constitua obrigação em situações de urgência, segurança ou risco relevante.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">14. DA VIGÊNCIA E DA RESCISÃO</h3>
+      <p class="text-slate-700 mb-3">
+        Estes Termos vigoram por prazo indeterminado, a partir do primeiro acesso, cadastro ou contratação, conforme aplicável.
+      </p>
+      <p class="text-slate-700 mb-3">
+        O USUÁRIO poderá deixar de utilizar a plataforma e, quando cabível, solicitar o cancelamento da conta ou da assinatura, observadas as condições comerciais aplicáveis, inclusive quanto a ciclos já contratados, obrigações pendentes e prazos técnicos razoáveis para processamento da solicitação.
+      </p>
+      <p class="text-slate-700 mb-2">A extinção da relação contratual não afasta:</p>
+      <ul class="space-y-1 text-slate-700 list-disc list-inside">
+        <li>obrigações vencidas e não adimplidas;</li>
+        <li>deveres legais de retenção de dados e registros;</li>
+        <li>direitos do LICENCIANTE ao exercício regular de direitos;</li>
+        <li>disposições que, por sua natureza, devam subsistir após o término da relação.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">15. DAS ALTERAÇÕES DESTES TERMOS</h3>
+      <p class="text-slate-700 mb-3">
+        O LICENCIANTE poderá alterar estes Termos a qualquer tempo, para refletir mudanças legais, regulatórias, técnicas, operacionais, metodológicas, comerciais ou funcionais da plataforma.
+      </p>
+      <p class="text-slate-700 mb-3">
+        A versão vigente será aquela disponibilizada na plataforma, com indicação de data de vigência. Caso as alterações sejam relevantes, o LICENCIANTE envidará esforços razoáveis para conferir publicidade adequada ao novo texto.
+      </p>
+      <p class="text-slate-700">
+        A continuidade de uso da plataforma após a entrada em vigor da nova versão poderá caracterizar aceitação dos Termos atualizados, ressalvados os direitos legalmente assegurados ao USUÁRIO.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">16. DO SUPORTE E CANAL DE CONTATO</h3>
+      <p class="text-slate-700 mb-3">
+        Para dúvidas, solicitações, comunicações ou suporte relacionado à plataforma, o USUÁRIO poderá utilizar o canal oficial:
+      </p>
+      <p class="text-slate-700 font-semibold">
+        E-mail: atendimento@calcularq.com.br
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">17. DO FORO E DA LEGISLAÇÃO APLICÁVEL</h3>
+      <p class="text-slate-700 mb-3">
+        Estes Termos serão regidos, interpretados e executados de acordo com as leis da República Federativa do Brasil.
+      </p>
+      <p class="text-slate-700">
+        Fica assegurado ao USUÁRIO, quando aplicável, o foro de seu domicílio, nos termos da legislação consumerista e demais normas aplicáveis.
       </p>
     </div>
   </div>
