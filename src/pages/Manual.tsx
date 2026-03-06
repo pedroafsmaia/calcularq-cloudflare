@@ -580,7 +580,7 @@ export default function Manual() {
                           id="hoursEstimate"
                           title="Estimativa de horas de projeto"
                           description="A calculadora já preencheu esse valor automaticamente com base nos dados do projeto. Você pode substituí-lo se preferir usar sua própria estimativa."
-                          hint={<p className="text-sm text-slate-500">A estimativa padrão já considera uma margem de incerteza — ela é conservadora por definição. Você também pode consultar o cenário principal, que representa a estimativa sem essa margem adicional.</p>}
+                          hint={<p className="text-sm text-slate-500">A estimativa padrão já considera uma margem de incerteza — ela é conservadora por definição. Você também pode escolher o cenário otimista, que representa a estimativa sem essa margem adicional.</p>}
                         />
                         <Step3FieldAccordion
                           id="variableExpenses"
