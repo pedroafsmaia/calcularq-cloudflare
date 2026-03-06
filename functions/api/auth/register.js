@@ -35,6 +35,9 @@ export async function onRequest(context) {
   if (!email || !password) {
     return jsonResponse({ success: false, message: "Email e senha são obrigatórios" }, { status: 400 });
   }
+  if (typeof password !== "string") {
+    return jsonResponse({ success: false, message: "Senha inválida" }, { status: 400 });
+  }
   if (!validateEmail(email)) {
     return jsonResponse({ success: false, message: "Email inválido" }, { status: 400 });
   }

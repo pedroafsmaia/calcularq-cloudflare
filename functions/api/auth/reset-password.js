@@ -25,6 +25,9 @@ export async function onRequest(context) {
   if (!token || !newPassword) {
     return jsonResponse({ success: false, message: "Token e nova senha são obrigatórios" }, { status: 400 });
   }
+  if (typeof token !== "string" || typeof newPassword !== "string") {
+    return jsonResponse({ success: false, message: "Dados inválidos" }, { status: 400 });
+  }
   if (String(newPassword).length < MIN_PASSWORD_LENGTH) {
     return jsonResponse({ success: false, message: `A senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres` }, { status: 400 });
   }
@@ -50,6 +53,13 @@ export async function onRequest(context) {
 
   await db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").bind(password_hash, row.user_id).run();
   await db.prepare("DELETE FROM reset_tokens WHERE id = ?").bind(row.rt_id).run();
+
+  // Invalidate all existing sessions for this user so compromised tokens can't be reused
+  try {
+    await db.prepare("DELETE FROM sessions WHERE user_id = ?").bind(row.user_id).run();
+  } catch {
+    // sessions table may not exist; safe to ignore
+  }
 
   return jsonResponse({ success: true, message: "Senha redefinida com sucesso" });
 }

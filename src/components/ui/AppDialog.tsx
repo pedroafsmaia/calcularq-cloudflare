@@ -95,6 +95,7 @@ export default function AppDialog({
                   variant="ghost"
                   size="icon"
                   onClick={() => onOpenChange(false)}
+                  aria-label="Fechar"
                   className="h-9 w-9 shrink-0 rounded-lg text-slate-500 hover:bg-slate-50"
                 >
                   <X className="h-4 w-4" />
@@ -102,7 +103,7 @@ export default function AppDialog({
               </div>
 
               {children ? (
-                <div className={`px-5 py-4 sm:px-6 ${useMobileInnerScroll ? "overflow-y-auto" : "overflow-y-auto"}`}>
+                <div className="px-5 py-4 sm:px-6 overflow-y-auto">
                   {children}
                 </div>
               ) : null}

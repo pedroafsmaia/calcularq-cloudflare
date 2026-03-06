@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Info } from "lucide-react";
 
 interface TooltipProps {
@@ -9,6 +9,7 @@ interface TooltipProps {
 }
 
 export default function Tooltip({ text, iconClassName, tone = "info", title }: TooltipProps) {
+  const tooltipId = useId();
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -111,6 +112,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
         onFocus={show}
         onBlur={hide}
         aria-label="Mais informações"
+        aria-describedby={visible ? tooltipId : undefined}
       >
         <Info className="h-4 w-4" />
       </button>
@@ -118,6 +120,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
       {visible ? (
         <span
           ref={tooltipRef}
+          id={tooltipId}
           className={`pointer-events-none fixed z-50 rounded-xl px-3.5 py-3 font-normal whitespace-normal break-words shadow-lg ${
             tone === "danger"
               ? "border border-red-200"

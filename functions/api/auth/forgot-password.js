@@ -98,7 +98,7 @@ export async function onRequest(context) {
     }
   }
 
-  const debug = String(context.env.DEBUG_EMAIL_TOKENS || "0") === "1";
+  const debug = String(context.env.DEBUG_EMAIL_TOKENS || "0") === "1" && String(context.env.ENVIRONMENT || "").toLowerCase() === "development";
   return okResponse(debug ? { debugResetUrl: resetUrl, debugToken: token } : {});
 }
 
