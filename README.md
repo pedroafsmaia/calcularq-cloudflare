@@ -18,6 +18,7 @@ A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e compo
 - Fluxo com importacao por etapa, reinicio de etapa/calculo e rascunho local (autosave)
 - Historico de calculos por usuario
 - Manual integrado com navegacao por etapas
+- Dashboard administrativo com analytics de uso, comercial, calibracao e exportacao
 
 ### Stack
 - Frontend: React + TypeScript + Vite + Tailwind CSS
@@ -43,7 +44,7 @@ src/
   hooks/
     calculator/      Hooks de progresso, reset e importacao por etapa
   lib/               API client, motion presets e helpers
-  pages/             Home, Calculadora, Manual, Auth, Payment, etc.
+  pages/             Home, Calculadora, Manual, Auth, Payment, Admin, etc.
   test/              Testes e setup de testes
   types/             Tipos compartilhados (budget/draft)
   utils/             Helpers gerais
@@ -52,6 +53,7 @@ functions/
   api/
     _utils.js        Sessao, validacoes, respostas, hardening
     auth/            Login, registro, logout, recovery/reset/me
+    admin/           Endpoints do dashboard admin (summary, usage, commercial, calibration)
     budgets/         CRUD dos calculos salvos
     stripe/          Checkout + webhook
     user/            Status de pagamento
@@ -111,7 +113,7 @@ npm run build
 
 ### Automacao de Repomix (apos push)
 
-Instalar hooks do repositório (uma vez):
+Instalar hooks do repositï¿½rio (uma vez):
 
 ```bash
 npm run hooks:install
@@ -154,7 +156,10 @@ npx wrangler pages deploy dist --project-name calcularq-cloudflare
 [vars]
 FRONTEND_URL = "https://calcularq-cloudflare.pages.dev"
 DEBUG_EMAIL_TOKENS = "0"
+ADMIN_EMAIL = "pedroafsmaia@gmail.com"
 ```
+
+- `ADMIN_EMAIL` â€” e-mail do usuario administrador. Esse usuario tera acesso ao dashboard administrativo (`/admin`) com analytics de uso, comercial, calibracao e exportacao de relatorios.
 
 Variaveis opcionais (podem ser definidas em `wrangler.toml` ou Pages):
 - `STRIPE_SUCCESS_PATH` (padrao: `/payment/close`)
@@ -221,6 +226,7 @@ Ja implementado no backend:
 - Cooldown em `forgot-password`
 - Hardening de payload/limites em budgets
 - Idempotencia no webhook Stripe por `event.id`
+- Controle de acesso admin via `ADMIN_EMAIL` com middleware `requireAdmin()` no backend e flag `isAdmin` no frontend
 
 Checklist de revisao:
 - `docs/QA_SECURITY_CHECKLIST.md`
