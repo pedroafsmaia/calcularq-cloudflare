@@ -208,45 +208,47 @@ export default function Home() {
       </div>
 
       <div id="como-funciona" className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-24">
-        <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" whileInView="show" viewport={viewportOnce} className="text-center">
-          <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Como funciona</h2>
-          <p className="mx-auto mb-12 max-w-[56ch] text-base leading-relaxed text-slate-700 sm:text-lg" style={{ textWrap: "balance" }}>
-            Cada projeto tem sua complexidade. A Calcularq transforma isso em número, em três etapas simples.
-          </p>
+        <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" whileInView="show" viewport={viewportOnce} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:p-10">
+          <div className="text-center">
+            <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Como funciona</h2>
+            <p className="mx-auto mb-12 max-w-[56ch] text-base leading-relaxed text-slate-700 sm:text-lg" style={{ textWrap: "balance" }}>
+              Cada projeto tem sua complexidade. A Calcularq transforma isso em número, em três etapas simples.
+            </p>
 
-          <div className="hidden md:block">
-            <div className="mx-auto flex w-full max-w-5xl items-start justify-between">
-              {howItWorksSteps.map((step, index) => (
-                <div key={step.number} className="flex min-w-0 flex-1 items-start">
-                  <div className="flex w-full flex-col items-center px-2">
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-calcularq-blue bg-calcularq-blue text-sm font-bold text-white shadow-sm sm:h-12 sm:w-12">
-                      {step.number}
-                    </span>
-                    <h3 className="mt-3 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">{step.title}</h3>
-                    <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-slate-700 sm:text-[0.95rem]">{step.description}</p>
+            <div className="hidden md:block">
+              <div className="mx-auto flex w-full max-w-5xl items-start justify-between">
+                {howItWorksSteps.map((step, index) => (
+                  <div key={step.number} className="flex min-w-0 flex-1 items-start">
+                    <div className="flex w-full flex-col items-center px-2">
+                      <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-calcularq-blue bg-calcularq-blue text-sm font-bold text-white shadow-sm sm:h-12 sm:w-12">
+                        {step.number}
+                      </span>
+                      <h3 className="mt-3 text-base font-semibold leading-snug text-calcularq-blue sm:text-lg">{step.title}</h3>
+                      <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-slate-700 sm:text-[0.95rem]">{step.description}</p>
+                    </div>
+                    {index < howItWorksSteps.length - 1 ? <span className="mt-5 h-0.5 w-10 shrink-0 rounded-full bg-slate-200 lg:w-16" /> : null}
                   </div>
-                  {index < howItWorksSteps.length - 1 ? <span className="mt-5 h-0.5 w-10 shrink-0 rounded-full bg-slate-200 lg:w-16" /> : null}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="mx-auto max-w-xl md:hidden">
-            <div className="space-y-5 text-left">
-              {howItWorksSteps.map((step, index) => (
-                <div key={step.number} className="flex items-start gap-3">
-                  <div className="relative flex flex-col items-center">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-calcularq-blue bg-calcularq-blue text-sm font-bold text-white shadow-sm">
-                      {step.number}
-                    </span>
-                    {index < howItWorksSteps.length - 1 ? <span className="mt-2 h-10 w-0.5 rounded-full bg-slate-200" /> : null}
+            <div className="mx-auto max-w-xl md:hidden">
+              <div className="space-y-5 text-left">
+                {howItWorksSteps.map((step, index) => (
+                  <div key={step.number} className="flex items-start gap-3">
+                    <div className="relative flex flex-col items-center">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-calcularq-blue bg-calcularq-blue text-sm font-bold text-white shadow-sm">
+                        {step.number}
+                      </span>
+                      {index < howItWorksSteps.length - 1 ? <span className="mt-2 h-10 w-0.5 rounded-full bg-slate-200" /> : null}
+                    </div>
+                    <div className="pt-0.5">
+                      <h3 className="text-base font-semibold leading-snug text-calcularq-blue">{step.title}</h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{step.description}</p>
+                    </div>
                   </div>
-                  <div className="pt-0.5">
-                    <h3 className="text-base font-semibold leading-snug text-calcularq-blue">{step.title}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{step.description}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>
