@@ -10,7 +10,7 @@ interface AppDialogProps {
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   footer?: React.ReactNode;
   maxWidthClassName?: string;
   scrollBehavior?: "inner" | "mobile-inner";
@@ -79,7 +79,7 @@ export default function AppDialog({
             <div
               className={`my-4 w-full ${maxWidthClassName} rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col ${
                 useMobileInnerScroll
-                  ? "overflow-hidden sm:overflow-visible max-h-[calc(100dvh-7rem)] sm:max-h-none"
+                  ? "max-h-[90dvh] overflow-hidden sm:max-h-[calc(100dvh-4rem)]"
                   : "overflow-hidden"
               }`}
               style={useMobileInnerScroll ? undefined : { maxHeight: "min(48rem, calc(100dvh - 2rem - env(safe-area-inset-bottom, 0px)))" }}
@@ -101,13 +101,15 @@ export default function AppDialog({
                 </Button>
               </div>
 
-              <div className={`px-5 py-4 sm:px-6 ${useMobileInnerScroll ? "overflow-y-auto sm:overflow-visible" : "overflow-y-auto"}`}>
-                {children}
-              </div>
+              {children ? (
+                <div className={`px-5 py-4 sm:px-6 ${useMobileInnerScroll ? "overflow-y-auto" : "overflow-y-auto"}`}>
+                  {children}
+                </div>
+              ) : null}
 
               {footer ? (
                 <div
-                  className="border-t border-slate-200 px-5 py-4 sm:px-6"
+                  className={`border-t border-slate-200 px-5 py-4 sm:px-6 ${useMobileInnerScroll ? "bg-white" : ""}`}
                   style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))" }}
                 >
                   {footer}

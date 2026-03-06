@@ -8,12 +8,6 @@ interface TooltipProps {
   title?: string;
 }
 
-/**
- * Tooltip leve e consistente com as caixas de Observação.
- * - Mesmas cores (texto azul) e borda.
- * - Fundo levemente transparente + blur.
- * - Texto formatado em pequenos parágrafos para leitura.
- */
 export default function Tooltip({ text, iconClassName, tone = "info", title }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
@@ -25,7 +19,6 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
     const raw = (text || "").trim();
     if (!raw) return [] as string[];
 
-    // Se houver quebras de linha, respeita.
     const byLines = raw
       .split(/\n+/)
       .map((s) => s.trim())
@@ -33,9 +26,8 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
 
     if (byLines.length > 1) return byLines;
 
-    // Caso contrário, tenta separar em frases (PT/EN) sem ser agressivo.
     const bySentences = raw
-      .split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÃÕÂÊÎÔÛ])/)
+      .split(/(?<=[.!?])\s+(?=\p{Lu})/u)
       .map((s) => s.trim())
       .filter(Boolean);
 
@@ -71,9 +63,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
       const triggerRect = trigger.getBoundingClientRect();
       const bubbleRect = bubble.getBoundingClientRect();
 
-      let left = mobile
-        ? triggerRect.left + triggerRect.width / 2 - width / 2
-        : triggerRect.right + gap;
+      let left = mobile ? triggerRect.left + triggerRect.width / 2 - width / 2 : triggerRect.right + gap;
 
       if (!mobile && left + width > viewportW - padding) {
         left = triggerRect.left - width - gap;
@@ -81,9 +71,7 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
 
       left = Math.min(Math.max(left, padding), viewportW - width - padding);
 
-      let top = mobile
-        ? triggerRect.bottom + gap
-        : triggerRect.top + triggerRect.height / 2 - bubbleRect.height / 2;
+      let top = mobile ? triggerRect.bottom + gap : triggerRect.top + triggerRect.height / 2 - bubbleRect.height / 2;
 
       if (mobile && top + bubbleRect.height > viewportH - padding) {
         top = triggerRect.top - bubbleRect.height - gap;
@@ -124,13 +112,13 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
         onBlur={hide}
         aria-label="Mais informações"
       >
-        <Info className="w-4 h-4" />
+        <Info className="h-4 w-4" />
       </button>
 
-      {visible && (
+      {visible ? (
         <span
           ref={tooltipRef}
-          className={`fixed z-50 rounded-xl px-3.5 py-3 shadow-lg pointer-events-none font-normal whitespace-normal break-words ${
+          className={`pointer-events-none fixed z-50 rounded-xl px-3.5 py-3 font-normal whitespace-normal break-words shadow-lg ${
             tone === "danger"
               ? "border border-red-200"
               : tone === "warning"
@@ -156,21 +144,17 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
           role="tooltip"
         >
           <div
-            className={`text-sm leading-relaxed space-y-1 font-normal whitespace-normal break-words ${
-              tone === "danger"
-                ? "text-red-700"
-                : tone === "warning"
-                  ? "text-amber-900"
-                  : "text-blue-800"
+            className={`space-y-1 text-sm leading-relaxed whitespace-normal break-words ${
+              tone === "danger" ? "text-red-700" : tone === "warning" ? "text-amber-900" : "text-blue-800"
             }`}
           >
             {title ? <p className="font-semibold">{title}</p> : null}
-            {formattedParts.map((p, idx) => (
-              <p key={idx}>{p}</p>
+            {formattedParts.map((part, index) => (
+              <p key={index}>{part}</p>
             ))}
           </div>
         </span>
-      )}
+      ) : null}
     </span>
   );
 }

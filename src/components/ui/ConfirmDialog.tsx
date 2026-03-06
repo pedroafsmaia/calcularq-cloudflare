@@ -29,7 +29,7 @@ export default function ConfirmDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={title}
-      description={description}
+      description={description || "Tem certeza que deseja continuar?"}
       maxWidthClassName="max-w-md"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -56,10 +56,6 @@ export default function ConfirmDialog({
           </Button>
         </div>
       }
-    >
-      <div className="text-sm text-slate-600 leading-relaxed">
-        {description || "Tem certeza que deseja continuar?"}
-      </div>
-    </AppDialog>
+    />
   );
 }
