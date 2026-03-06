@@ -299,8 +299,8 @@ export default function Home() {
           viewport={viewportOnce}
           className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:p-10"
         >
-          <h2 className="text-center text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl">Exemplos de Precificação</h2>
-          <p className="mt-3 text-center text-sm text-slate-600 sm:text-base">
+          <h2 className="text-center text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Exemplos de Precificação</h2>
+          <p className="mt-3 text-center text-base leading-relaxed text-slate-600 sm:text-lg">
             Cenários ilustrativos para mostrar como o método responde a diferentes níveis de complexidade.
           </p>
 
@@ -380,11 +380,11 @@ export default function Home() {
         >
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
             <div>
-              <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl">A Calcularq melhora com o uso</h2>
-              <p className="max-w-[58ch] text-sm leading-relaxed text-slate-700 sm:text-base">
+              <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">A Calcularq melhora com o uso</h2>
+              <p className="max-w-[58ch] text-base leading-relaxed text-slate-700 sm:text-lg">
                 A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o sistema ajusta automaticamente as estimativas futuras.
               </p>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700 sm:text-base">Quanto mais você usa, mais precisa ela fica.</p>
+              <p className="mt-3 text-base leading-relaxed text-slate-700 sm:text-lg">Quanto mais você usa, mais precisa ela fica.</p>
             </div>
 
             <div className="grid gap-3">
