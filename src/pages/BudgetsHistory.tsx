@@ -15,6 +15,7 @@ import BudgetCard from "@/components/budgets/BudgetCard";
 import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
 import BudgetCloseDialog from "@/components/budgets/BudgetCloseDialog";
 import { useToast } from "@/components/ui/ToastProvider";
+import { Badge } from "@/components/ui/badge";
 import { calculateGlobalComplexity, type Factor as PricingFactor } from "@/components/pricing/PricingEngine";
 import type { BudgetActualHoursByPhase, BudgetScopeChange, BudgetCloseFeedback } from "@/types/budget";
 
@@ -174,9 +175,9 @@ export default function BudgetsHistory() {
 
   const titleCountBadge =
     budgets.length > 0 ? (
-      <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">
+      <Badge variant="outline">
         {budgets.length}
-      </span>
+      </Badge>
     ) : null;
 
   const handleDelete = async (budgetId: string) => {
