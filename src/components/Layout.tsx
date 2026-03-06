@@ -101,14 +101,22 @@ export default function Layout({ children }: LayoutProps) {
                       </Link>
                     )}
 
-                    <button
+                    <span
+                      role={user.isAdmin ? "button" : undefined}
+                      tabIndex={user.isAdmin ? 0 : undefined}
                       onClick={() => {
                         if (user.isAdmin) navigate(createPageUrl("Admin"));
                       }}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-colors duration-150 border border-transparent cursor-pointer"
+                      onKeyDown={(e) => {
+                        if (user.isAdmin && (e.key === "Enter" || e.key === " ")) {
+                          e.preventDefault();
+                          navigate(createPageUrl("Admin"));
+                        }
+                      }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 transition-colors duration-150 border border-transparent ${user.isAdmin ? "hover:bg-slate-100 hover:text-calcularq-blue cursor-pointer" : ""}`}
                     >
                       <span className="hidden 2xl:inline">{user.name}</span>
-                    </button>
+                    </span>
 
                     <button onClick={logout} className={desktopNavItem(false)} aria-label="Sair">
                       <LogOut className="w-4 h-4" />
@@ -151,15 +159,23 @@ export default function Layout({ children }: LayoutProps) {
                       </Link>
                     )}
 
-                    <button
+                    <span
+                      role={user.isAdmin ? "button" : undefined}
+                      tabIndex={user.isAdmin ? 0 : undefined}
                       onClick={() => {
                         if (user.isAdmin) navigate(createPageUrl("Admin"));
                       }}
-                      className="shrink-0 flex items-center justify-center px-2 h-10 rounded-xl border border-transparent text-slate-600 hover:bg-slate-100 hover:text-calcularq-blue transition-colors duration-150 cursor-pointer"
+                      onKeyDown={(e) => {
+                        if (user.isAdmin && (e.key === "Enter" || e.key === " ")) {
+                          e.preventDefault();
+                          navigate(createPageUrl("Admin"));
+                        }
+                      }}
+                      className={`shrink-0 flex items-center justify-center px-2 h-10 rounded-xl border border-transparent text-slate-600 transition-colors duration-150 ${user.isAdmin ? "hover:bg-slate-100 hover:text-calcularq-blue cursor-pointer" : ""}`}
                       aria-label={user.name}
                     >
                       <span className="text-xs font-medium truncate max-w-[60px]">{user.name?.split(" ")[0]}</span>
-                    </button>
+                    </span>
 
                     <button onClick={logout} className={mobileIconItem()} aria-label="Sair">
                       <LogOut className="w-[18px] h-[18px]" />
