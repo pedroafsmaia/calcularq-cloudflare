@@ -48,7 +48,7 @@ export default function ManualMobileSummary({
               type="button"
               onClick={() => onStepClick(step.id)}
               className={[
-                "w-full text-left rounded-lg px-3 py-2 text-sm leading-snug transition-colors",
+                "w-full text-left rounded-lg px-3 py-2 text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-calcularq-blue/40 focus-visible:ring-offset-1",
                 isActive
                   ? "bg-calcularq-blue/5 text-calcularq-blue"
                   : isCompleted

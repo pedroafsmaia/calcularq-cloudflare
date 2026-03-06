@@ -16,5 +16,5 @@ export function NoteBox({ children, tone = "blue" }: { children: ReactNode; tone
         ? "border-slate-200 bg-slate-50 text-slate-700"
         : "border-blue-200 bg-blue-50/70 text-blue-800";
 
-  return <div className={`rounded-xl border px-4 py-3 leading-relaxed ${toneClass}`}>{children}</div>;
+  return <div className={`rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 leading-relaxed text-sm sm:text-base ${toneClass}`}>{children}</div>;
 }
