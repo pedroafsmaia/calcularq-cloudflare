@@ -3,6 +3,7 @@ import { Calendar, CheckCircle2, Eye, MessageSquare, Trash2 } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Budget } from "@/lib/api";
+import { fadeUp } from "@/lib/motion";
 
 type Props = {
   budget: Budget;
@@ -46,9 +47,10 @@ export default function BudgetCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, delay: prefersReducedMotion ? 0 : index * 0.03 }}
+      variants={fadeUp(prefersReducedMotion, 20)}
+      initial="hidden"
+      animate="show"
+      transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
       className="flex cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-colors transition-shadow duration-150 hover:border-slate-300 hover:shadow-sm sm:p-6"
       onClick={() => onOpenDetails(budget)}
       role="button"

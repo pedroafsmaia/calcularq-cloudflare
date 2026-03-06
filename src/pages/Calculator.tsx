@@ -27,7 +27,7 @@ import {
 } from "../components/pricing/PricingEngine";
 import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod10";
 import { createPageUrl } from "@/utils";
-import { fadeUp } from "@/lib/motion";
+import { fadeUp, fadeOnly } from "@/lib/motion";
 import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "@/lib/calculatorDraft";
 import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, resolveTechnicalPremium } from "@/lib/methodCalibration";
 import { useCalculatorProgress } from "@/hooks/calculator/useCalculatorProgress";
@@ -1129,9 +1129,9 @@ export default function Calculator() {
             <div className="lg:hidden mt-4">
               {currentStep < 3 ? (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+                  variants={fadeOnly(prefersReducedMotion)}
+                  initial="hidden"
+                  animate="show"
                 >
                   <details className="rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur-sm">
                     <summary className="list-none cursor-pointer [&::-webkit-details-marker]:hidden">

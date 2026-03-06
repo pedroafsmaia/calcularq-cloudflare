@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import { fadeUp } from "@/lib/motion";
+import { fadeUp, fadeOnly } from "@/lib/motion";
 import BudgetsToolbar from "@/components/budgets/BudgetsToolbar";
 import BudgetCard from "@/components/budgets/BudgetCard";
 import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
@@ -359,9 +359,9 @@ export default function BudgetsHistory() {
 
         {budgets.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+            variants={fadeOnly(prefersReducedMotion)}
+            initial="hidden"
+            animate="show"
             className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-sm min-h-[280px] flex flex-col items-center justify-center"
           >
             <div className="w-16 h-16 rounded-2xl bg-calcularq-blue/5 border border-calcularq-blue/10 flex items-center justify-center mb-5">
@@ -380,9 +380,9 @@ export default function BudgetsHistory() {
           </motion.div>
         ) : visibleBudgets.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: prefersReducedMotion ? 0.12 : 0.18 }}
+            variants={fadeOnly(prefersReducedMotion)}
+            initial="hidden"
+            animate="show"
             className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 text-center shadow-sm"
           >
             <h3 className="text-lg font-semibold text-slate-800 mb-2">Nenhum resultado encontrado</h3>
