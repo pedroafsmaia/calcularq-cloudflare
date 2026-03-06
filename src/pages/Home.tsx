@@ -207,35 +207,11 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-24">
-        <motion.div variants={listStagger} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              variants={fadeUp(prefersReducedMotion, 12)}
-              transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
-              className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue p-6 text-center shadow-sm transition-colors transition-shadow duration-150 hover:border-white/40 hover:shadow-md"
-            >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
-              <div className="pointer-events-none absolute -left-10 bottom-0 h-20 w-20 rounded-full bg-white/10 blur-xl" />
-
-              <div className="relative mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
-                <feature.icon className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="relative mx-auto mb-2 flex min-h-[3.2rem] max-w-[18ch] items-center justify-center px-1 text-base font-semibold leading-snug text-white sm:text-lg">
-                {feature.title}
-              </h3>
-              <p className="relative mx-auto max-w-[31ch] px-1 text-sm leading-relaxed text-blue-100 sm:text-[0.95rem]">{feature.description}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
-      <div id="como-funciona" className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
+      <div id="como-funciona" className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-24">
         <motion.div variants={fadeUp(prefersReducedMotion, 14)} initial="hidden" whileInView="show" viewport={viewportOnce} className="text-center">
           <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Como funciona</h2>
           <p className="mx-auto mb-12 max-w-[56ch] text-base leading-relaxed text-slate-700 sm:text-lg" style={{ textWrap: "balance" }}>
-            Cada projeto tem sua complexidade. O Calcularq transforma isso em número, em três etapas simples.
+            Cada projeto tem sua complexidade. A Calcularq transforma isso em número, em três etapas simples.
           </p>
 
           <div className="hidden md:block">
@@ -282,16 +258,16 @@ export default function Home() {
           initial="hidden"
           whileInView="show"
           viewport={viewportOnce}
-          className="rounded-3xl bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue p-6 sm:p-8 md:p-12"
+          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:p-12"
         >
           <div className="grid items-center gap-8 md:grid-cols-2">
             <div className="text-center md:text-left">
-              <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">Fatores de complexidade</h2>
-              <p className="mb-6 text-sm leading-relaxed text-slate-200 sm:text-base lg:text-lg">
+              <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl lg:text-4xl">Fatores de complexidade</h2>
+              <p className="mb-6 text-sm leading-relaxed text-slate-700 sm:text-base lg:text-lg">
                 A Calcularq analisa seis fatores para medir a complexidade do projeto e ajustar as estimativas de horas e valor.
               </p>
               <Link to={createPageUrl("Calculator")} className="inline-block" onClick={handleCalculatorClick}>
-                <Button className="border-2 border-white bg-white px-6 py-3 font-semibold text-calcularq-blue shadow-md transition-colors transition-shadow duration-150 hover:border-slate-200 hover:bg-slate-50 hover:shadow-lg">
+                <Button className="border-2 border-calcularq-blue bg-calcularq-blue px-6 py-3 font-semibold text-white shadow-md transition-colors transition-shadow duration-150 hover:bg-calcularq-blue/90 hover:shadow-lg">
                   Experimentar agora
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -300,9 +276,9 @@ export default function Home() {
 
             <div className="grid grid-cols-2 gap-3">
               {factorsList.map((factor) => (
-                <div key={factor} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-3">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-400" />
-                  <span className="min-w-0 text-sm leading-snug text-white sm:text-[0.95rem]">{factor}</span>
+                <div key={factor} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-500" />
+                  <span className="min-w-0 text-sm leading-snug text-slate-700 sm:text-[0.95rem]">{factor}</span>
                 </div>
               ))}
             </div>
@@ -365,28 +341,52 @@ export default function Home() {
         </motion.div>
       </div>
 
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-0 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
+        <motion.div variants={listStagger} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              variants={fadeUp(prefersReducedMotion, 12)}
+              transition={{ delay: prefersReducedMotion ? 0 : index * 0.03 }}
+              className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-calcularq-blue via-[#002366] to-calcularq-blue p-6 text-center shadow-sm transition-colors transition-shadow duration-150 hover:border-white/40 hover:shadow-md"
+            >
+              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+              <div className="pointer-events-none absolute -left-10 bottom-0 h-20 w-20 rounded-full bg-white/10 blur-xl" />
+
+              <div className="relative mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+                <feature.icon className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="relative mx-auto mb-2 flex min-h-[3.2rem] max-w-[18ch] items-center justify-center px-1 text-base font-semibold leading-snug text-white sm:text-lg">
+                {feature.title}
+              </h3>
+              <p className="relative mx-auto max-w-[31ch] px-1 text-sm leading-relaxed text-blue-100 sm:text-[0.95rem]">{feature.description}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+
       <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 sm:pb-24 lg:px-8 lg:pb-28">
         <motion.div
           variants={fadeUp(prefersReducedMotion, 14)}
           initial="hidden"
           whileInView="show"
           viewport={viewportOnce}
-          className="rounded-3xl border border-calcularq-blue/25 bg-gradient-to-br from-calcularq-blue via-[#002d6f] to-[#001f4f] px-6 py-10 sm:px-8 sm:py-12 md:px-10 md:py-14"
+          className="rounded-3xl border border-slate-200 bg-white px-6 py-10 shadow-sm sm:px-8 sm:py-12 md:px-10 md:py-14"
         >
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
             <div>
-              <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">Uma calculadora que evolui com você</h2>
-              <p className="max-w-[58ch] text-sm leading-relaxed text-blue-100 sm:text-base">
+              <h2 className="mb-4 text-2xl font-bold tracking-tight text-calcularq-blue sm:text-3xl">A Calcularq melhora com o uso</h2>
+              <p className="max-w-[58ch] text-sm leading-relaxed text-slate-700 sm:text-base">
                 A Calcularq aprende com a sua experiência. Ao registrar as horas reais dos seus projetos finalizados, o sistema ajusta automaticamente as estimativas futuras.
               </p>
-              <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">Quanto mais você usa, mais precisa ela fica.</p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700 sm:text-base">Quanto mais você usa, mais precisa ela fica.</p>
             </div>
 
             <div className="grid gap-3">
               {["Registre suas horas reais", "Receba ajustes automáticos", "Evolua sua precificação ao longo do uso"].map((item) => (
-                <div key={item} className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-3">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-300" />
-                  <span className="text-sm text-white sm:text-[0.95rem]">{item}</span>
+                <div key={item} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-500" />
+                  <span className="text-sm text-slate-700 sm:text-[0.95rem]">{item}</span>
                 </div>
               ))}
             </div>
