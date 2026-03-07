@@ -163,17 +163,29 @@ export async function requireAdmin(context) {
   if (!auth.ok) return auth;
 
   const db = context.env.DB;
-  const user = await db
-    .prepare("SELECT email FROM users WHERE id = ?")
-    .bind(auth.userId)
-    .first();
+  let user = null;
+  try {
+    user = await db
+      .prepare("SELECT email, is_admin FROM users WHERE id = ?")
+      .bind(auth.userId)
+      .first();
+  } catch (error) {
+    const message = String(error?.message || "");
+    if (!message.includes("no such column: is_admin")) throw error;
+    user = await db
+      .prepare("SELECT email FROM users WHERE id = ?")
+      .bind(auth.userId)
+      .first();
+  }
 
   if (!user) {
     return { ok: false, response: jsonResponse({ success: false, message: "Usuário não encontrado" }, { status: 404 }) };
   }
 
+  const isAdminFlag = Number(user.is_admin || 0) === 1;
   const adminEmail = String(context.env.ADMIN_EMAIL || "").trim().toLowerCase();
-  if (!adminEmail || user.email.toLowerCase() !== adminEmail) {
+  const isAdminByEmail = !!(adminEmail && user.email.toLowerCase() === adminEmail);
+  if (!isAdminFlag && !isAdminByEmail) {
     return { ok: false, response: jsonResponse({ success: false, message: "Acesso negado" }, { status: 403 }) };
   }
 
@@ -240,6 +252,24 @@ export function getClientIp(request) {
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     "unknown"
   );
+}
+
+export function getRequestId(request) {
+  return (
+    request.headers.get("CF-Ray") ||
+    request.headers.get("x-request-id") ||
+    crypto.randomUUID()
+  );
+}
+
+export function logApiError(scope, error, meta = {}) {
+  const payload = {
+    scope,
+    message: String(error?.message || error || "unknown_error"),
+    stack: error?.stack || null,
+    ...meta,
+  };
+  console.error(`[${scope}]`, JSON.stringify(payload));
 }
 
 export async function ensureSecurityTables(db) {
