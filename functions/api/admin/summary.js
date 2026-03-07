@@ -1,7 +1,10 @@
-import { jsonResponse, rateLimitByIp, requireAdmin } from "../_utils.js";
+import { getRequestId, jsonResponse, logApiError, rateLimitByIp, requireAdmin } from "../_utils.js";
 import { parseFilters, fetchFilteredBudgets, safeAvg, round4 } from "./_admin_utils.js";
 
 export async function onRequest(context) {
+  const startedAt = Date.now();
+  const requestId = getRequestId(context.request);
+
   if (context.request.method !== "GET") {
     return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
   }
@@ -82,7 +85,10 @@ export async function onRequest(context) {
       },
     });
   } catch (error) {
-    console.error("[admin/summary] error:", error);
+    logApiError("admin/summary", error, {
+      requestId,
+      elapsedMs: Date.now() - startedAt,
+    });
     return jsonResponse({ success: false, message: "Erro ao carregar dados" }, { status: 500 });
   }
 }

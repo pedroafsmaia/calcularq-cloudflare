@@ -1,4 +1,4 @@
-import { jsonResponse, rateLimitByIp, requireAdmin } from "../_utils.js";
+import { getRequestId, jsonResponse, logApiError, rateLimitByIp, requireAdmin } from "../_utils.js";
 import { parseFilters, fetchFilteredBudgets, getAreaRange, getFactorLevel } from "./_admin_utils.js";
 
 function getVolumetriaRange(v) {
@@ -16,6 +16,9 @@ function increment(obj, key) {
 }
 
 export async function onRequest(context) {
+  const startedAt = Date.now();
+  const requestId = getRequestId(context.request);
+
   if (context.request.method !== "GET") {
     return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
   }
@@ -87,7 +90,10 @@ export async function onRequest(context) {
       },
     });
   } catch (error) {
-    console.error("[admin/usage] error:", error);
+    logApiError("admin/usage", error, {
+      requestId,
+      elapsedMs: Date.now() - startedAt,
+    });
     return jsonResponse({ success: false, message: "Erro ao carregar dados" }, { status: 500 });
   }
 }
