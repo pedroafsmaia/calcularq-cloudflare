@@ -1,4 +1,4 @@
-import { assertAllowedOrigin, jsonResponse, requireAuth } from "../_utils.js";
+import { assertAllowedOrigin, jsonResponse, rateLimitByIp, requireAuth } from "../_utils.js";
 
 export async function onRequest(context) {
   const auth = await requireAuth(context);
@@ -39,6 +39,14 @@ export async function onRequest(context) {
   if (method === "DELETE") {
     const badOrigin = assertAllowedOrigin(context);
     if (badOrigin) return badOrigin;
+
+    const rate = await rateLimitByIp(context, { endpoint: "budgets:delete", limit: 60, windowMs: 60_000 });
+    if (!rate.ok) {
+      return jsonResponse(
+        { success: false, message: "Muitas tentativas. Tente novamente em instantes." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
 
     await db.prepare("DELETE FROM budgets WHERE id = ? AND user_id = ?").bind(id, auth.userId).run();
     return jsonResponse({ success: true });

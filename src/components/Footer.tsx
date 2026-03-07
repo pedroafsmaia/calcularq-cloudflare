@@ -3,11 +3,36 @@ import { Link } from "react-router-dom";
 import { Mail, Home, Calculator, FileText, Shield } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import LegalModal from "./LegalModal";
-import { termsContent, privacyContent } from "@/lib/legalContent";
 
 export default function Footer() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [termsContent, setTermsContent] = useState("");
+  const [privacyContent, setPrivacyContent] = useState("");
+
+  const openTerms = async () => {
+    try {
+      if (!termsContent) {
+        const legal = await import("@/lib/legalContent");
+        setTermsContent(legal.termsContent);
+      }
+      setShowTerms(true);
+    } catch (error) {
+      console.error("Falha ao carregar termos:", error);
+    }
+  };
+
+  const openPrivacy = async () => {
+    try {
+      if (!privacyContent) {
+        const legal = await import("@/lib/legalContent");
+        setPrivacyContent(legal.privacyContent);
+      }
+      setShowPrivacy(true);
+    } catch (error) {
+      console.error("Falha ao carregar política de privacidade:", error);
+    }
+  };
 
   return (
     <>
@@ -48,14 +73,16 @@ export default function Footer() {
               {/* Termos e Política */}
               <nav className="space-y-2 mt-4">
                 <button
-                  onClick={() => setShowTerms(true)}
+                  type="button"
+                  onClick={openTerms}
                   className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors w-full text-left"
                 >
                   <FileText className="w-4 h-4" />
                   Termos de Uso
                 </button>
                 <button
-                  onClick={() => setShowPrivacy(true)}
+                  type="button"
+                  onClick={openPrivacy}
                   className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors w-full text-left"
                 >
                   <Shield className="w-4 h-4" />

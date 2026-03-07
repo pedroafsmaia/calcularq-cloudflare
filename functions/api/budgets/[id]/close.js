@@ -1,4 +1,4 @@
-﻿import { assertAllowedOrigin, jsonResponse, readJson, requireAuth } from "../../_utils.js";
+﻿import { assertAllowedOrigin, jsonResponse, rateLimitByIp, readJson, requireAuth } from "../../_utils.js";
 
 const VALID_SCOPE_CHANGES = new Set(["as_planned", "moderate", "major"]);
 const VALID_CLOSE_FEEDBACK = new Set([
@@ -61,6 +61,14 @@ export async function onRequest(context) {
 
   const badOrigin = assertAllowedOrigin(context);
   if (badOrigin) return badOrigin;
+
+  const rate = await rateLimitByIp(context, { endpoint: "budgets:close", limit: 60, windowMs: 60_000 });
+  if (!rate.ok) {
+    return jsonResponse(
+      { success: false, message: "Muitas tentativas. Tente novamente em instantes." },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+    );
+  }
 
   const url = new URL(context.request.url);
   const parts = url.pathname.split("/").filter(Boolean);
@@ -179,3 +187,4 @@ export async function onRequest(context) {
     },
   });
 }
+

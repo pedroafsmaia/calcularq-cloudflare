@@ -1,4 +1,4 @@
-import { assertAllowedOrigin, jsonResponse, readJson, requireAuth, sanitizeText } from "../_utils.js";
+import { assertAllowedOrigin, jsonResponse, rateLimitByIp, readJson, requireAuth, sanitizeText } from "../_utils.js";
 
 const MAX_BUDGETS_PER_USER = 200;
 const MAX_BUDGET_JSON_BYTES = 180_000;
@@ -72,6 +72,14 @@ export async function onRequest(context) {
   if (method === "POST") {
     const badOrigin = assertAllowedOrigin(context);
     if (badOrigin) return badOrigin;
+
+    const rate = await rateLimitByIp(context, { endpoint: "budgets:save", limit: 120, windowMs: 60_000 });
+    if (!rate.ok) {
+      return jsonResponse(
+        { success: false, message: "Muitas tentativas. Tente novamente em instantes." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
 
     const body = await readJson(context.request);
     if (!body?.name || !body?.data) {
