@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, Budget } from "@/lib/api";
 import type { ExpenseItem } from "@/types/budget";
-import type { CenarioMethod10 } from "@/components/pricing/PricingEngineMethod10";
+import type { CenarioMethod10 } from "@/components/pricing/PricingEngineMethod12";
 
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
 import AreaFactorCard from "../components/calculator/AreaFactorCard";
@@ -25,7 +25,7 @@ import {
   Factor,
   AreaInterval,
 } from "../components/pricing/PricingEngine";
-import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod10";
+import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod12";
 import { createPageUrl } from "@/utils";
 import { fadeUp, fadeOnly } from "@/lib/motion";
 import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "@/lib/calculatorDraft";

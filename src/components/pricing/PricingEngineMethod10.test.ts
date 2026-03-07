@@ -9,7 +9,7 @@ import {
   calcularMethod10,
   calcularProdutividade,
   type Method10Input,
-} from "./PricingEngineMethod10";
+} from "./PricingEngineMethod12";
 
 const EXECUTIVO_ETAPA = ETAPA_MULTIPLIERS[4];
 
@@ -58,7 +58,7 @@ function buildInput(overrides: Partial<Method10Input> = {}): Method10Input {
   };
 }
 
-describe("PricingEngineMethod10 (Metodo 1.2)", () => {
+describe("PricingEngineMethod12 (Metodo 1.2)", () => {
   it("mantem deslocamento pequeno no miolo para areas medias e grandes", () => {
     const cases = [
       { area: 50, f3: 2, f4: 1, f5: 1, volumetria: 1 },
@@ -181,4 +181,3 @@ describe("PricingEngineMethod10 (Metodo 1.2)", () => {
     expect(output.h50).toBeLessThanOrEqual(20);
   });
 });
-

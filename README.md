@@ -62,6 +62,10 @@ migrations/
   0001_init.sql
   0002_security_hardening.sql
   0003_budget_feedback_fields.sql
+  0004_method_1_0.sql
+  0005_method_1_1.sql
+  0006_method_1_2.sql
+  0007_admin_rbac.sql
 
 docs/
   ARCHITECTURE.md
@@ -159,7 +163,8 @@ DEBUG_EMAIL_TOKENS = "0"
 ADMIN_EMAIL = "pedroafsmaia@gmail.com"
 ```
 
-- `ADMIN_EMAIL` — e-mail do usuario administrador. Esse usuario tera acesso ao dashboard administrativo (`/admin`) com analytics de uso, comercial, calibracao e exportacao de relatorios.
+- `ADMIN_EMAIL` - fallback de administrador por e-mail.
+- RBAC principal usa `users.is_admin = 1`.
 
 Variaveis opcionais (podem ser definidas em `wrangler.toml` ou Pages):
 - `STRIPE_SUCCESS_PATH` (padrao: `/payment/close`)
@@ -213,7 +218,21 @@ echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-
 npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0002_security_hardening.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0003_budget_feedback_fields.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0004_method_1_0.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0005_method_1_1.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0006_method_1_2.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0007_admin_rbac.sql
 ```
+
+---
+
+## CI
+
+Pipeline em GitHub Actions: `.github/workflows/ci.yml`
+
+- `npm run lint`
+- `npm test`
+- `npm run build`
 
 ---
 
@@ -226,7 +245,7 @@ Ja implementado no backend:
 - Cooldown em `forgot-password`
 - Hardening de payload/limites em budgets
 - Idempotencia no webhook Stripe por `event.id`
-- Controle de acesso admin via `ADMIN_EMAIL` com middleware `requireAdmin()` no backend e flag `isAdmin` no frontend
+- Controle de acesso admin via RBAC (`users.is_admin`) com fallback `ADMIN_EMAIL` no middleware `requireAdmin()`
 
 Checklist de revisao:
 - `docs/QA_SECURITY_CHECKLIST.md`

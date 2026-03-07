@@ -4,7 +4,7 @@ import SectionHeader from "./SectionHeader";
 import SaveBudgetButton from "./SaveBudgetButton";
 import ExpenseCard, { type Expense } from "./ExpenseCard";
 import type { BudgetData } from "@/types/budget";
-import type { Method10Output, CenarioMethod10, TipologiaMethod10 } from "@/components/pricing/PricingEngineMethod10";
+import type { Method10Output, CenarioMethod10, TipologiaMethod10 } from "@/components/pricing/PricingEngineMethod12";
 import Tooltip from "@/components/ui/Tooltip";
 import { parsePtBrNumber, sanitizeNumberDraft } from "@/lib/numberFormat";
 import { technicalPremiumGroup } from "@/lib/methodCalibration";
