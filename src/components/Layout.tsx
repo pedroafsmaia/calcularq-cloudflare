@@ -159,24 +159,6 @@ export default function Layout({ children }: LayoutProps) {
                       </Link>
                     )}
 
-                    <span
-                      role={user.isAdmin ? "button" : undefined}
-                      tabIndex={user.isAdmin ? 0 : undefined}
-                      onClick={() => {
-                        if (user.isAdmin) navigate(createPageUrl("Admin"));
-                      }}
-                      onKeyDown={(e) => {
-                        if (user.isAdmin && (e.key === "Enter" || e.key === " ")) {
-                          e.preventDefault();
-                          navigate(createPageUrl("Admin"));
-                        }
-                      }}
-                      className={`shrink-0 flex items-center justify-center px-2 h-10 rounded-xl border border-transparent text-slate-600 transition-colors duration-150 ${user.isAdmin ? "hover:bg-slate-100 hover:text-calcularq-blue cursor-pointer" : ""}`}
-                      aria-label={user.name}
-                    >
-                      <span className="text-xs font-medium truncate max-w-[60px]">{user.name?.split(" ")[0]}</span>
-                    </span>
-
                     <button onClick={logout} className={mobileIconItem()} aria-label="Sair">
                       <LogOut className="w-[18px] h-[18px]" />
                     </button>
