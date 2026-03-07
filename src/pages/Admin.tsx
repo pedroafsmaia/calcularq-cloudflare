@@ -201,7 +201,7 @@ function TabResumo({ summary }: { summary: AdminSummaryData | null }) {
     {
       title: "Usuários pagantes",
       value: fmtNum(summary.totalPaidUsers),
-      legend: "Usuários que completaram o pagamento",
+      legend: "Usuários com pagamento confirmado via Stripe",
     },
     {
       title: "Cálculos salvos",

@@ -26,7 +26,11 @@ export async function onRequest(context) {
 
   try {
     const usersCount = await db.prepare("SELECT COUNT(*) as total FROM users").first();
-    const paidCount = await db.prepare("SELECT COUNT(*) as total FROM users WHERE has_paid = 1").first();
+    const paidCount = await db
+      .prepare(
+        "SELECT COUNT(*) as total FROM users WHERE has_paid = 1 AND stripe_customer_id IS NOT NULL AND TRIM(stripe_customer_id) <> ''"
+      )
+      .first();
 
     const filtered = await fetchFilteredBudgets(db, filters);
 

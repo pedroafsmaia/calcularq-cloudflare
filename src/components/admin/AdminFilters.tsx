@@ -199,18 +199,6 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
         </div>
 
         <div className="mt-3 flex flex-wrap items-end gap-3 xl:flex-nowrap">
-          <div className="flex items-end pb-1">
-            <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={feedbackOnly}
-                onChange={(e) => setFeedbackOnly(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-calcularq-blue focus:ring-calcularq-blue"
-              />
-              Somente com feedback
-            </label>
-          </div>
-
           <div className="flex flex-wrap items-end gap-3">
             <button
               type="button"
@@ -226,6 +214,18 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             >
               Limpar
             </button>
+          </div>
+
+          <div className="xl:ml-auto flex items-end pb-1">
+            <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={feedbackOnly}
+                onChange={(e) => setFeedbackOnly(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-calcularq-blue focus:ring-calcularq-blue"
+              />
+              Somente com feedback
+            </label>
           </div>
         </div>
       </div>
