@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { createPageUrl } from "@/utils";
 import { Calculator, Home, BookOpen, LogIn, LogOut, History } from "lucide-react";
 import Footer from "./Footer";
@@ -30,7 +30,7 @@ export default function Layout({ children }: LayoutProps) {
   const currentPageName = getCurrentPageName();
   const headerRowRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const row = headerRowRef.current;
     if (!row) return;
 
@@ -72,7 +72,7 @@ export default function Layout({ children }: LayoutProps) {
       window.removeEventListener("resize", checkOverlap);
       images.forEach((img) => img.removeEventListener("load", checkOverlap));
     };
-  }, [user]);
+  }, [user, location.pathname]);
 
   useEffect(() => {
     const path = location.pathname.toLowerCase();
