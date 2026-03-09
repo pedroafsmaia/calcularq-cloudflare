@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+.container { background: white; padding: 20px; margin: 20px 0; border: 1px solid #ccc; }
+.flex { display: flex; align-items: center; gap: 10px; height: 64px; }
+.label { font-size: 12px; color: #666; margin-bottom: 5px; }
+img { border: 1px dashed red; }
+.ref-line { width: 2px; background: blue; height: 40px; }
+</style>
+</head>
+<body>
+<h2>Logo vs Logomarca Size Comparison</h2>
+
+<div class="container">
+<div class="label">Current: Logo at h-10 (40px) — notice the icon mark height</div>
+<div class="flex">
+<img src="logo.png" style="height: 40px; width: auto;">
+<div class="ref-line" title="40px reference"></div>
+</div>
+</div>
+
+<div class="container">
+<div class="label">Current: Logomarca at h-10 (40px) — icon fills full height (TOO BIG)</div>
+<div class="flex">
+<img src="logomarca.png" style="height: 40px; width: auto;">
+<div class="ref-line" title="40px reference"></div>
+</div>
+</div>
+
+<div class="container">
+<div class="label">FIX: Logomarca at h-8 (32px) — matches icon height within logo</div>
+<div class="flex">
+<img src="logomarca.png" style="height: 32px; width: auto;">
+<div class="ref-line" title="40px reference"></div>
+</div>
+</div>
+
+<div class="container">
+<div class="label">Side by side comparison (logo h-10 vs logomarca h-8)</div>
+<div class="flex">
+<img src="logo.png" style="height: 40px; width: auto;">
+<span style="color: #999;">→ swaps to →</span>
+<img src="logomarca.png" style="height: 32px; width: auto;">
+</div>
+</div>
+</body>
+</html>
