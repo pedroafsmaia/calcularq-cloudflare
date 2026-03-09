@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
@@ -20,15 +20,13 @@ import { useToast } from "@/components/ui/ToastProvider";
 import {
   DEFAULT_FACTORS,
   DEFAULT_AREA_INTERVALS,
-  calculateGlobalComplexity,
   calculateAreaLevel,
   Factor,
   AreaInterval,
 } from "../components/pricing/PricingEngine";
-import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod12";
+import { reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod12";
 import { createPageUrl } from "@/utils";
 import { fadeUp, fadeOnly } from "@/lib/motion";
-import { clearCalculatorDraft } from "@/lib/calculatorDraft";
 import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, resolveTechnicalPremium } from "@/lib/methodCalibration";
 import { useCalculatorProgress } from "@/hooks/calculator/useCalculatorProgress";
 import { useCalculatorReset } from "@/hooks/calculator/useCalculatorReset";
@@ -36,6 +34,8 @@ import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImp
 import { useCalculatorDraftSync } from "@/hooks/calculator/useCalculatorDraftSync";
 import { useCalculatorBudgetData } from "@/hooks/calculator/useCalculatorBudgetData";
 import { useCalculatorStepNavigation } from "@/hooks/calculator/useCalculatorStepNavigation";
+import { useCalculatorDerivedValues } from "@/hooks/calculator/useCalculatorDerivedValues";
+import { useCalculatorExitGuard } from "@/hooks/calculator/useCalculatorExitGuard";
 
 const STEPS = [
   { n: 1, label: "Hora técnica", line1: "Hora", line2: "técnica" },
@@ -55,7 +55,6 @@ export default function Calculator() {
   const [selectedImportBudgetId, setSelectedImportBudgetId] = useState<string>("");
   const [shouldClearDraftOnExit, setShouldClearDraftOnExit] = useState(false);
   const [lastCommittedHash, setLastCommittedHash] = useState<string | null>(null);
-  const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
@@ -196,6 +195,8 @@ export default function Calculator() {
     defaultFactors: DEFAULT_FACTORS,
     setSelectedImportBudgetId,
     setHydrationComplete,
+    setCurrentStep,
+    setMaxStepReached,
     setMinHourlyRate,
     setUseManualMinHourlyRate,
     setProfitMargin,
@@ -214,12 +215,6 @@ export default function Calculator() {
     setCommercialDiscount,
     setVariableExpenses,
   });
-
-  useEffect(() => {
-    if (!budgetId) return;
-    setCurrentStep(3);
-    setMaxStepReached(3);
-  }, [budgetId]);
 
 
   // ── Handlers ──────────────────────────────────────────────────
@@ -316,128 +311,29 @@ export default function Calculator() {
     setSelections((prev) => ({ ...prev, reform: checked ? 2 : 1 }));
   }, []);
 
-  const requiredSelectionIds = [
-    "area",
-    "tipology",
-    "volumetry",
-    "stage",
-    "monitoring",
-    "detail",
-    "technical",
-    "bureaucratic",
-  ];
-  const hasComplexitySelections = requiredSelectionIds.every((id) => Number(selections[id]) > 0);
-
-  // ── Cálculos ──────────────────────────────────────────────────
-  const methodInputs = useMemo(() => {
-    if (!minHourlyRate || minHourlyRate <= 0 || !area || area <= 0) return null;
-    if (!hasComplexitySelections) return null;
-
-    return {
-      ht_min: minHourlyRate,
-      margem_lucro: profitMargin,
-      area,
-      etapa: Number(selections.stage ?? 1),
-      tipologia: tipologiaFromLevel(Number(selections.tipology ?? 1)),
-      volumetria: Number(selections.volumetry ?? 1),
-      reforma: reformFromLevel(Number(selections.reform ?? 1)),
-      f3_detalhamento: Number(selections.detail ?? 1),
-      f4_tecnica: Number(selections.technical ?? 1),
-      f5_burocracia: Number(selections.bureaucratic ?? 1),
-      f6_obra: Number(selections.monitoring ?? 1),
-      cenario: cenarioEscolhido,
-      A: technicalPremium,
-    } as const;
-  }, [area, cenarioEscolhido, hasComplexitySelections, minHourlyRate, profitMargin, selections, technicalPremium]);
-
-  const methodOutputSuggested = useMemo(() => {
-    if (!methodInputs) return null;
-
-    try {
-      return calcularMethod10(methodInputs);
-    } catch {
-      return null;
-    }
-  }, [methodInputs]);
-
-  const methodOutput = useMemo(() => {
-    if (!methodInputs) return null;
-
-    try {
-      return calcularMethod10({
-        ...methodInputs,
-        h_usuario_manual: horasManuais ?? undefined,
-      });
-    } catch {
-      return null;
-    }
-  }, [horasManuais, methodInputs]);
-
-  useEffect(() => {
-    if (!methodOutput) return;
-    setEstimatedHours(methodOutput.h_final);
-  }, [methodOutput]);
-
-  const complexityScore = useMemo(() => {
-    if (methodOutput) return methodOutput.score_complexidade;
-    const legacyComplexity = calculateGlobalComplexity(factors, selections);
-    if (!Number.isFinite(legacyComplexity) || legacyComplexity <= 0) return 0;
-    return Math.round((legacyComplexity / 5) * 100);
-  }, [factors, methodOutput, selections]);
-
-  const displayValues = useMemo(() => {
-    if (!methodOutput || !minHourlyRate || minHourlyRate <= 0) {
-      return {
-        totalVariableExpenses: 0,
-        adjustedHourlyRate: 0,
-        projectPrice: 0,
-        projectPriceWithDiscount: 0,
-        discountAmount: 0,
-        finalSalePrice: 0,
-        profit: null as number | null,
-      };
-    }
-
-    const adjustedHourlyRate = methodOutput.ht_aj;
-    const projectPrice = methodOutput.preco_final;
-    const totalVariableExpenses = variableExpenses.reduce((sum, expense) => sum + (Number(expense.value) || 0), 0);
-    const sanitizedCommercialDiscount = Math.min(100, Math.max(0, Number(commercialDiscount) || 0));
-    const discountAmount = projectPrice * (sanitizedCommercialDiscount / 100);
-    const projectPriceWithDiscount = projectPrice - discountAmount;
-    const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
-    const profit = ((adjustedHourlyRate - minHourlyRate) * methodOutput.h_final) - discountAmount;
-
-    return {
-      totalVariableExpenses,
-      adjustedHourlyRate,
-      projectPrice,
-      projectPriceWithDiscount,
-      discountAmount,
-      finalSalePrice,
-      profit: Number(profit.toFixed(2)),
-    };
-  }, [commercialDiscount, methodOutput, minHourlyRate, variableExpenses]);
-
-  const effectiveAreaForCub = useMemo(() => {
-    if (typeof area === "number" && Number.isFinite(area) && area > 0) return area;
-
-    const selectedAreaLevel = Number(selections.area);
-    if (!Number.isFinite(selectedAreaLevel) || selectedAreaLevel <= 0) return null;
-
-    const interval = areaIntervals.find((i) => i.level === selectedAreaLevel);
-    if (!interval) return null;
-
-    if (typeof interval.max === "number" && interval.max > interval.min) {
-      return (interval.min + interval.max) / 2;
-    }
-
-    return interval.min > 0 ? interval.min : null;
-  }, [area, selections.area, areaIntervals]);
-
-  const pricePerSqm = useMemo(() => {
-    if (!effectiveAreaForCub || effectiveAreaForCub <= 0 || displayValues.finalSalePrice <= 0) return null;
-    return displayValues.finalSalePrice / effectiveAreaForCub;
-  }, [effectiveAreaForCub, displayValues.finalSalePrice]);
+  const {
+    hasComplexitySelections,
+    totalFactors,
+    selectedFactorsCount,
+    methodOutputSuggested,
+    methodOutput,
+    complexityScore,
+    displayValues,
+    pricePerSqm,
+  } = useCalculatorDerivedValues({
+    minHourlyRate,
+    profitMargin,
+    technicalPremium,
+    factors,
+    areaIntervals,
+    area,
+    selections,
+    cenarioEscolhido,
+    horasManuais,
+    commercialDiscount,
+    variableExpenses,
+    setEstimatedHours,
+  });
 
   const calculatorStateHash = useMemo(
     () =>
@@ -450,7 +346,7 @@ export default function Calculator() {
         personalExpenses,
         proLabore,
         productiveHours,
-        factors: factors.map((f) => ({ id: f.id, weight: f.weight })),
+        factors: factors.map((factor) => ({ id: factor.id, weight: factor.weight })),
         areaIntervals,
         area,
         selections,
@@ -470,53 +366,36 @@ export default function Calculator() {
       estimatedHours,
       factors,
       fixedExpenses,
+      horasManuais,
       minHourlyRate,
       personalExpenses,
       proLabore,
       productiveHours,
       profitMargin,
-      technicalPremium,
       selections,
+      technicalPremium,
       useManualMinHourlyRate,
       variableExpenses,
-      horasManuais,
     ]
   );
 
-  const hasUnsavedChanges = useMemo(() => {
-    if (!hydrationComplete || !lastCommittedHash) return false;
-    if (shouldClearDraftOnExit) return false;
-    return calculatorStateHash !== lastCommittedHash;
-  }, [calculatorStateHash, hydrationComplete, lastCommittedHash, shouldClearDraftOnExit]);
+  const {
+    hasUnsavedChanges,
+    confirmLeaveOpen,
+    setConfirmLeaveOpen,
+    confirmPendingNavigation,
+    cancelPendingNavigation,
+    markCommitted,
+    resetCommittedState,
+  } = useCalculatorExitGuard({
+    hydrationComplete,
+    shouldClearDraftOnExit,
+    setShouldClearDraftOnExit,
+    lastCommittedHash,
+    setLastCommittedHash,
+    calculatorStateHash,
+  });
 
-  useEffect(() => {
-    if (!hydrationComplete || lastCommittedHash !== null) return;
-    setLastCommittedHash(calculatorStateHash);
-  }, [calculatorStateHash, hydrationComplete, lastCommittedHash]);
-
-  useEffect(() => {
-    const clearDraft = () => {
-      if (!shouldClearDraftOnExit) return;
-      clearCalculatorDraft();
-    };
-
-    const onBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        event.preventDefault();
-        event.returnValue = "";
-      }
-      clearDraft();
-    };
-
-    window.addEventListener("beforeunload", onBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-      clearDraft();
-    };
-  }, [hasUnsavedChanges, shouldClearDraftOnExit]);
-
-  const totalFactors = requiredSelectionIds.length;
-  const selectedFactorsCount = requiredSelectionIds.filter((id) => Number(selections[id]) > 0).length;
   const areaFactor = factors.find(f => f.id === "area");
   const otherFactors = factors.filter(f => f.id !== "area" && f.id !== "volumetry" && f.id !== "reform");
 
@@ -557,33 +436,8 @@ export default function Calculator() {
     confirmLeaveOpen,
   });
 
-  // `useBlocker` requires a Data Router. This app uses BrowserRouter, so using
-  // it here can crash the calculator route at runtime (blank screen).
-  // Keep the `beforeunload` warning and disable SPA route blocking for now.
-  const navigationBlocker = useMemo(
-    () => ({
-      state: "unblocked" as "blocked" | "unblocked",
-      reset: () => {},
-      proceed: () => {},
-    }),
-    []
-  );
-
-  useEffect(() => {
-    if (navigationBlocker.state !== "blocked") return;
-    setConfirmLeaveOpen(true);
-  }, [navigationBlocker.state]);
-
-  useEffect(() => {
-    if (!shouldClearDraftOnExit || !lastCommittedHash) return;
-    if (calculatorStateHash !== lastCommittedHash) {
-      setShouldClearDraftOnExit(false);
-    }
-  }, [calculatorStateHash, lastCommittedHash, shouldClearDraftOnExit]);
-
   const handleBudgetSaved = useCallback(() => {
-    setShouldClearDraftOnExit(true);
-    setLastCommittedHash(calculatorStateHash);
+    markCommitted();
     setHydrationComplete(true);
     setDraftStatus("idle");
     toast({
@@ -591,7 +445,7 @@ export default function Calculator() {
       title: "Cálculo salvo",
       description: "Você pode sair da página; o rascunho local será limpo ao recarregar ou navegar.",
     });
-  }, [calculatorStateHash, setDraftStatus, setHydrationComplete, toast]);
+  }, [markCommitted, setDraftStatus, setHydrationComplete, toast]);
 
   const handleImportCurrentStepWithFeedback = useCallback(() => {
     handleImportCurrentStepFromSelectedBudget();
@@ -613,15 +467,14 @@ export default function Calculator() {
 
   const handleConfirmResetCalculationWithFeedback = useCallback(() => {
     handleConfirmResetCalculation();
-    setLastCommittedHash(null);
+    resetCommittedState();
     setHydrationComplete(true);
-    setShouldClearDraftOnExit(false);
     toast({
       tone: "info",
       title: "Cálculo reiniciado",
       description: "Os dados preenchidos foram reiniciados sem apagar o cálculo salvo.",
     });
-  }, [handleConfirmResetCalculation, setHydrationComplete, toast]);
+  }, [handleConfirmResetCalculation, resetCommittedState, setHydrationComplete, toast]);
 
 
 
@@ -1164,21 +1017,17 @@ export default function Calculator() {
       <ConfirmDialog
         open={confirmLeaveOpen}
         onOpenChange={(open) => {
-          setConfirmLeaveOpen(open);
-          if (!open && navigationBlocker.state === "blocked") {
-            navigationBlocker.reset();
+          if (open) {
+            setConfirmLeaveOpen(true);
+            return;
           }
+          cancelPendingNavigation();
         }}
         title="Sair sem salvar?"
         description="Há alterações não salvas neste cálculo. Se sair agora, você pode perder mudanças recentes."
         confirmLabel="Sair sem salvar"
         confirmVariant="danger"
-        onConfirm={() => {
-          setConfirmLeaveOpen(false);
-          if (navigationBlocker.state === "blocked") {
-            navigationBlocker.proceed();
-          }
-        }}
+        onConfirm={confirmPendingNavigation}
       />
     </div>
   );

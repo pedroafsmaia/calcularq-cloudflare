@@ -24,8 +24,11 @@ export function useCalculatorDraftSync({
   const draftRestoredRef = useRef(false);
 
   useEffect(() => {
+    if (draftSaveRef.current) {
+      clearTimeout(draftSaveRef.current);
+      draftSaveRef.current = null;
+    }
     if (!enabled || budgetId) return;
-    if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
     setDraftStatus("saving");
     draftSaveRef.current = setTimeout(() => {
       saveCalculatorDraft({
@@ -36,6 +39,7 @@ export function useCalculatorDraftSync({
       setDraftStatus("saved");
       if (draftStatusResetRef.current) clearTimeout(draftStatusResetRef.current);
       draftStatusResetRef.current = setTimeout(() => setDraftStatus("idle"), 1500);
+      draftSaveRef.current = null;
     }, 800);
   }, [budgetId, draftData, enabled]);
 

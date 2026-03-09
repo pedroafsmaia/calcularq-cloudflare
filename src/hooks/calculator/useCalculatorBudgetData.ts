@@ -14,6 +14,8 @@ type Params = {
   defaultFactors: Factor[];
   setSelectedImportBudgetId: Dispatch<SetStateAction<string>>;
   setHydrationComplete: Dispatch<SetStateAction<boolean>>;
+  setCurrentStep: Dispatch<SetStateAction<number>>;
+  setMaxStepReached: Dispatch<SetStateAction<number>>;
   setMinHourlyRate: Dispatch<SetStateAction<number | null>>;
   setUseManualMinHourlyRate: Dispatch<SetStateAction<boolean>>;
   setProfitMargin: Dispatch<SetStateAction<number>>;
@@ -39,6 +41,8 @@ export function useCalculatorBudgetData({
   defaultFactors,
   setSelectedImportBudgetId,
   setHydrationComplete,
+  setCurrentStep,
+  setMaxStepReached,
   setMinHourlyRate,
   setUseManualMinHourlyRate,
   setProfitMargin,
@@ -67,7 +71,7 @@ export function useCalculatorBudgetData({
     let cancelled = false;
 
     const fetchLastBudget = async () => {
-      if (!userId || budgetId) return;
+      if (!userId) return;
       try {
         const resp = await api.listBudgets();
         if (cancelled) return;
@@ -88,7 +92,7 @@ export function useCalculatorBudgetData({
     return () => {
       cancelled = true;
     };
-  }, [budgetId, setSelectedImportBudgetId, userId]);
+  }, [setSelectedImportBudgetId, userId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,6 +171,8 @@ export function useCalculatorBudgetData({
             }
           }
         }
+        setCurrentStep(3);
+        setMaxStepReached(3);
       } catch (e) {
         console.error("Erro ao carregar cálculo:", e);
       } finally {
@@ -185,11 +191,13 @@ export function useCalculatorBudgetData({
     setAreaIntervals,
     setCenarioEscolhido,
     setCommercialDiscount,
+    setCurrentStep,
     setEstimatedHours,
     setFactors,
     setFixedExpenses,
     setHorasManuais,
     setHydrationComplete,
+    setMaxStepReached,
     setMinHourlyRate,
     setPersonalExpenses,
     setProductiveHours,
