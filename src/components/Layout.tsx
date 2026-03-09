@@ -69,9 +69,14 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex items-center gap-2 sm:gap-4 h-16">
             <Link to={createPageUrl("Home")} className="flex items-center shrink-0">
               <img
+                src="/logomarca.png"
+                alt="Calcularq"
+                className="h-10 w-auto sm:hidden object-contain"
+              />
+              <img
                 src="/logo.png"
                 alt="Calcularq"
-                className="h-10 w-auto max-w-[160px] sm:max-w-none object-contain"
+                className="h-10 w-auto hidden sm:block object-contain"
               />
             </Link>
 
