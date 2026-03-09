@@ -8,6 +8,7 @@ import { createPageUrl } from "@/utils";
 import { api } from "@/lib/api";
 import { fadeUp } from "@/lib/motion";
 import AppDialog from "@/components/ui/AppDialog";
+import type { GoogleGlobal, GoogleCredentialResponse } from "@/types/google";
 
 export default function Login() {
   const MIN_PASSWORD_LENGTH = 8;
@@ -66,7 +67,7 @@ export default function Login() {
   }, []);
 
   const handleGoogleCredential = useCallback(
-    async (response: { credential?: string }) => {
+    async (response: GoogleCredentialResponse) => {
       if (!response.credential) return;
       setError("");
       setIsLoading(true);
@@ -91,10 +92,7 @@ export default function Login() {
     if (!googleClientId) return;
 
     const renderButton = () => {
-      const g = window as unknown as { google?: { accounts?: { id?: {
-        initialize: (config: { client_id: string; callback: (response: { credential?: string }) => void; auto_select?: boolean }) => void;
-        renderButton: (element: HTMLElement, config: { theme?: string; size?: string; text?: string; width?: number; logo_alignment?: string }) => void;
-      } } } };
+      const g = window as unknown as GoogleGlobal;
 
       if (g.google?.accounts?.id && googleButtonRef.current) {
         g.google.accounts.id.initialize({

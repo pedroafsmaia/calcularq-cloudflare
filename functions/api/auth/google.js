@@ -1,6 +1,5 @@
 import {
   assertAllowedOrigin,
-  hashPassword,
   jsonResponse,
   readJson,
   rateLimitByIp,
@@ -129,9 +128,8 @@ export async function onRequest(context) {
     if (!user) {
       // Create new user with Google account
       const id = crypto.randomUUID();
-      // Generate a random password hash for Google users (they will never use it)
-      const randomPassword = crypto.randomUUID() + crypto.randomUUID();
-      const password_hash = await hashPassword(randomPassword);
+      // Google OAuth users don't use password login; store a sentinel that never matches PBKDF2 verification
+      const password_hash = "google_oauth$none$0$0$0";
       const has_paid = requirePayment ? 0 : 1;
       const created_at = new Date().toISOString();
 
