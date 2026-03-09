@@ -43,11 +43,12 @@ export default function Layout({ children }: LayoutProps) {
 
       if (!logoImg || !logomarcaImg || !navInner) return;
 
-      // Show full logo first to measure
+      // Show full logo first to measure whether it causes nav overflow
       logoImg.style.display = "";
       logomarcaImg.style.display = "none";
 
-      // Force layout recalculation then check for overflow
+      // Read offsetWidth to force the browser to recalculate layout
+      // before checking scrollWidth vs clientWidth below
       void navInner.offsetWidth;
 
       if (navInner.scrollWidth > navInner.clientWidth) {
@@ -63,14 +64,13 @@ export default function Layout({ children }: LayoutProps) {
     const images = row.querySelectorAll<HTMLImageElement>(
       "img[data-mobile-logo], img[data-mobile-logomarca]"
     );
-    const handleLoad = () => checkOverlap();
     images.forEach((img) => {
-      if (!img.complete) img.addEventListener("load", handleLoad);
+      if (!img.complete) img.addEventListener("load", checkOverlap);
     });
 
     return () => {
       window.removeEventListener("resize", checkOverlap);
-      images.forEach((img) => img.removeEventListener("load", handleLoad));
+      images.forEach((img) => img.removeEventListener("load", checkOverlap));
     };
   }, [user]);
 
