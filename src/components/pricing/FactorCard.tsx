@@ -64,7 +64,7 @@ export default function FactorCard({ factor, value, onChange, reformValue, onRef
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-calcularq-blue focus:ring-calcularq-blue"
             />
             <span className="inline-flex items-center gap-1.5">
-              <span>Reforma/AmpliaÃ§Ã£o</span>
+              <span>Reforma/Ampliação</span>
               <Tooltip text={reformTooltipText} />
             </span>
           </label>

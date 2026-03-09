@@ -81,10 +81,10 @@ export default function CalculatorResultsPanel({
   return (
     <div className="space-y-4 bg-transparent p-4 sm:p-5">
       <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
-        <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do cÃ¡lculo</p>
+        <p className="mb-3 text-center text-sm font-semibold text-calcularq-blue">Base do cálculo</p>
         <div className="space-y-2.5">
           <Row
-            label={showAdjustedAsPrimary ? "Hora tÃ©cnica ajustada" : "Hora tÃ©cnica mÃ­nima"}
+            label={showAdjustedAsPrimary ? "Hora técnica ajustada" : "Hora técnica mínima"}
             value={
               showAdjustedAsPrimary
                 ? `R$ ${displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h`
@@ -112,7 +112,7 @@ export default function CalculatorResultsPanel({
 
           {!showAdjustedAsPrimary && displayValues.adjustedHourlyRate > 0 ? (
             <div className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5 text-sm">
-              <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora tÃ©cnica ajustada</span>
+              <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora técnica ajustada</span>
               <span
                 className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
                   isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
@@ -121,7 +121,7 @@ export default function CalculatorResultsPanel({
                 R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
                 {adjustedHourlyRateDescription ? (
                   <Tooltip
-                    title={isExtremeAdjustedHourlyRate ? "AtenÃ§Ã£o" : "ReferÃªncia interna"}
+                    title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
                     tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
                     iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
                     text={[
@@ -136,7 +136,7 @@ export default function CalculatorResultsPanel({
               </span>
             </div>
           ) : currentStep >= 3 ? (
-            <p className="border-t border-slate-200 pt-2.5 text-sm text-slate-400">A hora tÃ©cnica ajustada serÃ¡ exibida apÃ³s os ajustes de preÃ§o.</p>
+            <p className="border-t border-slate-200 pt-2.5 text-sm text-slate-400">A hora técnica ajustada será exibida após os ajustes de preço.</p>
           ) : null}
         </div>
       </div>
@@ -167,7 +167,7 @@ export default function CalculatorResultsPanel({
           />
 
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-            PrÃ³ximo passo: classificar os fatores de complexidade.
+            Próximo passo: classificar os fatores de complexidade.
           </p>
         </div>
       ) : null}
@@ -190,10 +190,10 @@ export default function CalculatorResultsPanel({
             valueClassName={hasComplexitySelections && estimatedHours > 0 ? "text-slate-800" : "text-slate-400"}
           />
           {!hasComplexitySelections || estimatedHours <= 0 ? (
-            <p className="text-xs text-slate-400">Aguardando conclusÃ£o da etapa para estimar as horas.</p>
+            <p className="text-xs text-slate-400">Aguardando conclusão da etapa para estimar as horas.</p>
           ) : null}
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-            PrÃ³ximo passo: finalize os ajustes de preÃ§o na Etapa 3.
+            Próximo passo: finalize os ajustes de preço na Etapa 3.
           </p>
         </div>
       ) : null}
@@ -204,10 +204,10 @@ export default function CalculatorResultsPanel({
             <div className="space-y-2.5 px-1 py-1 text-sm">
               <div className="grid grid-cols-[1fr_auto] items-start gap-2">
                 <span className="min-w-0 leading-snug text-slate-600">
-                  PreÃ§o do Projeto
+                  Preço do Projeto
                   {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 ? (
                     <span className="mt-0.5 block text-xs leading-snug text-slate-400">
-                      {estimatedHours}h Ã— R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       <span className="ml-1 inline-flex align-middle">
                         <Tooltip text="Resultado calculado pelas horas estimadas do projeto multiplicadas pela hora técnica ajustada." />
                       </span>
@@ -221,7 +221,7 @@ export default function CalculatorResultsPanel({
 
               {displayValues.totalVariableExpenses > 0 ? (
                 <div className="grid grid-cols-[1fr_auto] items-baseline gap-2">
-                  <span className="min-w-0 leading-snug text-slate-600">(+) Despesas VariÃ¡veis</span>
+                  <span className="min-w-0 leading-snug text-slate-600">(+) Despesas Variáveis</span>
                   <span className="whitespace-nowrap font-semibold text-slate-800">
                     R$ {displayValues.totalVariableExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -241,14 +241,14 @@ export default function CalculatorResultsPanel({
 
           {hasFinalPrice ? (
             <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 text-center shadow-sm">
-              <p className="mb-1 text-xs font-semibold text-calcularq-blue">PreÃ§o de Venda Final</p>
+              <p className="mb-1 text-xs font-semibold text-calcularq-blue">Preço de Venda Final</p>
               <p className="text-2xl font-bold text-calcularq-blue">
                 R$ {displayValues.finalSalePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           ) : (
             <div className="rounded-xl border-2 border-dashed border-slate-200 p-4 text-center">
-              <p className="text-xs text-slate-400">Conclua os ajustes de preÃ§o para liberar o valor final.</p>
+              <p className="text-xs text-slate-400">Conclua os ajustes de preço para liberar o valor final.</p>
             </div>
           )}
 
@@ -256,7 +256,7 @@ export default function CalculatorResultsPanel({
             <>
               <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-1 pt-1">
                 <span className="min-w-0 flex items-center gap-1 text-sm text-slate-500">
-                  PreÃ§o/mÂ²
+                  Preço/m²
                   <Tooltip text="Indicador comparativo. O aviso mostra a faixa interna de referência, ou a zona de transição, em que o valor se encaixa." />
                 </span>
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
@@ -267,11 +267,11 @@ export default function CalculatorResultsPanel({
                   >
                     {pricePerSqm !== null
                       ? `R$ ${pricePerSqm.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                      : "â€”"}
+                      : "—"}
                   </span>
                   {pricePerSqmDescription ? (
                     <Tooltip
-                      title={isExtremePricePerSqm ? "AtenÃ§Ã£o" : "ReferÃªncia interna"}
+                      title={isExtremePricePerSqm ? "Atenção" : "Referência interna"}
                       tone={isExtremePricePerSqm ? "warning" : "info"}
                       iconClassName={isExtremePricePerSqm ? "text-amber-700 hover:text-amber-800" : undefined}
                       text={[pricePerSqmDescription.line1, pricePerSqmDescription.line2].filter(Boolean).join("\n")}
@@ -284,7 +284,7 @@ export default function CalculatorResultsPanel({
                 <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-1 pt-1">
                   <span className="min-w-0 inline-flex items-center gap-1 text-sm text-slate-500">
                     Lucro Estimado
-                    <Tooltip text="Estimativa de margem bruta do projeto: diferenÃ§a entre Hora Ajustada e Hora TÃ©cnica, multiplicada pelas horas estimadas." />
+                    <Tooltip text="Estimativa de margem bruta do projeto: diferença entre Hora Ajustada e Hora Técnica, multiplicada pelas horas estimadas." />
                   </span>
                   <span className={`whitespace-nowrap text-sm font-bold ${displayValues.profit >= 0 ? "text-green-600" : "text-red-500"}`}>
                     R$ {displayValues.profit.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

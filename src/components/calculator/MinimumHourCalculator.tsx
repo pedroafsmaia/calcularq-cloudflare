@@ -36,9 +36,9 @@ export default function MinimumHourCalculator({
   initialProductiveHours,
   initialUseManual = false,
   onManualModeChange,
-  titleLabel = "Hora tÃ©cnica mÃ­nima",
-  manualToggleLabel = "JÃ¡ sei a minha hora tÃ©cnica.",
-  manualFieldLabel = "Hora tÃ©cnica (R$/hora)",
+  titleLabel = "Hora técnica mínima",
+  manualToggleLabel = "Já sei a minha hora técnica.",
+  manualFieldLabel = "Hora técnica (R$/hora)",
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
   const [personalExpenses, setPersonalExpenses] = useState<Expense[]>(
@@ -196,7 +196,7 @@ export default function MinimumHourCalculator({
         <SectionHeader
           className="mb-6"
           title={titleLabel}
-          description="Preencha os dados do seu escritÃ³rio para descobrir o valor da sua hora tÃ©cnica base."
+          description="Preencha os dados do seu escritório para descobrir o valor da sua hora técnica base."
           icon={<Calculator className="h-5 w-5 text-calcularq-blue" />}
         />
 
@@ -211,7 +211,7 @@ export default function MinimumHourCalculator({
             />
             <label htmlFor="useManual" className="flex items-center gap-1.5 text-sm font-medium leading-snug text-slate-700">
               {manualToggleLabel}
-              <Tooltip text="Use esta opÃ§Ã£o se vocÃª jÃ¡ conhece sua hora tÃ©cnica. Se o valor estiver abaixo do necessÃ¡rio, sua margem pode ficar comprometida." />
+              <Tooltip text="Use esta opção se você já conhece sua hora técnica. Se o valor estiver abaixo do necessário, sua margem pode ficar comprometida." />
             </label>
           </div>
 
@@ -219,7 +219,7 @@ export default function MinimumHourCalculator({
             <div>
               <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-700">
                 {manualFieldLabel}
-                <Tooltip text="Valor mÃ­nimo por hora para cobrir despesas fixas e pessoais sem prejuÃ­zo." />
+                <Tooltip text="Valor mínimo por hora para cobrir despesas fixas e pessoais sem prejuízo." />
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">R$</span>
@@ -254,7 +254,7 @@ export default function MinimumHourCalculator({
                 onUpdate={handleUpdateExpense}
                 placeholder="Ex: Aluguel, Contador..."
                 label="Despesas operacionais fixas (R$)"
-                tooltip="Despesas fixas mensais para manter o escritÃ³rio funcionando. Custos variÃ¡veis por projeto entram na etapa final."
+                tooltip="Despesas fixas mensais para manter o escritório funcionando. Custos variáveis por projeto entram na etapa final."
               />
 
               <ExpenseCard
@@ -262,7 +262,7 @@ export default function MinimumHourCalculator({
                 onAdd={handleAddPersonalExpense}
                 onRemove={handleRemovePersonalExpense}
                 onUpdate={handleUpdatePersonalExpense}
-                placeholder="Ex: Moradia, AlimentaÃ§Ã£o..."
+                placeholder="Ex: Moradia, Alimentação..."
                 label="Despesas pessoais essenciais (R$)"
                 tooltip="Inclua o valor mensal necessário para cobrir suas despesas pessoais essenciais. Não é a retirada desejada nem o lucro do projeto."
               />
@@ -270,7 +270,7 @@ export default function MinimumHourCalculator({
               <div>
                 <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-700">
                   Horas produtivas mensais
-                  <Tooltip text="Considere apenas tempo efetivo de produÃ§Ã£o de projeto, sem tarefas administrativas." />
+                  <Tooltip text="Considere apenas tempo efetivo de produção de projeto, sem tarefas administrativas." />
                 </label>
                 <input
                   type="text"
