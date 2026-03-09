@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPageUrl } from "@/utils";
 import { Calculator, Home, BookOpen, LogIn, LogOut, History } from "lucide-react";
 import Footer from "./Footer";
@@ -28,6 +28,51 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const currentPageName = getCurrentPageName();
+  const headerRowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const row = headerRowRef.current;
+    if (!row) return;
+
+    const checkOverlap = () => {
+      if (window.matchMedia("(min-width: 640px)").matches) return;
+
+      const logoImg = row.querySelector("[data-mobile-logo]") as HTMLElement;
+      const logomarcaImg = row.querySelector("[data-mobile-logomarca]") as HTMLElement;
+      const navInner = row.querySelector("[data-mobile-nav]") as HTMLElement;
+
+      if (!logoImg || !logomarcaImg || !navInner) return;
+
+      // Show full logo first to measure
+      logoImg.style.display = "";
+      logomarcaImg.style.display = "none";
+
+      // Force layout recalculation then check for overflow
+      void navInner.offsetWidth;
+
+      if (navInner.scrollWidth > navInner.clientWidth) {
+        // Buttons overflow — switch to logomarca
+        logoImg.style.display = "none";
+        logomarcaImg.style.display = "";
+      }
+    };
+
+    checkOverlap();
+    window.addEventListener("resize", checkOverlap);
+
+    const images = row.querySelectorAll<HTMLImageElement>(
+      "img[data-mobile-logo], img[data-mobile-logomarca]"
+    );
+    const handleLoad = () => checkOverlap();
+    images.forEach((img) => {
+      if (!img.complete) img.addEventListener("load", handleLoad);
+    });
+
+    return () => {
+      window.removeEventListener("resize", checkOverlap);
+      images.forEach((img) => img.removeEventListener("load", handleLoad));
+    };
+  }, [user]);
 
   useEffect(() => {
     const path = location.pathname.toLowerCase();
@@ -66,12 +111,20 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-white">
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 sm:gap-4 h-16">
+          <div ref={headerRowRef} className="flex items-center gap-2 sm:gap-4 h-16">
             <Link to={createPageUrl("Home")} className="flex items-center shrink-0">
+              <img
+                src="/logo.png"
+                alt="Calcularq"
+                className="h-10 w-auto sm:hidden object-contain"
+                data-mobile-logo
+              />
               <img
                 src="/logomarca.png"
                 alt="Calcularq"
                 className="h-10 w-auto sm:hidden object-contain"
+                data-mobile-logomarca
+                style={{ display: "none" }}
               />
               <img
                 src="/logo.png"
@@ -138,7 +191,7 @@ export default function Layout({ children }: LayoutProps) {
             </div>
 
             <div className="sm:hidden min-w-0 flex-1">
-              <div className="flex items-center justify-end gap-1.5 overflow-x-auto py-1">
+              <div className="flex items-center justify-end gap-1.5 overflow-x-auto py-1" data-mobile-nav>
                 {navigation.map((item) => {
                   const isActive = currentPageName === item.page;
                   return (
