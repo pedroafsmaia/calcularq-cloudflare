@@ -1,10 +1,10 @@
-﻿import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { BarChart2, ChevronRight, ChevronLeft, ChevronDown, PieChart, Download, RotateCcw, Trash2, MoreHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { api, Budget } from "@/lib/api";
 import type { ExpenseItem } from "@/types/budget";
+import type { CalculatorDraft } from "@/types/budget";
 import type { CenarioMethod10 } from "@/components/pricing/PricingEngineMethod12";
 
 import MinimumHourCalculator from "../components/calculator/MinimumHourCalculator";
@@ -28,11 +28,14 @@ import {
 import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "../components/pricing/PricingEngineMethod12";
 import { createPageUrl } from "@/utils";
 import { fadeUp, fadeOnly } from "@/lib/motion";
-import { clearCalculatorDraft, loadCalculatorDraft, saveCalculatorDraft } from "@/lib/calculatorDraft";
+import { clearCalculatorDraft } from "@/lib/calculatorDraft";
 import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, resolveTechnicalPremium } from "@/lib/methodCalibration";
 import { useCalculatorProgress } from "@/hooks/calculator/useCalculatorProgress";
 import { useCalculatorReset } from "@/hooks/calculator/useCalculatorReset";
 import { useCalculatorStepImport } from "@/hooks/calculator/useCalculatorStepImport";
+import { useCalculatorDraftSync } from "@/hooks/calculator/useCalculatorDraftSync";
+import { useCalculatorBudgetData } from "@/hooks/calculator/useCalculatorBudgetData";
+import { useCalculatorStepNavigation } from "@/hooks/calculator/useCalculatorStepNavigation";
 
 const STEPS = [
   { n: 1, label: "Hora técnica", line1: "Hora", line2: "técnica" },
@@ -46,19 +49,11 @@ export default function Calculator() {
   const { user } = useAuth();
   const { toast } = useToast();
   const budgetId = searchParams.get("budget");
-  const [loadedBudgetName, setLoadedBudgetName] = useState<string | null>(null);
-  const [loadedClientName, setLoadedClientName] = useState<string | null>(null);
-  const [loadedProjectName, setLoadedProjectName] = useState<string | null>(null);
-  const [loadedBudgetDescription, setLoadedBudgetDescription] = useState<string | null>(null);
   const [confirmClearStepOpen, setConfirmClearStepOpen] = useState(false);
   const [confirmClearAllOpen, setConfirmClearAllOpen] = useState(false);
   const [importStepDialogOpen, setImportStepDialogOpen] = useState(false);
-  const [savedBudgets, setSavedBudgets] = useState<Budget[]>([]);
   const [selectedImportBudgetId, setSelectedImportBudgetId] = useState<string>("");
   const [shouldClearDraftOnExit, setShouldClearDraftOnExit] = useState(false);
-  const [draftStatus, setDraftStatus] = useState<"idle" | "saving" | "saved">("idle");
-  const [lastDraftSavedAt, setLastDraftSavedAt] = useState<number | null>(null);
-  const [hydrationComplete, setHydrationComplete] = useState(false);
   const [lastCommittedHash, setLastCommittedHash] = useState<string | null>(null);
   const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
 
@@ -92,194 +87,139 @@ export default function Calculator() {
 
   // Restaurar último cálculo
 
-  // ── Autosave em localStorage ──────────────────────────────────
-  const draftSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const draftStatusResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const mobileStepperRef = useRef<HTMLDetailsElement | null>(null);
-  const stepContentTopRef = useRef<HTMLDivElement | null>(null);
-  const previousStepRef = useRef(currentStep);
-
-  useEffect(() => {
-    if (!user || budgetId) return;
-    if (draftSaveRef.current) clearTimeout(draftSaveRef.current);
-    setDraftStatus("saving");
-    draftSaveRef.current = setTimeout(() => {
-      saveCalculatorDraft({
-        minHourlyRate, useManualMinHourlyRate, profitMargin, technicalPremium, fixedExpenses, personalExpenses, proLabore, productiveHours,
-        factors: factors.map(f => ({ id: f.id, weight: f.weight })),
-        areaIntervals, area, selections,
-        estimatedHours, cenarioEscolhido, hUsuarioManual: horasManuais, commercialDiscount, variableExpenses,
-        currentStep, maxStepReached,
-        savedAt: Date.now(),
-      });
-      setLastDraftSavedAt(Date.now());
-      setDraftStatus("saved");
-      if (draftStatusResetRef.current) clearTimeout(draftStatusResetRef.current);
-      draftStatusResetRef.current = setTimeout(() => setDraftStatus("idle"), 1500);
-    }, 800);
-  }, [
-    budgetId,
-    minHourlyRate, useManualMinHourlyRate, profitMargin, technicalPremium, fixedExpenses, personalExpenses, proLabore, productiveHours,
-    factors, areaIntervals, area, selections,
-    estimatedHours, cenarioEscolhido, horasManuais, commercialDiscount, variableExpenses,
-    currentStep, maxStepReached,
-    user,
-  ]);
-
-  // ── Restaurar rascunho do localStorage ao montar ──────────────
-  const draftRestoredRef = useRef(false);
-  useEffect(() => {
-    if (draftRestoredRef.current || budgetId || !user) return;
-    draftRestoredRef.current = true;
-
-    const draft = loadCalculatorDraft();
-    if (!draft || !draft.minHourlyRate) {
-      setHydrationComplete(true);
-      return;
-    }
-
-    // Só restaura se o rascunho for recente (< 24h) e não vier de outro usuário
-    const age = Date.now() - (draft.savedAt || 0);
-    if (age > 24 * 60 * 60 * 1000) {
-      setHydrationComplete(true);
-      return;
-    }
-
-    setMinHourlyRate(draft.minHourlyRate ?? null);
-    setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
-    if (typeof draft.profitMargin === "number" && Number.isFinite(draft.profitMargin)) {
-      setProfitMargin(draft.profitMargin);
-    }
-    setTechnicalPremium(resolveTechnicalPremium(draft.technicalPremium, "B"));
-    if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
-    if (draft.personalExpenses) setPersonalExpenses(draft.personalExpenses);
-    if (draft.proLabore) setProLabore(draft.proLabore);
-    if (draft.productiveHours) setProductiveHours(draft.productiveHours);
-    if (draft.factors) {
-      const draftFactors = draft.factors;
-      setFactors(DEFAULT_FACTORS.map(df => {
-        const saved = draftFactors.find((f) => f.id === df.id);
-        return saved ? { ...df, weight: saved.weight } : df;
-      }));
-    }
-    if (draft.areaIntervals) setAreaIntervals(draft.areaIntervals);
-    if (draft.area) setArea(draft.area);
-    if (draft.selections) setSelections(draft.selections);
-    if (draft.estimatedHours) setEstimatedHours(draft.estimatedHours);
-    if (draft.cenarioEscolhido === "otimista" || draft.cenarioEscolhido === "conservador") {
-      setCenarioEscolhido(draft.cenarioEscolhido);
-    }
-    if (typeof draft.hUsuarioManual === "number" && Number.isFinite(draft.hUsuarioManual)) {
-      setHorasManuais(draft.hUsuarioManual);
-    }
-    if (draft.commercialDiscount !== undefined) setCommercialDiscount(draft.commercialDiscount);
-    if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
-    if (draft.currentStep) setCurrentStep(draft.currentStep);
-    if (draft.maxStepReached) setMaxStepReached(draft.maxStepReached);
-    setLastDraftSavedAt(draft.savedAt ?? null);
-    setDraftStatus("saved");
-    setHydrationComplete(true);
-  }, [user, budgetId]);
-
-  // ── Buscar último budget para banner de restauração ───────────
-  useEffect(() => {
-    const fetchLastBudget = async () => {
-      if (!user || budgetId) return;
-      try {
-        const resp = await api.listBudgets();
-        const budgets = Array.isArray(resp.budgets) ? resp.budgets : [];
-        setSavedBudgets(budgets);
-        if (budgets.length > 0) {
-          const last = budgets[0];          setSelectedImportBudgetId((prev) => prev || last.id);
-        } else {          setSelectedImportBudgetId("");
-        }
-      } catch { /* silencioso */ }
-    };
-    fetchLastBudget();
-  }, [user, budgetId]);
-
-  // ── Carregar orçamento salvo via URL ──────────────────────────
-  useEffect(() => {
-    const loadBudget = async () => {
-      if (!budgetId || !user) return;
-      try {
-        const resp = await api.getBudget(budgetId);
-        const budget = resp.budget;
-
-        setLoadedBudgetName(budget.name || null);
-        setLoadedClientName(budget.clientName || null);
-        setLoadedProjectName(budget.projectName || null);
-        setLoadedBudgetDescription(typeof budget.data?.description === "string" ? budget.data.description : null);
-        setMinHourlyRate(budget.data.minHourlyRate);
-        setUseManualMinHourlyRate(Boolean(budget.data.useManualMinHourlyRate));
-        if (typeof budget.data.margemLucro === "number" && Number.isFinite(budget.data.margemLucro)) {
-          setProfitMargin(budget.data.margemLucro);
-        } else if (budget.data.profitProfile === "portfolio") {
-          setProfitMargin(0.1);
-        } else if (budget.data.profitProfile === "referencia") {
-          setProfitMargin(0.2);
-        } else {
-          setProfitMargin(0.15);
-        }
-        setTechnicalPremium(resolveTechnicalPremium(budget.data.aValue, budget.data.aTestGroup));
-        if (budget.data.cenarioEscolhido === "otimista" || budget.data.cenarioEscolhido === "conservador") {
-          setCenarioEscolhido(budget.data.cenarioEscolhido);
-        } else {
-          setCenarioEscolhido("conservador");
-        }
-        if (typeof budget.data.hUsuarioManual === "number" && Number.isFinite(budget.data.hUsuarioManual)) {
-          setHorasManuais(budget.data.hUsuarioManual);
-        } else {
-          setHorasManuais(null);
-        }
-
+  const applyDraft = useCallback(
+    (draft: CalculatorDraft) => {
+      setMinHourlyRate(draft.minHourlyRate ?? null);
+      setUseManualMinHourlyRate(Boolean(draft.useManualMinHourlyRate));
+      if (typeof draft.profitMargin === "number" && Number.isFinite(draft.profitMargin)) {
+        setProfitMargin(draft.profitMargin);
+      }
+      setTechnicalPremium(resolveTechnicalPremium(draft.technicalPremium, "B"));
+      if (draft.fixedExpenses) setFixedExpenses(draft.fixedExpenses);
+      if (draft.personalExpenses) setPersonalExpenses(draft.personalExpenses);
+      if (draft.proLabore) setProLabore(draft.proLabore);
+      if (draft.productiveHours) setProductiveHours(draft.productiveHours);
+      if (draft.factors) {
+        const draftFactors = draft.factors;
         setFactors(
-          DEFAULT_FACTORS.map((defaultFactor) => {
-            const saved = budget.data.factors.find((factor) => factor.id === defaultFactor.id);
-            return saved ? { ...defaultFactor, weight: saved.weight } : defaultFactor;
+          DEFAULT_FACTORS.map((df) => {
+            const saved = draftFactors.find((f) => f.id === df.id);
+            return saved ? { ...df, weight: saved.weight } : df;
           })
         );
-
-        setAreaIntervals(budget.data.areaIntervals);
-        const mergedSelections: Record<string, number> = {
-          ...budget.data.selections,
-        };
-        for (const id of ["area", "tipology", "volumetry", "reform", "stage", "monitoring", "detail", "technical", "bureaucratic"]) {
-          if (!Number.isFinite(mergedSelections[id]) || mergedSelections[id] <= 0) {
-            mergedSelections[id] = 1;
-          }
-        }
-        setSelections(mergedSelections);
-        setEstimatedHours(budget.data.estimatedHours);
-        setVariableExpenses(budget.data.variableExpenses || []);
-        if (budget.data.commercialDiscount !== undefined) setCommercialDiscount(budget.data.commercialDiscount);
-        if (budget.data.fixedExpenses) setFixedExpenses(budget.data.fixedExpenses);
-        if (budget.data.personalExpenses) setPersonalExpenses(budget.data.personalExpenses);
-        if (budget.data.proLabore !== undefined) setProLabore(budget.data.proLabore);
-        if (budget.data.productiveHours !== undefined) setProductiveHours(budget.data.productiveHours);
-
-        if (typeof budget.data.area === "number" && Number.isFinite(budget.data.area)) {
-          setArea(budget.data.area);
-        } else {
-          const areaFactor = budget.data.factors.find((f) => f.id === "area");
-          if (areaFactor) {
-            const interval = budget.data.areaIntervals.find((i) => i.level === areaFactor.level);
-            if (interval) {
-              const max = interval.max ?? interval.min;
-              setArea((interval.min + max) / 2);
-            }
-          }
-        }
-        setCurrentStep(3);
-        setMaxStepReached(3);
-      } catch (e) {
-        console.error("Erro ao carregar cálculo:", e);
-      } finally {
-        setHydrationComplete(true);
       }
-    };
-    loadBudget();
-  }, [budgetId, user]);
+      if (draft.areaIntervals) setAreaIntervals(draft.areaIntervals);
+      if (draft.area) setArea(draft.area);
+      if (draft.selections) setSelections(draft.selections);
+      if (draft.estimatedHours) setEstimatedHours(draft.estimatedHours);
+      if (draft.cenarioEscolhido === "otimista" || draft.cenarioEscolhido === "conservador") {
+        setCenarioEscolhido(draft.cenarioEscolhido);
+      }
+      if (typeof draft.hUsuarioManual === "number" && Number.isFinite(draft.hUsuarioManual)) {
+        setHorasManuais(draft.hUsuarioManual);
+      }
+      if (draft.commercialDiscount !== undefined) setCommercialDiscount(draft.commercialDiscount);
+      if (draft.variableExpenses) setVariableExpenses(draft.variableExpenses);
+      if (draft.currentStep) setCurrentStep(draft.currentStep);
+      if (draft.maxStepReached) setMaxStepReached(draft.maxStepReached);
+    },
+    []
+  );
+
+  const draftData = useMemo<CalculatorDraft>(
+    () => ({
+      minHourlyRate,
+      useManualMinHourlyRate,
+      profitMargin,
+      technicalPremium,
+      fixedExpenses,
+      personalExpenses,
+      proLabore,
+      productiveHours,
+      factors: factors.map((f) => ({ id: f.id, weight: f.weight })),
+      areaIntervals,
+      area,
+      selections,
+      estimatedHours,
+      cenarioEscolhido,
+      hUsuarioManual: horasManuais,
+      commercialDiscount,
+      variableExpenses,
+      currentStep,
+      maxStepReached,
+    }),
+    [
+      area,
+      areaIntervals,
+      cenarioEscolhido,
+      commercialDiscount,
+      currentStep,
+      estimatedHours,
+      factors,
+      fixedExpenses,
+      horasManuais,
+      maxStepReached,
+      minHourlyRate,
+      personalExpenses,
+      proLabore,
+      productiveHours,
+      profitMargin,
+      selections,
+      technicalPremium,
+      useManualMinHourlyRate,
+      variableExpenses,
+    ]
+  );
+
+  const {
+    draftStatus,
+    setDraftStatus,
+    lastDraftSavedAt,
+    hydrationComplete,
+    setHydrationComplete,
+  } = useCalculatorDraftSync({
+    enabled: Boolean(user),
+    budgetId,
+    draftData,
+    applyDraft,
+  });
+
+  const {
+    savedBudgets,
+    loadedBudgetName,
+    loadedClientName,
+    loadedProjectName,
+    loadedBudgetDescription,
+  } = useCalculatorBudgetData({
+    userId: user?.id ?? null,
+    budgetId,
+    defaultFactors: DEFAULT_FACTORS,
+    setSelectedImportBudgetId,
+    setHydrationComplete,
+    setMinHourlyRate,
+    setUseManualMinHourlyRate,
+    setProfitMargin,
+    setTechnicalPremium,
+    setFixedExpenses,
+    setPersonalExpenses,
+    setProLabore,
+    setProductiveHours,
+    setFactors,
+    setAreaIntervals,
+    setArea,
+    setSelections,
+    setEstimatedHours,
+    setCenarioEscolhido,
+    setHorasManuais,
+    setCommercialDiscount,
+    setVariableExpenses,
+  });
+
+  useEffect(() => {
+    if (!budgetId) return;
+    setCurrentStep(3);
+    setMaxStepReached(3);
+  }, [budgetId]);
 
 
   // ── Handlers ──────────────────────────────────────────────────
@@ -591,29 +531,31 @@ export default function Calculator() {
     includeWeightStep: false,
   });
 
-  const stepVisualDone = (n: number) => maxStepReached > n;
-  const currentStepLabel = STEPS.find((s) => s.n === currentStep)?.label ?? `Etapa ${currentStep}`;
   const canImportCurrentStep = savedBudgets.length > 0;
   const selectedImportBudget = useMemo(
     () => savedBudgets.find((budget) => budget.id === selectedImportBudgetId) ?? null,
     [savedBudgets, selectedImportBudgetId]
   );
-
-  const handleNext = () => {
-    if (currentStep < STEPS.length && canAdvance) {
-      setCurrentStep(s => s + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) setCurrentStep(s => s - 1);
-  };
-
-  const goToStep = useCallback((stepNumber: number) => {
-    const canGoToReached = stepNumber <= maxStepReached;
-    const canGoToNext = stepNumber === maxStepReached + 1 && stepComplete(stepNumber - 1);
-    if (canGoToReached || canGoToNext) setCurrentStep(stepNumber);
-  }, [maxStepReached, stepComplete]);
+  const {
+    currentStepLabel,
+    stepVisualDone,
+    handleNext,
+    handleBack,
+    goToStep,
+    mobileStepperRef,
+    stepContentTopRef,
+  } = useCalculatorStepNavigation({
+    currentStep,
+    maxStepReached,
+    steps: STEPS,
+    canAdvance,
+    stepComplete,
+    setCurrentStep,
+    confirmClearAllOpen,
+    confirmClearStepOpen,
+    importStepDialogOpen,
+    confirmLeaveOpen,
+  });
 
   // `useBlocker` requires a Data Router. This app uses BrowserRouter, so using
   // it here can crash the calculator route at runtime (blank screen).
@@ -649,7 +591,7 @@ export default function Calculator() {
       title: "Cálculo salvo",
       description: "Você pode sair da página; o rascunho local será limpo ao recarregar ou navegar.",
     });
-  }, [calculatorStateHash, toast]);
+  }, [calculatorStateHash, setDraftStatus, setHydrationComplete, toast]);
 
   const handleImportCurrentStepWithFeedback = useCallback(() => {
     handleImportCurrentStepFromSelectedBudget();
@@ -679,74 +621,7 @@ export default function Calculator() {
       title: "Cálculo reiniciado",
       description: "Os dados preenchidos foram reiniciados sem apagar o cálculo salvo.",
     });
-  }, [handleConfirmResetCalculation, toast]);
-
-  useEffect(() => {
-    if (previousStepRef.current === currentStep) return;
-    previousStepRef.current = currentStep;
-
-    const target = stepContentTopRef.current;
-    if (!target) return;
-
-    const top = target.getBoundingClientRect().top + window.scrollY - 92;
-    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-  }, [currentStep]);
-
-  useEffect(() => {
-    const isTypingTarget = (target: EventTarget | null) => {
-      const el = target as HTMLElement | null;
-      if (!el) return false;
-      const tag = el.tagName;
-      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      const isShortcutCombo = event.altKey && !event.ctrlKey && !event.metaKey;
-      if (!isShortcutCombo && isTypingTarget(event.target)) return;
-      if (confirmClearAllOpen || confirmClearStepOpen || importStepDialogOpen || confirmLeaveOpen) return;
-
-      if (!isShortcutCombo) return;
-
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        if (currentStep < STEPS.length && canAdvance) setCurrentStep((s) => s + 1);
-        return;
-      }
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        if (currentStep > 1) setCurrentStep((s) => s - 1);
-        return;
-      }
-
-      const digitFromCode = (() => {
-        if (/^Digit[1-3]$/.test(event.code)) return Number(event.code.replace("Digit", ""));
-        if (/^Numpad[1-3]$/.test(event.code)) return Number(event.code.replace("Numpad", ""));
-        if (/^[1-3]$/.test(event.key)) return Number(event.key);
-        return null;
-      })();
-
-      if (digitFromCode !== null) {
-        event.preventDefault();
-        const targetStep = digitFromCode;
-        const canGoToReached = targetStep <= maxStepReached;
-        const canGoToNext = targetStep === maxStepReached + 1 && stepComplete(targetStep - 1);
-        if (canGoToReached || canGoToNext) setCurrentStep(targetStep);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown, { capture: true });
-    return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
-  }, [
-    canAdvance,
-    confirmClearAllOpen,
-    confirmClearStepOpen,
-    confirmLeaveOpen,
-    currentStep,
-    importStepDialogOpen,
-    maxStepReached,
-    setCurrentStep,
-    stepComplete,
-  ]);
+  }, [handleConfirmResetCalculation, setHydrationComplete, toast]);
 
 
 
