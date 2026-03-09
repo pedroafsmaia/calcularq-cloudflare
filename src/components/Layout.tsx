@@ -47,11 +47,20 @@ export default function Layout({ children }: LayoutProps) {
       logoImg.style.display = "";
       logomarcaImg.style.display = "none";
 
-      // Read offsetWidth to force the browser to recalculate layout
-      // before checking scrollWidth vs clientWidth below
+      // Force the browser to recalculate layout before measuring
       void navInner.offsetWidth;
 
-      if (navInner.scrollWidth > navInner.clientWidth) {
+      // Detect overflow in both directions: scrollWidth catches rightward
+      // overflow, but justify-end pushes excess items to the left where
+      // scrollWidth can't see them. getBoundingClientRect catches that case.
+      const firstItem = navInner.firstElementChild as HTMLElement | null;
+      const overflows =
+        navInner.scrollWidth > navInner.clientWidth ||
+        (firstItem != null &&
+          firstItem.getBoundingClientRect().left <
+            navInner.getBoundingClientRect().left - 1); // 1px tolerance for sub-pixel rounding
+
+      if (overflows) {
         // Buttons overflow — switch to logomarca
         logoImg.style.display = "none";
         logomarcaImg.style.display = "";
