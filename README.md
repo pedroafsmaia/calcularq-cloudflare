@@ -1,32 +1,62 @@
 # Calcularq
 
-Calculadora de precificacao por complexidade para projetos de arquitetura.
+Calculadora de precificação por complexidade para projetos de arquitetura.
 
-A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e composicao final do preco para gerar um valor de venda com base em dados do escritorio e do projeto.
+A aplicação cruza hora técnica mínima, fatores de complexidade, estimativa de horas e ajustes comerciais para chegar ao preço final do projeto. O produto inclui calculadora, manual metodológico, histórico de cálculos e área administrativa.
 
-**Producao (Pages):** https://calcularq-cloudflare.pages.dev
+**Produção (Pages):** https://calcularq-cloudflare.pages.dev
 
 ---
 
-## Visao geral
+## Visão geral
 
 ### Principais recursos
-- Cadastro/login com sessao via cookie HttpOnly
-- Recuperacao de senha por e-mail (Brevo)
-- Pagamento unico via Stripe (Checkout + Webhook)
-- Calculadora em 4 etapas (fatores antes da calibragem de pesos)
-- Fluxo com importacao por etapa, reinicio de etapa/calculo e rascunho local (autosave)
-- Historico de calculos por usuario
-- Manual integrado com navegacao por etapas
-- Dashboard administrativo com analytics de uso, comercial, calibracao e exportacao
+- Cadastro e login com sessão via cookie `HttpOnly`
+- Recuperação de senha por e-mail com Brevo
+- Pagamento único via Stripe (`Checkout` + `Webhook`)
+- Calculadora em 3 etapas
+- Rascunho local com autosave
+- Importação de etapa a partir de cálculo salvo
+- Histórico de cálculos por usuário
+- Manual integrado ao método
+- Dashboard administrativo com analytics e calibração
 
 ### Stack
-- Frontend: React + TypeScript + Vite + Tailwind CSS
-- Animacoes: Framer Motion (presets centralizados em `src/lib/motion.ts`)
+- Frontend: React 18 + TypeScript + Vite + Tailwind CSS
+- Animações: Framer Motion
+- Roteamento: `react-router-dom` com `BrowserRouter`
 - Backend: Cloudflare Pages Functions
 - Banco: Cloudflare D1 (SQLite)
-- Pagamento: Stripe
+- Pagamentos: Stripe
 - E-mail: Brevo
+
+---
+
+## Fluxo da calculadora
+
+### Etapas atuais
+1. Hora técnica
+2. Fatores de complexidade
+3. Preço e ajustes
+
+### Comportamentos relevantes
+- autosave local com restauração de rascunho
+- importação da etapa atual a partir de outro cálculo salvo
+- reset de etapa ou do cálculo inteiro
+- proteção contra saída com alterações não salvas
+- cálculo final com cenário conservador ou otimista
+
+### Núcleo técnico
+- Orquestração principal: [src/pages/Calculator.tsx](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/pages/Calculator.tsx)
+- Motor metodológico principal: [src/components/pricing/PricingEngineMethod12.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/components/pricing/PricingEngineMethod12.ts)
+- Hooks de suporte da calculadora:
+  - [src/hooks/calculator/useCalculatorDraftSync.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorDraftSync.ts)
+  - [src/hooks/calculator/useCalculatorBudgetData.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorBudgetData.ts)
+  - [src/hooks/calculator/useCalculatorDerivedValues.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorDerivedValues.ts)
+  - [src/hooks/calculator/useCalculatorExitGuard.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorExitGuard.ts)
+  - [src/hooks/calculator/useCalculatorStepNavigation.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorStepNavigation.ts)
+  - [src/hooks/calculator/useCalculatorStepImport.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorStepImport.ts)
+  - [src/hooks/calculator/useCalculatorReset.ts](C:/Users/pedro/OneDrive/Área%20de%20Trabalho/SaaS/calcularq-cloudflare/src/hooks/calculator/useCalculatorReset.ts)
 
 ---
 
@@ -35,27 +65,26 @@ A Calcularq cruza hora tecnica, fatores de complexidade, horas estimadas e compo
 ```text
 src/
   components/
-    budgets/         Cards, dialogs e toolbar de "Meus calculos"
-    calculator/      Blocos da calculadora (fatores, resultados, salvamento)
-    manual/          Componentes do manual (stepper, cards, resumo mobile)
-    pricing/         Motores de calculo (classico e demo)
-    ui/              Base de UI reutilizavel (dialog, tooltip, toast, etc.)
-  contexts/          AuthContext / sessao do usuario
+    budgets/         Componentes de "Meus cálculos"
+    calculator/      Blocos da calculadora, resultados e salvamento
+    manual/          Componentes do manual
+    pricing/         Motores de cálculo e testes do método
+    ui/              Base de UI reutilizável
+  contexts/          Contextos globais, incluindo autenticação
   hooks/
-    calculator/      Hooks de progresso, reset e importacao por etapa
-  lib/               API client, motion presets e helpers
-  pages/             Home, Calculadora, Manual, Auth, Payment, Admin, etc.
-  test/              Testes e setup de testes
-  types/             Tipos compartilhados (budget/draft)
+    calculator/      Hooks de fluxo e orquestração da calculadora
+  lib/               API client, helpers, parsing, motion e calibração
+  pages/             Home, Calculator, Manual, Login, Payment, Admin etc.
+  types/             Tipos compartilhados
   utils/             Helpers gerais
 
 functions/
   api/
-    _utils.js        Sessao, validacoes, respostas, hardening
+    _utils.js        Sessão, validações, respostas e hardening
     auth/            Login, registro, logout, recovery/reset/me
-    admin/           Endpoints do dashboard admin (summary, usage, commercial, calibration)
-    budgets/         CRUD dos calculos salvos
-    stripe/          Checkout + webhook
+    admin/           Endpoints do dashboard admin
+    budgets/         CRUD dos cálculos salvos
+    stripe/          Checkout e webhook
     user/            Status de pagamento
 
 migrations/
@@ -72,6 +101,7 @@ docs/
   CLOUDFLARE_DEPLOY_GUIDE.md
   COMMIT_STRATEGY.md
   MAINTENANCE_GUIDE.md
+  METODO_1_2_IMPLEMENTACAO.md
   METODO_V3_1_1_IMPLEMENTACAO.md
   QA_SECURITY_CHECKLIST.md
   README_CLOUDFLARE.md
@@ -85,29 +115,29 @@ docs/
 ### Requisitos
 - Node.js 20+
 - npm 10+
-- Wrangler (via `npx` ja atende)
+- Wrangler via `npx`
 
-### Rodar frontend
+### Rodar o frontend
 
 ```bash
 npm install
 npm run dev
 ```
 
-### Build de producao (check principal)
+### Build de produção
 
 ```bash
 npm run build
 ```
 
-### Rodar frontend + Functions (Cloudflare local)
+### Rodar frontend + Functions localmente
 
 ```bash
 npm run build
 npm run cf:dev
 ```
 
-### Qualidade (recomendado antes de commit/push)
+### Qualidade
 
 ```bash
 npm run lint
@@ -115,36 +145,36 @@ npm run test:run
 npm run build
 ```
 
-### Automacao de Repomix (apos push)
-
-Instalar hooks do reposit�rio (uma vez):
-
-```bash
-npm run hooks:install
-```
-
-Gerar manualmente quando quiser:
-
-```bash
-npm run repomix:full
-```
-
-Regra configurada:
-- A cada `git push`, o hook `pre-push` gera `repomix-calcularq-full.md`
-- O arquivo anterior de repomix e substituido automaticamente
-- `dist/`, `backups/` e `node_modules/` ficam fora do pacote
-
 ### Preview local
 
 ```bash
 npm run preview
 ```
 
+### Hooks de repositório e Repomix
+
+Instalar hooks uma vez:
+
+```bash
+npm run hooks:install
+```
+
+Gerar manualmente:
+
+```bash
+npm run repomix:full
+```
+
+Regra atual:
+- o hook `pre-push` gera `repomix-calcularq-full.md`
+- o arquivo anterior é substituído
+- `dist/`, `backups/` e `node_modules/` ficam fora do pacote
+
 ---
 
-## Cloudflare Pages / Deploy
+## Cloudflare Pages e deploy
 
-### Deploy automatico
+### Deploy automático
 Todo push em `main` dispara deploy no Cloudflare Pages.
 
 ### Deploy manual
@@ -154,7 +184,7 @@ npm run build
 npx wrangler pages deploy dist --project-name calcularq-cloudflare
 ```
 
-### Variaveis publicas (`wrangler.toml`)
+### Variáveis públicas (`wrangler.toml`)
 
 ```toml
 [vars]
@@ -163,21 +193,20 @@ DEBUG_EMAIL_TOKENS = "0"
 ADMIN_EMAIL = "pedroafsmaia@gmail.com"
 ```
 
-- `ADMIN_EMAIL` - fallback de administrador por e-mail.
-- RBAC principal usa `users.is_admin = 1`.
+- `ADMIN_EMAIL`: fallback de administrador por e-mail
+- RBAC principal: `users.is_admin = 1`
 
-Variaveis opcionais (podem ser definidas em `wrangler.toml` ou Pages):
-- `STRIPE_SUCCESS_PATH` (padrao: `/payment/close`)
-- `STRIPE_CANCEL_PATH` (padrao: `/payment`)
+Variáveis opcionais:
+- `STRIPE_SUCCESS_PATH` (padrão: `/payment/close`)
+- `STRIPE_CANCEL_PATH` (padrão: `/payment`)
 
-### Secrets (Cloudflare Pages)
-Secrets sensiveis nao ficam versionados. Configure via dashboard ou Wrangler:
+### Secrets do Cloudflare Pages
 
 ```bash
 npx wrangler pages secret put NOME_DA_VARIAVEL --project-name calcularq-cloudflare
 ```
 
-#### Secrets obrigatorios
+Obrigatórios:
 - `JWT_SECRET`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_PRICE_ID`
@@ -186,33 +215,30 @@ npx wrangler pages secret put NOME_DA_VARIAVEL --project-name calcularq-cloudfla
 - `BREVO_SENDER_EMAIL`
 - `BREVO_SENDER_NAME`
 
-### Toggle de paywall (`REQUIRE_PAYMENT`)
-Configurado como secret no Cloudflare Pages:
-- `"1"` = paywall ativo
-- `"0"` = paywall desativado (teste)
+### Toggle de paywall
+Secret `REQUIRE_PAYMENT`:
+- `1`: paywall ativo
+- `0`: paywall desativado
 
 ```bash
-# Desativar paywall (teste)
 echo 0 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
-
-# Ativar paywall
 echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
 ```
 
-> Apos alterar o secret, rode um redeploy no Cloudflare Pages para aplicar imediatamente.
+Após alterar um secret, faça redeploy.
 
 ---
 
-## Banco de dados (D1)
+## Banco de dados
 
 ### Tabelas principais
 - `users`
 - `budgets`
 - `reset_tokens`
-- `request_rate_limits` (hardening)
-- `stripe_webhook_events` (idempotencia)
+- `request_rate_limits`
+- `stripe_webhook_events`
 
-### Rodar migrations (remoto)
+### Rodar migrations remotamente
 
 ```bash
 npx wrangler d1 execute calcularq --remote --file=migrations/0001_init.sql
@@ -228,63 +254,72 @@ npx wrangler d1 execute calcularq --remote --file=migrations/0007_admin_rbac.sql
 
 ## CI
 
-Pipeline em GitHub Actions: `.github/workflows/ci.yml`
+Pipeline em `.github/workflows/ci.yml`.
 
+Checks atuais:
 - `npm run lint`
-- `npm test`
+- `npm run test:run`
 - `npm run build`
 
 ---
 
-## Seguranca (resumo)
+## Segurança
 
-Ja implementado no backend:
-- Sessao JWT em cookie HttpOnly (`SameSite=Lax`, `Secure` em producao)
-- Validacao de origem (`Origin`) em endpoints mutaveis
-- Validacao de e-mail e senha minima (8 chars)
-- Cooldown em `forgot-password`
-- Hardening de payload/limites em budgets
-- Idempotencia no webhook Stripe por `event.id`
-- Controle de acesso admin via RBAC (`users.is_admin`) com fallback `ADMIN_EMAIL` no middleware `requireAdmin()`
+Já implementado no backend:
+- sessão JWT em cookie `HttpOnly`
+- `SameSite=Lax`
+- `Secure` em produção
+- validação de `Origin` em endpoints mutáveis
+- validação de e-mail e senha mínima
+- cooldown em recuperação de senha
+- hardening de payload em budgets
+- idempotência no webhook Stripe
+- controle de acesso admin via `users.is_admin` com fallback `ADMIN_EMAIL`
 
-Checklist de revisao:
+Checklist:
 - `docs/QA_SECURITY_CHECKLIST.md`
 
 ---
 
-## Documentacao do projeto
+## Documentação
 
-- `docs/ARCHITECTURE.md` -> arquitetura, fluxos e responsabilidades por camada
-- `docs/CLOUDFLARE_DEPLOY_GUIDE.md` -> referencia de deploy/ambiente Cloudflare
-- `docs/README_CLOUDFLARE.md` -> operacao rapida de ambiente Cloudflare
-- `docs/MAINTENANCE_GUIDE.md` -> convencoes, hotspots e roadmap de refatoracao
-- `docs/COMMIT_STRATEGY.md` -> padrao de commits, scopes e fluxo sem reescrever historico antigo
-- `docs/QA_SECURITY_CHECKLIST.md` -> check/fix de bugs, UX e seguranca
-- `docs/VISUAL_IDENTITY_CHECKLIST.md` -> checklist de consistencia visual (cores, componentes, tipografia e spacing)
+- `docs/ARCHITECTURE.md`
+- `docs/CLOUDFLARE_DEPLOY_GUIDE.md`
+- `docs/README_CLOUDFLARE.md`
+- `docs/MAINTENANCE_GUIDE.md`
+- `docs/METODO_1_2_IMPLEMENTACAO.md`
+- `docs/METODO_V3_1_1_IMPLEMENTACAO.md`
+- `docs/COMMIT_STRATEGY.md`
+- `docs/QA_SECURITY_CHECKLIST.md`
+- `docs/VISUAL_IDENTITY_CHECKLIST.md`
 
 ---
 
-## Comandos uteis (D1 / operacao)
+## Comandos úteis
 
-### Listar usuarios
+### Listar usuários
+
 ```bash
 npx wrangler d1 execute calcularq --remote --command "SELECT id, email, has_paid FROM users;"
 ```
 
 ### Liberar acesso manualmente
+
 ```bash
 npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 1, payment_date = datetime('now') WHERE email = 'email@exemplo.com';"
 ```
 
 ### Revogar acesso
+
 ```bash
 npx wrangler d1 execute calcularq --remote --command "UPDATE users SET has_paid = 0 WHERE email = 'email@exemplo.com';"
 ```
 
 ---
 
-## Observacoes de manutencao
+## Observações de manutenção
 
-- `npm run build` e o check minimo antes de commit/push.
-- O arquivo mais sensivel do projeto hoje e `src/pages/Calculator.tsx` (fluxo, importacao por etapa, draft, reset, resultados, dialogs).
-- As proximas melhorias estruturais recomendadas estao descritas em `docs/MAINTENANCE_GUIDE.md`.
+- Check mínimo antes de push: `npm run lint`, `npm run test:run` e `npm run build`
+- O fluxo mais sensível do produto continua na calculadora
+- A página principal da calculadora foi desacoplada em hooks, mas ainda é um hotspot de manutenção
+- O motor do método `1.2` já tem testes dedicados em `src/components/pricing/PricingEngineMethod12.test.ts`
