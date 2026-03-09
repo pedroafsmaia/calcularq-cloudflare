@@ -12,6 +12,7 @@ A aplicação cruza hora técnica mínima, fatores de complexidade, estimativa d
 
 ### Principais recursos
 - Cadastro e login com sessão via cookie `HttpOnly`
+- Login social com Google (OAuth / Google Identity Services)
 - Recuperação de senha por e-mail com Brevo
 - Pagamento único via Stripe (`Checkout` + `Webhook`)
 - Calculadora em 3 etapas
@@ -26,6 +27,7 @@ A aplicação cruza hora técnica mínima, fatores de complexidade, estimativa d
 - Animações: Framer Motion
 - Roteamento: `react-router-dom` com `BrowserRouter`
 - Backend: Cloudflare Pages Functions
+- Autenticação Google: `jose` (verificação de ID token via JWKS)
 - Banco: Cloudflare D1 (SQLite)
 - Pagamentos: Stripe
 - E-mail: Brevo
@@ -75,13 +77,13 @@ src/
     calculator/      Hooks de fluxo e orquestração da calculadora
   lib/               API client, helpers, parsing, motion e calibração
   pages/             Home, Calculator, Manual, Login, Payment, Admin etc.
-  types/             Tipos compartilhados
+  types/             Tipos compartilhados (incluindo Google Identity Services)
   utils/             Helpers gerais
 
 functions/
   api/
     _utils.js        Sessão, validações, respostas e hardening
-    auth/            Login, registro, logout, recovery/reset/me
+    auth/            Login, registro, logout, recovery/reset/me, Google OAuth
     admin/           Endpoints do dashboard admin
     budgets/         CRUD dos cálculos salvos
     stripe/          Checkout e webhook
@@ -95,6 +97,7 @@ migrations/
   0005_method_1_1.sql
   0006_method_1_2.sql
   0007_admin_rbac.sql
+  0008_google_oauth.sql
 
 docs/
   ARCHITECTURE.md
@@ -215,6 +218,10 @@ Obrigatórios:
 - `BREVO_SENDER_EMAIL`
 - `BREVO_SENDER_NAME`
 
+Opcionais (Google OAuth):
+- `GOOGLE_CLIENT_ID` — ID do cliente OAuth para verificação server-side do token
+- `VITE_GOOGLE_CLIENT_ID` — mesmo valor, exposto ao frontend via Vite para renderizar o botão Google
+
 ### Toggle de paywall
 Secret `REQUIRE_PAYMENT`:
 - `1`: paywall ativo
@@ -248,6 +255,7 @@ npx wrangler d1 execute calcularq --remote --file=migrations/0004_method_1_0.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0005_method_1_1.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0006_method_1_2.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0007_admin_rbac.sql
+npx wrangler d1 execute calcularq --remote --file=migrations/0008_google_oauth.sql
 ```
 
 ---
@@ -275,6 +283,7 @@ Já implementado no backend:
 - hardening de payload em budgets
 - idempotência no webhook Stripe
 - controle de acesso admin via `users.is_admin` com fallback `ADMIN_EMAIL`
+- login Google OAuth com verificação server-side de ID token via JWKS
 
 Checklist:
 - `docs/QA_SECURITY_CHECKLIST.md`

@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -55,6 +56,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
+  const loginWithGoogle = async (credential: string) => {
+    await api.loginWithGoogle(credential);
+    const me = await api.me();
+    const userData: User = {
+      ...me.user,
+      paymentDate: me.user.paymentDate ?? undefined,
+      stripeCustomerId: me.user.stripeCustomerId ?? undefined,
+      isAdmin: me.user.isAdmin ?? undefined,
+      createdAt: me.user.createdAt ?? new Date().toISOString(),
+    };
+    db.setCurrentUser(userData);
+    setUser(userData);
+  };
+
   const register = async (email: string, password: string, name: string) => {
     const response = await api.register(email, password, name);
     const userData: User = {
@@ -89,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading, refreshUser }}>
+    <AuthContext.Provider value={{ user, login, loginWithGoogle, register, logout, isLoading, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
