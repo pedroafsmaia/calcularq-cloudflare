@@ -131,7 +131,7 @@ export default function Layout({ children }: LayoutProps) {
               <img
                 src="/logomarca.png"
                 alt="Calcularq"
-                className="h-10 w-auto sm:hidden object-contain"
+                className="h-8 w-auto sm:hidden object-contain"
                 data-mobile-logomarca
                 style={{ display: "none" }}
               />
