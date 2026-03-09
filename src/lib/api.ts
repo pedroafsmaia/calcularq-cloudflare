@@ -248,6 +248,13 @@ class ApiClient {
     });
   }
 
+  async loginWithGoogle(credential: string): Promise<{ success: boolean; user: ApiUser }> {
+    return this.request("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ credential }),
+    });
+  }
+
   private buildAdminQuery(filters?: AdminFilters): string {
     if (!filters) return "";
     const params = new URLSearchParams();

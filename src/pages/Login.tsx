@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -26,9 +26,11 @@ export default function Login() {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const { login, register, user, isLoading: authLoading } = useAuth();
+  const { login, loginWithGoogle, register, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const hasMinPasswordLength = password.length >= MIN_PASSWORD_LENGTH;
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -62,6 +64,69 @@ export default function Login() {
       // no-op
     }
   }, []);
+
+  const handleGoogleCredential = useCallback(
+    async (response: { credential?: string }) => {
+      if (!response.credential) return;
+      setError("");
+      setIsLoading(true);
+      try {
+        await loginWithGoogle(response.credential);
+        navigate(createPageUrl("Calculator"));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "";
+        if (!message || message === "Erro desconhecido") {
+          setError("Não foi possível concluir o login com Google. Tente novamente.");
+        } else {
+          setError(message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loginWithGoogle, navigate]
+  );
+
+  useEffect(() => {
+    if (!googleClientId) return;
+
+    const renderButton = () => {
+      const g = window as unknown as { google?: { accounts?: { id?: {
+        initialize: (config: { client_id: string; callback: (response: { credential?: string }) => void; auto_select?: boolean }) => void;
+        renderButton: (element: HTMLElement, config: { theme?: string; size?: string; text?: string; width?: number; logo_alignment?: string }) => void;
+      } } } };
+
+      if (g.google?.accounts?.id && googleButtonRef.current) {
+        g.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleCredential,
+          auto_select: false,
+        });
+        googleButtonRef.current.innerHTML = "";
+        g.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          width: googleButtonRef.current.offsetWidth || 380,
+          logo_alignment: "left",
+        });
+      }
+    };
+
+    // Check if the script is already loaded
+    const existing = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existing) {
+      renderButton();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = renderButton;
+    document.head.appendChild(script);
+  }, [googleClientId, handleGoogleCredential]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,6 +286,20 @@ export default function Login() {
               )}
             </Button>
           </form>
+
+          {googleClientId && (
+            <div className="mt-5">
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-3 text-slate-500">ou</span>
+                </div>
+              </div>
+              <div ref={googleButtonRef} className="flex justify-center" />
+            </div>
+          )}
 
           <div className="mt-6 text-center">
             <button
