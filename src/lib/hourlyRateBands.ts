@@ -1,4 +1,4 @@
-export type HourlyRateBandKind = "extreme" | "unique" | "transition";
+﻿export type HourlyRateBandKind = "extreme" | "unique" | "transition";
 
 export function describeHourlyRate(hourlyRate: number): {
   kind: HourlyRateBandKind;
@@ -10,9 +10,9 @@ export function describeHourlyRate(hourlyRate: number): {
   if (hourlyRate < 45) {
     return {
       kind: "extreme",
-      label: "Abaixo da faixa júnior",
-      line1: "A hora ajustada ficou abaixo das faixas internas de referência.",
-      line2: "Abaixo de R$ 45/h (júnior: R$ 45-85/h).",
+      label: "Abaixo da faixa jÃºnior",
+      line1: "A hora ajustada ficou abaixo das faixas internas de referÃªncia.",
+      line2: "Abaixo de R$ 45/h (jÃºnior: R$ 45-85/h).",
       intervalLabel: "< R$ 45/h",
     };
   }
@@ -20,9 +20,9 @@ export function describeHourlyRate(hourlyRate: number): {
   if (hourlyRate > 200) {
     return {
       kind: "extreme",
-      label: "Acima da faixa sênior",
-      line1: "A hora ajustada ficou acima das faixas internas de referência.",
-      line2: "Acima de R$ 200/h (sênior: R$ 130-200/h).",
+      label: "Acima da faixa sÃªnior",
+      line1: "A hora ajustada ficou acima das faixas internas de referÃªncia.",
+      line2: "Acima de R$ 200/h (sÃªnior: R$ 130-200/h).",
       intervalLabel: "> R$ 200/h",
     };
   }
@@ -30,9 +30,9 @@ export function describeHourlyRate(hourlyRate: number): {
   if (hourlyRate >= 75 && hourlyRate <= 85) {
     return {
       kind: "transition",
-      label: "Transição júnior-pleno",
-      line1: "A hora ajustada está na transição entre júnior e pleno.",
-      line2: "Zona de transição: R$ 75-85/h.",
+      label: "TransiÃ§Ã£o jÃºnior-pleno",
+      line1: "A hora ajustada estÃ¡ na transiÃ§Ã£o entre jÃºnior e pleno.",
+      line2: "Zona de transiÃ§Ã£o: R$ 75-85/h.",
       intervalLabel: "R$ 75-85/h",
     };
   }
@@ -40,9 +40,9 @@ export function describeHourlyRate(hourlyRate: number): {
   if (hourlyRate >= 120 && hourlyRate <= 130) {
     return {
       kind: "transition",
-      label: "Transição pleno-sênior",
-      line1: "A hora ajustada está na transição entre pleno e sênior.",
-      line2: "Zona de transição: R$ 120-130/h.",
+      label: "TransiÃ§Ã£o pleno-sÃªnior",
+      line1: "A hora ajustada estÃ¡ na transiÃ§Ã£o entre pleno e sÃªnior.",
+      line2: "Zona de transiÃ§Ã£o: R$ 120-130/h.",
       intervalLabel: "R$ 120-130/h",
     };
   }
@@ -50,9 +50,9 @@ export function describeHourlyRate(hourlyRate: number): {
   if (hourlyRate >= 45 && hourlyRate < 75) {
     return {
       kind: "unique",
-      label: "Faixa júnior",
-      line1: "A hora ajustada está em uma faixa comum de perfil júnior.",
-      line2: "Faixa de referência: R$ 45-85/h.",
+      label: "Faixa jÃºnior",
+      line1: "A hora ajustada estÃ¡ em uma faixa comum de perfil jÃºnior.",
+      line2: "Faixa de referÃªncia: R$ 45-85/h.",
       intervalLabel: "R$ 45-85/h",
     };
   }
@@ -61,17 +61,18 @@ export function describeHourlyRate(hourlyRate: number): {
     return {
       kind: "unique",
       label: "Faixa pleno",
-      line1: "A hora ajustada está em uma faixa comum de perfil pleno.",
-      line2: "Faixa de referência: R$ 85-130/h.",
+      line1: "A hora ajustada estÃ¡ em uma faixa comum de perfil pleno.",
+      line2: "Faixa de referÃªncia: R$ 85-130/h.",
       intervalLabel: "R$ 85-130/h",
     };
   }
 
   return {
     kind: "unique",
-    label: "Faixa sênior",
-    line1: "A hora ajustada está em uma faixa comum de perfil sênior.",
-    line2: "Faixa de referência: R$ 130-200/h.",
+    label: "Faixa sÃªnior",
+    line1: "A hora ajustada estÃ¡ em uma faixa comum de perfil sÃªnior.",
+    line2: "Faixa de referÃªncia: R$ 130-200/h.",
     intervalLabel: "R$ 130-200/h",
   };
 }
+

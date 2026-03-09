@@ -8,14 +8,10 @@
 const MANUAL_FACTOR_GUIDES: Record<string, ManualFactorGuide> = {
   volume: {
     title: "Volume do projeto",
+    intro: "Reúne a área total de intervenção e o número de pavimentos do projeto.",
     options: [
-      "1 nível: Projeto térreo ou unidade única",
-      "2-3 níveis: Sobrado ou pequeno edifício",
-      "4-6 níveis: Edifício médio com repetição",
-      "7-15 níveis: Edifício alto",
-      "16+ níveis: Edifício muito alto",
+      "Considere apenas a metragem e níveis efetivamente projetados.",
     ],
-    footer: "Subsolo conta como nível adicional.",
   },
   tipology: {
     title: "Tipologia",
@@ -96,3 +92,4 @@ export function getManualFactorTooltip(factorId: string): string | undefined {
 
   return lines.join("\n");
 }
+

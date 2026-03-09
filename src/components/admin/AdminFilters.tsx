@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AdminFilters } from "@/types/admin";
+import { sanitizeNumberDraft } from "@/lib/numberFormat";
 
 const TIPOLOGIA_OPTIONS = [
   { value: "", label: "Todos" },
@@ -148,12 +149,12 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             <label htmlFor="filter-area-min" className={labelBase}>Área min. (m²)</label>
             <input
               id="filter-area-min"
-              type="number"
-              min={0}
+              type="text"
+              inputMode="decimal"
               className={inputBase}
               placeholder="0"
               value={areaMin}
-              onChange={(e) => setAreaMin(e.target.value)}
+              onChange={(e) => setAreaMin(sanitizeNumberDraft(e.target.value).replace(/-/g, ""))}
             />
           </div>
 
@@ -161,12 +162,12 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
             <label htmlFor="filter-area-max" className={labelBase}>Área máx. (m²)</label>
             <input
               id="filter-area-max"
-              type="number"
-              min={0}
+              type="text"
+              inputMode="decimal"
               className={inputBase}
               placeholder="∞"
               value={areaMax}
-              onChange={(e) => setAreaMax(e.target.value)}
+              onChange={(e) => setAreaMax(sanitizeNumberDraft(e.target.value).replace(/-/g, ""))}
             />
           </div>
 
@@ -183,6 +184,7 @@ export default function AdminFiltersBar({ filters, onApply }: AdminFiltersBarPro
               ))}
             </select>
           </div>
+
           <div className="xl:col-span-2">
             <label htmlFor="filter-close-status" className={labelBase}>Status de fechamento</label>
             <select

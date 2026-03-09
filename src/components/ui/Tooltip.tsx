@@ -41,7 +41,13 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
   };
 
   const hide = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setVisible(false), 120);
+  };
+
+  const hideImmediately = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setVisible(false);
   };
 
   useEffect(() => {
@@ -96,6 +102,32 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
   }, [visible, text]);
 
   useEffect(() => {
+    if (!visible) return;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (buttonRef.current?.contains(target)) return;
+      if (tooltipRef.current?.contains(target)) return;
+      hideImmediately();
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") hideImmediately();
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown, { passive: true });
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [visible]);
+
+  useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
@@ -106,13 +138,21 @@ export default function Tooltip({ text, iconClassName, tone = "info", title }: T
       <button
         ref={buttonRef}
         type="button"
-        className={`transition-colors focus:outline-none ${iconClassName ?? "text-blue-700/90 hover:text-blue-800"}`}
+        className={`-m-0.5 rounded-full p-0.5 transition-colors focus:outline-none ${iconClassName ?? "text-blue-700/90 hover:text-blue-800"}`}
         onMouseEnter={show}
         onMouseLeave={hide}
         onFocus={show}
         onBlur={hide}
+        onClick={() => {
+          if (visible) {
+            hideImmediately();
+            return;
+          }
+          show();
+        }}
         aria-label="Mais informações"
         aria-describedby={visible ? tooltipId : undefined}
+        aria-expanded={visible}
       >
         <Info className="h-4 w-4" />
       </button>

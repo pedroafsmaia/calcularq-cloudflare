@@ -134,6 +134,8 @@ export default function FinalCalculation({
 }: Props) {
   const [discountDraft, setDiscountDraft] = useState("0");
   const [isEditingDiscount, setIsEditingDiscount] = useState(false);
+  const [hoursManualDraft, setHoursManualDraft] = useState("");
+  const [isEditingHoursManual, setIsEditingHoursManual] = useState(false);
   const [customMarginDraft, setCustomMarginDraft] = useState("15");
   const [customPremiumDraft, setCustomPremiumDraft] = useState("25");
 
@@ -171,6 +173,15 @@ export default function FinalCalculation({
   }, [technicalPremium]);
 
   useEffect(() => {
+    if (isEditingHoursManual) return;
+    setHoursManualDraft(
+      typeof horasManual === "number" && Number.isFinite(horasManual) && horasManual > 0
+        ? horasManual.toLocaleString("pt-BR", { maximumFractionDigits: 1 })
+        : ""
+    );
+  }, [horasManual, isEditingHoursManual]);
+
+  useEffect(() => {
     if (variableExpenses.length > 0) return;
     onVariableExpensesChange([{ id: Date.now().toString(), name: "", value: 0 }]);
   }, [onVariableExpensesChange, variableExpenses.length]);
@@ -179,17 +190,16 @@ export default function FinalCalculation({
     const technicalLevel = Math.max(1, Math.min(5, Math.round(Number(selections.technical ?? 1))));
     const cTech = (technicalLevel - 1) / 4;
 
-    const maxLines = TECHNICAL_PREMIUM_OPTIONS.map((option) => {
-      const maxHourly = minHourlyRate * (1 + margin + option.value * cTech);
-      return `${option.label} (+${Math.round(option.value * 100)}%): ${formatCurrency(maxHourly)}/h`;
+    const simulatedLines = TECHNICAL_PREMIUM_OPTIONS.map((option) => {
+      const simulatedHourly = minHourlyRate * (1 + margin + option.value * cTech);
+      return `${option.label} (+${Math.round(option.value * 100)}%): ${formatCurrency(simulatedHourly)}/h`;
     });
 
     return [
-      "Este prêmio ajusta a hora técnica, não apenas o preço final.",
-      `Exigência técnica atual (F4): nível ${technicalLevel}.`,
-      "Valores máximos simulados:",
-      ...maxLines,
-      "Baseado em simulações, ajustado com uso.",
+      "Este prêmio ajusta a hora técnica conforme o nível de exigência técnica do projeto.",
+      "Os percentuais de 15%, 25% e 35% representam o prêmio máximo possível em cada perfil, aplicado integralmente apenas no nível máximo de exigência técnica.",
+      `Com o nível atual (F4: ${technicalLevel}), a hora técnica ficaria em:`,
+      ...simulatedLines,
     ].join("\n");
   }, [margin, minHourlyRate, selections.technical]);
 
@@ -286,7 +296,10 @@ export default function FinalCalculation({
                 checked={cenario === "conservador"}
                 onChange={() => onCenarioChange("conservador")}
               />
-              <strong>Conservador</strong> (recomendado)
+              <span className="inline-flex items-center gap-1.5">
+                <strong>Conservador</strong> (recomendado)
+                <Tooltip text="Aplica a margem de incerteza do método sobre a estimativa-base de horas. É o cenário mais prudente para precificação." />
+              </span>
             </label>
             <label className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
               <input
@@ -296,7 +309,10 @@ export default function FinalCalculation({
                 checked={cenario === "otimista"}
                 onChange={() => onCenarioChange("otimista")}
               />
-              <strong>Otimista</strong>
+              <span className="inline-flex items-center gap-1.5">
+                <strong>Otimista</strong>
+                <Tooltip text="Usa a estimativa-base de horas sem a margem adicional de incerteza. Serve como referência de cenário mais enxuto, com menor folga para imprevistos." />
+              </span>
             </label>
           </div>
 
@@ -316,20 +332,36 @@ export default function FinalCalculation({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">Usar outra estimativa (opcional)</label>
+            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700">
+              Usar outra estimativa (opcional)
+              <Tooltip text="Use este campo para substituir a estimativa-base de horas do método pela sua própria estimativa. No cenário conservador, a margem de incerteza continua sendo aplicada sobre o valor informado." />
+            </label>
             <input
-              type="number"
-              min={0}
-              step={0.5}
-              value={horasManual ?? ""}
+              type="text"
+              inputMode="decimal"
+              value={hoursManualDraft}
+              onFocus={() => setIsEditingHoursManual(true)}
               onChange={(event) => {
-                const value = event.target.value;
-                if (!value) {
+                const nextDraft = sanitizeNumberDraft(event.target.value);
+                setHoursManualDraft(nextDraft);
+                if (!nextDraft) {
                   onHorasManualChange(null);
                   return;
                 }
-                const parsed = Number(value);
-                onHorasManualChange(Number.isFinite(parsed) && parsed > 0 ? parsed : null);
+                const parsed = parsePtBrNumber(nextDraft);
+                onHorasManualChange(parsed !== null && parsed > 0 ? parsed : null);
+              }}
+              onBlur={() => {
+                const parsed = parsePtBrNumber(hoursManualDraft);
+                if (parsed !== null && parsed > 0) {
+                  const normalized = parsed.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+                  setHoursManualDraft(normalized);
+                  onHorasManualChange(parsed);
+                } else {
+                  setHoursManualDraft("");
+                  onHorasManualChange(null);
+                }
+                setIsEditingHoursManual(false);
               }}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-calcularq-blue focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20"
               placeholder="Ex.: 220"
@@ -365,7 +397,10 @@ export default function FinalCalculation({
 
         <div className="space-y-5">
           <div>
-            <h4 className="mb-2 text-sm font-semibold text-slate-800">Margem de lucro</h4>
+            <h4 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+              Margem de lucro
+              <Tooltip text="Percentual aplicado sobre a hora técnica mínima para compor a hora técnica ajustada. Representa a margem de lucro desejada antes do prêmio por complexidade técnica." />
+            </h4>
             <div className="space-y-2">
               {MARGIN_OPTIONS.map((option) => (
                 <label
@@ -604,4 +639,5 @@ export default function FinalCalculation({
     </div>
   );
 }
+
 

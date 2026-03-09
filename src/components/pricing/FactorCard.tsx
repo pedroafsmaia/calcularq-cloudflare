@@ -1,4 +1,4 @@
-import { Factor } from "./PricingEngine";
+﻿import { Factor } from "./PricingEngine";
 import Tooltip from "@/components/ui/Tooltip";
 import { getManualFactorTooltip } from "@/lib/manualFactorGuides";
 
@@ -12,6 +12,8 @@ interface FactorCardProps {
 
 export default function FactorCard({ factor, value, onChange, reformValue, onReformChange }: FactorCardProps) {
   const tooltipText = getManualFactorTooltip(factor.id);
+  const reformTooltipText =
+    "Marque quando o projeto envolver intervenção em edificação existente. Inclui reforma, ampliação, adaptação ou compatibilização com o existente.";
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm transition-colors transition-shadow duration-150 hover:border-slate-300 hover:shadow-sm sm:p-6">
@@ -61,10 +63,14 @@ export default function FactorCard({ factor, value, onChange, reformValue, onRef
               onChange={(event) => onReformChange?.(event.target.checked)}
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-calcularq-blue focus:ring-calcularq-blue"
             />
-            <span>Reforma/Ampliação</span>
+            <span className="inline-flex items-center gap-1.5">
+              <span>Reforma/AmpliaÃ§Ã£o</span>
+              <Tooltip text={reformTooltipText} />
+            </span>
           </label>
         </div>
       ) : null}
     </div>
   );
 }
+

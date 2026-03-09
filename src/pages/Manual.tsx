@@ -404,7 +404,7 @@ export default function Manual() {
                         <Step1FieldAccordion
                           id="personal"
                           title="Despesas pessoais essenciais"
-                          description="O valor líquido mensal que você precisa para cobrir suas despesas pessoais essenciais — não o quanto você quer ganhar, mas o mínimo para se manter."
+                          description="O valor mensal necessário para cobrir suas despesas pessoais essenciais. Não é a retirada desejada nem o lucro do projeto."
                           hint={<p className="text-sm text-amber-700">Atenção: o lucro tende a aparecer na etapa final, via complexidade, horas e composição do preço.</p>}
                         />
                         <Step1FieldAccordion
@@ -443,7 +443,7 @@ export default function Manual() {
                       <FactorAccordion
                         id="volume"
                         title="1. Volume do Projeto"
-                        definition={<><strong>Definição:</strong> Reúne dois dados: a área total de intervenção em m² e o número de pavimentos do projeto. Juntos, definem a escala física e a complexidade volumétrica do trabalho.</>}
+                        definition={<><strong>Definição:</strong> Reúne a área total de intervenção em m² e o número de pavimentos do projeto. Considere apenas a metragem e níveis efetivamente projetados.</>}
                         items={[
                           <>
                             <strong>Área (m²):</strong>
@@ -465,7 +465,7 @@ export default function Manual() {
                         ]}
                         footer={
                           <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm leading-relaxed text-calcularq-blue">
-                            Subsolo conta como nível adicional. Em reforma de apartamento, o volume é o da unidade — não do edifício inteiro.
+                            Em reforma de apartamento, o volume é o da unidade efetivamente projetada — não do edifício inteiro.
                           </div>
                         }
                       />
@@ -483,7 +483,7 @@ export default function Manual() {
                         ]}
                         footer={
                           <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm leading-relaxed text-calcularq-blue">
-                            Reforma / Ampliação: opção adicional que indica intervenção em edificação existente. Marque quando o projeto envolver levantamento, compatibilização com o existente ou condicionantes de obra em uso.
+                            Reforma / Ampliação: marque quando o projeto envolver intervenção em edificação existente. Inclui reforma, ampliação, adaptação ou compatibilização com o existente.
                           </div>
                         }
                       />
@@ -579,8 +579,8 @@ export default function Manual() {
                         <Step3FieldAccordion
                           id="hoursEstimate"
                           title="Estimativa de horas de projeto"
-                          description="A calculadora já preencheu esse valor automaticamente com base nos dados do projeto. Você pode substituí-lo se preferir usar sua própria estimativa."
-                          hint={<p className="text-sm text-slate-500">A estimativa padrão já considera uma margem de incerteza — ela é conservadora por definição. Você também pode escolher o cenário otimista, que representa a estimativa sem essa margem adicional.</p>}
+                          description="A calculadora já preenche esse valor com a estimativa-base de horas do método. Você pode substituí-lo se preferir usar sua própria estimativa."
+                          hint={<p className="text-sm text-slate-500">No cenário conservador, a margem de incerteza do método continua sendo aplicada sobre o valor informado. No cenário otimista, essa margem adicional não é aplicada.</p>}
                         />
                         <Step3FieldAccordion
                           id="variableExpenses"
@@ -593,6 +593,9 @@ export default function Manual() {
                           title="Desconto comercial"
                           description="Ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente."
                         />
+                        <NoteBox tone="slate">
+                          <strong>Margem de lucro e cenários:</strong> A margem de lucro é aplicada sobre a hora técnica mínima para compor a hora técnica ajustada, antes do prêmio por complexidade técnica. No cenário conservador, a calculadora aplica a margem de incerteza do método sobre a estimativa-base de horas. No cenário otimista, usa a estimativa-base sem essa margem adicional.
+                        </NoteBox>
                       </div>
                     </div>
 
@@ -661,4 +664,5 @@ export default function Manual() {
       </div>
   );
 }
+
 

@@ -89,8 +89,8 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
   const phaseSum = useMemo(
     () =>
       PHASE_FIELDS.reduce((sum, field) => {
-        const value = Number(phaseDrafts[field.key]);
-        if (!Number.isFinite(value) || value < 0) return sum;
+        const value = parsePtBrNumber(phaseDrafts[field.key] ?? "");
+        if (value === null || !Number.isFinite(value) || value < 0) return sum;
         return sum + value;
       }, 0),
     [phaseDrafts]
@@ -120,8 +120,8 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
             className="bg-calcularq-blue text-white hover:bg-[#002366]"
             disabled={isSaving || !budget || !actualHoursTotal.trim() || !closeFeedback}
             onClick={() => {
-              const total = Number(actualHoursTotal);
-              if (!Number.isFinite(total) || total <= 0) {
+              const total = parsePtBrNumber(actualHoursTotal);
+              if (total === null || !Number.isFinite(total) || total <= 0) {
                 setError("Informe as horas totais reais (maior que zero).");
                 return;
               }
@@ -139,8 +139,8 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
 
               const phasePayload: BudgetActualHoursByPhase = {};
               for (const field of PHASE_FIELDS) {
-                const value = Number(phaseDrafts[field.key]);
-                if (!Number.isFinite(value) || value < 0) continue;
+                const value = parsePtBrNumber(phaseDrafts[field.key] ?? "");
+                if (value === null || !Number.isFinite(value) || value < 0) continue;
                 if (value === 0) continue;
                 phasePayload[field.key] = value;
               }
@@ -176,13 +176,21 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700">Quantas horas você gastou no total? *</label>
             <input
-              type="number"
-              min={0}
-              step={0.5}
+              type="text"
+              inputMode="decimal"
               value={actualHoursTotal}
               onChange={(e) => {
-                setActualHoursTotal(e.target.value);
+                setActualHoursTotal(sanitizeNumberDraft(e.target.value));
                 if (error) setError(null);
+              }}
+              onBlur={() => {
+                const parsed = parsePtBrNumber(actualHoursTotal);
+                if (parsed !== null && parsed > 0) {
+                  setActualHoursTotal(parsed.toLocaleString("pt-BR", { maximumFractionDigits: 1 }));
+                  return;
+                }
+                if (!actualHoursTotal.trim()) return;
+                setActualHoursTotal("");
               }}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-calcularq-blue focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20"
               placeholder="Ex.: 182"
@@ -266,11 +274,24 @@ export default function BudgetCloseDialog({ open, budget, isSaving, onOpenChange
                 <label key={field.key} className="block">
                   <span className="mb-1 block text-xs font-medium normal-case text-slate-500">{field.label}</span>
                   <input
-                    type="number"
-                    min={0}
-                    step={0.5}
+                    type="text"
+                    inputMode="decimal"
                     value={phaseDrafts[field.key] ?? ""}
-                    onChange={(e) => setPhaseDrafts((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                    onChange={(e) =>
+                      setPhaseDrafts((prev) => ({ ...prev, [field.key]: sanitizeNumberDraft(e.target.value) }))
+                    }
+                    onBlur={() =>
+                      setPhaseDrafts((prev) => {
+                        const parsed = parsePtBrNumber(prev[field.key] ?? "");
+                        return {
+                          ...prev,
+                          [field.key]:
+                            parsed !== null && parsed >= 0
+                              ? parsed.toLocaleString("pt-BR", { maximumFractionDigits: 1 })
+                              : "",
+                        };
+                      })
+                    }
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-calcularq-blue focus:outline-none focus:ring-2 focus:ring-calcularq-blue/20"
                     placeholder="0"
                   />

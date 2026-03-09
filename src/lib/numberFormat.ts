@@ -30,7 +30,14 @@ export function parsePtBrNumber(raw: string): number | null {
 }
 
 export function sanitizeNumberDraft(raw: string) {
-  return raw.replace(/[^\d,.-]/g, "");
+  const cleaned = raw.replace(/[^\d,.-]/g, "");
+  if (!cleaned) return "";
+
+  const hasLeadingMinus = cleaned.startsWith("-");
+  const unsigned = cleaned.replace(/-/g, "");
+  const collapsed = unsigned.replace(/([,.]){2,}/g, "$1");
+
+  return `${hasLeadingMinus ? "-" : ""}${collapsed}`;
 }
 
 export function formatNumberPtBr(value: number, decimals = 2) {
