@@ -38,7 +38,7 @@ export default function MinimumHourCalculator({
   onManualModeChange,
   titleLabel = "Hora técnica mínima",
   manualToggleLabel = "Já sei a minha hora técnica.",
-  manualFieldLabel = "Hora técnica (R$/hora)",
+  manualFieldLabel = "Hora técnica mínima (R$/hora)",
 }: MinimumHourCalculatorProps) {
   const [fixedExpenses, setFixedExpenses] = useState<Expense[]>(initialFixedExpenses || []);
   const [personalExpenses, setPersonalExpenses] = useState<Expense[]>(
