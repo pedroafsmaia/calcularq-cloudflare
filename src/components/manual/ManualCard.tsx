@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AlertCircle, AlertTriangle } from "lucide-react";
 
 export function ManualCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
@@ -9,12 +10,29 @@ export function ManualCard({ children, className = "" }: { children: ReactNode; 
 }
 
 export function NoteBox({ children, tone = "blue" }: { children: ReactNode; tone?: "blue" | "amber" | "slate" }) {
-  const toneClass =
-    tone === "amber"
-      ? "border-amber-200 bg-amber-50 text-amber-800"
-      : tone === "slate"
-        ? "border-slate-200 bg-slate-50 text-slate-700"
-        : "border-blue-200 bg-blue-50/70 text-blue-800";
+  if (tone === "slate") {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm leading-relaxed text-slate-700 sm:px-4 sm:py-3 sm:text-base">
+        {children}
+      </div>
+    );
+  }
 
-  return <div className={`rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 leading-relaxed text-sm sm:text-base ${toneClass}`}>{children}</div>;
+  const Icon = tone === "amber" ? AlertTriangle : AlertCircle;
+  const containerClass =
+    tone === "amber"
+      ? "border-amber-500 bg-amber-50"
+      : "border-blue-500 bg-blue-50";
+  const iconClass = tone === "amber" ? "text-amber-600" : "text-blue-600";
+  const textClass =
+    tone === "amber"
+      ? "text-amber-800 [&_strong]:text-amber-900"
+      : "text-blue-700 [&_strong]:text-blue-900";
+
+  return (
+    <div className={`flex items-start gap-3 rounded-xl border-l-4 px-4 py-3 ${containerClass}`}>
+      <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconClass}`} />
+      <div className={`text-sm leading-relaxed sm:text-base ${textClass}`}>{children}</div>
+    </div>
+  );
 }

@@ -20,7 +20,7 @@ import { fadeUp } from "@/lib/motion";
 
 type FactorId = "volume" | "typology" | "stage" | "detail" | "technical" | "bureaucratic" | "monitoring";
 type Step1FieldId = "expenses" | "personal" | "hours";
-type Step3FieldId = "hoursEstimate" | "variableExpenses" | "commercialDiscount";
+type Step3FieldId = "hoursEstimate" | "profitMargin" | "technicalPremium" | "variableExpenses" | "commercialDiscount";
 
 const manualSteps = [
   { id: "introducao", label: "Visão geral", short: "Introdução" },
@@ -62,6 +62,8 @@ export default function Manual() {
 
   const [expandedStep3Fields, setExpandedStep3Fields] = useState<Record<Step3FieldId, boolean>>({
     hoursEstimate: true,
+    profitMargin: false,
+    technicalPremium: false,
     variableExpenses: false,
     commercialDiscount: false,
   });
@@ -404,8 +406,7 @@ export default function Manual() {
                         <Step1FieldAccordion
                           id="personal"
                           title="Despesas pessoais essenciais"
-                          description="O valor mensal necessário para cobrir suas despesas pessoais essenciais. Não é a retirada desejada nem o lucro do projeto."
-                          hint={<p className="text-sm text-amber-700">Atenção: o lucro tende a aparecer na etapa final, via complexidade, horas e composição do preço.</p>}
+                          description="O valor mensal necessário para cobrir suas despesas pessoais essenciais. Não inclui a retirada desejada nem o lucro do projeto."
                         />
                         <Step1FieldAccordion
                           id="hours"
@@ -464,9 +465,9 @@ export default function Manual() {
                           </>,
                         ]}
                         footer={
-                          <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm leading-relaxed text-calcularq-blue">
+                          <NoteBox>
                             Em reforma de apartamento, o volume é o da unidade efetivamente projetada — não do edifício inteiro.
-                          </div>
+                          </NoteBox>
                         }
                       />
 
@@ -482,9 +483,9 @@ export default function Manual() {
                           <><strong>Saúde:</strong> clínicas, hospitais, salas limpas e projetos com requisitos ANVISA ou farmacêuticos.</>,
                         ]}
                         footer={
-                          <div className="rounded-xl border border-calcularq-blue/20 bg-calcularq-blue/5 px-4 py-3 text-sm leading-relaxed text-calcularq-blue">
+                          <NoteBox>
                             Reforma / Ampliação: marque quando o projeto envolver intervenção em edificação existente. Inclui reforma, ampliação, adaptação ou compatibilização com o existente.
-                          </div>
+                          </NoteBox>
                         }
                       />
 
@@ -579,8 +580,40 @@ export default function Manual() {
                         <Step3FieldAccordion
                           id="hoursEstimate"
                           title="Estimativa de horas de projeto"
-                          description="A calculadora já preenche esse valor com a estimativa-base de horas do método. Você pode substituí-lo se preferir usar sua própria estimativa."
-                          hint={<p className="text-sm text-slate-500">No cenário conservador, a margem de incerteza do método continua sendo aplicada sobre o valor informado. No cenário otimista, essa margem adicional não é aplicada.</p>}
+                          description={
+                            <>
+                              <p>A calculadora já preenche esse valor com a estimativa-base de horas do método. Você pode substituí-lo se preferir usar sua própria estimativa.</p>
+                              <ul className="mt-3 space-y-2 text-sm sm:text-base text-slate-700 leading-relaxed">
+                                <li className="flex items-start gap-2">
+                                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-calcularq-blue shrink-0" />
+                                  <span>
+                                    <strong>Cenário conservador:</strong> aplica uma margem de incerteza, estimada a partir dos fatores de complexidade, sobre a estimativa-base de horas. Pode ser mais adequado para projetos com maior complexidade, exigências técnicas relevantes ou risco de mudanças durante o processo.
+                                  </span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-calcularq-blue shrink-0" />
+                                  <span>
+                                    <strong>Cenário otimista:</strong> usa a estimativa-base sem essa margem adicional. Pode ser mais adequado para projetos mais previsíveis, com escopo bem definido e menor chance de desvios ao longo do desenvolvimento.
+                                  </span>
+                                </li>
+                              </ul>
+                            </>
+                          }
+                          hint={
+                            <NoteBox>
+                              Ao inserir um valor personalizado para a estimativa de horas de projeto, a margem de incerteza do método será aplicada apenas se o cenário conservador estiver selecionado.
+                            </NoteBox>
+                          }
+                        />
+                        <Step3FieldAccordion
+                          id="profitMargin"
+                          title="Margem de lucro"
+                          description="Percentual aplicado sobre a hora técnica mínima para compor a hora técnica ajustada. Representa a remuneração desejada acima do custo mínimo de operação."
+                        />
+                        <Step3FieldAccordion
+                          id="technicalPremium"
+                          title="Prêmio de complexidade"
+                          description="Valor máximo de acréscimo considerado pela calculadora para refletir o impacto da complexidade técnica do projeto na hora técnica ajustada."
                         />
                         <Step3FieldAccordion
                           id="variableExpenses"
@@ -593,9 +626,6 @@ export default function Manual() {
                           title="Desconto comercial"
                           description="Ajuste opcional aplicado sobre os honorários. A calculadora mostra o impacto desse desconto para apoiar uma negociação consciente."
                         />
-                        <NoteBox tone="slate">
-                          <strong>Margem de lucro e cenários:</strong> A margem de lucro é aplicada sobre a hora técnica mínima para compor a hora técnica ajustada, antes do prêmio por complexidade técnica. No cenário conservador, a calculadora aplica a margem de incerteza do método sobre a estimativa-base de horas. No cenário otimista, usa a estimativa-base sem essa margem adicional.
-                        </NoteBox>
                       </div>
                     </div>
 
@@ -603,7 +633,7 @@ export default function Manual() {
                       <h3 className="font-semibold text-calcularq-blue mb-3">Resultado apresentado ao final</h3>
                       <ul className="space-y-2 text-sm sm:text-base text-slate-700 leading-relaxed">
                         {[
-                          "Score",
+                          "Score de complexidade",
                           "Hora Técnica Ajustada",
                           "Estimativa de Horas de Projeto",
                           "Despesas Variáveis",
@@ -619,6 +649,9 @@ export default function Manual() {
                         ))}
                       </ul>
                     </div>
+                    <NoteBox>
+                      <strong>Hora técnica ajustada (indicador comparativo):</strong> O valor da hora técnica ajustada é acompanhado por um indicador que serve como referência comparativa. Ele ajuda a interpretar o valor calculado, mas não deve ser usado isoladamente como parâmetro de mercado.
+                    </NoteBox>
                     <NoteBox>
                       <strong>Preço por m² (indicador comparativo):</strong> O indicador de preço por m² é apresentado como referência comparativa — não como parâmetro de mercado. O valor varia significativamente por região, padrão construtivo e complexidade. Use-o para ganhar perspectiva, não como critério de aprovação.
                     </NoteBox>
@@ -642,9 +675,6 @@ export default function Manual() {
                 <div className="relative space-y-3 text-white/95 leading-relaxed text-sm sm:text-base">
                   <p>
                     A calculadora entrega estrutura: uma estimativa de esforço, uma composição de custo e uma referência de preço baseadas nos dados do projeto. O que ela não entrega é o julgamento — sobre o cliente, o mercado e o momento. Isso é seu.
-                  </p>
-                  <p>
-                    <strong>Método em construção:</strong> A Calcularq está numa fase de estruturação do seu método final. Os parâmetros atuais foram calibrados com base em referências técnicas e serão refinados continuamente a partir do feedback real dos usuários.
                   </p>
                 </div>
 

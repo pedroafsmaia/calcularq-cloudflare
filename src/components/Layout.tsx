@@ -1,9 +1,9 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { createPageUrl } from "@/utils";
-import { Calculator, Home, BookOpen, LogIn, LogOut, History } from "lucide-react";
-import Footer from "./Footer";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BookOpen, Calculator, History, Home, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { createPageUrl } from "@/utils";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -37,31 +37,23 @@ export default function Layout({ children }: LayoutProps) {
     const checkOverlap = () => {
       if (window.matchMedia("(min-width: 640px)").matches) return;
 
-      const logoImg = row.querySelector("[data-mobile-logo]") as HTMLElement;
-      const logomarcaImg = row.querySelector("[data-mobile-logomarca]") as HTMLElement;
-      const navInner = row.querySelector("[data-mobile-nav]") as HTMLElement;
+      const logoImg = row.querySelector("[data-mobile-logo]") as HTMLElement | null;
+      const logomarcaImg = row.querySelector("[data-mobile-logomarca]") as HTMLElement | null;
+      const navInner = row.querySelector("[data-mobile-nav]") as HTMLElement | null;
 
       if (!logoImg || !logomarcaImg || !navInner) return;
 
-      // Show full logo first to measure whether it causes nav overflow
       logoImg.style.display = "";
       logomarcaImg.style.display = "none";
 
-      // Force the browser to recalculate layout before measuring
       void navInner.offsetWidth;
 
-      // Detect overflow in both directions: scrollWidth catches rightward
-      // overflow, but justify-end pushes excess items to the left where
-      // scrollWidth can't see them. getBoundingClientRect catches that case.
       const firstItem = navInner.firstElementChild as HTMLElement | null;
       const overflows =
         navInner.scrollWidth > navInner.clientWidth ||
-        (firstItem != null &&
-          firstItem.getBoundingClientRect().left <
-            navInner.getBoundingClientRect().left - 1); // 1px tolerance for sub-pixel rounding
+        (firstItem != null && firstItem.getBoundingClientRect().left < navInner.getBoundingClientRect().left - 1);
 
       if (overflows) {
-        // Buttons overflow — switch to logomarca
         logoImg.style.display = "none";
         logomarcaImg.style.display = "";
       }
@@ -70,9 +62,7 @@ export default function Layout({ children }: LayoutProps) {
     checkOverlap();
     window.addEventListener("resize", checkOverlap);
 
-    const images = row.querySelectorAll<HTMLImageElement>(
-      "img[data-mobile-logo], img[data-mobile-logomarca]"
-    );
+    const images = row.querySelectorAll<HTMLImageElement>("img[data-mobile-logo], img[data-mobile-logomarca]");
     images.forEach((img) => {
       if (!img.complete) img.addEventListener("load", checkOverlap);
     });
@@ -103,7 +93,7 @@ export default function Layout({ children }: LayoutProps) {
   }, [location.pathname, location.search]);
 
   const desktopNavItem = (isActive: boolean) =>
-    `shrink-0 flex items-center justify-center gap-0 xl:gap-2 h-10 w-10 xl:w-auto min-w-10 xl:min-w-10 px-0 xl:px-4 py-2 rounded-xl text-sm font-medium transition-colors transition-shadow duration-150 border ${
+    `shrink-0 flex items-center justify-center gap-2 h-10 w-auto min-w-10 px-4 py-2 rounded-xl text-sm font-medium transition-colors transition-shadow duration-150 border ${
       isActive
         ? "bg-calcularq-blue text-white border-calcularq-blue shadow-sm shadow-calcularq-blue/20"
         : "text-slate-600 border-transparent hover:bg-slate-100 hover:text-calcularq-blue"
@@ -118,38 +108,29 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={headerRowRef} className="flex items-center gap-2 sm:gap-4 h-16">
-            <Link to={createPageUrl("Home")} className="flex items-center shrink-0">
-              <img
-                src="/logo.png"
-                alt="Calcularq"
-                className="h-10 w-auto sm:hidden object-contain"
-                data-mobile-logo
-              />
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-lg">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div ref={headerRowRef} className="flex h-16 items-center gap-2 sm:gap-4">
+            <Link to={createPageUrl("Home")} className="flex shrink-0 items-center">
+              <img src="/logo.png" alt="Calcularq" className="h-10 w-auto object-contain sm:hidden" data-mobile-logo />
               <img
                 src="/logomarca.png"
                 alt="Calcularq"
-                className="h-8 w-auto sm:hidden object-contain"
+                className="h-8 w-auto object-contain sm:hidden"
                 data-mobile-logomarca
                 style={{ display: "none" }}
               />
-              <img
-                src="/logo.png"
-                alt="Calcularq"
-                className="h-10 w-auto hidden sm:block object-contain"
-              />
+              <img src="/logo.png" alt="Calcularq" className="hidden h-10 w-auto object-contain sm:block" />
             </Link>
 
-            <div className="hidden sm:block min-w-0 flex-1">
+            <div className="hidden min-w-0 flex-1 sm:block">
               <div className="flex items-center justify-end gap-1.5 overflow-x-auto py-1">
                 {navigation.map((item) => {
                   const isActive = currentPageName === item.page;
                   return (
                     <Link key={item.name} to={createPageUrl(item.page)} className={desktopNavItem(isActive)}>
-                      <item.icon className="w-4 h-4" />
-                      <span className="hidden xl:inline">{item.name}</span>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.name}</span>
                     </Link>
                   );
                 })}
@@ -157,16 +138,16 @@ export default function Layout({ children }: LayoutProps) {
                 {user ? (
                   <>
                     <Link to="/budgets" className={desktopNavItem(false)}>
-                      <History className="w-4 h-4" />
-                      <span className="hidden xl:inline">Meus cálculos</span>
+                      <History className="h-4 w-4" />
+                      <span>Meus cálculos</span>
                     </Link>
 
-                    {user.hasPaid && (
+                    {user.hasPaid ? (
                       <Link to={createPageUrl("Manual")} className={desktopNavItem(currentPageName === "Manual")}>
-                        <BookOpen className="w-4 h-4" />
-                        <span className="hidden xl:inline">Manual</span>
+                        <BookOpen className="h-4 w-4" />
+                        <span>Manual</span>
                       </Link>
-                    )}
+                    ) : null}
 
                     <span
                       role={user.isAdmin ? "button" : undefined}
@@ -174,38 +155,40 @@ export default function Layout({ children }: LayoutProps) {
                       onClick={() => {
                         if (user.isAdmin) navigate(createPageUrl("Admin"));
                       }}
-                      onKeyDown={(e) => {
-                        if (user.isAdmin && (e.key === "Enter" || e.key === " ")) {
-                          e.preventDefault();
+                      onKeyDown={(event) => {
+                        if (user.isAdmin && (event.key === "Enter" || event.key === " ")) {
+                          event.preventDefault();
                           navigate(createPageUrl("Admin"));
                         }
                       }}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 transition-colors duration-150 border border-transparent ${user.isAdmin ? "hover:bg-slate-100 hover:text-calcularq-blue cursor-pointer" : ""}`}
+                      className={`flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 ${
+                        user.isAdmin ? "cursor-pointer hover:bg-slate-100 hover:text-calcularq-blue" : ""
+                      }`}
                     >
                       <span className="inline max-w-[120px] truncate">{user.name}</span>
                     </span>
 
                     <button onClick={logout} className={desktopNavItem(false)} aria-label="Sair">
-                      <LogOut className="w-4 h-4" />
-                      <span className="hidden xl:inline">Sair</span>
+                      <LogOut className="h-4 w-4" />
+                      <span>Sair</span>
                     </button>
                   </>
                 ) : (
                   <Link to={createPageUrl("Login")} className={desktopNavItem(false)}>
-                    <LogIn className="w-4 h-4" />
-                    <span className="hidden xl:inline">Entrar</span>
+                    <LogIn className="h-4 w-4" />
+                    <span>Entrar</span>
                   </Link>
                 )}
               </div>
             </div>
 
-            <div className="sm:hidden min-w-0 flex-1">
+            <div className="min-w-0 flex-1 sm:hidden">
               <div className="flex items-center justify-end gap-1.5 overflow-x-auto py-1" data-mobile-nav>
                 {navigation.map((item) => {
                   const isActive = currentPageName === item.page;
                   return (
                     <Link key={item.name} to={createPageUrl(item.page)} className={mobileIconItem(isActive)} aria-label={item.name}>
-                      <item.icon className="w-[18px] h-[18px]" />
+                      <item.icon className="h-[18px] w-[18px]" />
                     </Link>
                   );
                 })}
@@ -213,26 +196,22 @@ export default function Layout({ children }: LayoutProps) {
                 {user ? (
                   <>
                     <Link to="/budgets" className={mobileIconItem()} aria-label="Meus cálculos">
-                      <History className="w-[18px] h-[18px]" />
+                      <History className="h-[18px] w-[18px]" />
                     </Link>
 
-                    {user.hasPaid && (
-                      <Link
-                        to={createPageUrl("Manual")}
-                        className={mobileIconItem(currentPageName === "Manual")}
-                        aria-label="Manual"
-                      >
-                        <BookOpen className="w-[18px] h-[18px]" />
+                    {user.hasPaid ? (
+                      <Link to={createPageUrl("Manual")} className={mobileIconItem(currentPageName === "Manual")} aria-label="Manual">
+                        <BookOpen className="h-[18px] w-[18px]" />
                       </Link>
-                    )}
+                    ) : null}
 
                     <button onClick={logout} className={mobileIconItem()} aria-label="Sair">
-                      <LogOut className="w-[18px] h-[18px]" />
+                      <LogOut className="h-[18px] w-[18px]" />
                     </button>
                   </>
                 ) : (
                   <Link to={createPageUrl("Login")} className={mobileIconItem()} aria-label="Entrar">
-                    <LogIn className="w-[18px] h-[18px]" />
+                    <LogIn className="h-[18px] w-[18px]" />
                   </Link>
                 )}
               </div>

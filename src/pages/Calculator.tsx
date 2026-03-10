@@ -758,8 +758,8 @@ export default function Calculator() {
                       icon={<BarChart2 className="w-5 h-5 text-calcularq-blue" />}
                     />
 
-                    <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-blue-50/70">
-                      <p className="text-sm text-blue-800">
+                    <div className="mb-6 rounded-xl border-l-4 border-blue-500 bg-blue-50 px-4 py-3">
+                      <p className="text-sm text-blue-700 [&_strong]:text-blue-900">
                         <strong>Precisa de apoio na classificação?</strong> Para entender os critérios técnicos e os exemplos práticos por trás de cada Fator e Valor,{" "}
                         <a href={createPageUrl("Manual")} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
                           acesse o manual de instruções

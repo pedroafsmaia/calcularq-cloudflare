@@ -1,4 +1,6 @@
-﻿import Tooltip from "@/components/ui/Tooltip";
+import type { ReactNode } from "react";
+import { AlertCircle } from "lucide-react";
+import Tooltip from "@/components/ui/Tooltip";
 import { describeHourlyRate } from "@/lib/hourlyRateBands";
 import { describePricePerSqm } from "@/lib/pricePerSqmBands";
 
@@ -29,19 +31,35 @@ type Props = {
   productiveHours: number;
 };
 
-function Row({ label, value, valueClassName = "text-slate-800", labelClassName = "text-slate-600", noWrapValue = true }: {
+function Row({
+  label,
+  value,
+  valueClassName = "text-slate-800",
+  labelClassName = "text-slate-600",
+  noWrapValue = true,
+  labelSuffix,
+}: {
   label: string;
   value: string;
   valueClassName?: string;
   labelClassName?: string;
   noWrapValue?: boolean;
+  labelSuffix?: ReactNode;
 }) {
   const isPendingValue = valueClassName.includes("text-slate-400");
+
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-sm">
-      <span className={`min-w-0 leading-snug ${labelClassName}`}>{label}</span>
+      <span className={`min-w-0 leading-snug ${labelClassName}`}>
+        <span className="inline-flex items-center gap-1">
+          <span>{label}</span>
+          {labelSuffix}
+        </span>
+      </span>
       <span
-        className={`${noWrapValue ? "whitespace-nowrap" : ""} self-start pt-0.5 text-right ${isPendingValue ? "font-normal" : "font-semibold"} ${valueClassName}`}
+        className={`${noWrapValue ? "whitespace-nowrap" : ""} self-start pt-0.5 text-right ${
+          isPendingValue ? "font-normal" : "font-semibold"
+        } ${valueClassName}`}
       >
         {value}
       </span>
@@ -78,6 +96,22 @@ export default function CalculatorResultsPanel({
   const isExtremeAdjustedHourlyRate = adjustedHourlyRateDescription?.kind === "extreme";
   const showAdjustedAsPrimary = currentStep >= 3 && displayValues.adjustedHourlyRate > 0;
 
+  const adjustedHourlyRateTooltip =
+    adjustedHourlyRateDescription != null ? (
+      <Tooltip
+        title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
+        tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
+        iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
+        text={[
+          adjustedHourlyRateDescription.line1,
+          adjustedHourlyRateDescription.line2,
+          "Indicador comparativo com base nas referências adotadas pelo método.",
+        ]
+          .filter(Boolean)
+          .join("\n")}
+      />
+    ) : null;
+
   return (
     <div className="space-y-4 bg-transparent p-4 sm:p-5">
       <div className="rounded-xl border border-calcularq-blue/15 bg-calcularq-blue/10 p-4 sm:p-5">
@@ -85,6 +119,7 @@ export default function CalculatorResultsPanel({
         <div className="space-y-2.5">
           <Row
             label={showAdjustedAsPrimary ? "Hora técnica ajustada" : "Hora técnica mínima"}
+            labelSuffix={showAdjustedAsPrimary ? adjustedHourlyRateTooltip : null}
             value={
               showAdjustedAsPrimary
                 ? `R$ ${displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h`
@@ -112,27 +147,18 @@ export default function CalculatorResultsPanel({
 
           {!showAdjustedAsPrimary && displayValues.adjustedHourlyRate > 0 ? (
             <div className="grid grid-cols-[1fr_auto] items-start gap-3 border-t border-slate-200 pt-2.5 text-sm">
-              <span className="min-w-0 font-semibold leading-snug text-slate-700">Hora técnica ajustada</span>
+              <span className="min-w-0 font-semibold leading-snug text-slate-700">
+                <span className="inline-flex items-center gap-1">
+                  <span>Hora técnica ajustada</span>
+                  {adjustedHourlyRateTooltip}
+                </span>
+              </span>
               <span
                 className={`inline-flex items-center gap-1 whitespace-nowrap font-bold ${
                   isExtremeAdjustedHourlyRate ? "text-amber-700" : "text-slate-700"
                 }`}
               >
                 R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h
-                {adjustedHourlyRateDescription ? (
-                  <Tooltip
-                    title={isExtremeAdjustedHourlyRate ? "Atenção" : "Referência interna"}
-                    tone={isExtremeAdjustedHourlyRate ? "warning" : "info"}
-                    iconClassName={isExtremeAdjustedHourlyRate ? "text-amber-700 hover:text-amber-800" : undefined}
-                    text={[
-                      adjustedHourlyRateDescription.line1,
-                      adjustedHourlyRateDescription.line2,
-                      "Indicador comparativo com base nas referências adotadas pelo método.",
-                    ]
-                      .filter(Boolean)
-                      .join("\n")}
-                  />
-                ) : null}
               </span>
             </div>
           ) : currentStep >= 3 ? (
@@ -145,9 +171,13 @@ export default function CalculatorResultsPanel({
         <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-sm font-semibold text-slate-700">Progresso da etapa 1</p>
           {useManualMinHourlyRate ? (
-            <p className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
-              Modo manual ativo: despesas e horas produtivas ficam dispensadas.
-            </p>
+            <div className="flex items-start gap-3 rounded-xl border-l-4 border-blue-500 bg-blue-50 px-4 py-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+              <div>
+                <p className="mb-0.5 text-sm font-semibold text-blue-900">Modo manual ativo</p>
+                <p className="text-sm text-blue-700">Despesas e horas produtivas ficam dispensadas.</p>
+              </div>
+            </div>
           ) : null}
 
           <Row
@@ -204,13 +234,13 @@ export default function CalculatorResultsPanel({
             <div className="space-y-2.5 px-1 py-1 text-sm">
               <div className="grid grid-cols-[1fr_auto] items-start gap-2">
                 <span className="min-w-0 leading-snug text-slate-600">
-                  Preço do Projeto
+                  <span className="inline-flex items-center gap-1">
+                    <span>Preço do Projeto</span>
+                    <Tooltip text="Resultado calculado pelas horas estimadas do projeto multiplicadas pela hora técnica ajustada." />
+                  </span>
                   {estimatedHours > 0 && displayValues.adjustedHourlyRate > 0 ? (
                     <span className="mt-0.5 block text-xs leading-snug text-slate-400">
                       {estimatedHours}h × R$ {displayValues.adjustedHourlyRate.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      <span className="ml-1 inline-flex align-middle">
-                        <Tooltip text="Resultado calculado pelas horas estimadas do projeto multiplicadas pela hora técnica ajustada." />
-                      </span>
                     </span>
                   ) : null}
                 </span>
@@ -298,4 +328,3 @@ export default function CalculatorResultsPanel({
     </div>
   );
 }
-
