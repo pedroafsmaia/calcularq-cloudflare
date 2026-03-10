@@ -1,14 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
+import { CheckCircle, Info, Loader, XCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
-import { CheckCircle, XCircle, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import LegalModal from "@/components/LegalModal";
 import { termsContent, privacyContent } from "@/lib/legalContent";
-import { fadeUp, fadeOnly } from "@/lib/motion";
+import { fadeOnly, fadeUp } from "@/lib/motion";
 
 const POLL_INTERVAL = 3000;
 const MAX_POLL_ATTEMPTS = 60;
@@ -258,6 +258,18 @@ export default function Payment() {
             <p className="text-lg text-slate-600">
               Para acessar a Calcularq, é necessário fazer um pagamento único de <strong className="text-calcularq-blue">R$19,90</strong>.
             </p>
+            <p className="mt-3 text-sm text-slate-500">
+              Sem mensalidade. Acesso liberado logo após a confirmação do pagamento.
+            </p>
+          </div>
+
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
+            <div className="flex items-start gap-3">
+              <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+              <p className="text-sm leading-relaxed text-amber-900">
+                <strong>Método em construção:</strong> A Calcularq está numa fase de estruturação do seu método final. Os parâmetros atuais foram calibrados com base em referências técnicas e serão refinados continuamente a partir do feedback real dos usuários.
+              </p>
+            </div>
           </div>
 
           <div className="bg-calcularq-blue/5 border border-calcularq-blue/20 rounded-xl p-6 mb-8">
@@ -275,7 +287,26 @@ export default function Payment() {
                 <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                 <span>Histórico organizado dos seus cálculos</span>
               </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span>Atualizações futuras do método conforme a evolução da plataforma</span>
+              </li>
             </ul>
+          </div>
+
+          <div className="mb-8 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-center">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Modelo</p>
+              <p className="mt-2 text-sm font-medium text-slate-700">Pagamento único</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-center">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Liberação</p>
+              <p className="mt-2 text-sm font-medium text-slate-700">Acesso após confirmação</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-center">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Evolução</p>
+              <p className="mt-2 text-sm font-medium text-slate-700">Refino contínuo do método</p>
+            </div>
           </div>
 
           <div className="text-center">

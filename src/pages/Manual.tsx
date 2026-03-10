@@ -348,7 +348,7 @@ export default function Manual() {
 
               <div className="mt-5 text-left">
                 <NoteBox>
-                  <strong>Método em construção:</strong> A Calcularq está numa fase de estruturação do seu método final. Os parâmetros atuais foram calibrados com base em referências técnicas e serão refinados continuamente a partir do feedback real dos usuários. Os resultados são estimativas estruturadas — quanto mais você usa, mais o método evolui.
+                  <strong>Método em construção:</strong> A Calcularq está numa fase de estruturação do seu método final. Os parâmetros atuais foram calibrados com base em referências técnicas e serão refinados continuamente a partir do feedback real dos usuários.
                 </NoteBox>
               </div>
 
@@ -644,7 +644,7 @@ export default function Manual() {
                     A calculadora entrega estrutura: uma estimativa de esforço, uma composição de custo e uma referência de preço baseadas nos dados do projeto. O que ela não entrega é o julgamento — sobre o cliente, o mercado e o momento. Isso é seu.
                   </p>
                   <p>
-                    O método está em construção ativa. Os parâmetros atuais partem de referências técnicas e serão refinados continuamente com base no feedback de quem usa a ferramenta. Cada projeto que você precificar aqui contribui para um método cada vez mais preciso e ajustado à realidade dos escritórios brasileiros.
+                    <strong>Método em construção:</strong> A Calcularq está numa fase de estruturação do seu método final. Os parâmetros atuais foram calibrados com base em referências técnicas e serão refinados continuamente a partir do feedback real dos usuários.
                   </p>
                 </div>
 
