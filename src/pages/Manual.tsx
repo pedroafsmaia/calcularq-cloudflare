@@ -392,7 +392,7 @@ export default function Manual() {
 
                   <div className="grid gap-4">
                     <NoteBox tone="slate">
-                      <strong>Resumo rápido:</strong> Informe despesas operacionais fixas, despesas pessoais essenciais e horas produtivas. O sistema retorna sua Hora Técnica Mínima.
+                      <strong>Resumo rápido:</strong> Informe despesas operacionais fixas, despesas pessoais essenciais e horas produtivas. O sistema retorna sua Hora técnica mínima.
                     </NoteBox>
 
                     <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -417,7 +417,7 @@ export default function Manual() {
                       </div>
 
                       <NoteBox>
-                        <strong>Resultado esperado:</strong> A calculadora define sua Hora Técnica Mínima. Esse valor será usado nas próximas etapas como base para o cálculo do preço.
+                        <strong>Resultado esperado:</strong> A calculadora define sua Hora técnica mínima. Esse valor será usado nas próximas etapas como base para o cálculo do preço.
                       </NoteBox>
                     </div>
                   </div>
@@ -634,10 +634,10 @@ export default function Manual() {
                       <ul className="space-y-2 text-sm sm:text-base text-slate-700 leading-relaxed">
                         {[
                           "Score de complexidade",
-                          "Hora Técnica Ajustada",
-                          "Estimativa de Horas de Projeto",
-                          "Despesas Variáveis",
-                          "Preço de Venda Final",
+                          "Hora técnica ajustada",
+                          "Estimativa de horas de projeto",
+                          "Despesas variáveis",
+                          "Preço de venda final",
                           "Valor do Desconto (se houver)",
                           "Preço/m² (indicador comparativo)",
                           "Lucro estimado (margem bruta entre hora ajustada e hora mínima)",
