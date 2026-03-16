@@ -50,6 +50,7 @@ export async function onRequest(context) {
     const db = context.env.DB;
     const jwtSecret = context.env.JWT_SECRET;
     const googleClientId = context.env.GOOGLE_CLIENT_ID;
+    const registrationsDisabled = String(context.env.DISABLE_REGISTRATION || "0") === "1";
 
     if (!jwtSecret || String(jwtSecret).trim().length < 16) {
       return jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 });
@@ -126,6 +127,10 @@ export async function onRequest(context) {
     }
 
     if (!user) {
+      if (registrationsDisabled) {
+        return jsonResponse({ success: false, message: "Novos cadastros estÃ£o temporariamente desativados" }, { status: 403 });
+      }
+
       // Create new user with Google account
       const id = crypto.randomUUID();
       // Google OAuth users don't use password login; store a sentinel that never matches PBKDF2 verification

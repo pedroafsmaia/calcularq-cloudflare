@@ -218,6 +218,9 @@ Obrigatórios:
 - `BREVO_SENDER_EMAIL`
 - `BREVO_SENDER_NAME`
 
+Observação:
+- Os secrets de produção estão salvos no Bitwarden. Não versionar valores reais no repositório.
+
 Opcionais (Google OAuth):
 - `GOOGLE_CLIENT_ID` — ID do cliente OAuth para verificação server-side do token
 - `VITE_GOOGLE_CLIENT_ID` — mesmo valor, exposto ao frontend via Vite para renderizar o botão Google
@@ -230,6 +233,16 @@ Secret `REQUIRE_PAYMENT`:
 ```bash
 echo 0 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
 echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
+```
+
+### Toggle de cadastro
+Secret `DISABLE_REGISTRATION`:
+- `1`: bloqueia novos cadastros por e-mail e o primeiro acesso via Google
+- `0`: libera novos cadastros
+
+```bash
+echo 1 | npx wrangler pages secret put DISABLE_REGISTRATION --project-name calcularq-cloudflare
+echo 0 | npx wrangler pages secret put DISABLE_REGISTRATION --project-name calcularq-cloudflare
 ```
 
 Após alterar um secret, faça redeploy.

@@ -17,6 +17,11 @@ export async function onRequest(context) {
     return jsonResponse({ success: false, message: "Método não permitido" }, { status: 405 });
   }
 
+  const registrationsDisabled = String(context.env.DISABLE_REGISTRATION || "0") === "1";
+  if (registrationsDisabled) {
+    return jsonResponse({ success: false, message: "Novos cadastros estÃ£o temporariamente desativados" }, { status: 403 });
+  }
+
   const badOrigin = assertAllowedOrigin(context);
   if (badOrigin) return badOrigin;
   const rate = await rateLimitByIp(context, { endpoint: "auth:register", limit: 6, windowMs: 60_000 });
