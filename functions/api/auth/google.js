@@ -128,7 +128,7 @@ export async function onRequest(context) {
 
     if (!user) {
       if (registrationsDisabled) {
-        return jsonResponse({ success: false, message: "Novos cadastros estÃ£o temporariamente desativados" }, { status: 403 });
+        return jsonResponse({ success: false, message: "Novos cadastros estão temporariamente desativados" }, { status: 403 });
       }
 
       // Create new user with Google account

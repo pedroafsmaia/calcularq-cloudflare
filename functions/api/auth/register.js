@@ -19,7 +19,7 @@ export async function onRequest(context) {
 
   const registrationsDisabled = String(context.env.DISABLE_REGISTRATION || "0") === "1";
   if (registrationsDisabled) {
-    return jsonResponse({ success: false, message: "Novos cadastros estÃ£o temporariamente desativados" }, { status: 403 });
+    return jsonResponse({ success: false, message: "Novos cadastros estão temporariamente desativados" }, { status: 403 });
   }
 
   const badOrigin = assertAllowedOrigin(context);
