@@ -10,7 +10,7 @@ A aplicacao e dividida em duas partes principais:
 Fluxo principal:
 1. Usuario cria conta / faz login
 2. Sessao e mantida por cookie HttpOnly
-3. Paywall verifica `has_paid`
+3. Acesso é calculado por `canAccess = !REQUIRE_PAYMENT || hasPaid`; `has_paid` registra apenas pagamentos reais
 4. Usuario usa a calculadora em 4 etapas
 5. Calculo pode ser salvo em `budgets`
 6. Stripe webhook libera acesso em pagamento confirmado

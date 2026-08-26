@@ -142,7 +142,7 @@ export default function Layout({ children }: LayoutProps) {
                       <span>Meus cálculos</span>
                     </Link>
 
-                    {user.hasPaid ? (
+                    {user.canAccess ? (
                       <Link to={createPageUrl("Manual")} className={desktopNavItem(currentPageName === "Manual")}>
                         <BookOpen className="h-4 w-4" />
                         <span>Manual</span>
@@ -199,7 +199,7 @@ export default function Layout({ children }: LayoutProps) {
                       <History className="h-[18px] w-[18px]" />
                     </Link>
 
-                    {user.hasPaid ? (
+                    {user.canAccess ? (
                       <Link to={createPageUrl("Manual")} className={mobileIconItem(currentPageName === "Manual")} aria-label="Manual">
                         <BookOpen className="h-[18px] w-[18px]" />
                       </Link>

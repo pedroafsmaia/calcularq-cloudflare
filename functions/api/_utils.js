@@ -6,6 +6,12 @@ const SESSION_COOKIE_NAME = "calcularq_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 let securityTablesEnsured = false;
 
+// `has_paid` is always a record of a real Stripe payment. Access is derived
+// separately so this single setting can safely enable or disable the paywall.
+export function isPaymentRequired(env) {
+  return String(env.REQUIRE_PAYMENT || "0") === "1";
+}
+
 function base64urlEncode(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)))
     .replace(/\+/g, "-")

@@ -34,6 +34,7 @@ export interface Budget {
 export interface PaymentStatus {
   userId: string;
   hasPaid: boolean;
+  canAccess: boolean;
   paymentDate: string | null;
   stripeCustomerId: string | null;
 }
@@ -97,6 +98,7 @@ type ApiUser = {
   email: string;
   name: string;
   hasPaid: boolean;
+  canAccess: boolean;
   paymentDate: string | null;
   stripeCustomerId?: string | null;
   isAdmin?: boolean;

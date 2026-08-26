@@ -35,7 +35,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      navigate(createPageUrl(user.hasPaid ? "Calculator" : "Payment"), { replace: true });
+      navigate(createPageUrl(user.canAccess ? "Calculator" : "Payment"), { replace: true });
     }
   }, [user, authLoading, navigate]);
 

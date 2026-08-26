@@ -1,6 +1,7 @@
 import {
   assertAllowedOrigin,
   hashPassword,
+  isPaymentRequired,
   jsonResponse,
   readJson,
   rateLimitByIp,
@@ -66,8 +67,8 @@ export async function onRequest(context) {
   const id = crypto.randomUUID();
   const password_hash = await hashPassword(password);
 
-  const requirePayment = String(context.env.REQUIRE_PAYMENT || "0") === "1";
-  const has_paid = requirePayment ? 0 : 1;
+  const has_paid = 0;
+  const canAccess = !isPaymentRequired(context.env);
   const created_at = new Date().toISOString();
 
   await db.prepare(
@@ -78,6 +79,6 @@ export async function onRequest(context) {
   const headers = new Headers();
   setSessionCookie(headers, token);
 
-  const user = { id, email, name, hasPaid: !!has_paid, paymentDate: null, stripeCustomerId: null, createdAt: created_at };
+  const user = { id, email, name, hasPaid: false, canAccess, paymentDate: null, stripeCustomerId: null, createdAt: created_at };
   return jsonResponse({ success: true, user }, { headers });
 }

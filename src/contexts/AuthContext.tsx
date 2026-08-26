@@ -95,7 +95,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const paymentStatus = await api.getPaymentStatus();
-      db.updateUserPayment(sessionUser.id, paymentStatus.hasPaid, paymentStatus.stripeCustomerId ?? undefined);
+      db.updateUserPayment(
+        sessionUser.id,
+        paymentStatus.hasPaid,
+        paymentStatus.canAccess,
+        paymentStatus.stripeCustomerId ?? undefined,
+        paymentStatus.paymentDate
+      );
       setUser(db.getCurrentUser());
     } catch (error) {
       console.error("Erro ao atualizar usuário:", error);

@@ -20,7 +20,7 @@ export default function ProtectedRoute({ children, requirePayment = true, allowe
     return <Navigate to={createPageUrl("Login")} replace />;
   }
 
-  if (requirePayment && !user.hasPaid) {
+  if (requirePayment && !user.canAccess) {
     return <Navigate to={createPageUrl("Payment")} replace />;
   }
 

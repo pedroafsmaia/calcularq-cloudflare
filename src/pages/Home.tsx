@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPageUrl } from "@/utils";
 import { fadeUp, listStagger, viewportOnce } from "@/lib/motion";
+import { isPaymentRequired } from "@/lib/payment";
 
 export default function Home() {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ export default function Home() {
   const prefersReducedMotion = !!useReducedMotion();
 
   useEffect(() => {
-    if (user?.hasPaid) {
+    if (!isPaymentRequired || user?.canAccess) {
       return;
     }
 
@@ -29,7 +30,7 @@ export default function Home() {
         document.body.removeChild(existingScript);
       }
     };
-  }, [user?.hasPaid]);
+  }, [user?.canAccess]);
 
   const handleCalculatorClick = (e: React.MouseEvent) => {
     if (!user) {
@@ -37,7 +38,7 @@ export default function Home() {
       navigate(createPageUrl("Login"));
       return;
     }
-    if (!user.hasPaid) {
+    if (!user.canAccess) {
       e.preventDefault();
       navigate(createPageUrl("Payment"));
     }
@@ -165,7 +166,7 @@ export default function Home() {
                   Precifique seus projetos de arquitetura com inteligência. A Calcularq é uma ferramenta que evolui com você, alinhando seus cálculos à complexidade de cada projeto.
                 </p>
 
-                {!user?.hasPaid ? (
+                {isPaymentRequired && !user?.canAccess ? (
                   <div className="mb-4 flex items-center justify-center sm:mb-5">
                     <div
                       className="senja-embed"
@@ -183,11 +184,15 @@ export default function Home() {
                     className="w-full rounded-xl px-8 py-6 text-base font-semibold text-white shadow-md transition-shadow duration-150 hover:shadow-lg sm:text-lg"
                     style={{ backgroundColor: "#fc7338" }}
                   >
-                    {user?.hasPaid ? "Acessar a Calcularq" : "Acessar a Calcularq - R$19,90"}
+                    {user?.canAccess
+                      ? "Acessar a Calcularq"
+                      : isPaymentRequired
+                        ? "Acessar a Calcularq - R$19,90"
+                        : "Acessar a Calcularq gratuitamente"}
                   </Button>
                 </Link>
 
-                {user?.hasPaid ? (
+                {user?.canAccess ? (
                   <a href="https://senja.io/p/calcularq/r/GRdv6A" target="_blank" rel="noopener noreferrer" className="mb-3 block sm:mb-3.5">
                     <Button
                       type="button"
@@ -200,7 +205,11 @@ export default function Home() {
                   </a>
                 ) : null}
 
-                <p className="text-center text-sm text-slate-600">Pagamento único. Sem mensalidades.</p>
+                <p className="text-center text-sm text-slate-600">
+                  {isPaymentRequired
+                    ? "Pagamento único. Sem mensalidades."
+                    : "Crie sua conta gratuitamente e comece a precificar seus projetos."}
+                </p>
               </motion.div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import {
   assertAllowedOrigin,
+  isPaymentRequired,
   jsonResponse,
   readJson,
   rateLimitByIp,
@@ -89,7 +90,7 @@ export async function onRequest(context) {
       return jsonResponse({ success: false, message: "O e-mail do Google não foi verificado" }, { status: 400 });
     }
 
-    const requirePayment = String(context.env.REQUIRE_PAYMENT || "0") === "1";
+    const requirePayment = isPaymentRequired(context.env);
 
     // Try to find user by google_id first, then by email
     let user = null;
@@ -135,7 +136,7 @@ export async function onRequest(context) {
       const id = crypto.randomUUID();
       // Google OAuth users don't use password login; store a sentinel that never matches PBKDF2 verification
       const password_hash = "google_oauth$none$0$0$0";
-      const has_paid = requirePayment ? 0 : 1;
+      const has_paid = 0;
       const created_at = new Date().toISOString();
 
       try {
@@ -166,7 +167,8 @@ export async function onRequest(context) {
       id: user.id,
       email: user.email,
       name: user.name,
-      hasPaid: requirePayment ? !!user.has_paid : true,
+      hasPaid: !!user.has_paid,
+      canAccess: !requirePayment || !!user.has_paid,
       paymentDate: user.payment_date,
       stripeCustomerId: user.stripe_customer_id,
       createdAt: user.created_at,

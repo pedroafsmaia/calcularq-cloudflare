@@ -50,4 +50,4 @@ Sugestão: use uma string grande (40+ caracteres).
 
 ## Observações importantes
 - No runtime Workers não existe `bcrypt`. Por isso a senha é armazenada com **PBKDF2 (WebCrypto)**.
-- Para facilitar os testes, o usuário novo nasce com `has_paid = 1` (sem paywall). Depois você pode mudar isso para 0 e integrar Stripe.
+- Usuários novos sempre nascem com `has_paid = 0`. Em modo gratuito (`REQUIRE_PAYMENT=0`), o acesso é liberado por `canAccess`; pagamentos reais continuam sendo registrados pelo webhook Stripe.

@@ -47,7 +47,7 @@ export default function Payment() {
   };
 
   useEffect(() => {
-    if (user?.hasPaid && !isProcessing) {
+    if (user?.canAccess && !isProcessing) {
       navigate(createPageUrl("Calculator"), { replace: true });
     }
   }, [user, navigate, isProcessing]);

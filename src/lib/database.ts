@@ -6,6 +6,7 @@ export interface User {
   email: string;
   name: string;
   hasPaid: boolean;
+  canAccess: boolean;
   paymentDate?: string;
   stripeCustomerId?: string;
   isAdmin?: boolean;
@@ -33,11 +34,12 @@ class LocalDatabase {
   }
 
   // Atualizar dados do usuário na sessão local (após pagamento, etc.)
-  updateUserPayment(userId: string, hasPaid: boolean, stripeCustomerId?: string): void {
+  updateUserPayment(userId: string, hasPaid: boolean, canAccess: boolean, stripeCustomerId?: string, paymentDate?: string | null): void {
     const currentUser = this.getCurrentUser();
     if (currentUser && currentUser.id === userId) {
       currentUser.hasPaid = hasPaid;
-      if (hasPaid) currentUser.paymentDate = new Date().toISOString();
+      currentUser.canAccess = canAccess;
+      if (paymentDate) currentUser.paymentDate = paymentDate;
       if (stripeCustomerId) currentUser.stripeCustomerId = stripeCustomerId;
       this.setCurrentUser(currentUser);
     }

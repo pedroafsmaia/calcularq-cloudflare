@@ -226,14 +226,22 @@ Opcionais (Google OAuth):
 - `VITE_GOOGLE_CLIENT_ID` — mesmo valor, exposto ao frontend via Vite para renderizar o botão Google
 
 ### Toggle de paywall
-Secret `REQUIRE_PAYMENT`:
-- `1`: paywall ativo
-- `0`: paywall desativado
+Backend `REQUIRE_PAYMENT` (variável do Cloudflare Pages):
+- `1`: paywall ativo; somente usuários com pagamento real (`has_paid = 1`) têm acesso
+- `0`: modo gratuito; todos os usuários autenticados têm acesso, sem alterar `has_paid`
+
+Frontend `VITE_REQUIRE_PAYMENT` (variável de build):
+- `1`: mostra os textos e a interface comercial
+- `0`: mostra a apresentação gratuita
+
+Mantenha as duas variáveis com o mesmo valor e faça um novo build/deploy depois de mudar `VITE_REQUIRE_PAYMENT`.
 
 ```bash
 echo 0 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
 echo 1 | npx wrangler pages secret put REQUIRE_PAYMENT --project-name calcularq-cloudflare
 ```
+
+O histórico de pagamentos não é alterado pelo modo gratuito. Se for necessário corrigir contas antigas que foram marcadas como pagas sem cliente Stripe, há um SQL manual e não destrutivo em `docs/payment-access-maintenance.sql`.
 
 ### Toggle de cadastro
 Secret `DISABLE_REGISTRATION`:
