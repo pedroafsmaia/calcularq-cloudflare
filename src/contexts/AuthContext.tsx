@@ -5,8 +5,8 @@ import { api } from "@/lib/api";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: (credential: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  loginWithGoogle: (credential: string, acceptedTerms?: boolean) => Promise<void>;
+  register: (email: string, password: string, name: string, acceptedTerms: boolean) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   isLoading: boolean;
@@ -56,8 +56,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
-  const loginWithGoogle = async (credential: string) => {
-    await api.loginWithGoogle(credential);
+  const loginWithGoogle = async (credential: string, acceptedTerms = false) => {
+    await api.loginWithGoogle(credential, acceptedTerms);
     const me = await api.me();
     const userData: User = {
       ...me.user,
@@ -70,8 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
-  const register = async (email: string, password: string, name: string) => {
-    const response = await api.register(email, password, name);
+  const register = async (email: string, password: string, name: string, acceptedTerms: boolean) => {
+    const response = await api.register(email, password, name, acceptedTerms);
     const userData: User = {
       ...response.user,
       paymentDate: response.user.paymentDate ?? undefined,

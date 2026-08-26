@@ -14,6 +14,7 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const GOOGLE_JWKS_URI = "https://www.googleapis.com/oauth2/v3/certs";
 const GOOGLE_ISSUER = ["https://accounts.google.com", "accounts.google.com"];
+const LEGAL_VERSION = "2026-08-25";
 
 let cachedJWKS = null;
 
@@ -43,6 +44,7 @@ export async function onRequest(context) {
 
     const body = await readJson(context.request);
     const credential = body?.credential;
+    const acceptedTerms = body?.acceptedTerms === true;
 
     if (!credential || typeof credential !== "string") {
       return jsonResponse({ success: false, message: "Token do Google é obrigatório" }, { status: 400 });
@@ -131,6 +133,9 @@ export async function onRequest(context) {
       if (registrationsDisabled) {
         return jsonResponse({ success: false, message: "Novos cadastros estão temporariamente desativados" }, { status: 403 });
       }
+      if (!acceptedTerms) {
+        return jsonResponse({ success: false, message: "Para criar sua conta com Google, é necessário aceitar os Termos de Serviço e a Política de Privacidade." }, { status: 400 });
+      }
 
       // Create new user with Google account
       const id = crypto.randomUUID();
@@ -141,15 +146,15 @@ export async function onRequest(context) {
 
       try {
         await db.prepare(
-          "INSERT INTO users (id, email, name, password_hash, has_paid, payment_date, stripe_customer_id, created_at, google_id) VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?)"
-        ).bind(id, googleEmail, googleName, password_hash, has_paid, created_at, googleId).run();
+          "INSERT INTO users (id, email, name, password_hash, has_paid, payment_date, stripe_customer_id, created_at, google_id, terms_accepted_at, terms_version, privacy_version) VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)"
+        ).bind(id, googleEmail, googleName, password_hash, has_paid, created_at, googleId, created_at, LEGAL_VERSION, LEGAL_VERSION).run();
       } catch (err) {
         const message = String(err?.message || "");
         if (message.includes("no such column: google_id")) {
           // Fallback: insert without google_id if column doesn't exist yet
           await db.prepare(
-            "INSERT INTO users (id, email, name, password_hash, has_paid, payment_date, stripe_customer_id, created_at) VALUES (?, ?, ?, ?, ?, NULL, NULL, ?)"
-          ).bind(id, googleEmail, googleName, password_hash, has_paid, created_at).run();
+            "INSERT INTO users (id, email, name, password_hash, has_paid, payment_date, stripe_customer_id, created_at, terms_accepted_at, terms_version, privacy_version) VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?)"
+          ).bind(id, googleEmail, googleName, password_hash, has_paid, created_at, created_at, LEGAL_VERSION, LEGAL_VERSION).run();
         } else {
           throw err;
         }

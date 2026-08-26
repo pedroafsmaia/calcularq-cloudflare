@@ -173,10 +173,10 @@ class ApiClient {
     });
   }
 
-  async register(email: string, password: string, name: string): Promise<{ success: boolean; user: ApiUser }> {
+  async register(email: string, password: string, name: string, acceptedTerms: boolean): Promise<{ success: boolean; user: ApiUser }> {
     return this.request("/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({ email, password, name, acceptedTerms }),
     });
   }
 
@@ -250,10 +250,10 @@ class ApiClient {
     });
   }
 
-  async loginWithGoogle(credential: string): Promise<{ success: boolean; user: ApiUser }> {
+  async loginWithGoogle(credential: string, acceptedTerms = false): Promise<{ success: boolean; user: ApiUser }> {
     return this.request("/api/auth/google", {
       method: "POST",
-      body: JSON.stringify({ credential }),
+      body: JSON.stringify({ credential, acceptedTerms }),
     });
   }
 

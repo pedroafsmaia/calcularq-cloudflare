@@ -188,7 +188,7 @@ export default function Home() {
                       ? "Acessar a Calcularq"
                       : isPaymentRequired
                         ? "Acessar a Calcularq - R$19,90"
-                        : "Acessar a Calcularq gratuitamente"}
+                        : "Acessar a Calcularq"}
                   </Button>
                 </Link>
 

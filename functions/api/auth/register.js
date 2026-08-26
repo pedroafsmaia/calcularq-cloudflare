@@ -12,6 +12,7 @@ import {
 } from "../_utils.js";
 
 const MIN_PASSWORD_LENGTH = 8;
+const LEGAL_VERSION = "2026-08-25";
 
 export async function onRequest(context) {
   if (context.request.method !== "POST") {
@@ -36,6 +37,7 @@ export async function onRequest(context) {
   const body = await readJson(context.request);
   const email = body?.email?.toLowerCase?.().trim?.();
   const password = body?.password;
+  const acceptedTerms = body?.acceptedTerms === true;
   const name = sanitizeText(body?.name || "Usuário", { max: 120, allowEmpty: false });
 
   if (!email || !password) {
@@ -55,6 +57,9 @@ export async function onRequest(context) {
   if (!context.env.JWT_SECRET || String(context.env.JWT_SECRET).trim().length < 16) {
     return jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 });
   }
+  if (!acceptedTerms) {
+    return jsonResponse({ success: false, message: "Para criar sua conta, é necessário ler e aceitar os Termos de Serviço e a Política de Privacidade." }, { status: 400 });
+  }
   if (!db) {
     return jsonResponse({ success: false, message: "Serviço indisponível no momento" }, { status: 503 });
   }
@@ -72,8 +77,8 @@ export async function onRequest(context) {
   const created_at = new Date().toISOString();
 
   await db.prepare(
-    "INSERT INTO users (id, email, name, password_hash, has_paid, payment_date, stripe_customer_id, created_at) VALUES (?, ?, ?, ?, ?, NULL, NULL, ?)"
-  ).bind(id, email, name, password_hash, has_paid, created_at).run();
+    "INSERT INTO users (id, email, name, password_hash, has_paid, payment_date, stripe_customer_id, created_at, terms_accepted_at, terms_version, privacy_version) VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?)"
+  ).bind(id, email, name, password_hash, has_paid, created_at, created_at, LEGAL_VERSION, LEGAL_VERSION).run();
 
   const token = await signSessionToken({ sub: id }, context.env.JWT_SECRET);
   const headers = new Headers();

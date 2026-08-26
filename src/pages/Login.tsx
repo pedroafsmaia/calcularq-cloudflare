@@ -8,6 +8,8 @@ import { createPageUrl } from "@/utils";
 import { api } from "@/lib/api";
 import { fadeUp } from "@/lib/motion";
 import AppDialog from "@/components/ui/AppDialog";
+import LegalModal from "@/components/LegalModal";
+import { privacyContent, termsContent } from "@/lib/legalContent";
 import type { GoogleGlobal, GoogleCredentialResponse } from "@/types/google";
 
 export default function Login() {
@@ -23,6 +25,9 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -70,9 +75,13 @@ export default function Login() {
     async (response: GoogleCredentialResponse) => {
       if (!response.credential) return;
       setError("");
+      if (!isLogin && !acceptedTerms) {
+        setError("Para criar sua conta, é necessário ler e aceitar os Termos de Serviço e a Política de Privacidade.");
+        return;
+      }
       setIsLoading(true);
       try {
-        await loginWithGoogle(response.credential);
+        await loginWithGoogle(response.credential, !isLogin && acceptedTerms);
         navigate(createPageUrl("Calculator"));
       } catch (err) {
         const message = err instanceof Error ? err.message : "";
@@ -85,7 +94,7 @@ export default function Login() {
         setIsLoading(false);
       }
     },
-    [loginWithGoogle, navigate]
+    [acceptedTerms, isLogin, loginWithGoogle, navigate]
   );
 
   useEffect(() => {
@@ -151,7 +160,12 @@ export default function Login() {
           setIsLoading(false);
           return;
         }
-        await register(email, password, name);
+        if (!acceptedTerms) {
+          setError("Para criar sua conta, é necessário ler e aceitar os Termos de Serviço e a Política de Privacidade.");
+          setIsLoading(false);
+          return;
+        }
+        await register(email, password, name, acceptedTerms);
       }
       navigate(createPageUrl("Calculator"));
     } catch (err) {
@@ -266,6 +280,30 @@ export default function Login() {
               </div>
             )}
 
+            {!isLogin && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-slate-700" htmlFor="accept-legal">
+                  <input
+                    id="accept-legal"
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-calcularq-blue focus:ring-2 focus:ring-calcularq-blue/20 focus:ring-offset-0"
+                  />
+                  <span>
+                    Li e concordo com os{" "}
+                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowTerms(true); }} className="font-semibold text-calcularq-blue hover:underline">
+                      Termos de Serviço
+                    </button>{" "}
+                    e com a{" "}
+                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowPrivacy(true); }} className="font-semibold text-calcularq-blue hover:underline">
+                      Política de Privacidade
+                    </button>.
+                  </span>
+                </label>
+              </div>
+            )}
+
             {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{error}</div>}
 
             <Button type="submit" disabled={isLoading} className="w-full bg-calcularq-blue hover:bg-[#002366] text-white py-6 text-lg font-semibold">
@@ -305,6 +343,7 @@ export default function Login() {
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError("");
+                setAcceptedTerms(false);
               }}
               className="text-sm text-calcularq-blue hover:underline underline-offset-4"
             >
@@ -319,6 +358,14 @@ export default function Login() {
           </div>
         </div>
       </motion.div>
+
+      <LegalModal isOpen={showTerms} onClose={() => setShowTerms(false)} title="Termos de Serviço da Calcularq" content={termsContent} />
+      <LegalModal
+        isOpen={showPrivacy}
+        onClose={() => setShowPrivacy(false)}
+        title="Política de Privacidade da Calcularq"
+        content={privacyContent}
+      />
 
       <AppDialog
         open={showForgotPassword}

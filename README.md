@@ -279,6 +279,12 @@ npx wrangler d1 execute calcularq --remote --file=migrations/0007_admin_rbac.sql
 npx wrangler d1 execute calcularq --remote --file=migrations/0008_google_oauth.sql
 ```
 
+Após publicar mudanças que exigem o registro de aceite dos documentos legais, execute também a migration aditiva correspondente:
+
+```bash
+npx wrangler d1 execute calcularq --remote --file=migrations/0009_terms_acceptance.sql
+```
+
 ---
 
 ## CI

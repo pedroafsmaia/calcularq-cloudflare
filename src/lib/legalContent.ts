@@ -4,12 +4,12 @@ export const termsContent = `
   <div class="space-y-6">
     <div>
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS DE USO DA PLATAFORMA CALCULARQ</h2>
-      <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Data de Vigência: [Inserir Data de Lançamento]</p>
+      <p class="text-sm text-slate-500 mb-6">Versão 2.0 | Última atualização: 25 de agosto de 2026</p>
       <p class="text-slate-700 mb-4">
         O presente Instrumento de Termos de Uso ("Termos") disciplina as condições gerais de acesso, cadastro, contratação e utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>LICENCIANTE</strong>.
       </p>
       <p class="text-slate-700 mb-6">
-        Ao criar conta, contratar plano, acessar ou utilizar a plataforma, o usuário declara ter lido, compreendido e aceitado integralmente estes Termos, bem como a Política de Privacidade aplicável.
+        Ao criar conta, contratar plano, acessar ou utilizar a plataforma, o usuário declara ter lido, compreendido e aceitado integralmente estes Termos, bem como a Política de Privacidade aplicável. A criação de conta poderá exigir aceite expresso por checkbox; esse aceite registra a concordância com os documentos, sem representar autorização genérica para qualquer tratamento de dados.
       </p>
     </div>
 
@@ -66,6 +66,9 @@ export const termsContent = `
     <div>
       <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DOS PLANOS, LICENÇA DE USO E PAGAMENTOS</h3>
       <p class="text-slate-700 mb-3">
+        Atualmente, determinadas funcionalidades da Calcularq são disponibilizadas gratuitamente aos usuários cadastrados. O acesso gratuito não constitui compra, assinatura, pagamento realizado ou aquisição de licença paga.
+      </p>
+      <p class="text-slate-700 mb-3">
         O acesso à plataforma poderá ocorrer em modalidades gratuitas, promocionais, de teste, pagas ou condicionadas a assinatura, conforme as condições comerciais vigentes no momento da contratação.
       </p>
       <p class="text-slate-700 mb-3">
@@ -73,6 +76,9 @@ export const termsContent = `
       </p>
       <p class="text-slate-700 mb-3">
         Os preços, formas de pagamento, periodicidades, condições promocionais, renovação, cancelamento e eventuais períodos de teste observarão a oferta vigente no momento da contratação.
+      </p>
+      <p class="text-slate-700 mb-3">
+        A Calcularq poderá futuramente criar planos, recursos premium, assinaturas ou compras únicas. Qualquer cobrança futura será apresentada antes da contratação, com preço, condições e forma de pagamento aplicáveis; o aceite destes Termos, por si só, não autoriza cobrança automática.
       </p>
       <p class="text-slate-700 mb-3">
         O processamento financeiro poderá ser realizado por terceiros especializados, e o LICENCIANTE não armazena integralmente dados completos de cartão de crédito ou equivalentes quando processados em ambiente próprio do provedor de pagamento.
@@ -282,7 +288,7 @@ export const privacyContent = `
   <div class="space-y-6">
     <div>
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">POLÍTICA DE PRIVACIDADE E PROTEÇÃO DE DADOS PESSOAIS</h2>
-      <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Data de Vigência: [Inserir Data de Lançamento]</p>
+      <p class="text-sm text-slate-500 mb-6">Versão 2.0 | Última atualização: 25 de agosto de 2026</p>
       <p class="text-slate-700 mb-4">
         O presente Instrumento de Política de Privacidade ("Política") tem por escopo disciplinar as condições de tratamento de dados pessoais no âmbito da utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>CONTROLADOR</strong>.
       </p>
@@ -350,6 +356,7 @@ export const privacyContent = `
             <li>nome e/ou identificador da conta;</li>
             <li>endereço de correio eletrônico (e-mail);</li>
             <li>credenciais de acesso, quando existentes, armazenadas sob técnicas adequadas de proteção;</li>
+            <li>data e versão dos Termos de Serviço e da Política de Privacidade aceitos no momento da criação de conta;</li>
             <li>registros de conexão e/ou de acesso à aplicação, tais como endereço IP, user-agent, data e hora, identificadores técnicos e logs de autenticação.</li>
           </ul>
           <p class="text-slate-700">
@@ -361,8 +368,8 @@ export const privacyContent = `
           <p class="text-slate-700 mb-2">Serão tratados, quando aplicável:</p>
           <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
             <li>histórico de pagamentos;</li>
-            <li>identificadores de transação;</li>
-            <li>status do plano, licença ou assinatura;</li>
+            <li>identificador de cliente Stripe e data de pagamento, quando houver pagamento confirmado;</li>
+            <li>status de pagamento;</li>
             <li>informações mínimas necessárias à conciliação financeira, prevenção a fraudes e suporte ao usuário.</li>
           </ul>
           <p class="text-slate-700">
@@ -451,6 +458,8 @@ export const privacyContent = `
       <p class="text-slate-700 mb-2">Atualmente, os dados poderão ser hospedados ou processados, conforme aplicável, por provedores como:</p>
       <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
         <li><strong>Cloudflare, Inc.</strong>, para fins de infraestrutura de aplicação, hospedagem, proteção e banco de dados;</li>
+        <li><strong>Google</strong>, quando o usuário escolhe autenticar-se com Google; a plataforma utiliza o identificador, nome e e-mail verificado disponibilizados nesse fluxo e não solicita acesso a Gmail, Drive, contatos ou calendário;</li>
+        <li><strong>Brevo</strong>, para o envio de e-mails de redefinição de senha;</li>
         <li><strong>Stripe, Inc.</strong> ou outro provedor de pagamento equivalente, para fins de processamento de pagamentos, prevenção a fraudes e gestão de transações.</li>
       </ul>
       <p class="text-slate-700">
@@ -459,7 +468,17 @@ export const privacyContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DA SEGURANÇA DA INFORMAÇÃO E DOS CONTROLES INTERNOS</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">6. DOS COOKIES E ARMAZENAMENTO LOCAL</h3>
+      <p class="text-slate-700 mb-3">
+        A Calcularq utiliza cookie de sessão estritamente necessário para manter a autenticação. Esse cookie é protegido contra acesso por scripts do navegador. A aplicação também pode utilizar o armazenamento local do navegador para manter dados de sessão apresentados na interface, a opção de lembrar e-mail e rascunhos de cálculos; esses itens permanecem no dispositivo do usuário até que sejam removidos pelo próprio usuário, pela aplicação ou pelo navegador.
+      </p>
+      <p class="text-slate-700">
+        Não foram identificados no código ferramentas de publicidade comportamental, pixels de marketing ou analytics de terceiros. Quando o fluxo comercial estiver ativo, a página inicial poderá carregar o widget de avaliações Senja; o Stripe poderá ser acionado apenas quando o usuário iniciar um pagamento.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DA SEGURANÇA DA INFORMAÇÃO E DOS CONTROLES INTERNOS</h3>
       <p class="text-slate-700 mb-3">
         O CONTROLADOR emprega medidas técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou difusão.
       </p>
@@ -479,7 +498,7 @@ export const privacyContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">7. DOS DIREITOS DO TITULAR</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DOS DIREITOS DO TITULAR</h3>
       <p class="text-slate-700 mb-3">
         Nos termos da legislação aplicável, especialmente do art. 18 da LGPD, o titular poderá requerer, observados os limites legais e regulatórios:
       </p>
@@ -500,7 +519,7 @@ export const privacyContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">8. DO ENCARREGADO E DO CANAL DE CONTATO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DO ENCARREGADO E DO CANAL DE CONTATO</h3>
       <p class="text-slate-700 mb-3">
         Para o exercício de quaisquer direitos previstos nesta Política ou na legislação aplicável, bem como para esclarecimento de dúvidas referentes ao tratamento de dados, o titular poderá entrar em contato por meio do canal oficial:
       </p>
@@ -513,7 +532,7 @@ export const privacyContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">9. DA RETENÇÃO, CONSERVAÇÃO E ELIMINAÇÃO</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">10. DA RETENÇÃO, CONSERVAÇÃO E ELIMINAÇÃO</h3>
       <p class="text-slate-700 mb-2">Os dados pessoais serão mantidos:</p>
       <ul class="space-y-1 text-slate-700 list-disc list-inside mb-3">
         <li>enquanto perdurar a relação contratual;</li>
@@ -534,7 +553,7 @@ export const privacyContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">10. DAS ALTERAÇÕES DESTA POLÍTICA</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">11. DAS ALTERAÇÕES DESTA POLÍTICA</h3>
       <p class="text-slate-700 mb-3">
         Esta Política poderá ser atualizada a qualquer tempo, para refletir alterações legais, regulatórias, tecnológicas, operacionais ou funcionais da plataforma.
       </p>
@@ -544,7 +563,7 @@ export const privacyContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">11. DO FORO E DA LEGISLAÇÃO APLICÁVEL</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">12. DO FORO E DA LEGISLAÇÃO APLICÁVEL</h3>
       <p class="text-slate-700 mb-3">
         Esta Política será regida, interpretada e executada de acordo com as leis da República Federativa do Brasil, especialmente a Lei nº 13.709/2018.
       </p>
