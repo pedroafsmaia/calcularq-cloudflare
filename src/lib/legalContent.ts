@@ -6,10 +6,10 @@ export const termsContent = `
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS DE USO DA PLATAFORMA CALCULARQ</h2>
       <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Última atualização: 25 de agosto de 2026</p>
       <p class="text-slate-700 mb-4">
-        O presente Instrumento de Termos de Uso ("Termos") disciplina as condições gerais de acesso, cadastro, contratação e utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>LICENCIANTE</strong>.
+        O presente Instrumento de Termos de Uso ("Termos") disciplina as condições gerais de acesso, cadastro e utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>LICENCIANTE</strong>.
       </p>
       <p class="text-slate-700 mb-6">
-        Ao criar conta, contratar plano, acessar ou utilizar a plataforma, o usuário declara ter lido, compreendido e aceitado integralmente estes Termos, bem como a Política de Privacidade aplicável. A criação de conta poderá exigir aceite expresso por checkbox; esse aceite registra a concordância com os documentos, sem representar autorização genérica para qualquer tratamento de dados.
+        Ao criar conta, acessar ou utilizar a plataforma, o usuário declara ter lido, compreendido e aceitado integralmente estes Termos, bem como a Política de Privacidade aplicável. A criação de conta poderá exigir aceite expresso por checkbox; esse aceite registra a concordância com os documentos, sem representar autorização genérica para qualquer tratamento de dados.
       </p>
     </div>
 
@@ -64,32 +64,13 @@ export const termsContent = `
     </div>
 
     <div>
-      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DOS PLANOS, LICENÇA DE USO E PAGAMENTOS</h3>
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">4. DO ACESSO GRATUITO</h3>
       <p class="text-slate-700 mb-3">
-        Atualmente, determinadas funcionalidades da Calcularq são disponibilizadas gratuitamente aos usuários cadastrados. O acesso gratuito não constitui compra, assinatura, pagamento realizado ou aquisição de licença paga.
+        Nesta versão, a Calcularq é disponibilizada gratuitamente aos usuários cadastrados. Não há planos pagos, compras, assinaturas ou cobranças disponíveis na plataforma.
       </p>
       <p class="text-slate-700 mb-3">
-        O acesso à plataforma poderá ocorrer em modalidades gratuitas, promocionais, de teste, pagas ou condicionadas a assinatura, conforme as condições comerciais vigentes no momento da contratação.
+        Caso o modelo de acesso seja alterado futuramente, a Calcularq atualizará estes Termos e apresentará as condições aplicáveis antes de qualquer contratação ou cobrança.
       </p>
-      <p class="text-slate-700 mb-3">
-        Ao contratar plano pago, o USUÁRIO adquire licença de uso <strong>limitada, pessoal, não exclusiva, intransferível e revogável</strong>, restrita ao período contratado e às funcionalidades correspondentes ao plano escolhido.
-      </p>
-      <p class="text-slate-700 mb-3">
-        Os preços, formas de pagamento, periodicidades, condições promocionais, renovação, cancelamento e eventuais períodos de teste observarão a oferta vigente no momento da contratação.
-      </p>
-      <p class="text-slate-700 mb-3">
-        A Calcularq poderá futuramente criar planos, recursos premium, assinaturas ou compras únicas. Qualquer cobrança futura será apresentada antes da contratação, com preço, condições e forma de pagamento aplicáveis; o aceite destes Termos, por si só, não autoriza cobrança automática.
-      </p>
-      <p class="text-slate-700 mb-3">
-        O processamento financeiro poderá ser realizado por terceiros especializados, e o LICENCIANTE não armazena integralmente dados completos de cartão de crédito ou equivalentes quando processados em ambiente próprio do provedor de pagamento.
-      </p>
-      <p class="text-slate-700 mb-2">A inadimplência poderá ensejar, conforme aplicável e observadas as condições comerciais e legais:</p>
-      <ul class="space-y-1 text-slate-700 list-disc list-inside">
-        <li>suspensão de funcionalidades;</li>
-        <li>limitação de acesso;</li>
-        <li>cancelamento de assinatura;</li>
-        <li>impedimento de novas contratações até regularização.</li>
-      </ul>
     </div>
 
     <div>
@@ -135,7 +116,7 @@ export const termsContent = `
         <li>utilizar a plataforma para fins ilícitos ou em desconformidade com a legislação aplicável;</li>
         <li>violar direitos de propriedade intelectual do LICENCIANTE ou de terceiros;</li>
         <li>tentar acessar áreas, contas, sistemas, rotas, APIs, painéis ou dados sem autorização;</li>
-        <li>contornar medidas de autenticação, limitação, pagamento, segurança ou controle de acesso;</li>
+        <li>contornar medidas de autenticação, limitação, segurança ou controle de acesso;</li>
         <li>explorar vulnerabilidades, realizar engenharia reversa indevida, scraping abusivo, automações não autorizadas ou práticas que comprometam a estabilidade do serviço;</li>
         <li>reproduzir, revender, sublicenciar, redistribuir, espelhar ou explorar comercialmente a plataforma sem autorização expressa;</li>
         <li>utilizar a plataforma para desenvolver produto concorrente com cópia substancial de interface, metodologia protegível, estrutura funcional ou materiais proprietários do LICENCIANTE;</li>
@@ -197,7 +178,7 @@ export const termsContent = `
         O tratamento de dados pessoais relacionado ao uso da plataforma observará a Política de Privacidade do CALCULARQ, que integra estes Termos para todos os fins.
       </p>
       <p class="text-slate-700">
-        Ao utilizar a plataforma, o USUÁRIO declara ciência de que determinados dados técnicos, operacionais, cadastrais e transacionais poderão ser tratados para viabilizar a prestação do serviço, a segurança da conta, o cumprimento de obrigações legais, a prevenção a fraudes, a melhoria da plataforma e o aperfeiçoamento metodológico do produto, nos limites da legislação aplicável e da Política de Privacidade.
+        Ao utilizar a plataforma, o USUÁRIO declara ciência de que determinados dados técnicos, operacionais e cadastrais poderão ser tratados para viabilizar a prestação do serviço, a segurança da conta, o cumprimento de obrigações legais, a prevenção a fraudes, a melhoria da plataforma e o aperfeiçoamento metodológico do produto, nos limites da legislação aplicável e da Política de Privacidade.
       </p>
     </div>
 
@@ -223,7 +204,6 @@ export const termsContent = `
         <li>violação destes Termos;</li>
         <li>uso fraudulento, abusivo ou ilícito da plataforma;</li>
         <li>tentativa de acesso indevido a áreas restritas;</li>
-        <li>inadimplência, quando aplicável;</li>
         <li>risco à segurança da plataforma, de terceiros ou do próprio USUÁRIO;</li>
         <li>exigência legal, regulatória ou ordem de autoridade competente.</li>
       </ul>
@@ -235,14 +215,13 @@ export const termsContent = `
     <div>
       <h3 class="text-xl font-bold text-calcularq-blue mb-3">14. DA VIGÊNCIA E DA RESCISÃO</h3>
       <p class="text-slate-700 mb-3">
-        Estes Termos vigoram por prazo indeterminado, a partir do primeiro acesso, cadastro ou contratação, conforme aplicável.
+        Estes Termos vigoram por prazo indeterminado, a partir do primeiro acesso ou cadastro.
       </p>
       <p class="text-slate-700 mb-3">
-        O USUÁRIO poderá deixar de utilizar a plataforma e, quando cabível, solicitar o cancelamento da conta ou da assinatura, observadas as condições comerciais aplicáveis, inclusive quanto a ciclos já contratados, obrigações pendentes e prazos técnicos razoáveis para processamento da solicitação.
+        O USUÁRIO poderá deixar de utilizar a plataforma e solicitar o cancelamento da conta, observados os prazos técnicos razoáveis para processamento da solicitação.
       </p>
       <p class="text-slate-700 mb-2">A extinção da relação contratual não afasta:</p>
       <ul class="space-y-1 text-slate-700 list-disc list-inside">
-        <li>obrigações vencidas e não adimplidas;</li>
         <li>deveres legais de retenção de dados e registros;</li>
         <li>direitos do LICENCIANTE ao exercício regular de direitos;</li>
         <li>disposições que, por sua natureza, devam subsistir após o término da relação.</li>
