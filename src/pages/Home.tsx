@@ -207,7 +207,7 @@ export default function Home() {
 
                 <p className="text-center text-sm text-slate-600">
                   {user?.canAccess
-                    ? "Sua opinião ajuda a aprimorar a Calcularq. Conte-nos o que você achou."
+                    ? "Avalie a Calcularq e ajude-a a evoluir."
                     : isPaymentRequired
                       ? "Pagamento único. Sem mensalidades."
                       : "Crie sua conta gratuitamente e comece a precificar seus projetos."}
