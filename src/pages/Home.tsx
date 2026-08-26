@@ -206,9 +206,11 @@ export default function Home() {
                 ) : null}
 
                 <p className="text-center text-sm text-slate-600">
-                  {isPaymentRequired
-                    ? "Pagamento único. Sem mensalidades."
-                    : "Crie sua conta gratuitamente e comece a precificar seus projetos."}
+                  {user?.canAccess
+                    ? "Gostou da Calcularq? Deixe sua avaliação e ajude a ferramenta a evoluir."
+                    : isPaymentRequired
+                      ? "Pagamento único. Sem mensalidades."
+                      : "Crie sua conta gratuitamente e comece a precificar seus projetos."}
                 </p>
               </motion.div>
             </div>

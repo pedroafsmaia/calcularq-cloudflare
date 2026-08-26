@@ -12,7 +12,7 @@ import {
 } from "../_utils.js";
 
 const MIN_PASSWORD_LENGTH = 8;
-const LEGAL_VERSION = "2026-08-25";
+const LEGAL_VERSION = "1.0";
 
 export async function onRequest(context) {
   if (context.request.method !== "POST") {

@@ -4,7 +4,7 @@ export const termsContent = `
   <div class="space-y-6">
     <div>
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">TERMOS DE USO DA PLATAFORMA CALCULARQ</h2>
-      <p class="text-sm text-slate-500 mb-6">Versão 2.0 | Última atualização: 25 de agosto de 2026</p>
+      <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Última atualização: 25 de agosto de 2026</p>
       <p class="text-slate-700 mb-4">
         O presente Instrumento de Termos de Uso ("Termos") disciplina as condições gerais de acesso, cadastro, contratação e utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>LICENCIANTE</strong>.
       </p>
@@ -288,7 +288,7 @@ export const privacyContent = `
   <div class="space-y-6">
     <div>
       <h2 class="text-2xl font-bold text-calcularq-blue mb-4">POLÍTICA DE PRIVACIDADE E PROTEÇÃO DE DADOS PESSOAIS</h2>
-      <p class="text-sm text-slate-500 mb-6">Versão 2.0 | Última atualização: 25 de agosto de 2026</p>
+      <p class="text-sm text-slate-500 mb-6">Versão 1.0 | Última atualização: 25 de agosto de 2026</p>
       <p class="text-slate-700 mb-4">
         O presente Instrumento de Política de Privacidade ("Política") tem por escopo disciplinar as condições de tratamento de dados pessoais no âmbito da utilização da plataforma <strong>CALCULARQ</strong>, de titularidade de <strong>PEDRO AFONSO MAIA PIRES</strong>, pessoa física, doravante denominado <strong>CONTROLADOR</strong>.
       </p>
@@ -474,6 +474,16 @@ export const privacyContent = `
       </p>
       <p class="text-slate-700">
         Não foram identificados no código ferramentas de publicidade comportamental, pixels de marketing ou analytics de terceiros. Quando o fluxo comercial estiver ativo, a página inicial poderá carregar o widget de avaliações Senja; o Stripe poderá ser acionado apenas quando o usuário iniciar um pagamento.
+      </p>
+    </div>
+
+    <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+      <h3 class="text-xl font-bold text-calcularq-blue mb-3">MODELO ATUAL: ACESSO GRATUITO</h3>
+      <p class="text-slate-700 mb-3">
+        <strong>No momento, a Calcularq é disponibilizada gratuitamente aos usuários cadastrados.</strong> A criação ou o uso de uma conta gratuita não gera cobrança, compra, assinatura, pagamento realizado ou contratação de plano pago.
+      </p>
+      <p class="text-slate-700">
+        A Calcularq poderá, no futuro, oferecer planos, funcionalidades premium, assinaturas ou compras únicas. Caso isso ocorra, qualquer preço, condição comercial e forma de pagamento será informado ao usuário antes de uma contratação; nenhuma cobrança será criada automaticamente apenas em razão destes Termos ou da conta gratuita.
       </p>
     </div>
 

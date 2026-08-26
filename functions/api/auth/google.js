@@ -14,7 +14,7 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const GOOGLE_JWKS_URI = "https://www.googleapis.com/oauth2/v3/certs";
 const GOOGLE_ISSUER = ["https://accounts.google.com", "accounts.google.com"];
-const LEGAL_VERSION = "2026-08-25";
+const LEGAL_VERSION = "1.0";
 
 let cachedJWKS = null;
 
