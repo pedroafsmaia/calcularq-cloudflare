@@ -1,6 +1,6 @@
 ﻿import { DEFAULT_METHOD_11_TECHNICAL_PREMIUM, isValidMethod11TechnicalPremium } from "@/lib/methodCalibration";
 
-export const METHOD_12_VERSION = "1.2.0";
+export const METHOD_12_VERSION = "1.0";
 
 export const METHOD_12_PARAMS = {
   r_min: 0.55,

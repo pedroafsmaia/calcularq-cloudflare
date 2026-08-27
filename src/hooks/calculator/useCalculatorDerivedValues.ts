@@ -4,6 +4,8 @@ import type { Dispatch, SetStateAction } from "react";
 import type { ExpenseItem } from "@/types/budget";
 import type { CenarioMethod10 } from "@/components/pricing/PricingEngineMethod12";
 import { calcularMethod10, reformFromLevel, tipologiaFromLevel } from "@/components/pricing/PricingEngineMethod12";
+import { calculateLegacyMethod10 } from "@/components/pricing/PricingEngineLegacy10";
+import { isBetaMethodVersion } from "@/lib/methodVersion";
 import { calculateGlobalComplexity, type AreaInterval, type Factor } from "@/components/pricing/PricingEngine";
 
 type CalculatorDisplayValues = {
@@ -28,6 +30,7 @@ type Params = {
   horasManuais: number | null;
   commercialDiscount: number;
   variableExpenses: ExpenseItem[];
+  methodVersion?: string | null;
   setEstimatedHours: Dispatch<SetStateAction<number>>;
 };
 
@@ -54,6 +57,7 @@ export function useCalculatorDerivedValues({
   horasManuais,
   commercialDiscount,
   variableExpenses,
+  methodVersion,
   setEstimatedHours,
 }: Params) {
   const hasComplexitySelections = REQUIRED_SELECTION_IDS.every((id) => Number(selections[id]) > 0);
@@ -85,24 +89,24 @@ export function useCalculatorDerivedValues({
     if (!methodInputs) return null;
 
     try {
-      return calcularMethod10(methodInputs);
+      return isBetaMethodVersion(methodVersion)
+        ? calculateLegacyMethod10(methodInputs)
+        : calcularMethod10(methodInputs);
     } catch {
       return null;
     }
-  }, [methodInputs]);
+  }, [methodInputs, methodVersion]);
 
   const methodOutput = useMemo(() => {
     if (!methodInputs) return null;
 
     try {
-      return calcularMethod10({
-        ...methodInputs,
-        h_usuario_manual: horasManuais ?? undefined,
-      });
+      const input = { ...methodInputs, h_usuario_manual: horasManuais ?? undefined };
+      return isBetaMethodVersion(methodVersion) ? calculateLegacyMethod10(input) : calcularMethod10(input);
     } catch {
       return null;
     }
-  }, [horasManuais, methodInputs]);
+  }, [horasManuais, methodInputs, methodVersion]);
 
   useEffect(() => {
     if (!methodOutput) return;

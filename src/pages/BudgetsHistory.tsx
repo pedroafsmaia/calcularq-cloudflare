@@ -16,7 +16,7 @@ import BudgetDetailsDialog from "@/components/budgets/BudgetDetailsDialog";
 import BudgetCloseDialog from "@/components/budgets/BudgetCloseDialog";
 import { useToast } from "@/components/ui/ToastProvider";
 import { Badge } from "@/components/ui/badge";
-import { calculateGlobalComplexity, type Factor as PricingFactor } from "@/components/pricing/PricingEngine";
+import { usesPercentComplexityScore } from "@/lib/methodVersion";
 import type { BudgetActualHoursByPhase, BudgetScopeChange, BudgetCloseFeedback } from "@/types/budget";
 
 type SortMode = "recent" | "price_desc" | "price_asc" | "name";
@@ -34,8 +34,8 @@ type DetailPreview = {
 };
 
 const toSafeNumber = (value: unknown, fallback = 0): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
-  return value;
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 };
 
 const resolveSelections = (data: BudgetData): Record<string, number> => {
@@ -61,45 +61,34 @@ const resolveEffectiveArea = (data: BudgetData, selections: Record<string, numbe
 
 const calculatePreview = (data: BudgetData): DetailPreview => {
   const minHourlyRate = toSafeNumber(data.minHourlyRate, 0);
-  const estimatedHours = toSafeNumber(data.estimatedHours, 0);
-  const discountPercent = toSafeNumber(data.commercialDiscount, 0);
-  const isMethod10 = String(data.methodVersion || "").startsWith("1.0");
+  const estimatedHours = toSafeNumber(data.hFinal ?? data.estimatedHours, 0);
+  const discountPercent = Math.min(100, Math.max(0, toSafeNumber(data.commercialDiscount, 0)));
   const selections = resolveSelections(data);
   const totalVariableExpenses = Array.isArray(data.variableExpenses)
     ? data.variableExpenses.reduce((sum, expense) => sum + toSafeNumber(expense?.value, 0), 0)
     : 0;
 
-  let adjustedHourlyRate = toSafeNumber(data.results?.adjustedHourlyRate, 0);
-  let projectPrice = toSafeNumber(data.results?.projectPrice, 0);
+  // O histórico é um retrato do cálculo no momento em que ele foi salvo.
+  // Não recalcule aqui: versões diferentes do método podem produzir valores distintos.
+  const adjustedHourlyRate = toSafeNumber(data.results?.adjustedHourlyRate, 0);
+  const projectPrice = toSafeNumber(data.results?.projectPrice, 0);
+  const savedFinalSalePrice = data.results?.finalSalePrice;
 
   const scoreComplexidade =
     typeof data.scoreComplexidade === "number" && Number.isFinite(data.scoreComplexidade)
       ? Math.round(data.scoreComplexidade)
-      : Math.round(toSafeNumber(data.results?.globalComplexity, 0) * 20);
-
-  if (isMethod10) {
-    // Method 1.0 uses stored values directly
-  } else if (minHourlyRate > 0 && estimatedHours >= 0) {
-    const factorsForComplexity: PricingFactor[] = (data.factors ?? []).map((factor) => ({
-      id: factor.id,
-      name: factor.name || factor.id,
-      description: "",
-      options: [],
-      weight: toSafeNumber(factor.weight, 1),
-    }));
-    const computedComplexity = calculateGlobalComplexity(factorsForComplexity, selections);
-    if (computedComplexity > 0) {
-      adjustedHourlyRate = minHourlyRate * computedComplexity;
-      projectPrice = adjustedHourlyRate * estimatedHours;
-    }
-  }
+      : usesPercentComplexityScore(data.methodVersion)
+        ? Math.round(toSafeNumber(data.results?.globalComplexity, 0) * 100)
+        : Math.round(toSafeNumber(data.results?.globalComplexity, 0) * 20);
 
   const discountAmount = projectPrice * (discountPercent / 100);
-  const projectPriceWithDiscount = projectPrice - discountAmount;
-  const finalSalePrice = projectPriceWithDiscount + totalVariableExpenses;
+  const finalSalePrice =
+    typeof savedFinalSalePrice === "number" && Number.isFinite(savedFinalSalePrice)
+      ? savedFinalSalePrice
+      : projectPrice - discountAmount + totalVariableExpenses;
   const profit =
     minHourlyRate > 0 && adjustedHourlyRate > 0 && estimatedHours > 0
-      ? (adjustedHourlyRate - minHourlyRate) * estimatedHours
+      ? Number(((adjustedHourlyRate - minHourlyRate) * estimatedHours - discountAmount).toFixed(2))
       : null;
 
   const effectiveArea = resolveEffectiveArea(data, selections);

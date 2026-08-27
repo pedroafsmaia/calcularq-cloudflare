@@ -338,7 +338,7 @@ function downloadMarkdown(content: string, filename: string) {
 }
 
 const btnClass =
-  "rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-calcularq-blue focus:ring-offset-2 transition-colors";
+  "w-full whitespace-nowrap rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-calcularq-blue focus:ring-offset-2 sm:w-auto";
 
 export default function AdminExport({ filters, summary, usage, commercial, calibration }: ExportProps) {
   const data: ExportProps = { filters, summary, usage, commercial, calibration };

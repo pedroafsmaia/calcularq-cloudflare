@@ -66,6 +66,7 @@ export function useCalculatorBudgetData({
   const [loadedClientName, setLoadedClientName] = useState<string | null>(null);
   const [loadedProjectName, setLoadedProjectName] = useState<string | null>(null);
   const [loadedBudgetDescription, setLoadedBudgetDescription] = useState<string | null>(null);
+  const [loadedMethodVersion, setLoadedMethodVersion] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -108,6 +109,7 @@ export function useCalculatorBudgetData({
         setLoadedClientName(budget.clientName || null);
         setLoadedProjectName(budget.projectName || null);
         setLoadedBudgetDescription(typeof budget.data?.description === "string" ? budget.data.description : null);
+        setLoadedMethodVersion(typeof budget.data?.methodVersion === "string" ? budget.data.methodVersion : null);
         setMinHourlyRate(budget.data.minHourlyRate);
         setUseManualMinHourlyRate(Boolean(budget.data.useManualMinHourlyRate));
 
@@ -216,5 +218,6 @@ export function useCalculatorBudgetData({
     loadedClientName,
     loadedProjectName,
     loadedBudgetDescription,
+    loadedMethodVersion,
   };
 }

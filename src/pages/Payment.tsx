@@ -226,7 +226,7 @@ export default function Payment() {
           <p className="text-sm text-slate-500 mb-6">
             Se o problema persistir, verifique se os pop-ups estão bloqueados ou entre em contato com o suporte.
           </p>
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button
               onClick={() => {
                 pollAttemptsRef.current = 0;
@@ -234,11 +234,11 @@ export default function Payment() {
                 setIsProcessing(false);
                 void handleStripeCheckout();
               }}
-              className="bg-calcularq-blue hover:bg-[#002366] text-white"
+              className="w-full bg-calcularq-blue text-white hover:bg-[#002366] sm:w-auto"
             >
               Tentar novamente
             </Button>
-            <Button onClick={() => navigate(createPageUrl("Home"))} className="border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">
+            <Button onClick={() => navigate(createPageUrl("Home"))} className="w-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 sm:w-auto">
               Voltar
             </Button>
           </div>

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /calculator
+Disallow: /manual
+Disallow: /login
+Disallow: /reset-password
+Disallow: /payment
+Disallow: /budgets
+Disallow: /admin
+
+Sitemap: https://calcularq.com.br/sitemap.xml

@@ -189,6 +189,7 @@ export default function Calculator() {
     loadedClientName,
     loadedProjectName,
     loadedBudgetDescription,
+    loadedMethodVersion,
   } = useCalculatorBudgetData({
     userId: user?.id ?? null,
     budgetId,
@@ -332,6 +333,7 @@ export default function Calculator() {
     horasManuais,
     commercialDiscount,
     variableExpenses,
+    methodVersion: loadedMethodVersion,
     setEstimatedHours,
   });
 
@@ -900,20 +902,20 @@ export default function Calculator() {
         </div>
 
         {/* Navegação */}
-        <div className="flex items-center justify-between mt-6">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors
+            className={`flex w-full items-center justify-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-lg font-medium text-sm transition-colors sm:w-auto
               ${currentStep === 1 ? "text-slate-300 cursor-not-allowed" : "text-slate-600 hover:bg-slate-100"}`}
           >
             <ChevronLeft className="w-4 h-4" />
             Etapa anterior
           </button>
 
-          <span className="text-xs text-slate-400 lg:hidden">{currentStep} de {STEPS.length}</span>
+          <span className="hidden text-xs text-slate-400 sm:inline lg:hidden">{currentStep} de {STEPS.length}</span>
 
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex w-full flex-col items-end gap-1 sm:w-auto">
             {currentStep < STEPS.length ? (
               <>
                 {!canAdvance ? (
@@ -922,7 +924,7 @@ export default function Calculator() {
                 <button
                   onClick={handleNext}
                   disabled={!canAdvance}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors
+                  className={`flex w-full items-center justify-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors sm:w-auto
                     ${canAdvance ? "bg-calcularq-blue text-white hover:bg-calcularq-blue/90 shadow-sm" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}
                 >
                   Próxima etapa
@@ -970,7 +972,7 @@ export default function Calculator() {
             <button
               type="button"
               onClick={() => setImportStepDialogOpen(false)}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
               Cancelar
             </button>
@@ -978,7 +980,7 @@ export default function Calculator() {
               type="button"
               onClick={handleImportCurrentStepWithFeedback}
               disabled={!selectedImportBudget}
-              className="inline-flex items-center justify-center rounded-lg bg-calcularq-blue px-4 py-2 text-sm font-semibold text-white hover:bg-calcularq-blue/90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-calcularq-blue px-4 py-2 text-sm font-semibold text-white hover:bg-calcularq-blue/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Importar etapa
             </button>

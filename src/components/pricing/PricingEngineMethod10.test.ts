@@ -155,7 +155,7 @@ describe("PricingEngineMethod12 (Metodo 1.2)", () => {
     const htAjRaw = 40 * (1 + 0.1 + premio);
     expect(noObra.preco_h50).toBe(Number((noObra.h50 * htAjRaw).toFixed(2)));
     expect(noObra.preco_conservador).toBe(Number((noObra.h_cons * htAjRaw).toFixed(2)));
-    expect(noObra.method_version).toBe("1.2.0");
+    expect(noObra.method_version).toBe("1.0");
   });
 
   it("gera snapshot numerico esperado para microprojeto de 7m²", () => {

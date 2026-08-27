@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Budget } from "@/lib/api";
 import { fadeUp } from "@/lib/motion";
+import { usesPercentComplexityScore } from "@/lib/methodVersion";
 
 type Props = {
   budget: Budget;
@@ -26,17 +27,14 @@ export default function BudgetCard({
   onOpenCloseProject,
   onRequestDelete,
 }: Props) {
-  const finalPrice =
-    typeof budget.data?.hFinal === "number" &&
-    Number.isFinite(budget.data.hFinal) &&
-    typeof budget.data?.results?.adjustedHourlyRate === "number"
-      ? budget.data.hFinal * budget.data.results.adjustedHourlyRate
-      : budget.data.results.finalSalePrice;
+  const finalPrice = budget.data.results.finalSalePrice;
 
   const complexityScore =
     typeof budget.data?.scoreComplexidade === "number" && Number.isFinite(budget.data.scoreComplexidade)
       ? Math.round(budget.data.scoreComplexidade)
-      : Math.round((budget.data.results.globalComplexity || 0) * 20);
+      : Math.round(
+          (budget.data.results.globalComplexity || 0) * (usesPercentComplexityScore(budget.data.methodVersion) ? 100 : 20)
+        );
 
   const hoursLabel =
     typeof budget.data?.hFinal === "number" && Number.isFinite(budget.data.hFinal)

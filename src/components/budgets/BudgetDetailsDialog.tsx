@@ -3,6 +3,7 @@ import type { Budget } from "@/lib/api";
 import AppDialog from "@/components/ui/AppDialog";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
+import { getMethodVersionLabel, usesPercentComplexityScore } from "@/lib/methodVersion";
 
 type DetailPreview = {
   scoreComplexidade: number;
@@ -172,9 +173,17 @@ export default function BudgetDetailsDialog({
                     {detailPreview?.scoreComplexidade ?? (
                       typeof selectedBudget.data.scoreComplexidade === "number" && Number.isFinite(selectedBudget.data.scoreComplexidade)
                         ? Math.round(selectedBudget.data.scoreComplexidade)
-                        : Math.round((selectedBudget.data.results.globalComplexity || 0) * 20)
+                        : Math.round(
+                            (selectedBudget.data.results.globalComplexity || 0) *
+                              (usesPercentComplexityScore(selectedBudget.data.methodVersion) ? 100 : 20)
+                          )
                     )}/100
                   </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-slate-500">Método</span>
+                  <span className="font-semibold text-slate-800">{getMethodVersionLabel(selectedBudget.data.methodVersion)}</span>
                 </div>
 
                 <div className="flex items-center justify-between gap-3 text-sm">
@@ -200,7 +209,9 @@ export default function BudgetDetailsDialog({
 
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-500">Horas estimadas</span>
-                  <span className="font-semibold text-slate-800">{selectedBudget.data.estimatedHours}h</span>
+                  <span className="font-semibold text-slate-800">
+                    {selectedBudget.data.hFinal ?? selectedBudget.data.estimatedHours}h
+                  </span>
                 </div>
 
                 {detailPreview && detailPreview.totalVariableExpenses > 0 ? (
