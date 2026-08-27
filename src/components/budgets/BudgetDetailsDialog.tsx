@@ -3,7 +3,7 @@ import type { Budget } from "@/lib/api";
 import AppDialog from "@/components/ui/AppDialog";
 import SectionHeader from "@/components/calculator/SectionHeader";
 import { Button } from "@/components/ui/button";
-import { getMethodVersionLabel, usesPercentComplexityScore } from "@/lib/methodVersion";
+import { usesPercentComplexityScore } from "@/lib/methodVersion";
 
 type DetailPreview = {
   scoreComplexidade: number;
@@ -179,11 +179,6 @@ export default function BudgetDetailsDialog({
                           )
                     )}/100
                   </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-slate-500">Método</span>
-                  <span className="font-semibold text-slate-800">{getMethodVersionLabel(selectedBudget.data.methodVersion)}</span>
                 </div>
 
                 <div className="flex items-center justify-between gap-3 text-sm">
