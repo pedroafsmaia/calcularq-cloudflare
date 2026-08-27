@@ -77,7 +77,8 @@ export default function Layout({ children }: LayoutProps) {
     const path = location.pathname.toLowerCase();
     let pageTitle = "";
 
-    if (path === "/" || path === "/home" || path.includes("home")) pageTitle = "Home";
+    // A página inicial usa somente a marca no título, sem o sufixo "Home".
+    if (path === "/" || path === "/home" || path.includes("home")) pageTitle = "";
     else if (path === "/calculator" || path.includes("calculator")) pageTitle = "Calculadora";
     else if (path === "/manual" || path.includes("manual")) pageTitle = "Manual";
     else if (path === "/budgets" || path.includes("budgets")) pageTitle = "Meus cálculos";
