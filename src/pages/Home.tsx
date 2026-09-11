@@ -14,7 +14,8 @@ export default function Home() {
   const prefersReducedMotion = !!useReducedMotion();
 
   useEffect(() => {
-    if (!isPaymentRequired || user?.canAccess) {
+    // O widget é uma prova social para quem ainda não entrou na plataforma.
+    if (user) {
       return;
     }
 
@@ -166,7 +167,7 @@ export default function Home() {
                   Precifique seus projetos de arquitetura com inteligência. A Calcularq é uma ferramenta que evolui com você, alinhando seus cálculos à complexidade de cada projeto.
                 </p>
 
-                {isPaymentRequired && !user?.canAccess ? (
+                {!user ? (
                   <div className="mb-4 flex items-center justify-center sm:mb-5">
                     <div
                       className="senja-embed"
